@@ -12,11 +12,11 @@ before_install:
   - sudo apt-get update -qq
 
 install: 
-  - sudo apt-get install -qq g++-6
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+  - sudo apt-get install -qq g++-7
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
   - sudo apt-get install -qq cppcheck
 
 script: 
-  - g++ test/test_autodiff.cpp -std=c++17 -Iinclude -Wall -o test_autodiff
+  - g++ test/test_autodiff.cpp -std=c++1z -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
   - cppcheck --quiet --error-exitcode=1 .

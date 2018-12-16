@@ -1,0 +1,21 @@
+language: cpp
+compiler: gcc
+dist: trusty
+
+addons: 
+  apt: 
+    sources: boost-latest
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+
+install: 
+  - sudo apt-get install -qq g++-6
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+  - sudo apt-get install -qq cppcheck
+
+script: 
+  - g++ test/test_autodiff.cpp -std=c++1z -Iinclude -Wall -o test_autodiff
+  - ./test_autodiff
+  - cppcheck --quiet --error-exitcode=1 .

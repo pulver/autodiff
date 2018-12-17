@@ -4,7 +4,7 @@
 
 ## Introduction and Quick-Start Examples
 
-Autodiff is a C++ header-only library to facilitate the [automatic differentation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
+Autodiff is a C++ header-only library to facilitate the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
 
 See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) for more details.
 

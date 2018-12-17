@@ -108,7 +108,7 @@ class dimension
     // RealType(cr) | RealType | RealType is copy constructible.
     dimension(const dimension<RealType,Order>&) = default;
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
-    explicit dimension(const root_type&); // Initialize a variable of differentation.
+    explicit dimension(const root_type&); // Initialize a variable of differentiation.
     explicit dimension(const std::initializer_list<root_type>&); // Initialize a constant.
     // r = cr | RealType& | Assignment operator.
     dimension<RealType,Order>& operator=(const dimension<RealType,Order>&) = default;

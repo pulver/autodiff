@@ -353,7 +353,7 @@ template<typename RealType,size_t Order,size_t Depth>
 struct type_at<dimension<RealType,Order>,Depth>
 {
     using type =
-        typename std::conditional<Depth,typename type_at<RealType,Depth-1>::type,dimension<RealType,Order>>::type;
+        typename std::conditional<Depth==0,dimension<RealType,Order>,typename type_at<RealType,Depth-1>::type>::type;
 };
 
 // Compile-time test for dimension<> type.

@@ -1,22 +1,45 @@
 language: cpp
-compiler: gcc
-dist: trusty
 
-addons: 
-  apt: 
-    packages:
-      - libboost-dev
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - cppcheck
+            - libboost-dev
+            - libstdc++-7-dev
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - cppcheck
+            - libboost-dev
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+#   - os: osx # Does not recognize constexpr if statements.
+#     osx_image: xcode8
+#     env:
+#       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && CC=gcc-7 && CXX=g++-7 && COMPILER=g++ && STD=c++1z"
 
 before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
+  - eval "${MATRIX_EVAL}"
 
-install: 
-  - sudo apt-get install -qq g++-7
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
-  - sudo apt-get install -qq cppcheck
-
-script: 
-  - g++ test/test_autodiff.cpp -std=c++1z -Iinclude -Wall -o test_autodiff
+script:
+  - echo $COMPILER
+  - $CXX test/test_autodiff.cpp -std=c++17 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
   - cppcheck --quiet --error-exitcode=1 .

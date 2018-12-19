@@ -11,7 +11,6 @@
 template<typename W,typename X,typename Y,typename Z>
 auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
 {
-    using namespace boost::math::autodiff;
     using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
 }
@@ -62,7 +61,7 @@ BOOST_AUTO_TEST_CASE(assignment)
 	boost::math::autodiff::variable<double,m,n> empty; // Uninitialized variable<> may have non-zero values.
 	// Single variable
 	auto x = boost::math::autodiff::variable<double,m>(cx);
-	empty = x; // Test assignment operator of single-variable to double-variable.
+	empty = static_cast<decltype(empty)>(x); // Test static_cast of single-variable to double-variable type.
 	for (int i=0 ; i<=m ; ++i)
 		for (int j=0 ; j<=n ; ++j)
 			if (i==0 && j==0)
@@ -225,7 +224,7 @@ BOOST_AUTO_TEST_CASE(unary_signs)
 	boost::math::autodiff::variable<double,m,n> lhs;
 	// Single variable
 	const auto x = boost::math::autodiff::variable<double,m>(cx);
-	lhs = -x;
+	lhs = static_cast<decltype(lhs)>(-x);
 	for (int i=0 ; i<=m ; ++i)
 		for (int j=0 ; j<=n ; ++j)
 			if (i==0 && j==0)
@@ -234,7 +233,7 @@ BOOST_AUTO_TEST_CASE(unary_signs)
 				BOOST_REQUIRE(lhs.derivative(i,j) == -1.0);
 			else
 				BOOST_REQUIRE(lhs.derivative(i,j) == 0.0);
-	lhs = +x;
+	lhs = static_cast<decltype(lhs)>(+x);
 	for (int i=0 ; i<=m ; ++i)
 		for (int j=0 ; j<=n ; ++j)
 			if (i==0 && j==0)

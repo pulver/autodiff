@@ -4,7 +4,6 @@
 template<typename W,typename X,typename Y,typename Z>
 auto f(const W& w, const X& x, const Y& y, const Z& z)
 {
-  using namespace boost::math::autodiff;
   using namespace std;
   return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
 }

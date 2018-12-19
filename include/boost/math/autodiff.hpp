@@ -60,7 +60,9 @@ using a data type with greater precision.
  *
  */
 
-#pragma once
+#ifndef BOOST_MATH_AUTODIFF_HPP
+#define BOOST_MATH_AUTODIFF_HPP
+
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/tools/promotion.hpp>
 
@@ -110,10 +112,10 @@ class dimension
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
     explicit dimension(const root_type&); // Initialize a variable of differentiation.
     explicit dimension(const std::initializer_list<root_type>&); // Initialize a constant.
+    template<typename RealType2,size_t Order2>
+    explicit dimension<RealType,Order>(const dimension<RealType2,Order2>&);
     // r = cr | RealType& | Assignment operator.
     dimension<RealType,Order>& operator=(const dimension<RealType,Order>&) = default;
-    template<typename RealType2,size_t Order2>
-    dimension<RealType,Order>& operator=(const dimension<RealType2,Order2>&);
     // r = ca | RealType& | Assignment operator from the arithmetic types.
     dimension<RealType,Order>& operator=(const root_type&); // Set a constant.
     // r += cr | RealType& | Adds cr to r.
@@ -371,7 +373,7 @@ dimension<RealType,Order>::dimension(const root_type& ca)
 :    v{{static_cast<RealType>(ca)}}
 {
     if constexpr (depth() == 1 && 0 < Order)
-        v[1] = static_cast<root_type>(1); // Set epsilon coefficient =1.
+        v[1] = static_cast<root_type>(1); // Set epsilon coefficient = 1.
 }
 
 template<typename RealType,size_t Order>
@@ -384,13 +386,16 @@ dimension<RealType,Order>::dimension(const std::initializer_list<root_type>& lis
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-dimension<RealType,Order>& dimension<RealType,Order>::operator=(const dimension<RealType2,Order2>& cr)
+dimension<RealType,Order>::dimension(const dimension<RealType2,Order2>& cr)
 {
-    for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
-        v[i] = cr.v[i];
+    if constexpr (is_dimension<RealType2>::value)
+        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+            v[i] = RealType(cr.v[i]);
+    else
+        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+            v[i] = cr.v[i];
     if constexpr (Order2 < Order)
         std::fill(v.begin()+(Order2+1), v.end(), RealType{0});
-    return *this;
 }
 
 template<typename RealType,size_t Order>
@@ -479,8 +484,7 @@ dimension<RealType,Order>& dimension<RealType,Order>::operator/=(const dimension
 template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::operator/=(const root_type& ca)
 {
-    for (RealType& x : v)
-        x /= ca;
+    std::for_each(v.begin(), v.end(), [&ca](RealType& x) { x /= ca; });
     return *this;
 }
 
@@ -992,7 +996,6 @@ dimension<RealType,Order> abs(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
 {
-    // Why using namespace std doesn't work here? Compiler won't match to std::ceil().
     if constexpr (is_dimension<RealType>::value)
         return dimension<RealType,Order>{ceil(cr.at(0))}; // constant with all epsilon terms zero.
     else
@@ -1002,7 +1005,6 @@ dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> floor(const dimension<RealType,Order>& cr)
 {
-    // Why using namespace std doesn't work here? Compiler won't match to std::floor().
     if constexpr (is_dimension<RealType>::value)
         return dimension<RealType,Order>{floor(cr.at(0))}; // constant with all epsilon terms zero.
     else
@@ -1250,3 +1252,5 @@ struct promote_args_2<RealType0,autodiff::dimension<RealType1,Order1>>
 };
 
 } } } // namespace boost::math::tools
+
+#endif // BOOST_MATH_AUTODIFF_HPP

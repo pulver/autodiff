@@ -1,0 +1,7 @@
+f[w_,x_,y_,z_] := Exp[w*Sin[x*Log[y]/z] + Sqrt[w*z/(x*y)]] + w*w/Tan[z];
+
+{Nw, Nx, Ny, Nz} = {3, 2, 4, 3} (* Max derivative order for each variable *)
+
+N[D[f[w,x,y,z],{w,Nw},{x,Nx},{y,Ny},{z,Nz}] /. {w->11, x->12, y->13, z->14},102]
+
+(* Output: 1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314 *)

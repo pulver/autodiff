@@ -26,6 +26,14 @@
  *
  * <hr>
  *
+ * \subsection multiprecision Multi-variable mixed partial derivatives with boost::multiprecision
+ * <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
+ * with a precision of about 100 decimal digits, where
+\f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
+ * \include multiprecision.cpp
+ *
+ * <hr>
+ *
  * \subsection multi-variable Multi-variable mixed partial derivatives
  * <h3>Calculate mixed partial derivatives of
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
@@ -47,6 +55,7 @@ Out of the 240 calculated values, the maximum relative error between the values 
 the Boost Autodiff library is found to be about \f$6.82\times10^{-13}\f$ using the standard IEEE double precision
 floating point data type. Since the data type is a template variable, the error can be reduced arbitrarily by
 using a data type with greater precision.
+
  *
  * <hr>
  *
@@ -66,6 +75,7 @@ using a data type with greater precision.
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/tools/promotion.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <functional>
@@ -996,32 +1006,30 @@ dimension<RealType,Order> abs(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return dimension<RealType,Order>{ceil(cr.at(0))}; // constant with all epsilon terms zero.
-    else
-        return dimension<RealType,Order>{std::ceil(cr.at(0))}; // constant with all epsilon terms zero.
+    using std::ceil;
+    return dimension<RealType,Order>{ceil(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> floor(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return dimension<RealType,Order>{floor(cr.at(0))}; // constant with all epsilon terms zero.
-    else
-        return dimension<RealType,Order>{std::floor(cr.at(0))}; // constant with all epsilon terms zero.
+    using std::floor;
+    return dimension<RealType,Order>{floor(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> exp(const dimension<RealType,Order>& cr)
 {
+    using std::exp;
     using root_type = typename dimension<RealType,Order>::root_type;
-    const root_type d0 = std::exp(static_cast<root_type>(cr));
+    const root_type d0 = exp(static_cast<root_type>(cr));
     return cr.apply_with_horner([&d0](size_t) { return d0; });
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const typename dimension<RealType,Order>::root_type& y)
 {
+    using std::pow;
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     std::array<root_type,order+1> derivatives; // array of derivatives
@@ -1030,7 +1038,7 @@ dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const typename 
     root_type coef = 1;
     for (; i<=order && coef!=0 ; ++i)
     {
-        derivatives[i] = coef * std::pow(x0, y-i);
+        derivatives[i] = coef * pow(x0, y-i);
         coef *= y - i;
     }
     return x.apply([&derivatives,i](size_t j) { return j < i ? derivatives[j] : 0; });
@@ -1039,7 +1047,8 @@ dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const typename 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> pow(const typename dimension<RealType,Order>::root_type& x,const dimension<RealType,Order>& y)
 {
-    return exp(y*std::log(x));
+    using std::log;
+    return exp(y*log(x));
 }
 
 template<typename RealType1,size_t Order1,typename RealType2,size_t Order2>
@@ -1059,9 +1068,10 @@ dimension<RealType,Order> sqrt(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
 {
+    using std::log;
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
-    const root_type d0 = std::log(static_cast<root_type>(cr));
+    const root_type d0 = log(static_cast<root_type>(cr));
     if constexpr (order == 0)
         return dimension<RealType,0>(d0);
     else
@@ -1074,27 +1084,32 @@ dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> frexp(const dimension<RealType,Order>& cr, int* exp)
 {
+    using std::exp2;
+    using std::frexp;
     using root_type = typename dimension<RealType,Order>::root_type;
-    std::frexp(static_cast<root_type>(cr), exp);
-    return cr * std::exp2(-*exp);
+    frexp(static_cast<root_type>(cr), exp);
+    return cr * exp2(-*exp);
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> ldexp(const dimension<RealType,Order>& cr, int exp)
 {
-    return cr * std::exp2(exp);
+    using std::exp2;
+    return cr * exp2(exp);
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
 {
+    using std::cos;
+    using std::sin;
     using root_type = typename dimension<RealType,Order>::root_type;
-    const root_type d0 = std::cos(static_cast<root_type>(cr));
+    const root_type d0 = cos(static_cast<root_type>(cr));
     if constexpr (dimension<RealType,Order>::order_sum() == 0)
         return dimension<RealType,0>(d0);
     else
     {
-        const root_type d1 = -std::sin(static_cast<root_type>(cr));
+        const root_type d1 = -sin(static_cast<root_type>(cr));
         const root_type derivatives[] { d0, d1, -d0, -d1 };
         return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
     }
@@ -1103,13 +1118,15 @@ dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
 {
+    using std::sin;
+    using std::cos;
     using root_type = typename dimension<RealType,Order>::root_type;
-    const root_type d0 = std::sin(static_cast<root_type>(cr));
+    const root_type d0 = sin(static_cast<root_type>(cr));
     if constexpr (dimension<RealType,Order>::order_sum() == 0)
         return dimension<RealType,0>(d0);
     else
     {
-        const root_type d1 = std::cos(static_cast<root_type>(cr));
+        const root_type d1 = cos(static_cast<root_type>(cr));
         const root_type derivatives[] { d0, d1, -d0, -d1 };
         return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
     }
@@ -1118,9 +1135,10 @@ dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> asin(const dimension<RealType,Order>& cr)
 {
+    using std::asin;
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
-    const root_type d0 = std::asin(static_cast<root_type>(cr));
+    const root_type d0 = asin(static_cast<root_type>(cr));
     if constexpr (order == 0)
         return dimension<RealType,0>(d0);
     else
@@ -1141,9 +1159,10 @@ dimension<RealType,Order> tan(const dimension<RealType,Order>& cr)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> atan(const dimension<RealType,Order>& cr)
 {
+    using std::atan;
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
-    const root_type d0 = std::atan(static_cast<root_type>(cr));
+    const root_type d0 = atan(static_cast<root_type>(cr));
     if constexpr (order == 0)
         return dimension<RealType,0>(d0);
     else
@@ -1158,53 +1177,44 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order>
     fmod(const dimension<RealType,Order>& cr, const typename dimension<RealType,Order>::root_type& ca)
 {
+    using std::fmod;
     using root_type = typename dimension<RealType,Order>::root_type;
-    return dimension<RealType,Order>(cr).set_root(0) += std::fmod(static_cast<root_type>(cr), ca);
+    return dimension<RealType,Order>(cr).set_root(0) += fmod(static_cast<root_type>(cr), ca);
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> round(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return dimension<RealType,Order>{round(cr.at(0))}; // constant with all epsilon terms zero.
-    else
-        return dimension<RealType,Order>{std::round(cr.at(0))}; // constant with all epsilon terms zero.
+    using std::round;
+    return dimension<RealType,Order>{round(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
 long lround(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return lround(cr.at(0));
-    else
-        return std::lround(cr.at(0));
+    using std::lround;
+    return lround(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
 long long llround(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return llround(cr.at(0));
-    else
-        return std::llround(cr.at(0));
+    using std::llround;
+    return llround(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> trunc(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return dimension<RealType,Order>{trunc(cr.at(0))}; // constant with all epsilon terms zero.
-    else
-        return dimension<RealType,Order>{std::trunc(cr.at(0))}; // constant with all epsilon terms zero.
+    using std::trunc;
+    return dimension<RealType,Order>{trunc(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
 long double truncl(const dimension<RealType,Order>& cr)
 {
-    if constexpr (is_dimension<RealType>::value)
-        return truncl(cr.at(0));
-    else
-        return std::truncl(cr.at(0));
+    using std::truncl;
+    return truncl(cr.at(0));
 }
 
 template<typename RealType,size_t Order>

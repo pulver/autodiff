@@ -2,6 +2,7 @@
 
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
@@ -897,6 +898,27 @@ BOOST_AUTO_TEST_CASE(mixed_partials)
             for (int iy=0 ; iy<=Ny ; ++iy)
                 for (int iz=0 ; iz<=Nz ; ++iz)
                     BOOST_REQUIRE_CLOSE(v.derivative(iw,ix,iy,iz), answers[ia++], tolerance);
+}
+
+BOOST_AUTO_TEST_CASE(multiprecision)
+{
+    constexpr double tolerance = 100e-98; // percent
+    using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
+    // Calculated from Mathematica symbolic differentiation. See example/multiprecision.nb for script.
+    const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
+    constexpr int Nw=3;
+    constexpr int Nx=2;
+    constexpr int Ny=4;
+    constexpr int Nz=3;
+    const boost::math::autodiff::variable<cpp_dec_float_100,Nw> w(11);
+    const boost::math::autodiff::variable<cpp_dec_float_100,0,Nx> x(12);
+    const boost::math::autodiff::variable<cpp_dec_float_100,0,0,Ny> y(13);
+    const boost::math::autodiff::variable<cpp_dec_float_100,0,0,0,Nz> z(14);
+    const auto v = mixed_partials_f(w,x,y,z); // auto = boost::math::autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>
+    // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, tolerance); Doesn't compile on travis-ci trusty.
+    using std::fabs;
+    const cpp_dec_float_100 relative_error = fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1);
+    BOOST_REQUIRE(100*relative_error.convert_to<double>() < tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

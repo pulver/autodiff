@@ -82,9 +82,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:af2f233a0c7adfed89492c791e5552c24"><td class="memItemLeft" align="right" valign="top"><a id="af2f233a0c7adfed89492c791e5552c24"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> = typename std::conditional&lt; Depth, typename <a class="el" href="structboost_1_1math_1_1autodiff_1_1v1_1_1type__at.html">type_at</a>&lt; RealType, Depth-1 &gt;::type, <a class="el" href="classboost_1_1math_1_1autodiff_1_1v1_1_1dimension.html">dimension</a>&lt; RealType, Order &gt; &gt;::type</td></tr>
-<tr class="separator:af2f233a0c7adfed89492c791e5552c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c4e6b3837d9ee6c76c98a1edcec9a86"><td class="memItemLeft" align="right" valign="top"><a id="a8c4e6b3837d9ee6c76c98a1edcec9a86"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> = typename std::conditional&lt; Depth==0, <a class="el" href="classboost_1_1math_1_1autodiff_1_1v1_1_1dimension.html">dimension</a>&lt; RealType, Order &gt;, typename <a class="el" href="structboost_1_1math_1_1autodiff_1_1v1_1_1type__at.html">type_at</a>&lt; RealType, Depth-1 &gt;::type &gt;::type</td></tr>
+<tr class="separator:a8c4e6b3837d9ee6c76c98a1edcec9a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>include/boost/math/<a class="el" href="autodiff_8hpp_source.html">autodiff.hpp</a></li>

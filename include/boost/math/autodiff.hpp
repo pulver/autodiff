@@ -72,6 +72,7 @@ using a data type with greater precision.
 #ifndef BOOST_MATH_AUTODIFF_HPP
 #define BOOST_MATH_AUTODIFF_HPP
 
+#include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/tools/promotion.hpp>
 
@@ -119,11 +120,12 @@ class dimension
     dimension() = default;
     // RealType(cr) | RealType | RealType is copy constructible.
     dimension(const dimension<RealType,Order>&) = default;
+    // Be aware of implicit casting from one dimension<> type to another by this copy constructor.
+    template<typename RealType2,size_t Order2>
+    dimension<RealType,Order>(const dimension<RealType2,Order2>&);
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
     explicit dimension(const root_type&); // Initialize a variable of differentiation.
     explicit dimension(const std::initializer_list<root_type>&); // Initialize a constant.
-    template<typename RealType2,size_t Order2>
-    explicit dimension<RealType,Order>(const dimension<RealType2,Order2>&);
     // r = cr | RealType& | Assignment operator.
     dimension<RealType,Order>& operator=(const dimension<RealType,Order>&) = default;
     // r = ca | RealType& | Assignment operator from the arithmetic types.
@@ -350,6 +352,12 @@ dimension<RealType,Order> trunc(const dimension<RealType,Order>&);
 template<typename RealType,size_t Order>
 long double truncl(const dimension<RealType,Order>&);
 
+// Additional functions
+template<typename RealType,size_t Order>
+dimension<RealType,Order> acos(const dimension<RealType,Order>&);
+template<typename RealType,size_t Order>
+dimension<RealType,Order> erfc(const dimension<RealType,Order>&);
+
 template<typename RealType,size_t Order>
 struct nested_dimensions<RealType,Order> { using type = dimension<RealType,Order>; };
 
@@ -374,6 +382,20 @@ struct is_dimension : std::false_type {};
 template<typename RealType,size_t Order>
 struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 
+template<typename RealType,size_t Order>
+template<typename RealType2,size_t Order2>
+dimension<RealType,Order>::dimension(const dimension<RealType2,Order2>& cr)
+{
+    if constexpr (is_dimension<RealType2>::value)
+        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+            v[i] = RealType(cr.v[i]);
+    else
+        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+            v[i] = cr.v[i];
+    if constexpr (Order2 < Order)
+        std::fill(v.begin()+(Order2+1), v.end(), RealType{0});
+}
+
 // Note difference between arithmetic constructors and arithmetic assignment:
 //  * non-initializer_list arithmetic constructor creates a variable dimension (epsilon coefficient = 1).
 //  * initializer_list arithmetic constructor creates a constant dimension (epsilon coefficient = 0).
@@ -392,20 +414,6 @@ dimension<RealType,Order>::dimension(const std::initializer_list<root_type>& lis
 {
     for (size_t i=0 ; i<std::min(Order+1,list.size()) ; ++i)
         v[i] = *(list.begin()+i);
-}
-
-template<typename RealType,size_t Order>
-template<typename RealType2,size_t Order2>
-dimension<RealType,Order>::dimension(const dimension<RealType2,Order2>& cr)
-{
-    if constexpr (is_dimension<RealType2>::value)
-        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
-            v[i] = RealType(cr.v[i]);
-    else
-        for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
-            v[i] = cr.v[i];
-    if constexpr (Order2 < Order)
-        std::fill(v.begin()+(Order2+1), v.end(), RealType{0});
 }
 
 template<typename RealType,size_t Order>
@@ -617,16 +625,16 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     if constexpr (Order < Order2)
     {
         for (size_t i=1, j=Order2-1 ; i<=Order ; ++i, --j)
-            retval.v[i] = (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero))
-                / cr.v.front();
+            retval.v[i] = (v[i] -
+                std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)) / cr.v.front();
         for (size_t i=Order+1, j=Order2-Order-1 ; i<=Order2 ; ++i, --j)
-            retval.v[i] = -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)
-                / cr.v.front();
+            retval.v[i] =
+                -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero) / cr.v.front();
     }
     else if constexpr (0 < Order2)
         for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
-            retval.v[i] = (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero))
-                / cr.v.front();
+            retval.v[i] =
+                (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero)) / cr.v.front();
     else
         for (size_t i=1 ; i<=Order ; ++i)
             retval.v[i] = v[i] / cr.v.front();
@@ -1227,6 +1235,42 @@ std::ostream& operator<<(std::ostream& out, const dimension<RealType,Order>& dim
         out << (i?',':'(') << dim.v[i];
     out.precision(original_precision);
     return out << ')';
+}
+
+// Additional functions
+
+template<typename RealType,size_t Order>
+dimension<RealType,Order> acos(const dimension<RealType,Order>& cr)
+{
+    using std::acos;
+    using root_type = typename dimension<RealType,Order>::root_type;
+    constexpr size_t order = dimension<RealType,Order>::order_sum();
+    const root_type d0 = acos(static_cast<root_type>(cr));
+    if constexpr (order == 0)
+        return dimension<RealType,0>(d0);
+    else
+    {
+        auto d1 = dimension<root_type,order-1>(static_cast<root_type>(cr));
+        d1 = -sqrt(1-(d1*=d1)).inverse(); // acos'(x) = -1 / sqrt(1-x*x).
+        return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+    }
+}
+
+template<typename RealType,size_t Order>
+dimension<RealType,Order> erfc(const dimension<RealType,Order>& cr)
+{
+    using std::erfc;
+    using root_type = typename dimension<RealType,Order>::root_type;
+    constexpr size_t order = dimension<RealType,Order>::order_sum();
+    const root_type d0 = erfc(static_cast<root_type>(cr));
+    if constexpr (order == 0)
+        return dimension<RealType,0>(d0);
+    else
+    {
+        auto d1 = dimension<root_type,order-1>(static_cast<root_type>(cr));
+        d1 = -2*boost::math::constants::one_div_root_pi<root_type>()*exp(-(d1*=d1)); // erfc'(x)=-2/sqrt(pi)*exp(-x*x)
+        return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+    }
 }
 
 } } } } // namespace boost::math::autodiff::v1

@@ -1,3 +1,7 @@
+//               Copyright Matthew Pulver 2018.
+// Distributed under the Boost Software License, Version 1.0.
+//      (See accompanying file LICENSE_1_0.txt or copy at
+//           https://www.boost.org/LICENSE_1_0.txt)
 #include <boost/math/autodiff.hpp>
 
 #include <boost/math/special_functions/factorials.hpp>
@@ -14,6 +18,38 @@ auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
 {
     using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
+}
+
+// Equations and function/variable names are from
+// https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+//
+// Standard normal probability density function
+template<typename X>
+X phi(const X& x)
+{
+  return boost::math::constants::one_div_root_two_pi<double>()*exp(-0.5*x*x);
+}
+
+// Standard normal cumulative distribution function
+template<typename X>
+X Phi(const X& x)
+{
+  return 0.5*erfc(-boost::math::constants::one_div_root_two<double>()*x);
+}
+
+enum CP { call, put };
+
+// Assume zero annual dividend yield (q=0).
+template<typename Price,typename Sigma,typename Tau,typename Rate>
+auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
+{
+  using namespace std;
+  const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
+  const auto d2 = (log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau));
+  if (cp == call)
+    return S*Phi(d1) - exp(-r*tau)*K*Phi(d2);
+  else
+    return exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1);
 }
 
 BOOST_AUTO_TEST_SUITE(test_autodiff)
@@ -399,6 +435,7 @@ BOOST_AUTO_TEST_CASE(dim2_multiplication_and_subtraction)
 	constexpr double cy = 5.0;
 	const auto y = boost::math::autodiff::variable<double,0,n>(cy);
 	const auto z = x*x - y*y;
+    //std::cout << "z = "<<z<<std::endl;
 	BOOST_REQUIRE(z.derivative(0,0) == cx*cx - cy*cy);
 	BOOST_REQUIRE(z.derivative(0,1) == -2*cy);
 	BOOST_REQUIRE(z.derivative(0,2) == -2.0);
@@ -410,7 +447,10 @@ BOOST_AUTO_TEST_CASE(dim2_multiplication_and_subtraction)
 			if (i==2 && j==0)
 				BOOST_REQUIRE(z.derivative(i,j) == 2.0);
 			else
+            {
+                //std::cout << "z.derivative("<<i<<','<<j<<") = "<<z.derivative(i,j)<<std::endl;
 				BOOST_REQUIRE(z.derivative(i,j) == 0.0);
+            }
 }
 
 BOOST_AUTO_TEST_CASE(inverse)
@@ -755,6 +795,21 @@ BOOST_AUTO_TEST_CASE(cos_and_sin)
 	BOOST_REQUIRE(sin.derivative(5) == std::cos(cx));
 }
 
+BOOST_AUTO_TEST_CASE(acos)
+{
+    constexpr double tolerance = 100e-15; // percent
+	constexpr int m = 5;
+	constexpr double cx = 0.5;
+	auto x = boost::math::autodiff::variable<double,m>(cx);
+	auto y = boost::math::autodiff::acos(x);
+	BOOST_REQUIRE(y.derivative(0) == std::acos(cx));
+	BOOST_REQUIRE_CLOSE(y.derivative(1), -1/std::sqrt(1-cx*cx), tolerance);
+	BOOST_REQUIRE_CLOSE(y.derivative(2), -cx/std::pow(1-cx*cx,1.5), tolerance);
+	BOOST_REQUIRE_CLOSE(y.derivative(3), -(2*cx*cx+1)/std::pow(1-cx*cx,2.5), tolerance);
+	BOOST_REQUIRE_CLOSE(y.derivative(4), -3*cx*(2*cx*cx+3)/std::pow(1-cx*cx,3.5), tolerance);
+	BOOST_REQUIRE_CLOSE(y.derivative(5), -(24*(cx*cx+3)*cx*cx+9)/std::pow(1-cx*cx,4.5), tolerance);
+}
+
 BOOST_AUTO_TEST_CASE(asin)
 {
     constexpr double tolerance = 100e-15; // percent
@@ -919,6 +974,68 @@ BOOST_AUTO_TEST_CASE(multiprecision)
     using std::fabs;
     const cpp_dec_float_100 relative_error = fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1);
     BOOST_REQUIRE(100*relative_error.convert_to<double>() < tolerance);
+}
+
+BOOST_AUTO_TEST_CASE(black_scholes)
+{
+  constexpr double tolerance = 100e-14; // percent
+  using boost::math::autodiff::exp;
+  using boost::math::autodiff::log;
+  using boost::math::autodiff::sqrt;
+  const double K = 100.0; // Strike price
+  const boost::math::autodiff::variable<double,3> S(105); // Stock price.
+  const boost::math::autodiff::variable<double,0,3> sigma(5); // Volatility.
+  const boost::math::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
+  const boost::math::autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
+  const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
+  const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
+  // Compare automatically calculated greeks by autodiff with formulas for greeks.
+  // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+  const double d1 = static_cast<double>((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau)));
+  const double d2 = static_cast<double>((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau)));
+  const double formula_call_delta = +Phi(+d1);
+  const double formula_put_delta  = -Phi(-d1);
+  const double formula_vega = static_cast<double>(S*phi(d1)*sqrt(tau));
+  const double formula_call_theta = static_cast<double>(-S*phi(d1)*sigma/(2*sqrt(tau))-r*K*exp(-r*tau)*Phi(+d2));
+  const double formula_put_theta  = static_cast<double>(-S*phi(d1)*sigma/(2*sqrt(tau))+r*K*exp(-r*tau)*Phi(-d2));
+  const double formula_call_rho = static_cast<double>(+K*tau*exp(-r*tau)*Phi(+d2));
+  const double formula_put_rho  = static_cast<double>(-K*tau*exp(-r*tau)*Phi(-d2));
+  const double formula_gamma = static_cast<double>(phi(d1)/(S*sigma*sqrt(tau)));
+  const double formula_vanna = static_cast<double>(-phi(d1)*d2/sigma);
+  const double formula_charm = static_cast<double>(phi(d1)*(d2*sigma*sqrt(tau)-2*r*tau)/(2*tau*sigma*sqrt(tau)));
+  const double formula_vomma = static_cast<double>(S*phi(d1)*sqrt(tau)*d1*d2/sigma);
+  const double formula_veta = static_cast<double>(-S*phi(d1)*sqrt(tau)*(r*d1/(sigma*sqrt(tau))-(1+d1*d2)/(2*tau)));
+  const double formula_speed = static_cast<double>(-phi(d1)*(d1/(sigma*sqrt(tau))+1)/(S*S*sigma*sqrt(tau)));
+  const double formula_zomma = static_cast<double>(phi(d1)*(d1*d2-1)/(S*sigma*sigma*sqrt(tau)));
+  const double formula_color =
+    static_cast<double>(-phi(d1)/(2*S*tau*sigma*sqrt(tau))*(1+(2*r*tau-d2*sigma*sqrt(tau))*d1/(sigma*sqrt(tau))));
+  const double formula_ultima = -formula_vega*static_cast<double>((d1*d2*(1-d1*d2)+d1*d1+d2*d2)/(sigma*sigma));
+  BOOST_REQUIRE_CLOSE( call_price.derivative(1,0,0,0), formula_call_delta, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(0,1,0,0), formula_vega, tolerance);
+  BOOST_REQUIRE_CLOSE(-call_price.derivative(0,0,1,0), formula_call_theta, tolerance); // minus sign from tau = T-time
+  BOOST_REQUIRE_CLOSE( call_price.derivative(0,0,0,1), formula_call_rho, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(1,0,0,0), formula_put_delta, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(0,1,0,0), formula_vega, tolerance);
+  BOOST_REQUIRE_CLOSE( -put_price.derivative(0,0,1,0), formula_put_theta, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(0,0,0,1), formula_put_rho, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(2,0,0,0), formula_gamma, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(2,0,0,0), formula_gamma, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(1,1,0,0), formula_vanna, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(1,1,0,0), formula_vanna, tolerance);
+  BOOST_REQUIRE_CLOSE(-call_price.derivative(1,0,1,0), formula_charm, tolerance);
+  BOOST_REQUIRE_CLOSE( -put_price.derivative(1,0,1,0), formula_charm, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(0,2,0,0), formula_vomma, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(0,2,0,0), formula_vomma, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(0,1,1,0), formula_veta, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(0,1,1,0), formula_veta, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(3,0,0,0), formula_speed, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(3,0,0,0), formula_speed, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(2,1,0,0), formula_zomma, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(2,1,0,0), formula_zomma, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(2,0,1,0), formula_color, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(2,0,1,0), formula_color, tolerance);
+  BOOST_REQUIRE_CLOSE( call_price.derivative(0,3,0,0), formula_ultima, tolerance);
+  BOOST_REQUIRE_CLOSE(  put_price.derivative(0,3,0,0), formula_ultima, tolerance);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

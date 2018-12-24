@@ -11,9 +11,10 @@
  *
  * <hr>
  *
- * \subsection single-variable Single-variable derivatives
+ * \subsection single-variable Example 1: Single-variable derivatives
  * <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
- * \include fourth_power.cpp
+ * \dontinclude fourth_power.cpp \skip #include
+ * \until **
  * The above calculates \f{array}
 {lrrl}
 {\tt y.derivative(0)} =& f(2) =& \left.x^4\right|_{x=2} &= 16\\
@@ -26,20 +27,32 @@
  *
  * <hr>
  *
- * \subsection multiprecision Multi-variable mixed partial derivatives with boost::multiprecision
+ * \subsection multiprecision Example 2: Multi-variable mixed partial derivatives with multi-precision data type
  * <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
  * with a precision of about 100 decimal digits, where
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
- * \include multiprecision.cpp
+ * \dontinclude multiprecision.cpp \skip #include
+ * \until **
+ *
+ * <hr>
+ * \subsection black-scholes Example 3: Black-Scholes option pricing
+ * <h3>Using the standard Black-Scholes model for pricing European options, calculate call/put prices and greeks.</h3>
+ * https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+ *
+ * One of the primary benefits of using automatic differentiation is the elimination of additional functions to
+calculate derivatives, which is a form of code redundancy.
+ * \dontinclude black_scholes.cpp \skip #include
+ * \until **
  *
  * <hr>
  *
- * \subsection multi-variable Multi-variable mixed partial derivatives
+ * \subsection multi-variable Example 4: Multi-variable mixed partial derivatives
  * <h3>Calculate mixed partial derivatives of
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
 at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
- * \include mixed_partials.cpp
- * The above calculates \f[
+ * \dontinclude mixed_partials.cpp \skip #include
+ * \until **
+ * The above calculates \f[{\tt v.derivative(iw,ix,iy,iz)} =
 \frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
 \qquad\text{for each}\qquad
 (i_w,i_x,i_y,i_z)\in \mathbb{N}_4\times\mathbb{N}_3\times\mathbb{N}_5\times\mathbb{N}_4

@@ -1,7 +1,9 @@
+//               Copyright Matthew Pulver 2018.
+// Distributed under the Boost Software License, Version 1.0.
+//      (See accompanying file LICENSE_1_0.txt or copy at
+//           https://www.boost.org/LICENSE_1_0.txt)
+
 #include <boost/math/autodiff.hpp> // Currently proposed.
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <cmath>
-#include <limits>
 #include <iostream>
 
 // Equations and function/variable names are from
@@ -38,7 +40,7 @@ auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& si
 
 int main()
 {
-  const double K = 100.0; // Strike price
+  const double K = 100.0; // Strike price.
   const boost::math::autodiff::variable<double,3> S(105); // Stock price.
   const boost::math::autodiff::variable<double,0,3> sigma(5); // Volatility.
   const boost::math::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
@@ -179,4 +181,4 @@ autodiff put  color = -0.0184014426606065
 autodiff call ultima = -0.0922426864775683
 autodiff put  ultima = -0.0922426864775683
       formula ultima = -0.0922426864775685
-*/
+**/

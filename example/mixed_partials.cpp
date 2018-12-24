@@ -1,3 +1,8 @@
+//               Copyright Matthew Pulver 2018.
+// Distributed under the Boost Software License, Version 1.0.
+//      (See accompanying file LICENSE_1_0.txt or copy at
+//           https://www.boost.org/LICENSE_1_0.txt)
+
 #include <boost/math/autodiff.hpp> // Currently proposed.
 #include <iostream>
 
@@ -44,4 +49,4 @@ $ g++ -std=c++1z -Iinclude example/mixed_partials.cpp
 Output:
 $ ./a.out
 max_relative_error = 6.82e-13 out of 240 calculated values.
-*/
+**/

@@ -1,3 +1,8 @@
+//               Copyright Matthew Pulver 2018.
+// Distributed under the Boost Software License, Version 1.0.
+//      (See accompanying file LICENSE_1_0.txt or copy at
+//           https://www.boost.org/LICENSE_1_0.txt)
+
 #include <boost/math/autodiff.hpp> // Currently proposed.
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <iostream>
@@ -39,4 +44,4 @@ $ ./a.out
 mathematica   : 1976.319600747797717779881875290418720908121189218754990765825359511118457691105604218209405164232553
 autodiff      : 1976.319600747797717779881875290418720908121189218754990765825359511118457691105604218209405164232566
 relative error: 6.47e-99
-*/
+**/

@@ -1,6 +1,7 @@
 # Autodiff - Automatic Differentiation C++ Library
 
 [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff)
+[![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master)
 
 ## Introduction and Quick-Start Examples
 

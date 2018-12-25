@@ -776,23 +776,24 @@ BOOST_AUTO_TEST_CASE(ldexp)
 
 BOOST_AUTO_TEST_CASE(cos_and_sin)
 {
+    constexpr double tolerance = 100e-15; // percent
 	constexpr int m = 5;
-	constexpr double cx = M_PI/3;
+	constexpr double cx = boost::math::constants::third_pi<double>();
 	const auto x = boost::math::autodiff::variable<double,m>(cx);
 	auto cos = boost::math::autodiff::cos(x);
 	BOOST_REQUIRE(cos.derivative(0) == std::cos(cx));
-	BOOST_REQUIRE(cos.derivative(1) == -std::sin(cx));
-	BOOST_REQUIRE(cos.derivative(2) == -std::cos(cx));
-	BOOST_REQUIRE(cos.derivative(3) == std::sin(cx));
-	BOOST_REQUIRE(cos.derivative(4) == std::cos(cx));
-	BOOST_REQUIRE(cos.derivative(5) == -std::sin(cx));
+	BOOST_REQUIRE_CLOSE(cos.derivative(1), -std::sin(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(cos.derivative(2), -std::cos(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(cos.derivative(3), std::sin(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(cos.derivative(4), std::cos(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(cos.derivative(5), -std::sin(cx), tolerance);
 	auto sin = boost::math::autodiff::sin(x);
 	BOOST_REQUIRE(sin.derivative(0) == std::sin(cx));
-	BOOST_REQUIRE(sin.derivative(1) == std::cos(cx));
-	BOOST_REQUIRE(sin.derivative(2) == -std::sin(cx));
-	BOOST_REQUIRE(sin.derivative(3) == -std::cos(cx));
-	BOOST_REQUIRE(sin.derivative(4) == std::sin(cx));
-	BOOST_REQUIRE(sin.derivative(5) == std::cos(cx));
+	BOOST_REQUIRE_CLOSE(sin.derivative(1), std::cos(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(sin.derivative(2), -std::sin(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(sin.derivative(3), -std::cos(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(sin.derivative(4), std::sin(cx), tolerance);
+	BOOST_REQUIRE_CLOSE(sin.derivative(5), std::cos(cx), tolerance);
 }
 
 BOOST_AUTO_TEST_CASE(acos)
@@ -831,7 +832,7 @@ BOOST_AUTO_TEST_CASE(asin_infinity)
 	auto x = boost::math::autodiff::variable<double,m>(1);
 	auto y = boost::math::autodiff::asin(x);
 	//std::cout << "boost::math::autodiff::asin(1) = " << y << std::endl; // depth(1)(1.5707963267949,inf,inf,-nan,-nan,-nan)
-	BOOST_REQUIRE(y.derivative(0) == M_PI_2);
+	BOOST_REQUIRE(y.derivative(0) == boost::math::constants::half_pi<double>());
 	BOOST_REQUIRE(y.derivative(1) == std::numeric_limits<double>::infinity());
 }
 
@@ -865,7 +866,7 @@ BOOST_AUTO_TEST_CASE(tan)
 {
     constexpr double tolerance = 200e-15; // percent
 	constexpr int m = 5;
-	constexpr double cx = M_PI/3;
+	constexpr double cx = boost::math::constants::third_pi<double>();
 	const auto x = boost::math::autodiff::variable<double,m>(cx);
 	auto y = boost::math::autodiff::tan(x);
 	BOOST_REQUIRE_CLOSE(y.derivative(0), std::sqrt(3), tolerance);
@@ -882,7 +883,7 @@ BOOST_AUTO_TEST_CASE(atan)
 	constexpr double cx = 1.0;
 	const auto x = boost::math::autodiff::variable<double,m>(cx);
 	auto y = boost::math::autodiff::atan(x);
-	BOOST_REQUIRE(y.derivative(0) == M_PI_4);
+	BOOST_REQUIRE(y.derivative(0) == boost::math::constants::pi<double>()/4);
 	BOOST_REQUIRE(y.derivative(1) == 0.5);
 	BOOST_REQUIRE(y.derivative(2) == -0.5);
 	BOOST_REQUIRE(y.derivative(3) == 0.5);

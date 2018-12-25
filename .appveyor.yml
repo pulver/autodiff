@@ -1,0 +1,35 @@
+#               Copyright Matthew Pulver 2018.
+# Distributed under the Boost Software License, Version 1.0.
+#      (See accompanying file LICENSE_1_0.txt or copy at
+#           https://www.boost.org/LICENSE_1_0.txt)
+
+environment:
+  cl: /IC:\Libraries\boost_1_67_0 /EHsc
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars32.bat"
+      STDCXX: c++17
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
+      STDCXX: c++17
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars32.bat"
+      STDCXX: c++latest
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
+      STDCXX: c++latest
+
+install:
+  - call "%INSTALL_SCRIPT%"
+
+build_script:
+  - cl.exe /std:%STDCXX% /Iinclude test/test_autodiff.cpp
+
+test_script:
+  - test_autodiff
+
+# Notes:
+#
+# * Adding /EHsc resolved both warnings:
+#   * C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\xlocale(319): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+#   * c:\libraries\boost_1_67_0\boost\test\impl\execution_monitor.ipp(277) : warning C4717: 'boost::detail::report_error': recursive on all control paths, function will cause runtime stack overflow

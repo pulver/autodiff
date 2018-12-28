@@ -85,7 +85,7 @@ using a data type with greater precision.
 #ifndef BOOST_MATH_AUTODIFF_HPP
 #define BOOST_MATH_AUTODIFF_HPP
 
-#include <boost/config/detail/select_compiler_config.hpp>
+#include <boost/config.hpp>
 #ifdef BOOST_COMPILER_CONFIG
 #include BOOST_COMPILER_CONFIG
 #endif

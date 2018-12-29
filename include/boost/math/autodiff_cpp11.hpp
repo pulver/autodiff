@@ -1058,7 +1058,7 @@ dimension<RealType, Order>
 // If z0=0 then use the regular multiply operator*() instead.
 template<typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca) const
+    const root_type &ca) const
 {
     using tag = Cond<is_dimension<RealType>::value, detail::IsDimensionTag,detail::IsNotDimensionTag>;
     return epsilon_multiply_impl(z0, isum0, ca, tag{});

@@ -276,11 +276,11 @@ private:
         detail::IsNotDimensionTag) const;
 
     dimension<RealType, Order>
-        epsilon_multiply_impl(size_t z0, size_t isum0, const dimension<RealType, Order>::root_type &ca,
+        epsilon_multiply_impl(size_t z0, size_t isum0, const root_type &ca,
         detail::IsDimensionTag) const;
 
     dimension<RealType, Order>
-        epsilon_multiply_impl(size_t z0, size_t isum0, const dimension<RealType, Order>::root_type &ca,
+        epsilon_multiply_impl(size_t z0, size_t isum0, const root_type &ca,
         detail::IsNotDimensionTag) const;
 
     dimension<RealType, Order> inverse_natural_impl(detail::IsDimensionTag) const;
@@ -1066,7 +1066,7 @@ dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply(size_t z
 
 template <typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca, detail::IsDimensionTag) const
+    const root_type &ca, detail::IsDimensionTag) const
 {
     dimension<RealType, Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
@@ -1077,7 +1077,7 @@ dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(siz
 
 template <typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca,detail::IsNotDimensionTag) const
+    const root_type &ca,detail::IsNotDimensionTag) const
 {
     dimension<RealType, Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;

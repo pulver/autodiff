@@ -284,12 +284,13 @@ private:
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
     constexpr dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
+
     constexpr dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>::root_type& ca) const;
     constexpr dimension<RealType,Order> inverse_apply() const;
     constexpr dimension<RealType,Order> inverse_natural() const;
     constexpr dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
-
+  
     template<typename RealType2,size_t Orders2>
     friend class dimension;
     template<typename RealType2,size_t Order2>
@@ -484,10 +485,10 @@ dimension<RealType,Order>& dimension<RealType,Order>::operator*=(const dimension
             v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
     else
     {
-		for (size_t i = 0, j = Order; i <= Order - Order2; ++i, --j)
-			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin() + i, zero);
-		for (size_t i = Order - Order2 + 1, j = Order2 - 1; i <= Order; ++i, --j)
-			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin() + (j + 1), v.crbegin() + i, zero);
+  		for (size_t i = 0, j = Order; i <= Order - Order2; ++i, --j)
+	  		v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin() + i, zero);
+		  for (size_t i = Order - Order2 + 1, j = Order2 - 1; i <= Order; ++i, --j)
+			  v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin() + (j + 1), v.crbegin() + i, zero);
     }
     return *this;
 }

@@ -3,134 +3,6 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-/*!
- * \mainpage
- * \tableofcontents
- *
- * \section quick-start Quick Start Examples
- *
- * <hr>
- *
- * \subsection single-variable Single-variable derivatives
- * <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
- * \include fourth_power.cpp
- * The above calculates \f{array}
-{lrrl}
-{\tt y.derivative(0)} =& f(2) =& \left.x^4\right|_{x=2} &= 16\\
-{\tt y.derivative(1)} =& f'(2) =& \left.4\cdot x^3\right|_{x=2} &= 32\\
-{\tt y.derivative(2)} =& f''(2) =& \left.4\cdot 3\cdot x^2\right|_{x=2} &= 48\\
-{\tt y.derivative(3)} =& f'''(2) =& \left.4\cdot 3\cdot2\cdot x\right|_{x=2} &= 48\\
-{\tt y.derivative(4)} =& f^{(4)}(2) =& 4\cdot 3\cdot2\cdot1 &= 24\\
-{\tt y.derivative(5)} =& f^{(5)}(2) =& 0 &
-\f}
- *
- * <hr>
- *
- * \subsection multiprecision Multi-variable mixed partial derivatives with boost::multiprecision
- * <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
- * with a precision of about 100 decimal digits, where
-\f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
- * \include multiprecision.cpp
- *
- * <hr>
- *
- * \subsection multi-variable Multi-variable mixed partial derivatives
- * <h3>Calculate mixed partial derivatives of
-\f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
-at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
- * \include mixed_partials.cpp
- * The above calculates \f[
-\frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
-\qquad\text{for each}\qquad
-(i_w,i_x,i_y,i_z)\in \mathbb{N}_4\times\mathbb{N}_3\times\mathbb{N}_5\times\mathbb{N}_4
-\f]
-where \f$\mathbb{N}_i=\{0,1,2,...,i-1\}\f$.
-For testing purposes, the \f$4\times3\times5\times4=240\f$-element <code>answers[]</code>
-array was calculated independently by Mathematica (example/mixed_partials.nb) in 2 steps:
-
- 1. <a href="https://reference.wolfram.com/language/tutorial/SymbolicComputation.html">Symbolic differentiation</a>
- 2. <a href="https://reference.wolfram.com/language/tutorial/ArbitraryPrecisionNumbers.html">Arbitrary-precision computation</a> to calculate the answers to 20 decimal places.
-
-Out of the 240 calculated values, the maximum relative error between the values calculated by Mathematica vs.
-/*!
- * \mainpage
- * \tableofcontents
- *
- * \section quick-start Quick Start Examples
- *
- * <hr>
- *
- * \subsection single-variable Example 1: Single-variable derivatives
- * <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
- * \dontinclude fourth_power.cpp \skip #include
- * \until **
- * The above calculates \f{array}
-{lrrl}
-{\tt y.derivative(0)} =& f(2) =& \left.x^4\right|_{x=2} &= 16\\
-{\tt y.derivative(1)} =& f'(2) =& \left.4\cdot x^3\right|_{x=2} &= 32\\
-{\tt y.derivative(2)} =& f''(2) =& \left.4\cdot 3\cdot x^2\right|_{x=2} &= 48\\
-{\tt y.derivative(3)} =& f'''(2) =& \left.4\cdot 3\cdot2\cdot x\right|_{x=2} &= 48\\
-{\tt y.derivative(4)} =& f^{(4)}(2) =& 4\cdot 3\cdot2\cdot1 &= 24\\
-{\tt y.derivative(5)} =& f^{(5)}(2) =& 0 &
-\f}
- *
- * <hr>
- *
- * \subsection multiprecision Example 2: Multi-variable mixed partial derivatives with multi-precision data type
- * <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
- * with a precision of about 100 decimal digits, where
-\f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
- * \dontinclude multiprecision.cpp \skip #include
- * \until **
- *
- * <hr>
- * \subsection black-scholes Example 3: Black-Scholes option pricing
- * <h3>Using the standard Black-Scholes model for pricing European options, calculate call/put prices and greeks.</h3>
- * https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
- *
- * One of the primary benefits of using automatic differentiation is the elimination of additional functions to
-calculate derivatives, which is a form of code redundancy.
- * \dontinclude black_scholes.cpp \skip #include
- * \until **
- *
- * <hr>
- *
- * \subsection multi-variable Example 4: Multi-variable mixed partial derivatives
- * <h3>Calculate mixed partial derivatives of
-\f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
-at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
- * \dontinclude mixed_partials.cpp \skip #include
- * \until **
- * The above calculates \f[{\tt v.derivative(iw,ix,iy,iz)} =
-\frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
-\qquad\text{for each}\qquad
-(i_w,i_x,i_y,i_z)\in \mathbb{N}_4\times\mathbb{N}_3\times\mathbb{N}_5\times\mathbb{N}_4
-\f]
-where \f$\mathbb{N}_i=\{0,1,2,...,i-1\}\f$.
-For testing purposes, the \f$4\times3\times5\times4=240\f$-element <code>answers[]</code>
-array was calculated independently by Mathematica (example/mixed_partials.nb) in 2 steps:
-
- 1. <a href="https://reference.wolfram.com/language/tutorial/SymbolicComputation.html">Symbolic differentiation</a>
- 2. <a href="https://reference.wolfram.com/language/tutorial/ArbitraryPrecisionNumbers.html">Arbitrary-precision computation</a> to calculate the answers to 20 decimal places.
-
-Out of the 240 calculated values, the maximum relative error between the values calculated by Mathematica vs.
-the Boost Autodiff library is found to be about \f$6.82\times10^{-13}\f$ using the standard IEEE double precision
-floating point data type. Since the data type is a template variable, the error can be reduced arbitrarily by
-using a data type with greater precision.
-
- *
- * <hr>
- *
- * \copyright
- * <center>
- *               Copyright &copy; Matthew Pulver 2018.<br/>
- * Distributed under the Boost Software License, Version 1.0.<br/>
- *      (See accompanying file LICENSE_1_0.txt or copy at<br/>
- *           https://www.boost.org/LICENSE_1_0.txt)
- * </center>
- *
- */
-
 #ifndef BOOST_MATH_AUTODIFF_CPP11_HPP
 #define BOOST_MATH_AUTODIFF_CPP11_HPP
 
@@ -340,11 +212,10 @@ public:
     dimension<RealType,Order> apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
 private:
     RealType epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
-    const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
+        const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
     dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
-    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType,Order>::root_type& ca) const;
+        const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0, const root_type& ca) const;
     dimension<RealType,Order> inverse_apply() const;
     dimension<RealType,Order> inverse_natural() const;
     dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
@@ -405,11 +276,11 @@ private:
         detail::IsNotDimensionTag) const;
 
     dimension<RealType, Order>
-        epsilon_multiply_impl(size_t z0, size_t isum0, const dimension<RealType, Order>::root_type &ca,
+        epsilon_multiply_impl(size_t z0, size_t isum0, const root_type &ca,
         detail::IsDimensionTag) const;
 
     dimension<RealType, Order>
-        epsilon_multiply_impl(size_t z0, size_t isum0, const dimension<RealType, Order>::root_type &ca,
+        epsilon_multiply_impl(size_t z0, size_t isum0, const root_type &ca,
         detail::IsNotDimensionTag) const;
 
     dimension<RealType, Order> inverse_natural_impl(detail::IsDimensionTag) const;
@@ -632,18 +503,18 @@ template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
 dimension<RealType,Order>& dimension<RealType,Order>::operator*=(const dimension<RealType2,Order2>& cr)
 {
-	const promote<RealType, RealType2> zero{ 0 };
-	if (Order <= Order2)
-		for (size_t i = 0, j = Order; i <= Order; ++i, --j)
-			v[j] = std::inner_product(v.cbegin(), v.cend() - i, cr.v.crbegin() + i, zero);
-	else
-	{
-		for (size_t i = 0, j = Order; i <= Order - Order2; ++i, --j)
-			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin() + i, zero);
-		for (size_t i = Order - Order2 + 1, j = Order2 - 1; i <= Order; ++i, --j)
-			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin() + (j + 1), v.crbegin() + i, zero);
-	}
-	return *this;
+    const promote<RealType, RealType2> zero{ 0 };
+	  if (Order <= Order2)
+  		for (size_t i = 0, j = Order; i <= Order; ++i, --j)
+	  		v[j] = std::inner_product(v.cbegin(), v.cend() - i, cr.v.crbegin() + i, zero);
+	  else
+	  {
+		  for (size_t i = 0, j = Order; i <= Order - Order2; ++i, --j)
+			  v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin() + i, zero);
+		  for (size_t i = Order - Order2 + 1, j = Order2 - 1; i <= Order; ++i, --j)
+			  v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin() + (j + 1), v.crbegin() + i, zero);
+	  }
+	  return *this;
 }
 
 template<typename RealType,size_t Order>
@@ -1187,7 +1058,7 @@ dimension<RealType, Order>
 // If z0=0 then use the regular multiply operator*() instead.
 template<typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca) const
+    const root_type &ca) const
 {
     using tag = Cond<is_dimension<RealType>::value, detail::IsDimensionTag,detail::IsNotDimensionTag>;
     return epsilon_multiply_impl(z0, isum0, ca, tag{});
@@ -1195,7 +1066,7 @@ dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply(size_t z
 
 template <typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca, detail::IsDimensionTag) const
+    const root_type &ca, detail::IsDimensionTag) const
 {
     dimension<RealType, Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
@@ -1206,7 +1077,7 @@ dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(siz
 
 template <typename RealType, size_t Order>
 dimension<RealType, Order> dimension<RealType, Order>::epsilon_multiply_impl(size_t z0, size_t isum0,
-    const dimension<RealType, Order>::root_type &ca,detail::IsNotDimensionTag) const
+    const root_type &ca,detail::IsNotDimensionTag) const
 {
     dimension<RealType, Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;

@@ -4,26 +4,17 @@
 #           https://www.boost.org/LICENSE_1_0.txt)
 
 environment:
-  cl: /IC:\Libraries\boost_1_67_0 /EHsc
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars32.bat"
-      STDCXX: c++17
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
-      STDCXX: c++17
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars32.bat"
-      STDCXX: c++latest
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      INSTALL_SCRIPT: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat"
-      STDCXX: c++latest
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 64-bit
+      INSTALL_SCRIPT1: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
+      INSTALL_SCRIPT2: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
 
 install:
-  - call "%INSTALL_SCRIPT%"
+  - "%INSTALL_SCRIPT1%"
+  - "%INSTALL_SCRIPT2%"
 
 build_script:
-  - cl.exe /std:%STDCXX% /Iinclude test/test_autodiff.cpp
+  - cl.exe /EHsc /IC:\Libraries\boost_1_67_0 /Iinclude test/test_autodiff.cpp
 
 test_script:
   - test_autodiff

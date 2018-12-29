@@ -492,10 +492,10 @@ dimension<RealType,Order>& dimension<RealType,Order>::operator*=(const dimension
             v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
     else
     {
-        for (size_t i=0, j=Order ; i<=Order2 ; ++i, --j)
+        for (size_t i=0, j=Order ; i<=Order-Order2 ; ++i, --j)
             v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+i, zero);
-        for (size_t i=Order2+1, j=Order-Order2-1 ; i<=Order ; ++i, --j)
-            v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+(i-1), v.crbegin()+i, zero);
+        for (size_t i=Order-Order2+1, j=Order2-1 ; i<=Order ; ++i, --j)
+            v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+(j+1), v.crbegin()+i, zero);
     }
     return *this;
 }

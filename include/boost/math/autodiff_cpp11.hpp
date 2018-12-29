@@ -632,18 +632,18 @@ template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
 dimension<RealType,Order>& dimension<RealType,Order>::operator*=(const dimension<RealType2,Order2>& cr)
 {
-    const promote<RealType,RealType2> zero{0};
-    if (Order <= Order2)
-        for (size_t i=0, j=Order ; i<=Order ; ++i, --j)
-            v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
-    else
-    {
-        for (size_t i=0, j=Order ; i<=Order2 ; ++i, --j)
-            v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+i, zero);
-        for (size_t i=Order2+1, j=Order-Order2-1 ; i<=Order ; ++i, --j)
-            v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+(i-1), v.crbegin()+i, zero);
-    }
-    return *this;
+	const promote<RealType, RealType2> zero{ 0 };
+	if (Order <= Order2)
+		for (size_t i = 0, j = Order; i <= Order; ++i, --j)
+			v[j] = std::inner_product(v.cbegin(), v.cend() - i, cr.v.crbegin() + i, zero);
+	else
+	{
+		for (size_t i = 0, j = Order; i <= Order - Order2; ++i, --j)
+			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin() + i, zero);
+		for (size_t i = Order - Order2 + 1, j = Order2 - 1; i <= Order; ++i, --j)
+			v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin() + (j + 1), v.crbegin() + i, zero);
+	}
+	return *this;
 }
 
 template<typename RealType,size_t Order>

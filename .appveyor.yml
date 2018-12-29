@@ -11,7 +11,7 @@ environment:
       STDCXX: c++11
 
 install:
-  - ps: \& $INSTALL_SCRIPT
+  - ps: $env:INSTALL_SCRIPT
 
 build_script:
   - cl.exe /std:%STDCXX% /Iinclude test/test_autodiff.cpp

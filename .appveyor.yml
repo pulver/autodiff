@@ -3,12 +3,14 @@
 #      (See accompanying file LICENSE_1_0.txt or copy at
 #           https://www.boost.org/LICENSE_1_0.txt)
 
+#CL: /EHsc
+
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 64-bit
+      INCLUDE: 'C:\Libraries\boost_1_67_0'
       INSTALL_SCRIPT1: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
       INSTALL_SCRIPT2: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
-      CL: /IC:\Libraries\boost_1_67_0 /EHsc
 
 install:
   - "%INSTALL_SCRIPT1%"

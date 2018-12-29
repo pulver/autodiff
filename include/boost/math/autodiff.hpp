@@ -293,8 +293,7 @@ private:
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
     dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
-    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
-        const dimension<RealType,Order>::root_type& ca) const;
+    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0, const root_type& ca) const;
     dimension<RealType,Order> inverse_apply() const;
     dimension<RealType,Order> inverse_natural() const;
     dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);

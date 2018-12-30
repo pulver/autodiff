@@ -21,40 +21,16 @@ struct ZeroOrderSumTag {};
 struct NonZeroOrderSumTag {};
 
 template<typename RealType, size_t Order, typename Enable = void>
-struct depth
-{
-	constexpr size_t operator()() const
-	{
-		return 1;
-	}
-};
+struct depth : std::integral_constant<std::size_t, 1> {};
 
 template<typename RealType, size_t Order>
-struct depth<RealType, Order, boost::mp11::mp_void<decltype(RealType::depth())>>
-{
-	constexpr size_t operator()() const
-	{
-		return RealType::depth() + 1;
-	}
-};
+struct depth<RealType, Order, boost::mp11::mp_void<decltype(RealType::depth())>> : std::integral_constant<std::size_t, RealType::depth() + 1> {};
 
 template<typename RealType, size_t Order, typename Enable = void>
-struct order_sum
-{
-	constexpr size_t operator()() const
-	{
-		return Order;
-	}
-};
+struct order_sum : std::integral_constant<std::size_t, Order> {};
 
 template<typename RealType, size_t Order>
-struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>>
-{
-	constexpr size_t operator()() const
-	{
-		return RealType::order_sum() + Order;
-	}
-};
+struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>> : std::integral_constant<std::size_t, RealType::order_sum() + Order> {};
 
 //Borrowed from Kvasir-MPL
 template<bool b = true>
@@ -74,7 +50,7 @@ struct Cond_<false>
 } // namespace detail
 
 template<bool b, typename T, typename U>
-using Cond = typename detail::Cond_<b>::template type<T, U>;
+using Cond = boost::mp11::mp_cond<boost::mp11::mp_bool<b>, T, std::true_type, U>;
 
 // Use variable<> instead of dimension<> or nested_dimensions<>.
 template<typename RealType,size_t Order>
@@ -234,8 +210,8 @@ public:
 
     dimension<RealType,Order> inverse() const; // Multiplicative inverse.
 
-    static constexpr size_t depth(); // = sizeof...(Orders)
-    static constexpr size_t order_sum();
+	using depth = detail::depth<RealType, Order>; // = sizeof...(Orders)
+	using order_sum = detail::order_sum<RealType, Order>;
 
     explicit operator root_type() const;
     dimension<RealType,Order>& set_root(const root_type&);
@@ -998,12 +974,6 @@ dimension<RealType, Order>::at_impl(ZeroOrdersTag, size_t order, Orders...) cons
     return v.at(order);
 }
 
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::depth()
-{
-	return detail::depth<RealType, Order>{}();
-}
-
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
@@ -1115,7 +1085,7 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
-{	
+{
     std::array<root_type, order_sum() + 1> derivatives{}; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
@@ -1188,12 +1158,6 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
             *itr *= ca;
 
     return *this;
- }
-
- template<typename RealType,size_t Order>
- constexpr size_t dimension<RealType,Order>::order_sum()
- {
-	 return detail::order_sum<RealType, Order>{}();
  }
 
  template<typename RealType,size_t Order>
@@ -1347,7 +1311,7 @@ dimension<RealType, Order> detail::cos_impl(const dimension<RealType, Order> &cr
     using root_type = typename dimension<RealType,Order>::root_type;
     const root_type d0 = cos(static_cast<root_type>(cr));
     const root_type d1 = -sin(static_cast<root_type>(cr));
-    const root_type derivatives[]{d0, d1, -d0, -d1};
+    const std::array<root_type, 4> derivatives {d0, d1, -d0, -d1};
     return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i & 3]; });
 }
 
@@ -1369,7 +1333,7 @@ dimension<RealType, Order> detail::sin_impl(const dimension<RealType, Order> &cr
     using root_type = typename dimension<RealType, Order>::root_type;
     const root_type d0 = sin(static_cast<root_type>(cr));
     const root_type d1 = cos(static_cast<root_type>(cr));
-    const root_type derivatives[]{d0, d1, -d0, -d1};
+    const std::array<root_type, 4> derivatives {d0, d1, -d0, -d1};
     return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i & 3]; });
 }
 

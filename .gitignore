@@ -11,3 +11,9 @@
 /autodiff.vcxproj.filters
 /autodiff.vcxproj
 /autodiff.sln
+*.vcxproj
+*.filters
+*.suo
+*.sln
+/autodiff/autodiff.VC.db
+/autodiff.VC.db

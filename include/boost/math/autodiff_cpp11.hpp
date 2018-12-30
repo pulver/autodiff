@@ -32,21 +32,6 @@ struct order_sum : std::integral_constant<std::size_t, Order> {};
 template<typename RealType, size_t Order>
 struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>> : std::integral_constant<std::size_t, RealType::order_sum() + Order> {};
 
-//Borrowed from Kvasir-MPL
-template<bool b = true>
-struct Cond_
-{
-    template<typename T, typename>
-    using type = T;
-};
-
-template<>
-struct Cond_<false>
-{
-    template<typename, typename U>
-    using type = U;
-};
-
 } // namespace detail
 
 template<bool b, typename T, typename U>

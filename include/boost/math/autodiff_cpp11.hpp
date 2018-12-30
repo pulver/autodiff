@@ -6,6 +6,8 @@
 #ifndef BOOST_MATH_AUTODIFF_CPP11_HPP
 #define BOOST_MATH_AUTODIFF_CPP11_HPP
 
+#include <boost/mp11.hpp>
+
 // Automatic Differentiation v1
 namespace boost { namespace math { namespace autodiff { inline namespace v1 { inline namespace detail {
 struct IsDimensionTag    : std::true_type{};
@@ -17,6 +19,42 @@ struct NonZeroOrdersTag {};
 struct ZeroOrdersTag {};
 struct ZeroOrderSumTag {};
 struct NonZeroOrderSumTag {};
+
+template<typename RealType, size_t Order, typename Enable = void>
+struct depth
+{
+	constexpr size_t operator()() const
+	{
+		return 1;
+	}
+};
+
+template<typename RealType, size_t Order>
+struct depth<RealType, Order, boost::mp11::mp_void<decltype(RealType::depth())>>
+{
+	constexpr size_t operator()() const
+	{
+		return RealType::depth() + 1;
+	}
+};
+
+template<typename RealType, size_t Order, typename Enable = void>
+struct order_sum
+{
+	constexpr size_t operator()() const
+	{
+		return Order;
+	}
+};
+
+template<typename RealType, size_t Order>
+struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>>
+{
+	constexpr size_t operator()() const
+	{
+		return RealType::order_sum() + Order;
+	}
+};
 
 //Borrowed from Kvasir-MPL
 template<bool b = true>
@@ -63,7 +101,7 @@ struct type_at { using type = RealType; }; // specialized for dimension<> below.
 template<typename RealType,size_t Order>
 class dimension
 {
-    std::array<RealType,Order+1> v;
+    std::array<RealType,Order+1> v{};
 
 public:
     using root_type = typename root_type_finder<RealType>::type; // RealType in the root dimension<RealType,Order>.
@@ -230,13 +268,7 @@ private:
     dimension<RealType, Order> &set_root_impl(const root_type &, detail::IsDimensionTag);
 
     dimension<RealType, Order> &set_root_impl(const root_type &, detail::IsNotDimensionTag);
-
-    static constexpr size_t depth_impl(detail::IsDimensionTag);
-    static constexpr size_t depth_impl(detail::IsNotDimensionTag);
-
-    static constexpr size_t order_sum_impl(detail::IsDimensionTag);
-    static constexpr size_t order_sum_impl(detail::IsNotDimensionTag);
-
+    
     template<typename RealType2, size_t Order2>
     promote<dimension<RealType, Order>, dimension<RealType2, Order2>>
     promote_plus_impl(const dimension<RealType2, Order2> &, detail::OrderEqOrder2Tag) const;
@@ -969,20 +1001,7 @@ dimension<RealType, Order>::at_impl(ZeroOrdersTag, size_t order, Orders...) cons
 template<typename RealType,size_t Order>
 constexpr size_t dimension<RealType,Order>::depth()
 {
-    using tag = Cond<is_dimension<RealType>::value, detail::IsDimensionTag, detail::IsNotDimensionTag>;
-    return depth_impl(tag{});
-}
-
-template<typename RealType, size_t Order>
-constexpr size_t dimension<RealType, Order>::depth_impl(detail::IsDimensionTag)
-{
-    return 1 + RealType::depth();
-}
-
-template<typename RealType, size_t Order>
-constexpr size_t dimension<RealType, Order>::depth_impl(detail::IsNotDimensionTag)
-{
-    return 1;
+	return detail::depth<RealType, Order>{}();
 }
 
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
@@ -1096,11 +1115,11 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
-{
+{	
     std::array<root_type, order_sum() + 1> derivatives{}; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
-    for (size_t i=1 ; i<=order_sum() ; ++i)
+    for (size_t i=1 ; i<= order_sum(); ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
@@ -1174,20 +1193,7 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
  template<typename RealType,size_t Order>
  constexpr size_t dimension<RealType,Order>::order_sum()
  {
-     using tag = Cond<is_dimension<RealType>::value, detail::IsDimensionTag, detail::IsNotDimensionTag>;
-     return order_sum_impl(tag{});
- }
-
- template<typename RealType, size_t Order>
- constexpr size_t dimension<RealType, Order>::order_sum_impl(IsDimensionTag)
- {
-     return Order + RealType::order_sum();
- }
-
- template<typename RealType, size_t Order>
- constexpr size_t dimension<RealType, Order>::order_sum_impl(IsNotDimensionTag)
- {
-     return Order;
+	 return detail::order_sum<RealType, Order>{}();
  }
 
  template<typename RealType,size_t Order>

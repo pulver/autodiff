@@ -58,7 +58,6 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
-  - sudo apt-cache search libboost
 
 script:
   - $COMPILER --version

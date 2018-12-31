@@ -45,7 +45,7 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
     - os: osx
@@ -56,6 +56,7 @@ matrix:
 
 before_install:
   - eval "${MATRIX_EVAL}"
+  - sudo apt-cache search libboost
 
 script:
   - $COMPILER --version

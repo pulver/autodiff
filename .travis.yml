@@ -30,10 +30,11 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
+            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.67
+            - boost1.68
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"
@@ -45,10 +46,11 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
+            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.67
+            - boost1.68
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"
@@ -72,10 +74,11 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.67
+            - boost1.68
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
     - os: linux
@@ -85,10 +88,11 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.67
+            - boost1.68
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
     - os: osx

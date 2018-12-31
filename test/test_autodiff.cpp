@@ -41,11 +41,13 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r) -> decltype(cp == call ? S*Phi((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - exp(-r*tau)*K*Phi((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))) : exp(-r*tau)*K*Phi(-(log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - S*Phi(-(log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))))
+auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r) 
+		-> decltype(S*Phi((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - exp(-r*tau)*K*Phi((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))))
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
   const auto d2 = (log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau));
+  static_assert(std::is_same<decltype(S*Phi(d1) - exp(-r*tau)*K*Phi(d2)), decltype(exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1))>::value, "decltype(call) != decltype(put)");
   if (cp == call)
     return S*Phi(d1) - exp(-r*tau)*K*Phi(d2);
   else

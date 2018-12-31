@@ -12,7 +12,9 @@
 #include BOOST_COMPILER_CONFIG
 #endif
 
-#ifdef _MSVC_LANG
+#if defined(_MSC_VER) && _MSC_VER >= 1700L && !defined(_MSVC_LANG)
+#define BOOST_MATH_AUTODIFF_CPP_STD 201103L
+#elif defined(_MSVC_LANG)
 #define BOOST_MATH_AUTODIFF_CPP_STD _MSVC_LANG
 #else
 #define BOOST_MATH_AUTODIFF_CPP_STD __cplusplus

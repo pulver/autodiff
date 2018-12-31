@@ -33,7 +33,7 @@ matrix:
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
+            - boost1.67
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"
@@ -48,7 +48,7 @@ matrix:
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
+            - boost1.67
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"
@@ -75,7 +75,7 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
     - os: linux
@@ -88,7 +88,7 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
     - os: osx

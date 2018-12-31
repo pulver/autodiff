@@ -10,8 +10,16 @@
 
 // Automatic Differentiation v1
 namespace boost { namespace math { namespace autodiff { inline namespace v1 { inline namespace detail {
-struct IsDimensionTag    : std::true_type{};
-struct IsNotDimensionTag : std::false_type{};
+
+template<bool b>
+using mp_bool = boost::mp11::mp_bool<b>;
+template<size_t i>
+using mp_size_t = boost::mp11::mp_size_t<i>;
+template<class... T>
+using mp_void = boost::mp11::mp_void<T...>;
+
+using  IsDimensionTag     = mp_bool<true>;
+using  IsNotDimensionTag  = mp_bool<false>;
 struct OrderLtOrder2Tag {};
 struct Order2LtOrderTag {};
 struct OrderEqOrder2Tag {};
@@ -20,22 +28,37 @@ struct ZeroOrdersTag {};
 struct ZeroOrderSumTag {};
 struct NonZeroOrderSumTag {};
 
-template<typename RealType, size_t Order, typename Enable = void>
-struct depth : std::integral_constant<std::size_t, 1> {};
-
-template<typename RealType, size_t Order>
-struct depth<RealType, Order, boost::mp11::mp_void<decltype(RealType::depth())>> : std::integral_constant<std::size_t, RealType::depth() + 1> {};
+template<bool b, typename T, typename U>
+using Cond_ = boost::mp11::mp_cond<boost::mp11::mp_bool<b>, T, std::true_type, U>;
 
 template<typename RealType, size_t Order, typename Enable = void>
-struct order_sum : std::integral_constant<std::size_t, Order> {};
+struct depth
+{
+    using type = typename mp_size_t<1>::type;
+};
 
 template<typename RealType, size_t Order>
-struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>> : std::integral_constant<std::size_t, RealType::order_sum() + Order> {};
+struct depth<RealType, Order, boost::mp11::mp_void<decltype(RealType::depth())>>
+{
+    using type = typename mp_size_t<RealType::depth() + 1>::type;
+};
+
+template<typename RealType, size_t Order, typename Enable = void>
+struct order_sum
+{
+    using type = typename mp_size_t<Order>::type;
+};
+
+template<typename RealType, size_t Order>
+struct order_sum<RealType, Order, boost::mp11::mp_void<decltype(RealType::order_sum())>>
+{
+    using type = typename mp_size_t<RealType::order_sum() + Order>::type;
+};
 
 } // namespace detail
 
 template<bool b, typename T, typename U>
-using Cond = boost::mp11::mp_cond<boost::mp11::mp_bool<b>, T, std::true_type, U>;
+using Cond = detail::Cond_<b, T, U>;
 
 // Use variable<> instead of dimension<> or nested_dimensions<>.
 template<typename RealType,size_t Order>
@@ -195,8 +218,8 @@ public:
 
     dimension<RealType,Order> inverse() const; // Multiplicative inverse.
 
-	using depth = detail::depth<RealType, Order>; // = sizeof...(Orders)
-	using order_sum = detail::order_sum<RealType, Order>;
+    static constexpr size_t depth(); // = sizeof...(Orders)
+    static constexpr size_t order_sum();
 
     explicit operator root_type() const;
     dimension<RealType,Order>& set_root(const root_type&);
@@ -1065,6 +1088,18 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 {
     return operator root_type() == 0 ? inverse_apply() : inverse_natural();
+}
+
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::depth() // = sizeof...(Orders)
+{
+    return typename detail::depth<RealType,Order>::type();
+}
+
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    return typename detail::order_sum<RealType,Order>::type();
 }
 
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)

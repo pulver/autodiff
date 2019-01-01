@@ -87,8 +87,8 @@ matrix:
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
             - sourceline: 'ppa:mhier/libboost-latest'
+            - ubuntu-toolchain-r-testst'
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr

@@ -1248,7 +1248,6 @@ dimension<RealType, Order> detail::log_impl(const dimension<RealType, Order> &cr
 {
     using std::log;
     using root_type = typename dimension<RealType, Order>::root_type;
-    constexpr size_t order = dimension<RealType, Order>::order_sum::value;
     const root_type d0 = log(static_cast<root_type>(cr));
     return dimension<RealType, 0>(d0);
 }
@@ -1281,7 +1280,7 @@ dimension<RealType, Order> detail::cos_impl(const dimension<RealType, Order> &cr
     using root_type = typename dimension<RealType, Order>::root_type;
     const root_type d0 = cos(static_cast<root_type>(cr));
     const root_type d1 = -sin(static_cast<root_type>(cr));
-    const std::array<root_type, 4> derivatives{ d0, d1, -d0, -d1 };
+    const std::array<root_type, 4> derivatives{{ d0, d1, -d0, -d1 }};
     return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i & 3]; });
 }
 
@@ -1303,7 +1302,7 @@ dimension<RealType, Order> detail::sin_impl(const dimension<RealType, Order> &cr
     using root_type = typename dimension<RealType, Order>::root_type;
     const root_type d0 = sin(static_cast<root_type>(cr));
     const root_type d1 = cos(static_cast<root_type>(cr));
-    const std::array<root_type, 4> derivatives{ d0, d1, -d0, -d1 };
+    const std::array<root_type, 4> derivatives{{ d0, d1, -d0, -d1 }};
     return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i & 3]; });
 }
 
@@ -1312,7 +1311,6 @@ dimension<RealType, Order> detail::acos_impl(const dimension<RealType, Order> &c
 {
     using std::acos;
     using root_type = typename dimension<RealType, Order>::root_type;
-    constexpr size_t order = dimension<RealType, Order>::order_sum::value;
     const root_type d0 = acos(static_cast<root_type>(cr));
     return dimension<RealType, 0>(d0);
 }
@@ -1334,7 +1332,6 @@ dimension<RealType, Order> detail::asin_impl(const dimension<RealType, Order> &c
 {
     using std::asin;
     using root_type = typename dimension<RealType, Order>::root_type;
-    constexpr size_t order = dimension<RealType, Order>::order_sum::value;
     const root_type d0 = asin(static_cast<root_type>(cr));
     return dimension<RealType, 0>(d0);
 }
@@ -1357,7 +1354,6 @@ dimension<RealType, Order> detail::atan_impl(const dimension<RealType, Order> &c
 {
     using std::atan;
     using root_type = typename dimension<RealType, Order>::root_type;
-    constexpr size_t order = dimension<RealType, Order>::order_sum::value;
     const root_type d0 = atan(static_cast<root_type>(cr));
     return dimension<RealType, 0>(d0);
 }
@@ -1379,7 +1375,6 @@ dimension<RealType, Order> detail::erfc_impl(const dimension<RealType, Order>& c
 {
     using std::erfc;
     using root_type = typename dimension<RealType, Order>::root_type;
-    constexpr size_t order = dimension<RealType, Order>::order_sum::value;
     const root_type d0 = erfc(static_cast<root_type>(cr));
     return dimension<RealType, 0>(d0);
 }

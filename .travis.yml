@@ -118,4 +118,5 @@ script:
   - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
   - cppcheck --version
-  - cppcheck --error-exitcode=1 -Iinclude example/
+  - cppcheck --error-exitcode=1 -Iinclude
+# - cppcheck --error-exitcode=1 -Iexample

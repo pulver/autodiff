@@ -8,9 +8,6 @@
 #define AUTODIFF_COMPILER_CONFIG_HPP
 
 #include <boost/config.hpp>
-#ifdef BOOST_COMPILER_CONFIG
-#include BOOST_COMPILER_CONFIG
-#endif
 
 #if defined(_MSC_VER) && _MSC_VER >= 1700L && !defined(_MSVC_LANG)
 #define BOOST_MATH_AUTODIFF_CPP_STD 201103L

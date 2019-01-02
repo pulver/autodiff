@@ -292,7 +292,7 @@ private:
     friend std::ostream& operator<<(std::ostream&, const dimension<RealType2,Order2>&);
 
 // C++11 Compatibility
-#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
     template<typename... Orders>
     typename type_at<RealType, sizeof...(Orders)>::type at_cpp11(std::true_type, size_t order, Orders... orders) const;
     template<typename... Orders>
@@ -430,15 +430,15 @@ struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 #pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
 
 // C++11 compatibility
-#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
-#pragma message("true: ifdef BOOST_NO_CXX17_IF_CONSTEXPR")
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
+#pragma message("true: ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR
 #else
-#pragma message("false: ifdef BOOST_NO_CXX17_IF_CONSTEXPR")
+#pragma message("false: ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
 #endif
 
-#pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
+#pragma message("BOOST_NO_CXX17_FOLD_EXPRESSIONS=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_FOLD_EXPRESSIONS))
 #pragma message("BOOST_AUTODIFF_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_AUTODIFF_IF_CONSTEXPR))
 #pragma message("BOOST_COMPILER_CONFIG=" BOOST_PP_STRINGIZE(BOOST_COMPILER_CONFIG))
 #pragma message("BOOST_COMPILER=" BOOST_PP_STRINGIZE(BOOST_COMPILER))
@@ -898,7 +898,7 @@ dimension<RealType,Order>
     return accumulator;
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
@@ -911,7 +911,7 @@ typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at
 }
 #endif
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 constexpr size_t dimension<RealType,Order>::depth()
 {
@@ -922,7 +922,7 @@ constexpr size_t dimension<RealType,Order>::depth()
 }
 #endif
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 constexpr size_t dimension<RealType,Order>::order_sum()
 {
@@ -933,7 +933,7 @@ constexpr size_t dimension<RealType,Order>::order_sum()
 }
 #endif
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
@@ -957,7 +957,7 @@ RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum
     return accumulator;
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const
@@ -977,7 +977,7 @@ dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0,
 }
 #endif
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // When called from outside this method, z0 should be non-zero. Otherwise if z0=0 then it will give an
 // incorrect result of 0 when the root value is 0 and ca=inf, when instead the correct product is nan.
 // If z0=0 then use the regular multiply operator*() instead.
@@ -1017,7 +1017,7 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_by_root_type(bool is_root, const root_type& ca)
 {
@@ -1046,7 +1046,7 @@ dimension<RealType,Order>::operator root_type() const
     return static_cast<root_type>(v.front());
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& root)
 {
@@ -1376,7 +1376,7 @@ struct promote_args_2<RealType0,autodiff::dimension<RealType1,Order1>>
 
 } } } // namespace boost::math::tools
 
-#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 #include "autodiff_cpp11.hpp"
 #endif
 

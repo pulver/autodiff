@@ -85,8 +85,7 @@ using a data type with greater precision.
 #ifndef BOOST_MATH_AUTODIFF_HPP
 #define BOOST_MATH_AUTODIFF_HPP
 
-#include "detail/compiler_config.hpp"
-
+#include <boost/config.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/tools/promotion.hpp>
@@ -101,7 +100,13 @@ using a data type with greater precision.
 #include <ostream>
 #include <type_traits>
 
-#if BOOST_MATH_AUTODIFF_CPP_STD >= 201703L
+// C++11 compatibility
+#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+#  define BOOST_AUTODIFF_IF_CONSTEXPR
+#else
+#  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
+#endif
+
 // Automatic Differentiation v1
 namespace boost { namespace math { namespace autodiff { inline namespace v1 {
 
@@ -168,128 +173,132 @@ class dimension
     // r /= ca | RealType& | Divides r by ca.
     dimension<RealType,Order>& operator/=(const root_type&);
     // -r | RealType | Unary Negation.
-    constexpr dimension<RealType,Order> operator-() const;
+    dimension<RealType,Order> operator-() const;
     // +r | RealType& | Identity Operation.
-    constexpr const dimension<RealType,Order>& operator+() const;
+    const dimension<RealType,Order>& operator+() const;
     // cr + cr2 | RealType | Binary Addition
     template<typename RealType2,size_t Order2>
-    constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator+(const dimension<RealType2,Order2>&) const;
+    promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator+(const dimension<RealType2,Order2>&) const;
     // cr + ca | RealType | Binary Addition
-    constexpr dimension<RealType,Order> operator+(const root_type&) const;
+    dimension<RealType,Order> operator+(const root_type&) const;
     // ca + cr | RealType | Binary Addition
     template<typename RealType2,size_t Order2>
-    friend constexpr dimension<RealType2,Order2>
+    friend dimension<RealType2,Order2>
         operator+(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr - cr2 | RealType | Binary Subtraction
     template<typename RealType2,size_t Order2>
-    constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator-(const dimension<RealType2,Order2>&) const;
+    promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator-(const dimension<RealType2,Order2>&) const;
     // cr - ca | RealType | Binary Subtraction
-    constexpr dimension<RealType,Order> operator-(const root_type&) const;
+    dimension<RealType,Order> operator-(const root_type&) const;
     // ca - cr | RealType | Binary Subtraction
     template<typename RealType2,size_t Order2>
-    friend constexpr dimension<RealType2,Order2>
+    friend dimension<RealType2,Order2>
         operator-(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr * cr2 | RealType | Binary Multiplication
     template<typename RealType2,size_t Order2>
-    constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator*(const dimension<RealType2,Order2>&) const;
+    promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator*(const dimension<RealType2,Order2>&) const;
     // cr * ca | RealType | Binary Multiplication
-    constexpr dimension<RealType,Order> operator*(const root_type&) const;
+    dimension<RealType,Order> operator*(const root_type&) const;
     // ca * cr | RealType | Binary Multiplication
     template<typename RealType2,size_t Order2>
-    friend constexpr dimension<RealType2,Order2>
+    friend dimension<RealType2,Order2>
         operator*(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr / cr2 | RealType | Binary Subtraction
     template<typename RealType2,size_t Order2>
-    constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator/(const dimension<RealType2,Order2>&) const;
+    promote<dimension<RealType,Order>,dimension<RealType2,Order2>> operator/(const dimension<RealType2,Order2>&) const;
     // cr / ca | RealType | Binary Subtraction
-    constexpr dimension<RealType,Order> operator/(const root_type&) const;
+    dimension<RealType,Order> operator/(const root_type&) const;
     // ca / cr | RealType | Binary Subtraction
     template<typename RealType2,size_t Order2>
-    friend constexpr dimension<RealType2,Order2>
+    friend dimension<RealType2,Order2>
         operator/(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr == cr2 | bool | Equality Comparison
     template<typename RealType2,size_t Order2> // This only compares the root term. All other terms are ignored.
-    constexpr bool operator==(const dimension<RealType2,Order2>&) const;
+    bool operator==(const dimension<RealType2,Order2>&) const;
     // cr == ca | bool | Equality Comparison
-    constexpr bool operator==(const root_type&) const;
+    bool operator==(const root_type&) const;
     // ca == cr | bool | Equality Comparison
     template<typename RealType2,size_t Order2> // This only compares the root term. All other terms are ignored.
-    friend constexpr bool operator==(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator==(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr != cr2 | bool | Inequality Comparison
     template<typename RealType2,size_t Order2>
-    constexpr bool operator!=(const dimension<RealType2,Order2>&) const;
+    bool operator!=(const dimension<RealType2,Order2>&) const;
     // cr != ca | bool | Inequality Comparison
-    constexpr bool operator!=(const root_type&) const;
+    bool operator!=(const root_type&) const;
     // ca != cr | bool | Inequality Comparison
     template<typename RealType2,size_t Order2>
-    friend constexpr bool operator!=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator!=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr <= cr2 | bool | Less than equal to.
     template<typename RealType2,size_t Order2>
-    constexpr bool operator<=(const dimension<RealType2,Order2>&) const;
+    bool operator<=(const dimension<RealType2,Order2>&) const;
     // cr <= ca | bool | Less than equal to.
-    constexpr bool operator<=(const root_type&) const;
+    bool operator<=(const root_type&) const;
     // ca <= cr | bool | Less than equal to.
     template<typename RealType2,size_t Order2>
-    friend constexpr bool operator<=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator<=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr >= cr2 | bool | Greater than equal to.
     template<typename RealType2,size_t Order2>
-    constexpr bool operator>=(const dimension<RealType2,Order2>&) const;
+    bool operator>=(const dimension<RealType2,Order2>&) const;
     // cr >= ca | bool | Greater than equal to.
-    constexpr bool operator>=(const root_type&) const;
+    bool operator>=(const root_type&) const;
     // ca >= cr | bool | Greater than equal to.
     template<typename RealType2,size_t Order2>
-    friend constexpr bool operator>=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator>=(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr < cr2 | bool | Less than comparison.
     template<typename RealType2,size_t Order2>
-    constexpr bool operator<(const dimension<RealType2,Order2>&) const;
+    bool operator<(const dimension<RealType2,Order2>&) const;
     // cr < ca | bool | Less than comparison.
-    constexpr bool operator<(const root_type&) const;
+    bool operator<(const root_type&) const;
     // ca < cr | bool | Less than comparison.
     template<typename RealType2,size_t Order2>
-    friend constexpr bool operator<(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator<(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
     // cr > cr2 | bool | Greater than comparison.
     template<typename RealType2,size_t Order2>
-    constexpr bool operator>(const dimension<RealType2,Order2>&) const;
+    bool operator>(const dimension<RealType2,Order2>&) const;
     // cr > ca | bool | Greater than comparison.
-    constexpr bool operator>(const root_type&) const;
+    bool operator>(const root_type&) const;
     // ca > cr | bool | Greater than comparison.
     template<typename RealType2,size_t Order2>
-    friend constexpr bool operator>(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
+    friend bool operator>(const typename dimension<RealType2,Order2>::root_type&, const dimension<RealType2,Order2>&);
 
     // Will throw std::out_of_range if Order < order.
     template<typename... Orders>
-    constexpr typename type_at<RealType,sizeof...(Orders)>::type at(size_t order, Orders... orders) const;
+    typename type_at<RealType,sizeof...(Orders)>::type at(size_t order, Orders... orders) const;
     template<typename... Orders>
-    constexpr typename type_at<RealType,sizeof...(Orders)-1>::type derivative(Orders... orders) const;
+    typename type_at<RealType, sizeof...(Orders)>::type at_cpp11(std::true_type, size_t order, Orders... orders) const;
+    template<typename... Orders>
+    typename type_at<RealType, sizeof...(Orders)>::type at_cpp11(std::false_type, size_t order, Orders... orders) const;
+    template<typename... Orders>
+    typename type_at<RealType,sizeof...(Orders)-1>::type derivative(Orders... orders) const;
 
-    constexpr dimension<RealType,Order> inverse() const; // Multiplicative inverse.
+    dimension<RealType,Order> inverse() const; // Multiplicative inverse.
 
     static constexpr size_t depth(); // = sizeof...(Orders)
     static constexpr size_t order_sum();
 
-    constexpr explicit operator root_type() const;
+    explicit operator root_type() const;
     dimension<RealType,Order>& set_root(const root_type&);
 
     // Use when function returns derivatives.
-    constexpr dimension<RealType,Order> apply(const std::function<root_type(size_t)>&) const;
+    dimension<RealType,Order> apply(const std::function<root_type(size_t)>&) const;
     // Use when function returns derivative(i)/factorial(i) (slightly more efficient than apply().)
-    constexpr dimension<RealType,Order> apply_with_factorials(const std::function<root_type(size_t)>&) const;
+    dimension<RealType,Order> apply_with_factorials(const std::function<root_type(size_t)>&) const;
     // Same as apply() but uses horner method. May be more accurate in some cases but not as good with inf derivatives.
-    constexpr dimension<RealType,Order> apply_with_horner(const std::function<root_type(size_t)>&) const;
+    dimension<RealType,Order> apply_with_horner(const std::function<root_type(size_t)>&) const;
     // Same as apply_with_factorials() buy uses horner method.
-    constexpr dimension<RealType,Order> apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
+    dimension<RealType,Order> apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
 
 private:
-    constexpr RealType epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
+    RealType epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
-    constexpr dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
+    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
 
-    constexpr dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
+    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>::root_type& ca) const;
-    constexpr dimension<RealType,Order> inverse_apply() const;
-    constexpr dimension<RealType,Order> inverse_natural() const;
-    constexpr dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
+    dimension<RealType,Order> inverse_apply() const;
+    dimension<RealType,Order> inverse_natural() const;
+    dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
   
     template<typename RealType2,size_t Orders2>
     friend class dimension;
@@ -301,80 +310,80 @@ private:
 //
 // fabs(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> fabs(const dimension<RealType,Order>&);
+dimension<RealType,Order> fabs(const dimension<RealType,Order>&);
 // abs(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> abs(const dimension<RealType,Order>&);
+dimension<RealType,Order> abs(const dimension<RealType,Order>&);
 // ceil(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> ceil(const dimension<RealType,Order>&);
+dimension<RealType,Order> ceil(const dimension<RealType,Order>&);
 // floor(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> floor(const dimension<RealType,Order>&);
+dimension<RealType,Order> floor(const dimension<RealType,Order>&);
 // exp(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> exp(const dimension<RealType,Order>&);
+dimension<RealType,Order> exp(const dimension<RealType,Order>&);
 // pow(cr, ca) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> pow(const dimension<RealType,Order>&,const typename dimension<RealType,Order>::root_type&);
+dimension<RealType,Order> pow(const dimension<RealType,Order>&,const typename dimension<RealType,Order>::root_type&);
 // pow(ca, cr) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> pow(const typename dimension<RealType,Order>::root_type&,const dimension<RealType,Order>&);
+dimension<RealType,Order> pow(const typename dimension<RealType,Order>::root_type&,const dimension<RealType,Order>&);
 // pow(cr1, cr2) | RealType
 template<typename RealType1,size_t Order1,typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType1,Order1>,dimension<RealType2,Order2>>
+promote<dimension<RealType1,Order1>,dimension<RealType2,Order2>>
     pow(const dimension<RealType1,Order1>&, const dimension<RealType2,Order2>&);
 // sqrt(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> sqrt(const dimension<RealType,Order>&);
+dimension<RealType,Order> sqrt(const dimension<RealType,Order>&);
 // log(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> log(const dimension<RealType,Order>&);
+dimension<RealType,Order> log(const dimension<RealType,Order>&);
 // frexp(cr1, &i) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> frexp(const dimension<RealType,Order>&, int*);
+dimension<RealType,Order> frexp(const dimension<RealType,Order>&, int*);
 // ldexp(cr1, i) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> ldexp(const dimension<RealType,Order>&, int);
+dimension<RealType,Order> ldexp(const dimension<RealType,Order>&, int);
 // cos(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> cos(const dimension<RealType,Order>&);
+dimension<RealType,Order> cos(const dimension<RealType,Order>&);
 // sin(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> sin(const dimension<RealType,Order>&);
+dimension<RealType,Order> sin(const dimension<RealType,Order>&);
 // asin(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> asin(const dimension<RealType,Order>&);
+dimension<RealType,Order> asin(const dimension<RealType,Order>&);
 // tan(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> tan(const dimension<RealType,Order>&);
+dimension<RealType,Order> tan(const dimension<RealType,Order>&);
 // atan(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> atan(const dimension<RealType,Order>&);
+dimension<RealType,Order> atan(const dimension<RealType,Order>&);
 // fmod(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> fmod(const dimension<RealType,Order>&, const typename dimension<RealType,Order>::root_type&);
+dimension<RealType,Order> fmod(const dimension<RealType,Order>&, const typename dimension<RealType,Order>::root_type&);
 // round(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> round(const dimension<RealType,Order>&);
+dimension<RealType,Order> round(const dimension<RealType,Order>&);
 // lround(cr1) | long
 template<typename RealType,size_t Order>
-constexpr long lround(const dimension<RealType,Order>&);
+long lround(const dimension<RealType,Order>&);
 // llround(cr1) | long long
 template<typename RealType,size_t Order>
-constexpr long long llround(const dimension<RealType,Order>&);
+long long llround(const dimension<RealType,Order>&);
 // trunc(cr1) | RealType
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> trunc(const dimension<RealType,Order>&);
+dimension<RealType,Order> trunc(const dimension<RealType,Order>&);
 // truncl(cr1) | long double
 template<typename RealType,size_t Order>
-constexpr long double truncl(const dimension<RealType,Order>&);
+long double truncl(const dimension<RealType,Order>&);
 
 // Additional functions
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> acos(const dimension<RealType,Order>&);
+dimension<RealType,Order> acos(const dimension<RealType,Order>&);
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> erfc(const dimension<RealType,Order>&);
+dimension<RealType,Order> erfc(const dimension<RealType,Order>&);
 
 template<typename RealType,size_t Order>
 struct nested_dimensions<RealType,Order> { using type = dimension<RealType,Order>; };
@@ -525,7 +534,7 @@ dimension<RealType,Order>& dimension<RealType,Order>::operator/=(const root_type
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::operator-() const
+dimension<RealType,Order> dimension<RealType,Order>::operator-() const
 {
     dimension<RealType,Order> retval;
     for (size_t i=0 ; i<=Order ; ++i)
@@ -534,14 +543,14 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::operator-() const
 }
 
 template<typename RealType,size_t Order>
-constexpr const dimension<RealType,Order>& dimension<RealType,Order>::operator+() const
+const dimension<RealType,Order>& dimension<RealType,Order>::operator+() const
 {
     return *this;
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
+promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     dimension<RealType,Order>::operator+(const dimension<RealType2,Order2>& cr) const
 {
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
@@ -557,7 +566,7 @@ constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::operator+(const root_type& ca) const
+dimension<RealType,Order> dimension<RealType,Order>::operator+(const root_type& ca) const
 {
     dimension<RealType,Order> retval(*this);
     retval.v.front() += ca;
@@ -565,7 +574,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::operator+(const r
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     operator+(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return cr + ca;
@@ -573,7 +582,7 @@ constexpr dimension<RealType,Order>
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
+promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     dimension<RealType,Order>::operator-(const dimension<RealType2,Order2>& cr) const
 {
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
@@ -589,7 +598,7 @@ constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::operator-(const root_type& ca) const
+dimension<RealType,Order> dimension<RealType,Order>::operator-(const root_type& ca) const
 {
     dimension<RealType,Order> retval(*this);
     retval.v.front() -= ca;
@@ -597,7 +606,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::operator-(const r
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     operator-(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return -cr += ca;
@@ -605,7 +614,7 @@ constexpr dimension<RealType,Order>
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
+promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     dimension<RealType,Order>::operator*(const dimension<RealType2,Order2>& cr) const
 {
     const promote<RealType,RealType2> zero{0};
@@ -620,13 +629,13 @@ constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::operator*(const root_type& ca) const
+dimension<RealType,Order> dimension<RealType,Order>::operator*(const root_type& ca) const
 {
     return dimension<RealType,Order>(*this) *= ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     operator*(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return cr * ca;
@@ -634,7 +643,7 @@ constexpr dimension<RealType,Order>
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
+promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     dimension<RealType,Order>::operator/(const dimension<RealType2,Order2>& cr) const
 {
     const promote<RealType,RealType2> zero{0};
@@ -660,13 +669,13 @@ constexpr promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::operator/(const root_type& ca) const
+dimension<RealType,Order> dimension<RealType,Order>::operator/(const root_type& ca) const
 {
     return dimension<RealType,Order>(*this) /= ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     operator/(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     dimension<RealType,Order> retval;
@@ -683,114 +692,114 @@ constexpr dimension<RealType,Order>
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator==(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator==(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() == cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator==(const root_type& ca) const
+bool dimension<RealType,Order>::operator==(const root_type& ca) const
 {
     return v.front() == ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator==(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator==(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca == cr.v.front();
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator!=(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator!=(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() != cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator!=(const root_type& ca) const
+bool dimension<RealType,Order>::operator!=(const root_type& ca) const
 {
     return v.front() != ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator!=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator!=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca != cr.v.front();
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator<=(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator<=(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() <= cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator<=(const root_type& ca) const
+bool dimension<RealType,Order>::operator<=(const root_type& ca) const
 {
     return v.front() <= ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator<=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator<=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca <= cr.v.front();
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator>=(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator>=(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() >= cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator>=(const root_type& ca) const
+bool dimension<RealType,Order>::operator>=(const root_type& ca) const
 {
     return v.front() >= ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator>=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator>=(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca >= cr.v.front();
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator<(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator<(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() < cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator<(const root_type& ca) const
+bool dimension<RealType,Order>::operator<(const root_type& ca) const
 {
     return v.front() < ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator<(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator<(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca < cr.v.front();
 }
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
-constexpr bool dimension<RealType,Order>::operator>(const dimension<RealType2,Order2>& cr) const
+bool dimension<RealType,Order>::operator>(const dimension<RealType2,Order2>& cr) const
 {
     return v.front() > cr.v.front();
 }
 
 template<typename RealType,size_t Order>
-constexpr bool dimension<RealType,Order>::operator>(const root_type& ca) const
+bool dimension<RealType,Order>::operator>(const root_type& ca) const
 {
     return v.front() > ca;
 }
 
 template<typename RealType,size_t Order>
-constexpr bool operator>(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
+bool operator>(const typename dimension<RealType,Order>::root_type& ca, const dimension<RealType,Order>& cr)
 {
     return ca > cr.v.front();
 }
@@ -799,7 +808,7 @@ constexpr bool operator>(const typename dimension<RealType,Order>::root_type& ca
 
 // f : order -> derivative(order)
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::apply(const std::function<root_type(size_t)>& f) const
+dimension<RealType,Order> dimension<RealType,Order>::apply(const std::function<root_type(size_t)>& f) const
 {
     const dimension<RealType,Order> epsilon = dimension<RealType,Order>(*this).set_root(0);
     dimension<RealType,Order> epsilon_i = dimension<RealType,Order>{1}; // epsilon to the power of i
@@ -815,7 +824,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::apply(const std::
 // f : order -> derivative(order)/factorial(order)
 // Use this when the computation of the derivatives already includes the factorial terms. E.g. See atan().
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     dimension<RealType,Order>::apply_with_factorials(const std::function<root_type(size_t)>& f) const
 {
     const dimension<RealType,Order> epsilon = dimension<RealType,Order>(*this).set_root(0);
@@ -831,7 +840,7 @@ constexpr dimension<RealType,Order>
 
 // f : order -> derivative(order)
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::apply_with_horner(const std::function<root_type(size_t)>& f) const
+dimension<RealType,Order> dimension<RealType,Order>::apply_with_horner(const std::function<root_type(size_t)>& f) const
 {
     const dimension<RealType,Order> epsilon = dimension<RealType,Order>(*this).set_root(0);
     auto accumulator = dimension<RealType,Order>{f(order_sum())/boost::math::factorial<root_type>(order_sum())};
@@ -843,7 +852,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::apply_with_horner
 // f : order -> derivative(order)/factorial(order)
 // Use this when the computation of the derivatives already includes the factorial terms. E.g. See atan().
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     dimension<RealType,Order>::apply_with_horner_factorials(const std::function<root_type(size_t)>& f) const
 {
     const dimension<RealType,Order> epsilon = dimension<RealType,Order>(*this).set_root(0);
@@ -853,10 +862,11 @@ constexpr dimension<RealType,Order>
     return accumulator;
 }
 
+/*
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
-constexpr typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at(size_t order, Orders... orders) const
+typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at(size_t order, Orders... orders) const
 {
     if constexpr (0 < sizeof...(orders))
         return v.at(order).at(orders...);
@@ -873,10 +883,71 @@ constexpr size_t dimension<RealType,Order>::depth()
         return 1;
 }
 
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    if constexpr (is_dimension<RealType>::value)
+        return Order + RealType::order_sum();
+    else
+        return Order;
+}
+*/
+
+/*
+// Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
+template<typename RealType,size_t Order>
+typename type_at<RealType,0>::type dimension<RealType,Order>::at(size_t order) const
+{
+    return v.at(order);
+}
+*/
+
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
-constexpr typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::derivative(Orders... orders) const
+typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at(size_t order, Orders... orders) const
+{
+    return at_cpp11(std::integral_constant<bool,sizeof...(orders)==0>{}, order, orders...);
+}
+template<typename RealType,size_t Order>
+template<typename... Orders>
+typename type_at<RealType, sizeof...(Orders)>::type dimension<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... orders) const
+{
+    return v.at(order);
+}
+template<typename RealType,size_t Order>
+template<typename... Orders>
+typename type_at<RealType, sizeof...(Orders)>::type dimension<RealType,Order>::at_cpp11(std::false_type, size_t order, Orders... orders) const
+{
+    return v.at(order).at(orders...);
+}
+
+template <typename>
+struct depth_cpp11 : std::integral_constant<size_t, 0> {};
+template <typename RealType,size_t Order>
+struct depth_cpp11<dimension<RealType,Order>> :
+    std::integral_constant<size_t,depth_cpp11<RealType>::value+1> {};
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::depth()
+{
+    return depth_cpp11<dimension<RealType,Order>>::value;
+}
+
+template <typename>
+struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
+template <typename RealType,size_t Order>
+struct order_sum_cpp11<dimension<RealType,Order>> :
+    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    return order_sum_cpp11<dimension<RealType,Order>>::value;
+}
+
+// Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
+template<typename RealType,size_t Order>
+template<typename... Orders>
+typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::derivative(Orders... orders) const
 {
     static_assert(sizeof...(orders) <= depth(),
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
@@ -884,7 +955,7 @@ constexpr typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealTyp
 }
 
 template<typename RealType,size_t Order>
-constexpr RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
+RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
     const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const
 {
     static_assert(is_dimension<RealType>::value, "epsilon_inner_product() must have 1 < depth().");
@@ -896,7 +967,7 @@ constexpr RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, s
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
+dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
     const RealType zero{0};
@@ -917,7 +988,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(
 // incorrect result of 0 when the root value is 0 and ca=inf, when instead the correct product is nan.
 // If z0=0 then use the regular multiply operator*() instead.
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
+dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const dimension<RealType,Order>::root_type& ca) const
 {
     dimension<RealType,Order> retval(*this);
@@ -933,14 +1004,14 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::inverse() const
+dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 {
     return operator root_type() == 0 ? inverse_apply() : inverse_natural();
 }
 
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
+dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
     std::array<root_type,order_sum()+1> derivatives{}; // derivatives of 1/x
     const auto x0 = static_cast<root_type>(*this);
@@ -952,7 +1023,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() c
 
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,-nan,-nan,-nan)
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> dimension<RealType,Order>::inverse_natural() const
+dimension<RealType,Order> dimension<RealType,Order>::inverse_natural() const
 {
     const RealType zero{0};
     dimension<RealType,Order> retval;
@@ -966,7 +1037,7 @@ constexpr dimension<RealType,Order> dimension<RealType,Order>::inverse_natural()
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_by_root_type(bool is_root, const root_type& ca)
+dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_by_root_type(bool is_root, const root_type& ca)
 {
     auto itr = v.begin();
     if constexpr (is_dimension<RealType>::value)
@@ -987,16 +1058,7 @@ constexpr dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_
 }
 
 template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
-{
-    if constexpr (is_dimension<RealType>::value)
-        return Order + RealType::order_sum();
-    else
-        return Order;
-}
-
-template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>::operator root_type() const
+dimension<RealType,Order>::operator root_type() const
 {
     return static_cast<root_type>(v.front());
 }
@@ -1014,7 +1076,7 @@ dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& 
 // Standard Library Support Requirements
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> fabs(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> fabs(const dimension<RealType,Order>& cr)
 {
     const typename dimension<RealType,Order>::root_type zero{0};
     return zero < cr ? cr
@@ -1024,27 +1086,27 @@ constexpr dimension<RealType,Order> fabs(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> abs(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> abs(const dimension<RealType,Order>& cr)
 {
     return fabs(cr);
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
 {
     using std::ceil;
     return dimension<RealType,Order>{ceil(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> floor(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> floor(const dimension<RealType,Order>& cr)
 {
     using std::floor;
     return dimension<RealType,Order>{floor(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> exp(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> exp(const dimension<RealType,Order>& cr)
 {
     using std::exp;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1053,7 +1115,7 @@ constexpr dimension<RealType,Order> exp(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const typename dimension<RealType,Order>::root_type& y)
+dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const typename dimension<RealType,Order>::root_type& y)
 {
     using std::pow;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1071,28 +1133,28 @@ constexpr dimension<RealType,Order> pow(const dimension<RealType,Order>& x,const
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> pow(const typename dimension<RealType,Order>::root_type& x,const dimension<RealType,Order>& y)
+dimension<RealType,Order> pow(const typename dimension<RealType,Order>::root_type& x,const dimension<RealType,Order>& y)
 {
     using std::log;
     return exp(y*log(x));
 }
 
 template<typename RealType1,size_t Order1,typename RealType2,size_t Order2>
-constexpr promote<dimension<RealType1,Order1>,dimension<RealType2,Order2>>
+promote<dimension<RealType1,Order1>,dimension<RealType2,Order2>>
     pow(const dimension<RealType1,Order1>& x, const dimension<RealType2,Order2>& y)
 {
     return exp(y*log(x));
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> sqrt(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> sqrt(const dimension<RealType,Order>& cr)
 {
     return pow(cr,0.5);
 }
 
 // Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
 {
     using std::log;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1108,7 +1170,7 @@ constexpr dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> frexp(const dimension<RealType,Order>& cr, int* exp)
+dimension<RealType,Order> frexp(const dimension<RealType,Order>& cr, int* exp)
 {
     using std::exp2;
     using std::frexp;
@@ -1118,14 +1180,14 @@ constexpr dimension<RealType,Order> frexp(const dimension<RealType,Order>& cr, i
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> ldexp(const dimension<RealType,Order>& cr, int exp)
+dimension<RealType,Order> ldexp(const dimension<RealType,Order>& cr, int exp)
 {
     using std::exp2;
     return cr * exp2(exp);
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
 {
     using std::cos;
     using std::sin;
@@ -1142,7 +1204,7 @@ constexpr dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
 {
     using std::sin;
     using std::cos;
@@ -1159,7 +1221,7 @@ constexpr dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> asin(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> asin(const dimension<RealType,Order>& cr)
 {
     using std::asin;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1177,13 +1239,13 @@ constexpr dimension<RealType,Order> asin(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> tan(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> tan(const dimension<RealType,Order>& cr)
 {
     return sin(cr) / cos(cr);
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> atan(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> atan(const dimension<RealType,Order>& cr)
 {
     using std::atan;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1200,7 +1262,7 @@ constexpr dimension<RealType,Order> atan(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order>
+dimension<RealType,Order>
     fmod(const dimension<RealType,Order>& cr, const typename dimension<RealType,Order>::root_type& ca)
 {
     using std::fmod;
@@ -1209,35 +1271,35 @@ constexpr dimension<RealType,Order>
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> round(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> round(const dimension<RealType,Order>& cr)
 {
     using std::round;
     return dimension<RealType,Order>{round(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
-constexpr long lround(const dimension<RealType,Order>& cr)
+long lround(const dimension<RealType,Order>& cr)
 {
     using std::lround;
     return lround(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
-constexpr long long llround(const dimension<RealType,Order>& cr)
+long long llround(const dimension<RealType,Order>& cr)
 {
     using std::llround;
     return llround(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> trunc(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> trunc(const dimension<RealType,Order>& cr)
 {
     using std::trunc;
     return dimension<RealType,Order>{trunc(cr.at(0))}; // constant with all epsilon terms zero.
 }
 
 template<typename RealType,size_t Order>
-constexpr long double truncl(const dimension<RealType,Order>& cr)
+long double truncl(const dimension<RealType,Order>& cr)
 {
     using std::truncl;
     return truncl(cr.at(0));
@@ -1258,7 +1320,7 @@ std::ostream& operator<<(std::ostream& out, const dimension<RealType,Order>& dim
 // Additional functions
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> acos(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> acos(const dimension<RealType,Order>& cr)
 {
     using std::acos;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1275,7 +1337,7 @@ constexpr dimension<RealType,Order> acos(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-constexpr dimension<RealType,Order> erfc(const dimension<RealType,Order>& cr)
+dimension<RealType,Order> erfc(const dimension<RealType,Order>& cr)
 {
     using std::erfc;
     using root_type = typename dimension<RealType,Order>::root_type;
@@ -1308,7 +1370,8 @@ namespace boost { namespace math { namespace tools {
 template <typename RealType0,size_t Order0,typename RealType1,size_t Order1>
 struct promote_args_2<autodiff::dimension<RealType0,Order0>,autodiff::dimension<RealType1,Order1>>
 {
-    using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,std::max(Order0,Order1)>;
+    //using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,std::max(Order0,Order1)>;
+    using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,Order0<Order1?Order1:Order0>;
 };
 
 template <typename RealType0,size_t Order0,typename RealType1>
@@ -1325,7 +1388,4 @@ struct promote_args_2<RealType0,autodiff::dimension<RealType1,Order1>>
 
 } } } // namespace boost::math::tools
 
-#else
-#include "autodiff_cpp11.hpp"
-#endif // BOOST_MATH_AUTODIFF_CPP_STD >= 201703L
 #endif // BOOST_MATH_AUTODIFF_HPP

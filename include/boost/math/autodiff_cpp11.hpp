@@ -214,12 +214,3 @@ dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& 
 }
 
 } } } } // namespace boost::math::autodiff::v1
-
-namespace boost { namespace math { namespace tools {
-template <typename RealType0,size_t Order0,typename RealType1,size_t Order1>
-struct promote_args_2<autodiff::dimension<RealType0,Order0>,autodiff::dimension<RealType1,Order1>>
-{
-    // std::max() is not constexpr in C++11
-    using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,Order0<Order1?Order1:Order0>;
-};
-} } } // namespace boost::math::tools

@@ -968,7 +968,7 @@ dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0,
 // If z0=0 then use the regular multiply operator*() instead.
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType,Order>::root_type& ca) const
+    const root_type& ca) const
 {
     dimension<RealType,Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
@@ -1337,13 +1337,15 @@ class numeric_limits<boost::math::autodiff::dimension<RealType,Order>>
 namespace boost { namespace math { namespace tools {
 
 // See boost/math/tools/promotion.hpp
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 template <typename RealType0,size_t Order0,typename RealType1,size_t Order1>
 struct promote_args_2<autodiff::dimension<RealType0,Order0>,autodiff::dimension<RealType1,Order1>>
 {
+#ifndef BOOST_NO_CXX14_CONSTEXPR
     using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,std::max(Order0,Order1)>;
-};
+#else
+    using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,Order0<Order1?Order1:Order0>;
 #endif
+};
 
 template <typename RealType0,size_t Order0,typename RealType1>
 struct promote_args_2<autodiff::dimension<RealType0,Order0>,RealType1>

@@ -83,7 +83,7 @@ template<typename RealType,size_t Order>
 template<typename... Orders>
 typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(orders) <= depth(),
+    static_assert(sizeof...(Orders) <= depth(),
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
 }

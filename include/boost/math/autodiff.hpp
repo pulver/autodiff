@@ -430,6 +430,13 @@ struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 #  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
 #endif
 
+// DEBUG
+#include <boost/preprocessor/stringize.hpp>
+#pragma message("BOOST_COMPILER_CONFIG=" BOOST_PP_STRINGIZE(BOOST_COMPILER_CONFIG))
+#pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
+#pragma message("BOOST_AUTODIFF_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_AUTODIFF_IF_CONSTEXPR))
+#pragma message("BOOST_NO_CXX14_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX14_CONSTEXPR))
+
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
 dimension<RealType,Order>::dimension(const dimension<RealType2,Order2>& cr)

@@ -931,6 +931,17 @@ constexpr size_t dimension<RealType,Order>::order_sum()
     else
         return Order;
 }
+#else
+template <typename>
+struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
+template <typename RealType,size_t Order>
+struct order_sum_cpp11<dimension<RealType,Order>> :
+    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    return order_sum_cpp11<dimension<RealType,Order>>::value;
+}
 #endif
 
 #ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS

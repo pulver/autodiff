@@ -1183,8 +1183,8 @@ dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
     else
     {
         const root_type d1 = -sin(static_cast<root_type>(cr));
-        const root_type derivatives[4] = { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
+        const root_type derivatives[] { d0, d1, -d0, -d1 };
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 
@@ -1200,8 +1200,8 @@ dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
     else
     {
         const root_type d1 = cos(static_cast<root_type>(cr));
-        const root_type derivatives[4] = { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
+        const root_type derivatives[] { d0, d1, -d0, -d1 };
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 

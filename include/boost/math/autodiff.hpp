@@ -423,21 +423,27 @@ struct is_dimension : std::false_type {};
 template<typename RealType,size_t Order>
 struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 
+// DEBUG
+#include <boost/preprocessor/stringize.hpp>
+#pragma message("__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus))
+#pragma message("BOOST_NO_CXX14_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX14_CONSTEXPR))
+#pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
+
 // C++11 compatibility
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+#pragma message("true: ifdef BOOST_NO_CXX17_IF_CONSTEXPR")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR
 #else
+#pragma message("false: ifdef BOOST_NO_CXX17_IF_CONSTEXPR")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
 #endif
 
-// DEBUG
-#include <boost/preprocessor/stringize.hpp>
-#pragma message("BOOST_COMPILER_CONFIG=" BOOST_PP_STRINGIZE(BOOST_COMPILER_CONFIG))
-#pragma message("_MSC_VER=" BOOST_PP_STRINGIZE(_MSC_VER))
-#pragma message("_MSVC_LANG=" BOOST_PP_STRINGIZE(_MSVC_LANG))
 #pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
 #pragma message("BOOST_AUTODIFF_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_AUTODIFF_IF_CONSTEXPR))
-#pragma message("BOOST_NO_CXX14_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX14_CONSTEXPR))
+#pragma message("BOOST_COMPILER_CONFIG=" BOOST_PP_STRINGIZE(BOOST_COMPILER_CONFIG))
+#pragma message("BOOST_COMPILER=" BOOST_PP_STRINGIZE(BOOST_COMPILER))
+#pragma message("_MSC_VER=" BOOST_PP_STRINGIZE(_MSC_VER))
+#pragma message("_MSVC_LANG=" BOOST_PP_STRINGIZE(_MSVC_LANG))
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>

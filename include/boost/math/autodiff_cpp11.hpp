@@ -53,19 +53,6 @@ constexpr size_t dimension<RealType,Order>::depth()
     return depth_cpp11<dimension<RealType,Order>>::value;
 }
 
-template <typename>
-struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
-
-template <typename RealType,size_t Order>
-struct order_sum_cpp11<dimension<RealType,Order>> :
-    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
-
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
-{
-    return order_sum_cpp11<dimension<RealType,Order>>::value;
-}
-
 template<typename T, typename... Ts>
 constexpr T product(Ts... factors)
 {
@@ -83,7 +70,7 @@ template<typename RealType,size_t Order>
 template<typename... Orders>
 typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(orders) <= depth(),
+    static_assert(sizeof...(Orders) <= depth(),
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
 }

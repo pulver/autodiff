@@ -4,7 +4,7 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 // Contributors:
-//  * KRB - C++11 compatibility.
+//  * Kedar R. Bhat - C++11 compatibility.
 
 // Notes:
 //  * Any changes to this file should always be downstream from autodiff.cpp.
@@ -51,6 +51,19 @@ template<typename RealType,size_t Order>
 constexpr size_t dimension<RealType,Order>::depth()
 {
     return depth_cpp11<dimension<RealType,Order>>::value;
+}
+
+template <typename>
+struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
+
+template <typename RealType,size_t Order>
+struct order_sum_cpp11<dimension<RealType,Order>> :
+    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
+
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    return order_sum_cpp11<dimension<RealType,Order>>::value;
 }
 
 template<typename T, typename... Ts>

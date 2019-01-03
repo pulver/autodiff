@@ -126,12 +126,6 @@ struct root_type_finder { using type = RealType; }; // specialized for dimension
 template<typename RealType,size_t Depth>
 struct type_at { using type = RealType; }; // specialized for dimension<> below.
 
-template <typename>
-struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
-template <typename RealType,size_t Order>
-struct order_sum_cpp11<dimension<RealType,Order>> :
-    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
-
 template<typename RealType,size_t Order>
 class dimension
 {
@@ -270,11 +264,6 @@ class dimension
 
     static constexpr size_t depth(); // = sizeof...(Orders)
     static constexpr size_t order_sum();
-#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
-    static constexpr size_t order_sum_value = order_sum();
-#else
-    static constexpr size_t order_sum_value = order_sum_cpp11<dimension<RealType,Order>>::value;
-#endif
 
     explicit operator root_type() const;
     dimension<RealType,Order>& set_root(const root_type&);
@@ -434,27 +423,13 @@ struct is_dimension : std::false_type {};
 template<typename RealType,size_t Order>
 struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 
-// DEBUG
-#include <boost/preprocessor/stringize.hpp>
-#pragma message("__cplusplus=" BOOST_PP_STRINGIZE(__cplusplus))
-#pragma message("BOOST_NO_CXX14_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX14_CONSTEXPR))
-#pragma message("BOOST_NO_CXX17_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_IF_CONSTEXPR))
-
 // C++11 compatibility
+// TODO Use BOOST_NO_CXX17_IF_CONSTEXPR instead of BOOST_NO_CXX17_FOLD_EXPRESSIONS. Requires recent boost.
 #ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
-#pragma message("true: ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR
 #else
-#pragma message("false: ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS")
 #  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
 #endif
-
-#pragma message("BOOST_NO_CXX17_FOLD_EXPRESSIONS=" BOOST_PP_STRINGIZE(BOOST_NO_CXX17_FOLD_EXPRESSIONS))
-#pragma message("BOOST_AUTODIFF_IF_CONSTEXPR=" BOOST_PP_STRINGIZE(BOOST_AUTODIFF_IF_CONSTEXPR))
-#pragma message("BOOST_COMPILER_CONFIG=" BOOST_PP_STRINGIZE(BOOST_COMPILER_CONFIG))
-#pragma message("BOOST_COMPILER=" BOOST_PP_STRINGIZE(BOOST_COMPILER))
-#pragma message("_MSC_VER=" BOOST_PP_STRINGIZE(_MSC_VER))
-#pragma message("_MSVC_LANG=" BOOST_PP_STRINGIZE(_MSVC_LANG))
 
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
@@ -942,12 +917,6 @@ constexpr size_t dimension<RealType,Order>::order_sum()
     else
         return Order;
 }
-#else
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
-{
-    return order_sum_cpp11<dimension<RealType,Order>>::value;
-}
 #endif
 
 #ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
@@ -1026,12 +995,10 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
-    //std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
-    std::array<root_type,order_sum_value+1> derivatives; // derivatives of 1/x
+    std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
-    //for (size_t i=1 ; i<=order_sum() ; ++i)
-    for (size_t i=1 ; i<=order_sum_value ; ++i)
+    for (size_t i=1 ; i<=order_sum() ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }

@@ -4,7 +4,7 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 // Contributors:
-//  * KRB - C++11 compatibility.
+//  * Kedar R. Bhat - C++11 compatibility.
 
 // Notes:
 //  * Any changes to this file should always be downstream from autodiff.cpp.

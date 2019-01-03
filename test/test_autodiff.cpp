@@ -631,7 +631,8 @@ BOOST_AUTO_TEST_CASE(one_over_one_plus_x_squared)
 	constexpr int m = 4;
 	constexpr double cx = 1.0;
 	auto f = boost::math::autodiff::variable<double,m>(cx);
-	f = ((f *= f) += 1).inverse();
+	//f = ((f *= f) += 1).inverse(); // Microsoft Visual C++ version 14.0: fatal error C1001: An internal error has occurred in the compiler. on call to order_sum() in inverse_apply().
+	f = 1 / ((f *= f) += 1);
 	BOOST_REQUIRE(f.derivative(0) == 0.5);
 	BOOST_REQUIRE(f.derivative(1) == -0.5);
 	BOOST_REQUIRE(f.derivative(2) == 0.5);

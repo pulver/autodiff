@@ -126,12 +126,6 @@ struct root_type_finder { using type = RealType; }; // specialized for dimension
 template<typename RealType,size_t Depth>
 struct type_at { using type = RealType; }; // specialized for dimension<> below.
 
-template <typename>
-struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
-template <typename RealType,size_t Order>
-struct order_sum_cpp11<dimension<RealType,Order>> :
-    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
-
 template<typename RealType,size_t Order>
 class dimension
 {
@@ -270,11 +264,6 @@ class dimension
 
     static constexpr size_t depth(); // = sizeof...(Orders)
     static constexpr size_t order_sum();
-#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
-    static constexpr size_t order_sum_value = order_sum();
-#else
-    static constexpr size_t order_sum_value = order_sum_cpp11<dimension<RealType,Order>>::value;
-#endif
 
     explicit operator root_type() const;
     dimension<RealType,Order>& set_root(const root_type&);
@@ -942,12 +931,6 @@ constexpr size_t dimension<RealType,Order>::order_sum()
     else
         return Order;
 }
-#else
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
-{
-    return order_sum_cpp11<dimension<RealType,Order>>::value;
-}
 #endif
 
 #ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
@@ -1026,12 +1009,10 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
-    //std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
-    std::array<root_type,order_sum_value+1> derivatives; // derivatives of 1/x
+    std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
-    //for (size_t i=1 ; i<=order_sum() ; ++i)
-    for (size_t i=1 ; i<=order_sum_value ; ++i)
+    for (size_t i=1 ; i<=order_sum() ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }

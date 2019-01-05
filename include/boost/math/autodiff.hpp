@@ -260,10 +260,10 @@ class dimension
 
     dimension<RealType,Order> inverse() const; // Multiplicative inverse.
 
-    static constexpr size_t depth(); // = sizeof...(Orders)
+    static constexpr size_t depth(); // Number of nested std::array<RealType,Order>.
     static constexpr size_t order_sum();
 
-    explicit operator root_type() const;
+    explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
     dimension<RealType,Order>& set_root(const root_type&);
 
     // Use when function returns derivatives.
@@ -352,24 +352,27 @@ dimension<RealType,Order> fmod(const dimension<RealType,Order>&, const typename 
 // round(cr1) | RealType
 template<typename RealType,size_t Order>
 dimension<RealType,Order> round(const dimension<RealType,Order>&);
-// lround(cr1) | long
+// iround(cr1) | int
 template<typename RealType,size_t Order>
-long lround(const dimension<RealType,Order>&);
-// llround(cr1) | long long
-template<typename RealType,size_t Order>
-long long llround(const dimension<RealType,Order>&);
+int iround(const dimension<RealType,Order>&);
 // trunc(cr1) | RealType
 template<typename RealType,size_t Order>
 dimension<RealType,Order> trunc(const dimension<RealType,Order>&);
-// truncl(cr1) | long double
+// itrunc(cr1) | int
 template<typename RealType,size_t Order>
-long double truncl(const dimension<RealType,Order>&);
+int itrunc(const dimension<RealType,Order>&);
 
 // Additional functions
 template<typename RealType,size_t Order>
 dimension<RealType,Order> acos(const dimension<RealType,Order>&);
 template<typename RealType,size_t Order>
 dimension<RealType,Order> erfc(const dimension<RealType,Order>&);
+template<typename RealType,size_t Order>
+long lround(const dimension<RealType,Order>&);
+template<typename RealType,size_t Order>
+long long llround(const dimension<RealType,Order>&);
+template<typename RealType,size_t Order>
+long double truncl(const dimension<RealType,Order>&);
 
 template<typename RealType,size_t Order>
 struct nested_dimensions<RealType,Order> { using type = dimension<RealType,Order>; };
@@ -1211,17 +1214,10 @@ dimension<RealType,Order> round(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-long lround(const dimension<RealType,Order>& cr)
+int iround(const dimension<RealType,Order>& cr)
 {
-    using std::lround;
-    return lround(cr.at(0));
-}
-
-template<typename RealType,size_t Order>
-long long llround(const dimension<RealType,Order>& cr)
-{
-    using std::llround;
-    return llround(cr.at(0));
+    using boost::math::iround;
+    return iround(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
@@ -1232,10 +1228,10 @@ dimension<RealType,Order> trunc(const dimension<RealType,Order>& cr)
 }
 
 template<typename RealType,size_t Order>
-long double truncl(const dimension<RealType,Order>& cr)
+int itrunc(const dimension<RealType,Order>& cr)
 {
-    using std::truncl;
-    return truncl(cr.at(0));
+    using boost::math::itrunc;
+    return itrunc(cr.at(0));
 }
 
 template<typename RealType,size_t Order>
@@ -1284,6 +1280,27 @@ dimension<RealType,Order> erfc(const dimension<RealType,Order>& cr)
         d1 = -2*boost::math::constants::one_div_root_pi<root_type>()*exp(-(d1*=d1)); // erfc'(x)=-2/sqrt(pi)*exp(-x*x)
         return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
+}
+
+template<typename RealType,size_t Order>
+long lround(const dimension<RealType,Order>& cr)
+{
+    using std::lround;
+    return lround(cr.at(0));
+}
+
+template<typename RealType,size_t Order>
+long long llround(const dimension<RealType,Order>& cr)
+{
+    using std::llround;
+    return llround(cr.at(0));
+}
+
+template<typename RealType,size_t Order>
+long double truncl(const dimension<RealType,Order>& cr)
+{
+    using std::truncl;
+    return truncl(cr.at(0));
 }
 
 } } } } // namespace boost::math::autodiff::v1

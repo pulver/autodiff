@@ -6,6 +6,8 @@
 
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include <boost/math/special_functions/round.hpp> // iround
+#include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
@@ -284,6 +286,16 @@ BOOST_AUTO_TEST_CASE(unary_signs)
 // TODO 3 tests for 3 operator+() definitions.
 
 BOOST_AUTO_TEST_CASE(cast_double)
+{
+	constexpr double ca = 13.0;
+	constexpr int i = 12;
+	constexpr int m = 3;
+	const auto x = boost::math::autodiff::variable<double,m>(ca);
+	BOOST_REQUIRE(i < x);
+	BOOST_REQUIRE(i*x == i*ca);
+}
+
+BOOST_AUTO_TEST_CASE(int_double_casting)
 {
 	constexpr double ca = 3.0;
 	const auto x0 = boost::math::autodiff::variable<double,0>(ca);
@@ -919,6 +931,18 @@ BOOST_AUTO_TEST_CASE(round_and_trunc)
 	BOOST_REQUIRE(y.derivative(1) == 0.0);
 	BOOST_REQUIRE(y.derivative(2) == 0.0);
 	BOOST_REQUIRE(y.derivative(3) == 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(iround_and_itrunc)
+{
+    using namespace boost::math;
+	constexpr int m = 3;
+	constexpr double cx = 3.25;
+	auto x = boost::math::autodiff::variable<double,m>(cx);
+	int y = iround(x);
+	BOOST_REQUIRE(y == iround(cx));
+	y = itrunc(x);
+	BOOST_REQUIRE(y == itrunc(cx));
 }
 
 BOOST_AUTO_TEST_CASE(lround_llround_truncl)

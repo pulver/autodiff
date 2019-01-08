@@ -1,64 +1,83 @@
-//               Copyright Matthew Pulver 2018.
+//           Copyright Matthew Pulver 2018 - 2019.
 // Distributed under the Boost Software License, Version 1.0.
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 /*!
- * \mainpage
- * \tableofcontents
- *
- * \section quick-start Quick Start Examples
- *
- * <hr>
- *
- * \subsection single-variable Example 1: Single-variable derivatives
- * <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
- * \dontinclude fourth_power.cpp \skip #include
- * \until **
- * The above calculates \f{array}
-{lrrl}
-{\tt y.derivative(0)} =& f(2) =& \left.x^4\right|_{x=2} &= 16\\
-{\tt y.derivative(1)} =& f'(2) =& \left.4\cdot x^3\right|_{x=2} &= 32\\
-{\tt y.derivative(2)} =& f''(2) =& \left.4\cdot 3\cdot x^2\right|_{x=2} &= 48\\
-{\tt y.derivative(3)} =& f'''(2) =& \left.4\cdot 3\cdot2\cdot x\right|_{x=2} &= 48\\
-{\tt y.derivative(4)} =& f^{(4)}(2) =& 4\cdot 3\cdot2\cdot1 &= 24\\
-{\tt y.derivative(5)} =& f^{(5)}(2) =& 0 &
+\mainpage
+
+\section synopsis Synopsis
+\dontinclude synopsis.cpp \skip #include
+\until **
+
+\section description Description
+
+Autodiff is a header-only C++ library that facilitates the
+[automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode)
+of mathematical functions in single and multiple variables.
+
+\subsection requirements Requirements
+
+1. C++11 compiler. Visual Studio 2015 is not supported.
+2. Maximum derivative orders are set at compile-time. This allows for compile-time allocation of memory with
+   `std::array<>`, so that use of dynamic memory is avoided.
+3. Mathematical functions should accept generic types (template variables) for the variables that derivatives are
+   calculated with respect to.
+
+\section examples Examples
+
+\subsection example-single-variable Example 1: Single-variable derivatives
+<h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
+\dontinclude fourth_power.cpp \skip #include
+\until **
+
+The above calculates \f{alignat*}{{3}
+{\tt y.derivative(0)} &=& f(2) =&& \left.x^4\right|_{x=2} &= 16\\
+{\tt y.derivative(1)} &=& f'(2) =&& \left.4\cdot x^3\right|_{x=2} &= 32\\
+{\tt y.derivative(2)} &=& f''(2) =&& \left.4\cdot 3\cdot x^2\right|_{x=2} &= 48\\
+{\tt y.derivative(3)} &=& f'''(2) =&& \left.4\cdot 3\cdot2\cdot x\right|_{x=2} &= 48\\
+{\tt y.derivative(4)} &=& f^{(4)}(2) =&& 4\cdot 3\cdot2\cdot1 &= 24\\
+{\tt y.derivative(5)} &=& f^{(5)}(2) =&& 0 &
 \f}
- *
- * <hr>
- *
- * \subsection multiprecision Example 2: Multi-variable mixed partial derivatives with multi-precision data type
- * <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
- * with a precision of about 100 decimal digits, where
+
+<hr>
+
+\subsection example-multiprecision Example 2: Multi-variable mixed partial derivatives with multi-precision data type
+<h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
+with a precision of about 100 decimal digits, where
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
- * \dontinclude multiprecision.cpp \skip #include
- * \until **
- *
- * <hr>
- * \subsection black-scholes Example 3: Black-Scholes option pricing
- * <h3>Using the standard Black-Scholes model for pricing European options, calculate call/put prices and greeks.</h3>
- * https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
- *
- * One of the primary benefits of using automatic differentiation is the elimination of additional functions to
+\dontinclude multiprecision.cpp \skip #include
+\until **
+
+<hr>
+
+\subsection example-black-scholes Example 3: Black-Scholes option pricing
+<h3>Using the standard Black-Scholes model for pricing European options, calculate call/put prices and greeks.</h3>
+https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+
+One of the primary benefits of using automatic differentiation is the elimination of additional functions to
 calculate derivatives, which is a form of code redundancy.
- * \dontinclude black_scholes.cpp \skip #include
- * \until **
- *
- * <hr>
- *
- * \subsection multi-variable Example 4: Multi-variable mixed partial derivatives
- * <h3>Calculate mixed partial derivatives of
+\dontinclude black_scholes.cpp \skip #include
+\until **
+
+<hr>
+
+\subsection example-multi-variable Example 4: Multi-variable mixed partial derivatives
+<h3>Calculate mixed partial derivatives of
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
 at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
- * \dontinclude mixed_partials.cpp \skip #include
- * \until **
- * The above calculates \f[{\tt v.derivative(iw,ix,iy,iz)} =
+\dontinclude mixed_partials.cpp \skip #include
+\until **
+
+The above calculates
+\f[
+{\tt v.derivative(iw,ix,iy,iz)} =
 \frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
-\qquad\text{for each}\qquad
-(i_w,i_x,i_y,i_z)\in \mathbb{N}_4\times\mathbb{N}_3\times\mathbb{N}_5\times\mathbb{N}_4
+\qquad\text{for each}\qquad (i_w,i_x,i_y,i_z)\in \mathbb{N}_4\times\mathbb{N}_3\times\mathbb{N}_5\times\mathbb{N}_4
 \f]
+
 where \f$\mathbb{N}_i=\{0,1,2,...,i-1\}\f$.
-For testing purposes, the \f$4\times3\times5\times4=240\f$-element <code>answers[]</code>
+For testing purposes, the \f$4\times3\times5\times4=240\f$-element `answers[]`
 array was calculated independently by Mathematica (example/mixed_partials.nb) in 2 steps:
 
  1. <a href="https://reference.wolfram.com/language/tutorial/SymbolicComputation.html">Symbolic differentiation</a>
@@ -69,18 +88,413 @@ the Boost Autodiff library is found to be about \f$6.82\times10^{-13}\f$ using t
 floating point data type. Since the data type is a template variable, the error can be reduced arbitrarily by
 using a data type with greater precision.
 
- *
- * <hr>
- *
- * \copyright
- * <center>
- *               Copyright &copy; Matthew Pulver 2018.<br/>
- * Distributed under the Boost Software License, Version 1.0.<br/>
- *      (See accompanying file LICENSE_1_0.txt or copy at<br/>
- *           https://www.boost.org/LICENSE_1_0.txt)
- * </center>
- *
- */
+<hr>
+
+\section mathematics Mathematics
+
+In order for the usage of the autodiff library to make sense, a basic understanding of the mathematics will help.
+
+\subsection taylor-series Truncated Taylor Series
+
+Basic calculus courses teach that a real [analytic function](https://en.wikipedia.org/wiki/Analytic_function)
+\f$f : D\rightarrow\mathbb{R}\f$ is one which can be expressed as a Taylor series at a point
+\f$x_0\in D\subseteq\mathbb{R}\f$:
+
+\f[
+f(x) = f(x_0) + f'(x_0)(x-x_0) + \frac{f''(x_0)}{2!}(x-x_0)^2 + \frac{f'''(x_0)}{3!}(x-x_0)^3 + \cdots \f]
+
+One way of thinking about this form is that given the value of an analytic function \f$f(x_0)\f$ and its derivatives
+\f$f'(x_0), f''(x_0), f'''(x_0), ...\f$ evaluated at a point \f$x_0\f$, then the value of the function
+\f$f(x)\f$ can be obtained at any other point \f$x\in D\f$ using the above formula.
+
+Let us make the substitution \f$x=x_0+\varepsilon\f$ and rewrite the above equation to get:
+
+\f[
+f(x_0+\varepsilon) = f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots
+\f]
+
+Now consider \f$\varepsilon\f$ as **an abstract algebraic entity that never acquires a numeric value**, much like
+one does in basic algebra with variables like \f$x\f$ or \f$y\f$. For example, we can still manipulate entities
+like \f$xy\f$ and \f$(1+2x+3x^2)\f$ without having to assign specific numbers to them.
+
+Using this formula, autodiff goes in the other direction. Given a general formula/algorithm for calculating
+\f$f(x_0+\varepsilon)\f$, the derivatives are obtained from the coefficients of the powers of \f$\varepsilon\f$
+in the resulting computation. The general coefficient for \f$\varepsilon^n\f$ is
+
+\f[\frac{f^{(n)}(x_0)}{n!}.\f]
+
+Thus to obtain \f$f^{(n)}(x_0)\f$, the coefficient of \f$\varepsilon^n\f$ is multiplied by \f$n!\f$.
+
+\subsubsection taylor-series-example Example
+
+Apply the above technique to calculate the derivatives of \f$f(x)=x^4\f$ at \f$x_0=2\f$.
+
+The first step is to evaluate \f$f(x_0+\varepsilon)\f$ and simply go through the calculation/algorithm, treating
+\f$\varepsilon\f$ as an abstract algebraic entity:
+
+\f{align*}
+f(x_0+\varepsilon) &= f(2+\varepsilon) \\
+ &= (2+\varepsilon)^4 \\
+ &= \left(4+4\varepsilon+\varepsilon^2\right)^2 \\
+ &= 16+32\varepsilon+24\varepsilon^2+8\varepsilon^3+\varepsilon^4.
+\f}
+
+Equating the powers of \f$\varepsilon\f$ from this result with the above \f$\varepsilon\f$-taylor expansion
+yields the following equalities:
+\f[
+f(2) = 16, \qquad
+f'(2) = 32, \qquad
+\frac{f''(2)}{2!} = 24, \qquad
+\frac{f'''(2)}{3!} = 8, \qquad
+\frac{f^{(4)}(2)}{4!} = 1, \qquad
+\frac{f^{(5)}(2)}{5!} = 0.
+\f]
+
+Multiplying both sides by the respective factorials gives
+\f[
+f(2) = 16, \qquad
+f'(2) = 32, \qquad
+f''(2) = 48, \qquad
+f'''(2) = 48, \qquad
+f^{(4)}(2) = 24, \qquad
+f^{(5)}(2) = 0.
+\f]
+
+These values can be directly confirmed by the [power rule](https://en.wikipedia.org/wiki/Power_rule)
+applied to \f$f(x)=x^4\f$.
+
+<hr>
+
+\subsection arithmetic Arithmetic
+
+What was essentially done above was to take a formula/algorithm for calculating \f$f(x_0)\f$ from a number \f$x_0\f$,
+and instead apply the same formula/algorithm to a polynomial \f$x_0+\varepsilon\f$. Intermediate steps operate on
+values of the form
+
+\f[ {\bf x} = x_0 + x_1\varepsilon + x_2\varepsilon^2 +\cdots+ x_N\varepsilon^N \f]
+
+and the final return value is of this polynomial form as well. In other words, the normal arithmetic operators
+\f$+,-,\times,\div\f$ applied to numbers \f$x\f$ are instead applied to polynomials \f$\bf x\f$. Through the
+overloading of C++ operators and functions, floating point data types are replaced with data types that represent
+these polynomials. More specifically, C++ types such as `double` are replaced with `std::array<double,N+1>`, which
+hold the above \f$N+1\f$ coefficients \f$x_i\f$, and are wrapped in a `class` that overloads all of the arithmetic
+operators.
+
+The logic of these arithmetic operators simply mirror that which is applied to polynomials. We'll look at
+each of the 4 arithmetic operators in detail.
+
+\subsubsection arithmetic-addition Addition
+
+Given polynomials \f$\bf x\f$ and \f$\bf y\f$, how is \f$\bf z=x+y\f$ calculated?
+
+To answer this, one simply expands \f$\bf x\f$ and \f$\bf y\f$ into their polynomial forms and add them together:
+
+\f{align*}
+{\bf z} &= {\bf x} + {\bf y} \\
+ &= \left(\sum_{i=0}^Nx_i\varepsilon^i\right) + \left(\sum_{i=0}^Ny_i\varepsilon^i\right) \\
+ &= \sum_{i=0}^N(x_i+y_i)\varepsilon^i \\
+z_i &= x_i + y_i \qquad \text{for}\; i\in\{0,1,2,...,N\}.
+\f}
+
+\subsubsection arithmetic-subtraction Subtraction
+
+Subtraction follows the same form as addition:
+
+\f{align*}
+{\bf z} &= {\bf x} - {\bf y} \\
+ &= \left(\sum_{i=0}^Nx_i\varepsilon^i\right) - \left(\sum_{i=0}^Ny_i\varepsilon^i\right) \\
+ &= \sum_{i=0}^N(x_i-y_i)\varepsilon^i \\
+z_i &= x_i - y_i \qquad \text{for}\; i\in\{0,1,2,...,N\}.
+\f}
+
+\subsubsection arithmetic-multiplication Multiplication
+
+Multiplication is a bit more interesting:
+
+\f{align*}
+{\bf z} &= {\bf x} \times {\bf y} \\
+ &= \left(\sum_{i=0}^Nx_i\varepsilon^i\right) \left(\sum_{i=0}^Ny_i\varepsilon^i\right) \\
+ &= x_0y_0 + (x_0y_1+x_1y_0)\varepsilon + (x_0y_2+x_1y_1+x_2y_0)\varepsilon^2 + \cdots +
+    \left(\sum_{j=0}^Nx_jy_{N-j}\right)\varepsilon^N + O\left(\varepsilon^{N+1}\right) \\
+ &= \sum_{i=0}^N\sum_{j=0}^ix_jy_{i-j}\varepsilon^i + O\left(\varepsilon^{N+1}\right) \\
+z_i &= \sum_{j=0}^ix_jy_{i-j} \qquad \text{for}\; i\in\{0,1,2,...,N\}.
+\f}
+
+In the case of multiplication, terms involving powers of \f$\varepsilon\f$ greater than \f$N\f$, collectively
+denoted by \f$O\left(\varepsilon^{N+1}\right)\f$, are simply discarded. Fortunately, the values of \f$z_i\f$
+for \f$i\le N\f$ do not depend on any of these discarded terms, so there is no loss of precision in the final
+answer. The only information that is lost are the values of higher order derivatives, which we are not interested
+in anyway. If we were, then we would have simply chosen a larger value of \f$N\f$ to begin with.
+
+\subsubsection arithmetic-division Division
+
+Division is not directly calculated as are the others. Instead, to find the components of
+\f${\bf z}={\bf x}\div{\bf y}\f$ we require that \f${\bf x}={\bf y}\times{\bf z}\f$. This yields
+a recursive formula for the components \f$z_i\f$:
+
+\f{align*}
+x_i &= \sum_{j=0}^iy_jz_{i-j} \\
+ &= y_0z_i + \sum_{j=1}^iy_jz_{i-j} \\
+z_i &= \frac{1}{y_0}\left(x_i - \sum_{j=1}^iy_jz_{i-j}\right) \qquad \text{for}\; i\in\{0,1,2,...,N\}.
+\f}
+
+In the case of division, the values for \f$z_i\f$ must be calculated sequentially, since \f$z_i\f$
+depends on the previously calculated values \f$z_0, z_1, ..., z_{i-1}\f$.
+
+<hr>
+
+\subsection general-functions General Functions
+
+When calling standard mathematical functions such as `log()`, `cos()`, etc. how should these be written in order
+to support autodiff variable types? That is, how should they be written to provide accurate derivatives?
+
+To simplify notation, for a given polynomial \f${\bf x} = x_0 + x_1\varepsilon + x_2\varepsilon^2 +\cdots+
+x_N\varepsilon^N\f$ define
+
+\f[
+{\bf x}_\varepsilon = x_1\varepsilon + x_2\varepsilon^2 +\cdots+ x_N\varepsilon^N = \sum_{i=1}^Nx_i\varepsilon^i
+\f]
+
+This allows for a concise expression of a general function \f$f\f$ of \f$\bf x\f$:
+
+\f{align*}
+f({\bf x}) &= f(x_0 + {\bf x}_\varepsilon) \\
+ & = f(x_0) + f'(x_0){\bf x}_\varepsilon + \frac{f''(x_0)}{2!}{\bf x}_\varepsilon^2 + \frac{f'''(x_0)}{3!}{\bf x}_\varepsilon^3 + \cdots + \frac{f^{(N)}(x_0)}{N!}{\bf x}_\varepsilon^N + O\left(\varepsilon^{N+1}\right) \\
+ & = \sum_{i=0}^N\frac{f^{(i)}(x_0)}{i!}{\bf x}_\varepsilon^i + O\left(\varepsilon^{N+1}\right)
+\f}
+
+where \f$\varepsilon\f$ has been substituted with \f${\bf x}_\varepsilon\f$ in the \f$\varepsilon\f$-taylor series
+for \f$f(x)\f$. This form gives a recipe for calculating \f$f({\bf x})\f$ in general from regular numeric calculations
+\f$f(x_0)\f$, \f$f'(x_0)\f$, \f$f''(x_0)\f$, ...  and successive powers of the epsilon terms \f${\bf x}_\varepsilon\f$.
+
+For an application in which we are interested in up to \f$N\f$ derivatives in \f$x\f$ the data structure to hold
+this information is an \f$(N+1)\f$-element array `v` whose general element is
+
+\f[ {\tt v[i]} = \frac{f^{(i)}(x_0)}{i!} \qquad \text{for}\; i\in\{0,1,2,...,N\}. \f]
+
+<hr>
+
+\subsection multiple-variables Multiple Variables
+
+In C++, the generalization to mixed partial derivatives with multiple independent variables is conveniently achieved
+with recursion. To begin to see the recursive pattern, consider a two-variable function \f$f(x,y)\f$. Since \f$x\f$
+and \f$y\f$ are independent, they require their own independent epsilons \f$\varepsilon_x\f$ and \f$\varepsilon_y\f$,
+respectively.
+
+Expand \f$f(x,y)\f$ for \f$x=x_0+\varepsilon_x\f$:
+\f{align*}
+f(x_0+\varepsilon_x,y) &= f(x_0,y)
++ \frac{\partial f}{\partial x}(x_0,y)\varepsilon_x
++ \frac{1}{2!}\frac{\partial^2 f}{\partial x^2}(x_0,y)\varepsilon_x^2
++ \frac{1}{3!}\frac{\partial^3 f}{\partial x^3}(x_0,y)\varepsilon_x^3
++ \cdots
++ \frac{1}{M!}\frac{\partial^M f}{\partial x^M}(x_0,y)\varepsilon_x^M
++ O\left(\varepsilon_x^{M+1}\right) \\
+&= \sum_{i=0}^M\frac{1}{i!}\frac{\partial^i f}{\partial x^i}(x_0,y)\varepsilon_x^i + O\left(\varepsilon_x^{M+1}\right).
+\f}
+
+Next, expand \f$f(x_0+\varepsilon_x,y)\f$ for \f$y=y_0+\varepsilon_y\f$:
+\f{align*}
+f(x_0+\varepsilon_x,y_0+\varepsilon_y) &= \sum_{j=0}^N\frac{1}{j!}\frac{\partial^j}{\partial y^j}
+    \left(\sum_{i=0}^M\frac{1}{i!}\frac{\partial^if}{\partial x^i}\right)(x_0,y_0)\varepsilon_x^i\varepsilon_y^j
+    + O\left(\varepsilon_x^{M+1}\right) + O\left(\varepsilon_y^{N+1}\right) \\
+&= \sum_{i=0}^M\sum_{j=0}^N\frac{1}{i!j!}\frac{\partial^{i+j}f}{\partial x^i\partial y^j}(x_0,y_0)
+   \varepsilon_x^i\varepsilon_y^j + O\left(\varepsilon_x^{M+1}\right) + O\left(\varepsilon_y^{N+1}\right).
+\f}
+
+Similarly to the single-variable case, for an application in which we are interested in up to \f$M\f$ derivatives in
+\f$x\f$ and \f$N\f$ derivatives in \f$y\f$, the data structure to hold this information is an \f$(M+1)\times(N+1)\f$
+array `v` whose element at \f$(i,j)\f$ is
+
+\f[ {\tt v[i][j]} = \frac{1}{i!j!}\frac{\partial^{i+j}f}{\partial x^i\partial y^j}(x_0,y_0)
+    \qquad \text{for}\; (i,j)\in\{0,1,2,...,M\}\times\{0,1,2,...,N\}. \f]
+
+The generalization to additional independent variables follows the same pattern. This is made more concrete with
+C++ code in the next section.
+
+<hr>
+
+\section Usage
+
+\subsection usage-single-variable Single Variable
+
+To calculate derivatives of a single variable \f$x\f$, at a particular value \f$x_0\f$, the following must be
+specified at compile-time:
+
+1. The numeric data type `T` of \f$x_0\f$. Examples: `double`, `boost::multiprecision::cpp_dec_float_100`, etc.
+2. The **maximum** derivative order \f$M\f$ that is to be calculated with respect to \f$x\f$.
+
+Note that both of these requirements are entirely analogous to declaring and using a `std::array<T,N>`. `T` and
+`N` must be set as compile-time, but which elements in the array are accessed can be determined at run-time,
+just as the choice of what derivatives to query in autodiff can be made during run-time.
+
+To declare and initialize \f$x\f$:
+
+\code{.cpp}
+boost::math::autodiff::variable<T,M> x(x0);
+\endcode
+
+where `x0` is a run-time value of type `T`.  Assuming `0 < M`, this represents the polynomial \f$ x_0 + \varepsilon
+\f$.  Internally, the member variable of type `std::array<T,M>` is `v = { x0, 1, 0, 0, ... }`, consistent with the
+above mathematical treatise.
+
+To find the derivatives \f$f^{(n)}(x_0)\f$ for \f$0\le n\le M\f$ of a function
+\f$f : \mathbb{R}\rightarrow\mathbb{R}\f$, the function can be represented as a template
+
+\code{.cpp}
+template<typename T>
+T f(T x);
+\endcode
+
+Using a generic type `T` allows for `x` to be of a regular type such as `double`, but also allows for
+`autodiff::variable<>` types.
+
+Internal calls to mathematical functions must allow for [argument-dependent
+lookup](https://en.wikipedia.org/wiki/Argument-dependent_name_lookup) (ADP). Many standard library functions are
+overloaded in the `boost::math::autodiff` namespace. For example, instead of calling `std::cos(x)` from within
+`f`, include the line `using std::cos;` and call `cos(x)` without a namespace prefix.
+
+Calling \f$f\f$ and retrieving the calculated value and derivatives:
+
+\code{.cpp}
+boost::math::autodiff::variable<T,M> x(x0);
+boost::math::autodiff::variable<T,M> y = f(x);
+for (int n=0 ; n<=M ; ++n)
+    std::cout << "y.derivative("<<n<<") == " << y.derivative(n) << std::endl;
+\endcode
+
+`y.derivative(0)` returns the undifferentiated value \f$f(x_0)\f$, and `y.derivative(n)` returns \f$f^{(n)}(x_0)\f$.
+Casting `y` to type `T` also gives the undifferentiated value. In other words, the following 3 values are equal:
+1. `f(x0)`
+2. `y.derivative(0)`
+3. `static_cast<T>(y)`
+
+\subsection usage-multiple-variables Multiple Variables
+
+Independent variables are represented in autodiff as independent dimensions within a multi-dimensional array.
+This is perhaps best illustrated with examples.
+
+The following instantiates a variable of \f$x=13\f$ with up to 3 orders of derivatives:
+\code{.cpp}
+boost::math::autodiff::variable<double,3> x(13);
+\endcode
+
+This instantiates *an independent* value of \f$y=14\f$ with up to 4 orders of derivatives:
+\code{.cpp}
+boost::math::autodiff::variable<double,0,4> y(14);
+\endcode
+
+Combining them together *promotes* their data type automatically to the smallest multidimensional array that
+accommodates both.
+\code{.cpp}
+auto z = 10*x*x + 50*x*y + 100*y*y; // z is promoted to boost::math::autodiff::variable<double,3,4>
+\endcode
+
+The object `z` holds a 2-dimensional array, thus `derivative(...)` is a 2-parameter method:
+
+\f[
+{\tt z.derivative(i,j)} = \frac{\partial^{i+j}f}{\partial x^i\partial y^j}(13,14)
+    \qquad \text{for}\; (i,j)\in\{0,1,2,3\}\times\{0,1,2,3,4\}.
+\f]
+
+A few values of the result can be confirmed through inspection:
+\code{.cpp}
+z.derivative(2,0) == 20
+z.derivative(1,1) == 50
+z.derivative(0,2) == 200
+\endcode
+
+Note how the position of the parameters in `derivative(..)` match how `x` and `y` were declared.
+This will be clarified next.
+
+\subsubsection two-rules Two Rules of Variable Initialization
+
+In general, there are two rules to keep in mind when dealing with multiple variables:
+
+1. Independent variables correspond to parameter position, in both the declaration `autodiff::variable<T,...>`
+   and calls to `derivative(...)`.
+2. The last template position in a value-initialized instance determines which variable a derivative will be
+   taken with respect to.
+
+Both rules are illustrated with an example in which there are 3 independent variables \f$x,y,z\f$ and 1 dependent
+variable \f$w=f(x,y,z)\f$, though the following code readily generalizes to any number of independent variables,
+limited only by the C++ compiler/memory/platform. The maximum derivative order of each variable is `Nx`, `Ny`,
+and `Nz`, respectively. Then the type for `w` is `boost::math::autodiff::variable<T,Nx,Ny,Nz>` and all possible
+mixed partial derivatives are available via
+\f[
+{\tt w.derivative(nx,ny,nz)} =
+    \frac{\partial^{n_x+n_y+n_z}f}{\partial x^{n_x}\partial y^{n_y}\partial z^{n_z} }(x_0,y_0,z_0)
+    \qquad \text{for}\; (n_x,n_y,n_z)\in\{0,1,2,...,N_x\}\times\{0,1,2,...,N_y\}\times\{0,1,2,...,N_z\}
+\f]
+
+where \f$x_0, y_0, z_0\f$ are the numerical values at which the function \f$f\f$ and its derivatives are evaluated.
+
+In code:
+\code{.cpp}
+using var = boost::math::autodiff::variable<double,Nx,Ny,Nz>; // Nx, Ny, Nz are constexpr size_t.
+
+var x = boost::math::autodiff::variable<double,Nx>(x0);       // x0 is of type double
+var y = boost::math::autodiff::variable<double,Nx,Ny>(y0);    // y0 is of type double
+var z = boost::math::autodiff::variable<double,Nx,Ny,Nz>(z0); // z0 is of type double
+
+var w = f(x,y,z);
+
+for (size_t nx=0 ; nx<=Nx ; ++nx)
+    for (size_t ny=0 ; ny<=Ny ; ++ny)
+        for (size_t nz=0 ; nz<=Nz ; ++nz)
+            std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == " << w.derivative(nx,ny,nz) << std::endl;
+\endcode
+
+Note how `x`, `y`, and `z` are initialized: the last template parameter determines which variable
+\f$x, y,\f$ or \f$z\f$ a derivative is taken with respect to. In terms of the \f$\varepsilon\f$-polynomials
+above, this determines whether to add \f$\varepsilon_x, \varepsilon_y,\f$ or \f$\varepsilon_z\f$ to
+\f$x_0, y_0,\f$ or \f$z_0\f$, respectively.
+
+In contrast, the following initialization of `x` would be INCORRECT:
+\code{.cpp}
+var x = boost::math::autodiff::variable<T,Nx,0>(x0); // WRONG
+\endcode
+
+Mathematically, this represents \f$x_0+\varepsilon_y\f$, since the last template parameter corresponds to the
+\f$y\f$ variable, and thus the resulting value will be invalid.
+
+\subsubsection type-promotion Type Promotion
+
+The previous example can be optimized to save some unnecessary computation, by declaring smaller arrays,
+and relying on autodiff's automatic type-promotion:
+\code{.cpp}
+boost::math::autodiff::variable<double,Nx> x(x0);
+boost::math::autodiff::variable<double,0,Ny> y(y0);
+boost::math::autodiff::variable<double,0,0,Nz> z(z0);
+
+boost::math::autodiff::variable<double,Nx,Ny,Nz> w = f(x,y,z);
+
+for (size_t nx=0 ; nx<=Nx ; ++nx)
+    for (size_t ny=0 ; ny<=Ny ; ++ny)
+        for (size_t nz=0 ; nz<=Nz ; ++nz)
+            std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == " << w.derivative(nx,ny,nz) << std::endl;
+\endcode
+
+For example, if one of the first steps in the computation of \f$f\f$ was `z*z`, then a significantly less
+number of multiplications and additions may occur if `z` is declared as `variable<double,0,0,Nz>` as opposed to
+`variable<double,Nx,Ny,Nz>`. There is no loss of precision with the former, since the extra dimensions represent
+0 values. Once `z` is combined with `x` and `y` during the computation, the types will be promoted as necessary.
+This is the recommended way to initialize variables in autodiff.
+
+\section acknowledgments Acknowledgments
+
+- Kedar Bhat - C++11 compatibility and feedback.
+- Nick Thompson - Initial feedback and help with Boost integration.
+- John Maddock - Initial feedback and help with Boost integration.
+
+\copyright
+<center>
+       Copyright &copy; Matthew Pulver 2018 - 2019.<br/>
+Distributed under the Boost Software License, Version 1.0.<br/>
+    (See accompanying file LICENSE_1_0.txt or copy at<br/>
+          https://www.boost.org/LICENSE_1_0.txt)
+</center>
+*/
 
 #ifndef BOOST_MATH_AUTODIFF_HPP
 #define BOOST_MATH_AUTODIFF_HPP
@@ -107,8 +521,8 @@ class dimension;
 template<typename RealType,size_t Order,size_t... Orders> // specialized for dimension<> below.
 struct nested_dimensions { using type = dimension<typename nested_dimensions<RealType,Orders...>::type,Order>; };
 
-// Satisfies Conceptual Requirements for Real Number Types
-// https://www.boost.org/doc/libs/1_69_0/libs/math/doc/html/math_toolkit/real_concepts.html
+// The variable<> alias is the primary template for instantiating autodiff variables.
+// This nests one or more dimension<> classes together into a multi-dimensional type.
 template<typename RealType,size_t Order,size_t... Orders>
 using variable = typename nested_dimensions<RealType,Order,Orders...>::type;
 
@@ -124,6 +538,7 @@ struct root_type_finder { using type = RealType; }; // specialized for dimension
 template<typename RealType,size_t Depth>
 struct type_at { using type = RealType; }; // specialized for dimension<> below.
 
+// Satisfies Boost's Conceptual Requirements for Real Number Types.
 template<typename RealType,size_t Order>
 class dimension
 {
@@ -272,7 +687,7 @@ class dimension
     dimension<RealType,Order> apply_with_factorials(const std::function<root_type(size_t)>&) const;
     // Same as apply() but uses horner method. May be more accurate in some cases but not as good with inf derivatives.
     dimension<RealType,Order> apply_with_horner(const std::function<root_type(size_t)>&) const;
-    // Same as apply_with_factorials() buy uses horner method.
+    // Same as apply_with_factorials() but uses horner method.
     dimension<RealType,Order> apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
 
 private:
@@ -293,7 +708,7 @@ private:
 };
 
 // Standard Library Support Requirements
-//
+
 // fabs(cr1) | RealType
 template<typename RealType,size_t Order>
 dimension<RealType,Order> fabs(const dimension<RealType,Order>&);
@@ -877,7 +1292,7 @@ template<typename... Orders>
 typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::derivative(Orders... orders) const
 {
     static_assert(sizeof...(orders) <= depth(),
-        "Numer of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
+        "Number of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
     return at(orders...) * (... * boost::math::factorial<root_type>(orders));
 }
 

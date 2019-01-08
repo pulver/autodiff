@@ -1,0 +1,4 @@
+var structboost_1_1math_1_1autodiff_1_1v1_1_1type__at_3_01dimension_3_01RealType_00_01Order_01_4_00_01Depth_01_4 =
+[
+    [ "type", "structboost_1_1math_1_1autodiff_1_1v1_1_1type__at_3_01dimension_3_01RealType_00_01Order_01_4_00_01Depth_01_4.html#a8c4e6b3837d9ee6c76c98a1edcec9a86", null ]
+];

@@ -499,6 +499,7 @@ Distributed under the Boost Software License, Version 1.0.<br/>
 #ifndef BOOST_MATH_AUTODIFF_HPP
 #define BOOST_MATH_AUTODIFF_HPP
 
+#include <boost/config.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/tools/promotion.hpp>
@@ -511,6 +512,7 @@ Distributed under the Boost Software License, Version 1.0.<br/>
 #include <limits>
 #include <numeric>
 #include <ostream>
+#include <type_traits>
 
 // Automatic Differentiation v1
 namespace boost { namespace math { namespace autodiff { inline namespace v1 {
@@ -695,16 +697,42 @@ private:
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
     dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
         const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
-    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
-        const dimension<RealType,Order>::root_type& ca) const;
+    dimension<RealType,Order> epsilon_multiply(size_t z0, size_t isum0, const root_type& ca) const;
     dimension<RealType,Order> inverse_apply() const;
-    dimension<RealType,Order> inverse_natural() const;
     dimension<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
 
     template<typename RealType2,size_t Orders2>
     friend class dimension;
     template<typename RealType2,size_t Order2>
     friend std::ostream& operator<<(std::ostream&, const dimension<RealType2,Order2>&);
+
+// C++11 Compatibility
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
+    template<typename... Orders>
+    typename type_at<RealType, sizeof...(Orders)>::type at_cpp11(std::true_type, size_t order, Orders... orders) const;
+    template<typename... Orders>
+    typename type_at<RealType, sizeof...(Orders)>::type at_cpp11(std::false_type, size_t order, Orders... orders) const;
+    template<typename SizeType>
+    dimension<RealType,Order> epsilon_multiply_cpp11(std::true_type, SizeType z0, size_t isum0,
+        const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    template<typename SizeType>
+    dimension<RealType,Order> epsilon_multiply_cpp11(std::false_type, SizeType z0, size_t isum0,
+        const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    template<typename SizeType>
+    dimension<RealType,Order> epsilon_multiply_cpp11(std::true_type, SizeType z0, size_t isum0,
+        const root_type& ca) const;
+    template<typename SizeType>
+    dimension<RealType,Order> epsilon_multiply_cpp11(std::false_type, SizeType z0, size_t isum0,
+        const root_type& ca) const;
+    template<typename RootType>
+    dimension<RealType,Order>& multiply_assign_by_root_type_cpp11(std::true_type, bool is_root, const RootType& ca);
+    template<typename RootType>
+    dimension<RealType,Order>& multiply_assign_by_root_type_cpp11(std::false_type, bool is_root, const RootType& ca);
+    template<typename RootType>
+    dimension<RealType,Order>& set_root_cpp11(std::true_type, const RootType& root);
+    template<typename RootType>
+    dimension<RealType,Order>& set_root_cpp11(std::false_type, const RootType& root);
+#endif
 };
 
 // Standard Library Support Requirements
@@ -813,17 +841,25 @@ struct is_dimension : std::false_type {};
 template<typename RealType,size_t Order>
 struct is_dimension<dimension<RealType,Order>> : std::true_type {};
 
+// C++11 compatibility
+// TODO Use BOOST_NO_CXX17_IF_CONSTEXPR instead of BOOST_NO_CXX17_FOLD_EXPRESSIONS. Requires recent boost.
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
+#  define BOOST_AUTODIFF_IF_CONSTEXPR
+#else
+#  define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
+#endif
+
 template<typename RealType,size_t Order>
 template<typename RealType2,size_t Order2>
 dimension<RealType,Order>::dimension(const dimension<RealType2,Order2>& cr)
 {
-    if constexpr (is_dimension<RealType2>::value)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (is_dimension<RealType2>::value)
         for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
             v[i] = RealType(cr.v[i]);
     else
         for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
             v[i] = cr.v[i];
-    if constexpr (Order2 < Order)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
         std::fill(v.begin()+(Order2+1), v.end(), RealType{0});
 }
 
@@ -835,7 +871,7 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order>::dimension(const root_type& ca)
 :    v{{static_cast<RealType>(ca)}}
 {
-    if constexpr (depth() == 1 && 0 < Order)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (depth() == 1 && 0 < Order)
         v[1] = static_cast<root_type>(1); // Set epsilon coefficient = 1.
 }
 
@@ -851,7 +887,7 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::operator=(const root_type& ca)
 {
     v.front() = RealType{ca};
-    if constexpr (0 < Order)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
         std::fill(v.begin()+1, v.end(), RealType{0});
     return *this;
 }
@@ -893,7 +929,7 @@ template<typename RealType2,size_t Order2>
 dimension<RealType,Order>& dimension<RealType,Order>::operator*=(const dimension<RealType2,Order2>& cr)
 {
     const promote<RealType,RealType2> zero{0};
-    if constexpr (Order <= Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order <= Order2)
         for (size_t i=0, j=Order ; i<=Order ; ++i, --j)
             v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
     else
@@ -918,10 +954,10 @@ dimension<RealType,Order>& dimension<RealType,Order>::operator/=(const dimension
 {
     const RealType zero{0};
     v.front() /= cr.v.front();
-    if constexpr (Order < Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, --j, --k)
             (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
-    else if constexpr (0 < Order2)
+    else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
         for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
             (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
     else
@@ -960,10 +996,10 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
     for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
         retval.v[i] = v[i] + cr.v[i];
-    if constexpr (Order < Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (size_t i=Order+1 ; i<=Order2 ; ++i)
             retval.v[i] = cr.v[i];
-    else if constexpr (Order2 < Order)
+    else if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
         for (size_t i=Order2+1 ; i<=Order ; ++i)
             retval.v[i] = v[i];
     return retval;
@@ -992,10 +1028,10 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
     for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
         retval.v[i] = v[i] - cr.v[i];
-    if constexpr (Order < Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (size_t i=Order+1 ; i<=Order2 ; ++i)
             retval.v[i] = -cr.v[i];
-    else if constexpr (Order2 < Order)
+    else if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
         for (size_t i=Order2+1 ; i<=Order ; ++i)
             retval.v[i] = v[i];
     return retval;
@@ -1023,7 +1059,7 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
 {
     const promote<RealType,RealType2> zero{0};
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
-    if constexpr (Order < Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (size_t i=0, j=Order, k=Order2 ; i<=Order2 ; ++i, j&&--j, --k)
             retval.v[i] = std::inner_product(v.cbegin(), v.cend()-j, cr.v.crbegin()+k, zero);
     else
@@ -1053,7 +1089,7 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
     const promote<RealType,RealType2> zero{0};
     promote<dimension<RealType,Order>,dimension<RealType2,Order2>> retval;
     retval.v.front() = v.front() / cr.v.front();
-    if constexpr (Order < Order2)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     {
         for (size_t i=1, j=Order2-1 ; i<=Order ; ++i, --j)
             retval.v[i] = (v[i] -
@@ -1062,7 +1098,7 @@ promote<dimension<RealType,Order>,dimension<RealType2,Order2>>
             retval.v[i] =
                 -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero) / cr.v.front();
     }
-    else if constexpr (0 < Order2)
+    else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
         for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
             retval.v[i] =
                 (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero)) / cr.v.front();
@@ -1084,7 +1120,7 @@ dimension<RealType,Order>
 {
     dimension<RealType,Order> retval;
     retval.v.front() = ca / cr.v.front();
-    if constexpr (0 < Order)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
     {
         const RealType zero{0};
         for (size_t i=1, j=Order-1 ; i<=Order ; ++i, --j)
@@ -1266,6 +1302,7 @@ dimension<RealType,Order>
     return accumulator;
 }
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
@@ -1276,7 +1313,9 @@ typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at
     else
         return v.at(order);
 }
+#endif
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 constexpr size_t dimension<RealType,Order>::depth()
 {
@@ -1285,7 +1324,20 @@ constexpr size_t dimension<RealType,Order>::depth()
     else
         return 1;
 }
+#endif
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
+template<typename RealType,size_t Order>
+constexpr size_t dimension<RealType,Order>::order_sum()
+{
+    if constexpr (is_dimension<RealType>::value)
+        return Order + RealType::order_sum();
+    else
+        return Order;
+}
+#endif
+
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType,size_t Order>
 template<typename... Orders>
@@ -1295,6 +1347,7 @@ typename type_at<RealType,sizeof...(Orders)-1>::type dimension<RealType,Order>::
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the dimension<...>.");
     return at(orders...) * (... * boost::math::factorial<root_type>(orders));
 }
+#endif
 
 template<typename RealType,size_t Order>
 RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
@@ -1308,6 +1361,7 @@ RealType dimension<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum
     return accumulator;
 }
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const dimension<RealType,Order>& cr, size_t z1, size_t isum1) const
@@ -1325,13 +1379,15 @@ dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0,
             retval.v[j] = std::inner_product(v.cbegin()+m0, v.cend()-(i+m1), cr.v.crbegin()+(i+m0), zero);
     return retval;
 }
+#endif
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 // When called from outside this method, z0 should be non-zero. Otherwise if z0=0 then it will give an
 // incorrect result of 0 when the root value is 0 and ca=inf, when instead the correct product is nan.
 // If z0=0 then use the regular multiply operator*() instead.
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
-    const dimension<RealType,Order>::root_type& ca) const
+    const root_type& ca) const
 {
     dimension<RealType,Order> retval(*this);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
@@ -1344,14 +1400,16 @@ dimension<RealType,Order> dimension<RealType,Order>::epsilon_multiply(size_t z0,
                 retval.v[i] *= ca;
     return retval;
 }
+#endif
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 {
-    return operator root_type() == 0 ? inverse_apply() : inverse_natural();
+    return operator root_type() == 0 ? inverse_apply() : 1 / *this;
 }
 
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
+// 1 / *this: autodiff::log(0.0) = depth(1)(-inf,inf,-inf,-nan,-nan,-nan)
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
@@ -1363,25 +1421,11 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
 
-// This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,-nan,-nan,-nan)
-template<typename RealType,size_t Order>
-dimension<RealType,Order> dimension<RealType,Order>::inverse_natural() const
-{
-    const RealType zero{0};
-    dimension<RealType,Order> retval;
-    if constexpr (is_dimension<RealType>::value)
-        retval.v.front() = v.front().inverse_natural();
-    else
-        retval.v.front() = 1 / v.front();
-    for (size_t i=1, j=Order-1 ; i<=Order ; ++i, --j)
-        retval.v[i] = -retval.v.front() * std::inner_product(v.cbegin()+1, v.cend()-j, retval.v.crbegin()+(j+1), zero);
-    return retval;
-}
-
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_by_root_type(bool is_root, const root_type& ca)
 {
-    typename decltype(v)::iterator itr = v.begin();
+    auto itr = v.begin();
     if constexpr (is_dimension<RealType>::value)
     {
         itr->multiply_assign_by_root_type(is_root, ca);
@@ -1398,15 +1442,7 @@ dimension<RealType,Order>& dimension<RealType,Order>::multiply_assign_by_root_ty
     }
     return *this;
 }
-
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
-{
-    if constexpr (is_dimension<RealType>::value)
-        return Order + RealType::order_sum();
-    else
-        return Order;
-}
+#endif
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order>::operator root_type() const
@@ -1414,6 +1450,7 @@ dimension<RealType,Order>::operator root_type() const
     return static_cast<root_type>(v.front());
 }
 
+#ifndef BOOST_NO_CXX17_FOLD_EXPRESSIONS
 template<typename RealType,size_t Order>
 dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& root)
 {
@@ -1423,6 +1460,7 @@ dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& 
         v.front() = root;
     return *this;
 }
+#endif
 
 // Standard Library Support Requirements
 
@@ -1511,7 +1549,7 @@ dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     const root_type d0 = log(static_cast<root_type>(cr));
-    if constexpr (order == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return dimension<RealType,0>(d0);
     else
     {
@@ -1544,13 +1582,13 @@ dimension<RealType,Order> cos(const dimension<RealType,Order>& cr)
     using std::sin;
     using root_type = typename dimension<RealType,Order>::root_type;
     const root_type d0 = cos(static_cast<root_type>(cr));
-    if constexpr (dimension<RealType,Order>::order_sum() == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (dimension<RealType,Order>::order_sum() == 0)
         return dimension<RealType,0>(d0);
     else
     {
         const root_type d1 = -sin(static_cast<root_type>(cr));
         const root_type derivatives[] { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 
@@ -1561,13 +1599,13 @@ dimension<RealType,Order> sin(const dimension<RealType,Order>& cr)
     using std::cos;
     using root_type = typename dimension<RealType,Order>::root_type;
     const root_type d0 = sin(static_cast<root_type>(cr));
-    if constexpr (dimension<RealType,Order>::order_sum() == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (dimension<RealType,Order>::order_sum() == 0)
         return dimension<RealType,0>(d0);
     else
     {
         const root_type d1 = cos(static_cast<root_type>(cr));
         const root_type derivatives[] { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 
@@ -1578,7 +1616,7 @@ dimension<RealType,Order> asin(const dimension<RealType,Order>& cr)
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     const root_type d0 = asin(static_cast<root_type>(cr));
-    if constexpr (order == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return dimension<RealType,0>(d0);
     else
     {
@@ -1602,7 +1640,7 @@ dimension<RealType,Order> atan(const dimension<RealType,Order>& cr)
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     const root_type d0 = atan(static_cast<root_type>(cr));
-    if constexpr (order == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return dimension<RealType,0>(d0);
     else
     {
@@ -1670,7 +1708,7 @@ dimension<RealType,Order> acos(const dimension<RealType,Order>& cr)
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     const root_type d0 = acos(static_cast<root_type>(cr));
-    if constexpr (order == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return dimension<RealType,0>(d0);
     else
     {
@@ -1687,7 +1725,7 @@ dimension<RealType,Order> erfc(const dimension<RealType,Order>& cr)
     using root_type = typename dimension<RealType,Order>::root_type;
     constexpr size_t order = dimension<RealType,Order>::order_sum();
     const root_type d0 = erfc(static_cast<root_type>(cr));
-    if constexpr (order == 0)
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return dimension<RealType,0>(d0);
     else
     {
@@ -1735,7 +1773,11 @@ namespace boost { namespace math { namespace tools {
 template <typename RealType0,size_t Order0,typename RealType1,size_t Order1>
 struct promote_args_2<autodiff::dimension<RealType0,Order0>,autodiff::dimension<RealType1,Order1>>
 {
+#ifndef BOOST_NO_CXX14_CONSTEXPR
     using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,std::max(Order0,Order1)>;
+#else
+    using type = autodiff::dimension<typename promote_args_2<RealType0,RealType1>::type,Order0<Order1?Order1:Order0>;
+#endif
 };
 
 template <typename RealType0,size_t Order0,typename RealType1>
@@ -1751,5 +1793,9 @@ struct promote_args_2<RealType0,autodiff::dimension<RealType1,Order1>>
 };
 
 } } } // namespace boost::math::tools
+
+#ifdef BOOST_NO_CXX17_FOLD_EXPRESSIONS
+#include "autodiff_cpp11.hpp"
+#endif
 
 #endif // BOOST_MATH_AUTODIFF_HPP

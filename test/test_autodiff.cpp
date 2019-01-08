@@ -17,7 +17,7 @@
 #include <iostream>
 
 template<typename W,typename X,typename Y,typename Z>
-auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
+auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z) -> decltype(exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z))
 {
     using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
@@ -44,11 +44,13 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
+auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r) 
+		-> decltype(S*Phi((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - exp(-r*tau)*K*Phi((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))))
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
   const auto d2 = (log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau));
+  static_assert(std::is_same<decltype(S*Phi(d1) - exp(-r*tau)*K*Phi(d2)), decltype(exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1))>::value, "decltype(call) != decltype(put)");
   if (cp == call)
     return S*Phi(d1) - exp(-r*tau)*K*Phi(d2);
   else
@@ -642,7 +644,8 @@ BOOST_AUTO_TEST_CASE(one_over_one_plus_x_squared)
 	constexpr int m = 4;
 	constexpr double cx = 1.0;
 	auto f = boost::math::autodiff::variable<double,m>(cx);
-	f = ((f *= f) += 1).inverse();
+	//f = ((f *= f) += 1).inverse(); // Microsoft Visual C++ version 14.0: fatal error C1001: An internal error has occurred in the compiler. on call to order_sum() in inverse_apply().
+	f = 1 / ((f *= f) += 1);
 	BOOST_REQUIRE(f.derivative(0) == 0.5);
 	BOOST_REQUIRE(f.derivative(1) == -0.5);
 	BOOST_REQUIRE(f.derivative(2) == 0.5);

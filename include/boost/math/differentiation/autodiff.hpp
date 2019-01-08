@@ -534,8 +534,12 @@ using variable = typename nested_dimensions<RealType,Order,Orders...>::type;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template<typename... RealTypes>
-using promote = typename boost::math::tools::promote_args<RealTypes...>::type;
+template<typename RealType0,typename RealType1,typename... RealTypes>
+struct promote_args_n { using type = typename boost::math::tools::promote_args_2<RealType0,
+    typename promote_args_n<RealType1,RealTypes...>::type>::type; };
+
+template<typename RealType0,typename RealType1,typename... RealTypes>
+using promote = typename promote_args_n<RealType0,RealType1,RealTypes...>::type;
 
 // Get non-dimension<> root type T of variable<T,O0,O1,O2,...>.
 template<typename RealType>
@@ -823,6 +827,12 @@ long double truncl(const dimension<RealType,Order>&);
 
 template<typename RealType,size_t Order>
 struct nested_dimensions<RealType,Order> { using type = dimension<RealType,Order>; };
+
+template<typename RealType0,typename RealType1>
+struct promote_args_n<RealType0,RealType1>
+{
+    using type = typename boost::math::tools::promote_args_2<RealType0,RealType1>::type;
+};
 
 template<typename RealType,size_t Order>
 struct root_type_finder<dimension<RealType,Order>> { using type = typename root_type_finder<RealType>::type; };

@@ -3,6 +3,8 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
+// THIS IS NOT MEANT TO BE COMPILED - ONLY FOR INCLUSION IN DOCUMENTATION.
+
 #include <boost/math/differentiation/autodiff.hpp>
 
 namespace boost { namespace math { namespace differentiation { namespace autodiff {

@@ -15,16 +15,18 @@ T fourth_power(T x)
 
 int main()
 {
+    using namespace boost::math::differentiation;
+
     constexpr int Order=5; // The highest order derivative to be calculated.
-    const boost::math::autodiff::variable<double,Order> x(2.0); // Find derivatives at x=2.
-    const boost::math::autodiff::variable<double,Order> y = fourth_power(x);
+    const autodiff::variable<double,Order> x(2.0); // Find derivatives at x=2.
+    const autodiff::variable<double,Order> y = fourth_power(x);
     for (int i=0 ; i<=Order ; ++i)
         std::cout << "y.derivative("<<i<<") = " << y.derivative(i) << std::endl;
     return 0;
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/fourth_power.cpp
+$ g++ -std=c++1z example/fourth_power.cpp
 
 Output:
 $ ./a.out

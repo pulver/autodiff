@@ -66,15 +66,17 @@ const double answers[] = { 19878.406289804349223, 20731.748382749395173, 14667.6
 
 int main()
 {
+  using namespace boost::math::differentiation;
+
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
   constexpr int Nz=3; // Max order of derivative to calculate for z
-  const boost::math::autodiff::variable<double,Nw> w(11);
-  const boost::math::autodiff::variable<double,0,Nx> x(12);
-  const boost::math::autodiff::variable<double,0,0,Ny> y(13);
-  const boost::math::autodiff::variable<double,0,0,0,Nz> z(14);
-  const auto v = f(w,x,y,z); // auto = boost::math::autodiff::variable<double,Nw,Nx,Ny,Nz>
+  const autodiff::variable<double,Nw> w(11);
+  const autodiff::variable<double,0,Nx> x(12);
+  const autodiff::variable<double,0,0,Ny> y(13);
+  const autodiff::variable<double,0,0,0,Nz> z(14);
+  const auto v = f(w,x,y,z); // auto = autodiff::variable<double,Nw,Nx,Ny,Nz>
   int ia=0;
   double max_relative_error=0;
   for (int iw=0 ; iw<=Nw ; ++iw)
@@ -92,7 +94,7 @@ int main()
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/mixed_partials.cpp
+$ g++ -std=c++1z example/mixed_partials.cpp
 
 Output:
 $ ./a.out

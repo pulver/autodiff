@@ -5,7 +5,7 @@
 
 #include <boost/math/differentiation/autodiff.hpp>
 
-namespace boost { namespace math { namespace autodiff {
+namespace boost { namespace math { namespace differentiation { namespace autodiff {
 
 // The primary template alias for instantiating autodiff variables.
 template<typename RealType,size_t Order,size_t... Orders>
@@ -46,5 +46,5 @@ dimension<RealType,Order> exp(const dimension<RealType,Order>&);
 
 // ...
 
-} } } // namespace boost::math::autodiff
+} } } } // namespace boost::math::differentiation::autodiff
 /**/

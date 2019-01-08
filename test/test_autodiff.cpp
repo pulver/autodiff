@@ -3,7 +3,7 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/math/autodiff.hpp>
+#include <boost/math/differentiation/autodiff.hpp>
 
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
@@ -17,7 +17,8 @@
 #include <iostream>
 
 template<typename W,typename X,typename Y,typename Z>
-auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z) -> decltype(exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z))
+auto mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
+    -> decltype(exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z))
 {
     using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
@@ -45,7 +46,7 @@ enum CP { call, put };
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
 auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r) 
-		-> decltype(S*Phi((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - exp(-r*tau)*K*Phi((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))))
+    -> decltype(S*Phi((log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau))) - exp(-r*tau)*K*Phi((log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau))))
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));

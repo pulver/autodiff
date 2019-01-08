@@ -14,7 +14,7 @@ See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) fo
 ![Calculate derivatives for x to 4th power](doc/images/fourth_power.png)
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
 template<typename T>
@@ -57,7 +57,7 @@ The above calculates
 ![12th-order mixed-partial derivative with about 100 decimal digits](doc/images/mixed_partial_multiprecision.png)
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <iostream>
 
@@ -111,8 +111,7 @@ One of the primary benefits of using automatic differentiation is the eliminatio
 calculate derivatives, which is a form of code redundancy.
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/math/differentiation/autodiff.hpp>
 #include <cmath>
 #include <limits>
 #include <iostream>
@@ -297,5 +296,5 @@ autodiff put  ultima = -0.0922426864775683
 
 ## Requirements
 
- - C++17 compiler that supports [constexpr if statements](https://en.cppreference.com/w/cpp/language/if).
+ - C++11 compiler. Visual Studio 2015 is not presently supported.
  - [Boost](https://www.boost.org/) library. (Headers only; no linking required.)

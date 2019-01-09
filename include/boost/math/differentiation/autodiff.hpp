@@ -21,8 +21,9 @@ of mathematical functions in single and multiple variables.
 1. C++11 compiler. Visual Studio 2015 is not supported.
 2. Maximum derivative orders are set at compile-time. This allows for compile-time allocation of memory with
    `std::array<>`, so that use of dynamic memory is avoided.
-3. Mathematical functions should accept generic types (template variables) for the variables that derivatives are
-   calculated with respect to.
+3. Mathematical functions should accept generic types (template variables) for the parameters that derivatives are
+   calculated with respect to, and internal function calls should allow for
+   [argument-dependent lookup](https://en.cppreference.com/w/cpp/language/adl) (ADL) on these parameters.
 
 \section examples Examples
 
@@ -350,9 +351,9 @@ Using a generic type `T` allows for `x` to be of a regular type such as `double`
 `boost::math::differentiation::autodiff::variable<>` types.
 
 Internal calls to mathematical functions must allow for [argument-dependent
-lookup](https://en.wikipedia.org/wiki/Argument-dependent_name_lookup) (ADP). Many standard library functions are
-overloaded in the `boost::math::differentiation::autodiff` namespace. For example, instead of calling `std::cos(x)`
-from within `f`, include the line `using std::cos;` and call `cos(x)` without a namespace prefix.
+lookup](https://en.cppreference.com/w/cpp/language/adl) (ADL). Many standard library functions are overloaded in
+the `boost::math::differentiation::autodiff` namespace. For example, instead of calling `std::cos(x)` from within
+`f`, include the line `using std::cos;` and call `cos(x)` without a namespace prefix.
 
 Calling \f$f\f$ and retrieving the calculated value and derivatives:
 

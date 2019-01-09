@@ -19,8 +19,6 @@ int main()
   using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
   using namespace boost::math::differentiation;
 
-  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
-  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
@@ -31,6 +29,8 @@ int main()
   const var y = autodiff::variable<cpp_dec_float_100,0,0,Ny>(13);
   const var z = autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14);
   const var v = f(w,x,y,z);
+  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
+  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
   std::cout << std::setprecision(std::numeric_limits<cpp_dec_float_100>::digits10)
     << "mathematica   : " << answer << '\n'
     << "autodiff      : " << v.derivative(Nw,Nx,Ny,Nz) << '\n'

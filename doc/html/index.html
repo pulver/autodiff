@@ -117,7 +117,7 @@ Requirements</h2>
 <ol type="1">
 <li>C++11 compiler. Visual Studio 2015 is not supported.</li>
 <li>Maximum derivative orders are set at compile-time. This allows for compile-time allocation of memory with <code>std::array&lt;&gt;</code>, so that use of dynamic memory is avoided.</li>
-<li>Mathematical functions should accept generic types (template variables) for the parameters that derivatives are calculated with respect to, and whose internal function calls allow for <a href="https://en.cppreference.com/w/cpp/language/adl">argument-dependent lookup</a> (ADL) on these parameters.</li>
+<li>Mathematical functions should accept generic types (template variables) for the parameters that derivatives are calculated with respect to, and internal function calls should allow for <a href="https://en.cppreference.com/w/cpp/language/adl">argument-dependent lookup</a> (ADL) on these parameters.</li>
 </ol>
 <h1><a class="anchor" id="examples"></a>
 Examples</h1>

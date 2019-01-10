@@ -7,7 +7,7 @@
 //  * Kedar R. Bhat - C++11 compatibility.
 
 // Notes:
-//  * Any changes to this file should always be downstream from autodiff.cpp.
+//  * Any changes to this file should always be downstream from autodiff.hpp.
 //    C++17 is a higher-level language and is easier to maintain. For example, a number of functions which are
 //    lucidly read in autodiff.cpp are forced to be split into multiple structs/functions in this file for C++11.
 //  * Use of typename RootType and SizeType is a hack to prevent Visual Studio 2015 from compiling functions
@@ -41,29 +41,35 @@ typename type_at<RealType,sizeof...(Orders)>::type dimension<RealType,Order>::at
     return at_cpp11(std::integral_constant<bool,sizeof...(orders)==0>{}, order, orders...);
 }
 
-template <typename>
-struct depth_cpp11 : std::integral_constant<size_t, 0> {};
-
-template <typename RealType,size_t Order>
-struct depth_cpp11<dimension<RealType,Order>> : std::integral_constant<size_t,depth_cpp11<RealType>::value+1> {};
-
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::depth()
+namespace detail
 {
-    return depth_cpp11<dimension<RealType,Order>>::value;
+	template<typename T, typename = void>
+	struct depth_t : std::integral_constant<std::size_t, 1> {};
+	
+	template<typename RealType, size_t Order>
+	struct depth_t<dimension<RealType, Order>, typename std::enable_if<is_dimension<RealType>::value>::type> : std::integral_constant<std::size_t, depth_t<RealType>::value + 1> {};	
+
+	template<typename T> struct get_order_t;
+
+	template<typename RealType, size_t Order> struct get_order_t <dimension<RealType, Order>> : std::integral_constant<size_t, Order> {};	
+
+	template<typename T, typename = void>
+	struct order_sum_t : get_order_t<T> {};	
+
+	template<typename RealType, size_t Order>
+	struct order_sum_t<dimension<RealType, Order>, typename std::enable_if<is_dimension<RealType>::value>::type> : std::integral_constant<std::size_t, order_sum_t<RealType>::value + Order> {};
+} // namespace detail
+
+template<typename RealType, size_t Order>
+constexpr size_t dimension<RealType,Order>::depth()
+{	
+	return detail::depth_t<dimension<RealType, Order>>::value;
 }
 
-template <typename>
-struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
-
-template <typename RealType,size_t Order>
-struct order_sum_cpp11<dimension<RealType,Order>> :
-    std::integral_constant<size_t,order_sum_cpp11<RealType>::value+Order> {};
-
-template<typename RealType,size_t Order>
-constexpr size_t dimension<RealType,Order>::order_sum()
+template<typename RealType, size_t Order>
+constexpr size_t dimension<RealType, Order>::order_sum()
 {
-    return order_sum_cpp11<dimension<RealType,Order>>::value;
+	return detail::order_sum_t<dimension<RealType, Order>>::value;	
 }
 
 template<typename T, typename... Ts>
@@ -212,5 +218,36 @@ dimension<RealType,Order>& dimension<RealType,Order>::set_root(const root_type& 
 {
     return set_root_cpp11(std::integral_constant<bool,is_dimension<RealType>::value>{}, root);
 }
+
+// This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
+// 1 / *this: autodiff::log(0.0) = depth(1)(-inf,inf,-inf,-nan,-nan,-nan)
+template<typename RealType, size_t Order>
+dimension<RealType, Order> dimension<RealType, Order>::inverse_apply() const
+{
+	std::array<root_type, detail::order_sum_t<dimension<RealType,Order>>::value + 1> derivatives; // derivatives of 1/x
+	const root_type x0 = static_cast<root_type>(*this);
+	derivatives[0] = 1 / x0;
+	for (size_t i = 1; i <= order_sum(); ++i)
+		derivatives[i] = -derivatives[i - 1] * i / x0;
+	return apply([&derivatives](size_t j) { return derivatives[j]; });
+}
+
+// Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
+template<typename RealType, size_t Order>
+dimension<RealType, Order> log(const dimension<RealType, Order>& cr)
+{
+	using std::log;
+	using root_type = typename dimension<RealType, Order>::root_type;
+	constexpr size_t order = detail::order_sum_t<dimension<RealType,Order>>::value;
+	const root_type d0 = log(static_cast<root_type>(cr));
+	if BOOST_AUTODIFF_IF_CONSTEXPR(order == 0)
+		return dimension<RealType, 0>(d0);
+	else
+	{
+		const auto d1 = dimension<root_type, order - 1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
+		return cr.apply_with_factorials([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+	}
+}
+
 
 } } } } // namespace boost::math::autodiff::v1

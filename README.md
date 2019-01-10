@@ -301,5 +301,5 @@ autodiff put  ultima = -0.0922426864775683
 
 ## Requirements
 
- - C++11 compiler, but optimized for C++17. Visual Studio 2015 is not presently supported.
+ - C++11 compiler, but optimized for C++17.
  - [Boost](https://www.boost.org/) library. (Headers only; no linking required.)

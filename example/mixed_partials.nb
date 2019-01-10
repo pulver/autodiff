@@ -1,3 +1,8 @@
+(*           Copyright Matthew Pulver 2018 - 2019.
+// Distributed under the Boost Software License, Version 1.0.
+//      (See accompanying file LICENSE_1_0.txt or copy at
+//           https://www.boost.org/LICENSE_1_0.txt) *)
+
 f[w_,x_,y_,z_] := Exp[w*Sin[x*Log[y]/z] + Sqrt[w*z/(x*y)]] + w*w/Tan[z];
 
 {Nw, Nx, Ny, Nz} = {3, 2, 4, 3} (* Max derivative order for each variable *)

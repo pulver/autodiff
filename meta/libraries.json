@@ -1,5 +1,5 @@
 {
-    "key": "math/autodiff",
+    "key": "math/differentiation/autodiff",
     "name": "Boost.Autodiff",
     "authors": [ "Matthew Pulver" ],
     "maintainers": [ "Matthew Pulver <mpulver -at- unitytechgroup -dot- com>" ],

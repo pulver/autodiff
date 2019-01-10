@@ -9,6 +9,11 @@ cache:
   directories:
     - $HOME/cache2
 
+stages:
+  - setup
+  - compile
+  - test
+
 matrix:
   include:
     - os: linux
@@ -105,11 +110,17 @@ matrix:
 #       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
         - MATRIX_EVAL="brew update && brew install gcc && COMPILER=clang++ && CXXSTD=c++11"
 
+jobs:
+  include:
+    - stage: setup
+      script:
+        - if [ \! -d $HOME/cache2/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -C $HOME/cache2 -; fi
+        - ls $HOME
+
 before_install:
 # - mkdir -p ~/$TRAVIS_BUILD_NUMBER
 # - pip install --user awscli
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
-  - if [ \!-d $HOME/cache2/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -C $HOME/cache2 -; fi
   - eval "${MATRIX_EVAL}"
 
 script:

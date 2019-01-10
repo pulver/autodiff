@@ -19,8 +19,8 @@ of mathematical functions in single and multiple variables.
 \subsection requirements Requirements
 
 1. C++11 compiler. Visual Studio 2015 is not supported.
-2. Maximum derivative orders are set at compile-time. This allows for compile-time allocation of memory with
-   `std::array<>`, so that use of dynamic memory is avoided.
+2. Maximum derivative orders are set at compile-time. This allows for compile-time calculation of memory
+   requirements for use with `std::array<>`, so that use of dynamic memory allocation is avoided.
 3. Mathematical functions should accept generic types (template variables) for the parameters that derivatives are
    calculated with respect to, and internal function calls should allow for
    [argument-dependent lookup](https://en.cppreference.com/w/cpp/language/adl) (ADL) on these parameters.

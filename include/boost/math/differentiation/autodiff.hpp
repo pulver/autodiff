@@ -1422,7 +1422,6 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
     return operator root_type() == 0 ? inverse_apply() : 1 / *this;
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 // This gives autodiff::log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
 // 1 / *this: autodiff::log(0.0) = depth(1)(-inf,inf,-inf,-nan,-nan,-nan)
 template<typename RealType,size_t Order>
@@ -1435,7 +1434,6 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
-#endif
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 template<typename RealType,size_t Order>
@@ -1557,7 +1555,6 @@ dimension<RealType,Order> sqrt(const dimension<RealType,Order>& cr)
     return pow(cr,0.5);
 }
 
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 // Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
 template<typename RealType,size_t Order>
 dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
@@ -1574,7 +1571,6 @@ dimension<RealType,Order> log(const dimension<RealType,Order>& cr)
         return cr.apply_with_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
-#endif
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> frexp(const dimension<RealType,Order>& cr, int* exp)

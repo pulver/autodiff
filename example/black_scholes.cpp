@@ -1,9 +1,9 @@
-//               Copyright Matthew Pulver 2018.
+//           Copyright Matthew Pulver 2018 - 2019.
 // Distributed under the Boost Software License, Version 1.0.
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
 // Equations and function/variable names are from
@@ -27,7 +27,8 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
+boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
+    black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
@@ -40,11 +41,13 @@ auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& si
 
 int main()
 {
+  using namespace boost::math::differentiation;
+
   const double K = 100.0; // Strike price.
-  const boost::math::autodiff::variable<double,3> S(105); // Stock price.
-  const boost::math::autodiff::variable<double,0,3> sigma(5); // Volatility.
-  const boost::math::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
-  const boost::math::autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
+  const autodiff::variable<double,3> S(105); // Stock price.
+  const autodiff::variable<double,0,3> sigma(5); // Volatility.
+  const autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
+  const autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
   const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
   const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
 
@@ -125,7 +128,7 @@ int main()
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/black_scholes.cpp
+$ g++ -std=c++1z example/black_scholes.cpp
 
 Output:
 $ ./a.out

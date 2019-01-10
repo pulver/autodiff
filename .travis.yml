@@ -1,9 +1,13 @@
-#               Copyright Matthew Pulver 2018.
+#           Copyright Matthew Pulver 2018 - 2019.
 # Distributed under the Boost Software License, Version 1.0.
 #      (See accompanying file LICENSE_1_0.txt or copy at
 #           https://www.boost.org/LICENSE_1_0.txt)
 
 language: cpp
+
+cache:
+  directories:
+    - $HOME/cache
 
 matrix:
   include:
@@ -18,7 +22,6 @@ matrix:
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++17"
@@ -30,11 +33,9 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
-            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.68
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"
@@ -46,11 +47,9 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
-            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - clang-5.0
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.68
             - libstdc++-7-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"
@@ -64,7 +63,6 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libboost-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++17"
     - os: linux
@@ -74,11 +72,9 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - sourceline: 'ppa:mhier/libboost-latest'
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.68
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
     - os: linux
@@ -87,12 +83,10 @@ matrix:
       addons:
         apt:
           sources:
-            - sourceline: 'ppa:mhier/libboost-latest'
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - boost1.68
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
     - os: osx
@@ -110,12 +104,18 @@ matrix:
       env:
 #       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
         - MATRIX_EVAL="brew update && brew install gcc && COMPILER=clang++ && CXXSTD=c++11"
+
 before_install:
+# - mkdir -p ~/$TRAVIS_BUILD_NUMBER
+# - pip install --user awscli
+# - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
+  - if [ \! -d $HOME/cache/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache -f -; fi
   - eval "${MATRIX_EVAL}"
 
 script:
+  - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -Iinclude -Wall -o test_autodiff
+  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/

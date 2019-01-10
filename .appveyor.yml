@@ -1,23 +1,32 @@
-#               Copyright Matthew Pulver 2018.
+#           Copyright Matthew Pulver 2018 - 2019.
 # Distributed under the Boost Software License, Version 1.0.
 #      (See accompanying file LICENSE_1_0.txt or copy at
 #           https://www.boost.org/LICENSE_1_0.txt)
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 64-bit
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 # 32-bit
+      configuration: Debug
+      INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"'
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 # 32-bit
       configuration: Release
-      INSTALL_SCRIPT1: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
-      INSTALL_SCRIPT2: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
+      INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"'
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 # 64-bit
+      configuration: Debug
+      INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 # 64-bit
+      configuration: Release
       INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"'
 
 install:
+  - curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -
   - "%INSTALL_SCRIPT1%"
   - "%INSTALL_SCRIPT2%"
+  - ls
 
 build_script:
-  - cl.exe /EHsc /IC:\Libraries\boost_1_67_0 /Iinclude test/test_autodiff.cpp
+# - cl.exe /EHsc /IC:\Libraries\boost_1_67_0 /Iinclude test/test_autodiff.cpp
+  - cl.exe /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
 
 test_script:
   - test_autodiff

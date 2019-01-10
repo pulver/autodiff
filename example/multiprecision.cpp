@@ -1,9 +1,9 @@
-//               Copyright Matthew Pulver 2018.
+//           Copyright Matthew Pulver 2018 - 2019.
 // Distributed under the Boost Software License, Version 1.0.
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <iostream>
 
@@ -17,18 +17,20 @@ T f(const T& w, const T& x, const T& y, const T& z)
 int main()
 {
   using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
-  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
-  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
+  using namespace boost::math::differentiation;
+
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
   constexpr int Nz=3; // Max order of derivative to calculate for z
-  using AdType = boost::math::autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>;
-  const AdType w = boost::math::autodiff::variable<cpp_dec_float_100,Nw>(11);
-  const AdType x = boost::math::autodiff::variable<cpp_dec_float_100,0,Nx>(12);
-  const AdType y = boost::math::autodiff::variable<cpp_dec_float_100,0,0,Ny>(13);
-  const AdType z = boost::math::autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14);
-  const AdType v = f(w,x,y,z);
+  using var = autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>;
+  const var w = autodiff::variable<cpp_dec_float_100,Nw>(11);
+  const var x = autodiff::variable<cpp_dec_float_100,0,Nx>(12);
+  const var y = autodiff::variable<cpp_dec_float_100,0,0,Ny>(13);
+  const var z = autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14);
+  const var v = f(w,x,y,z);
+  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
+  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
   std::cout << std::setprecision(std::numeric_limits<cpp_dec_float_100>::digits10)
     << "mathematica   : " << answer << '\n'
     << "autodiff      : " << v.derivative(Nw,Nx,Ny,Nz) << '\n'
@@ -37,7 +39,7 @@ int main()
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/multiprecision.cpp
+$ g++ -std=c++1z example/multiprecision.cpp
 
 Output:
 $ ./a.out

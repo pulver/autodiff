@@ -5,6 +5,10 @@
 
 language: cpp
 
+cache:
+  directories:
+    - $HOME/boost_1_69_0
+
 matrix:
   include:
     - os: linux
@@ -105,7 +109,7 @@ before_install:
 # - mkdir -p ~/$TRAVIS_BUILD_NUMBER
 # - pip install --user awscli
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
-  - curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -
+  - test -d $HOME/boost_1_69_0 || (curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -)
   - eval "${MATRIX_EVAL}"
 
 script:

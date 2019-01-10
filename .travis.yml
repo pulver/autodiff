@@ -114,7 +114,7 @@ jobs:
   include:
     - stage: setup
       script:
-        - if [ \! -d $HOME/cache2/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar zxf -C $HOME/cache2 -; fi
+        - if [ \! -d $HOME/cache2/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache2 -f -; fi
         - ls $HOME
 
 before_install:

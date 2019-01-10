@@ -7,7 +7,7 @@ language: cpp
 
 cache:
   directories:
-    - $HOME/cache
+    - $HOME/cache3
 
 matrix:
   include:
@@ -109,13 +109,13 @@ before_install:
 # - mkdir -p ~/$TRAVIS_BUILD_NUMBER
 # - pip install --user awscli
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
-  - if [ \! -d $HOME/cache/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache -f -; fi
+  - if [ \! -d $HOME/cache3/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache3 -f -; fi
   - eval "${MATRIX_EVAL}"
 
 script:
   - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache/boost_1_69_0 -Iinclude -Wall -o test_autodiff
+  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/

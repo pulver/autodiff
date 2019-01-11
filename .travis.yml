@@ -123,7 +123,7 @@ script:
 
 after_success:
   - curl -s https://codecov.io/bash > .codecov
-  - find ./ -type f -name *codecov
+  - find ./ -type f -name "*codecov"
   - chmod +x .codecov
   - ./.codecov
  

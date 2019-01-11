@@ -113,9 +113,8 @@ before_install:
   - pip install --user codecov
   - eval "${MATRIX_EVAL}"
   
-
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
 
 script:
   - ls

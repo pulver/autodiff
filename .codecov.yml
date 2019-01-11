@@ -1,3 +1,0 @@
-fixes:
-  - home/travis/cache3/*/autodiff/*/::include/boost/math/differentiation
-  - home/travis/cache3/*/autodiff/*/test

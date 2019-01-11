@@ -1498,14 +1498,14 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order> ceil(const dimension<RealType,Order>& cr)
 {
     using std::ceil;
-    return dimension<RealType,Order>{ceil(cr.at(0))}; // constant with all epsilon terms zero.
+    return dimension<RealType,Order>{ceil(static_cast<typename dimension<RealType,Order>::root_type>(cr))};
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> floor(const dimension<RealType,Order>& cr)
 {
     using std::floor;
-    return dimension<RealType,Order>{floor(cr.at(0))}; // constant with all epsilon terms zero.
+    return dimension<RealType,Order>{floor(static_cast<typename dimension<RealType,Order>::root_type>(cr))};
 }
 
 template<typename RealType,size_t Order>
@@ -1677,28 +1677,28 @@ template<typename RealType,size_t Order>
 dimension<RealType,Order> round(const dimension<RealType,Order>& cr)
 {
     using std::round;
-    return dimension<RealType,Order>{round(cr.at(0))}; // constant with all epsilon terms zero.
+    return dimension<RealType,Order>{round(static_cast<typename dimension<RealType,Order>::root_type>(cr))};
 }
 
 template<typename RealType,size_t Order>
 int iround(const dimension<RealType,Order>& cr)
 {
     using boost::math::iround;
-    return iround(cr.at(0));
+    return iround(static_cast<typename dimension<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType,size_t Order>
 dimension<RealType,Order> trunc(const dimension<RealType,Order>& cr)
 {
     using std::trunc;
-    return dimension<RealType,Order>{trunc(cr.at(0))}; // constant with all epsilon terms zero.
+    return dimension<RealType,Order>{trunc(static_cast<typename dimension<RealType,Order>::root_type>(cr))};
 }
 
 template<typename RealType,size_t Order>
 int itrunc(const dimension<RealType,Order>& cr)
 {
     using boost::math::itrunc;
-    return itrunc(cr.at(0));
+    return itrunc(static_cast<typename dimension<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType,size_t Order>
@@ -1753,21 +1753,21 @@ template<typename RealType,size_t Order>
 long lround(const dimension<RealType,Order>& cr)
 {
     using std::lround;
-    return lround(cr.at(0));
+    return lround(static_cast<typename dimension<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType,size_t Order>
 long long llround(const dimension<RealType,Order>& cr)
 {
     using std::llround;
-    return llround(cr.at(0));
+    return llround(static_cast<typename dimension<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType,size_t Order>
 long double truncl(const dimension<RealType,Order>& cr)
 {
     using std::truncl;
-    return truncl(cr.at(0));
+    return truncl(static_cast<typename dimension<RealType,Order>::root_type>(cr));
 }
 
 } } } } } // namespace boost::math::differentiation::autodiff::v1

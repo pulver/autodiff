@@ -112,6 +112,9 @@ before_install:
   - if [ \! -d $HOME/cache3/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache3 -f -; fi
   - eval "${MATRIX_EVAL}"
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 script:
   - ls
   - $COMPILER --version

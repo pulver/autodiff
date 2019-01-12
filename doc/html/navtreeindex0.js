@@ -1,11 +1,11 @@
 var NAVTREEINDEX0 =
 {
 ".html":[6,0,0],
+".html":[6,0,0,0,0,0],
 ".html":[6,0,0,0,0,0,0],
 ".html":[6,0,0,0],
 ".html":[6,0,0,0,0],
 ".html":[6,0,0,0,1],
-".html":[6,0,0,0,0,0],
 ".html":[6,0,1],
 "annotated.html":[6,0],
 "autodiff_8hpp_source.html":[7,0,0,0,0,0,0],
@@ -95,6 +95,7 @@ var NAVTREEINDEX0 =
 "index.html#general-functions":[3,2],
 "index.html#mathematics":[3],
 "index.html#multiple-variables":[3,3],
+"index.html#quick-install":[1,1],
 "index.html#requirements":[1,0],
 "index.html#synopsis":[0],
 "index.html#taylor-series":[3,0],

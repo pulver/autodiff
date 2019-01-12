@@ -26,7 +26,8 @@ var NAVTREE =
   [ "Boost.Autodiff", "index.html", [
     [ "Synopsis", "index.html#synopsis", null ],
     [ "Description", "index.html#description", [
-      [ "Requirements", "index.html#requirements", null ]
+      [ "Requirements", "index.html#requirements", null ],
+      [ "Quick Install", "index.html#quick-install", null ]
     ] ],
     [ "Examples", "index.html#examples", [
       [ "Example 1: Single-variable derivatives", "index.html#example-single-variable", null ],

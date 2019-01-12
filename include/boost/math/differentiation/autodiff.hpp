@@ -16,19 +16,61 @@ Autodiff is a header-only C++ library that facilitates the
 [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode)
 of mathematical functions in single and multiple variables.
 
+The formula central to this implementation of automatic differentiation is the following
+Taylor expansion of an analytic function \f$f\f$ at the point \f$x_0\f$:
+\f{align*}
+f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\
+  &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right).
+\f}
+
+Instead of thinking of \f$f\f$ just as a function that takes a number as input, and returns another number as output,
+change perspective for a moment and consider that the algorithm for \f$f\f$ can also take a polynomial as input,
+and return another polynomial as output. Taking \f$\varepsilon\f$ as the polynomial variable, the above expansion
+shows that \f$f\f$ performs a polynomial-to-infinite-series transformation.
+
+Assume one is only interested in the first \f$N\f$ derivatives of \f$f\f$ at \f$x_0\f$. Then without any loss
+of precision, all terms \f$O\left(\varepsilon^{N+1}\right)\f$ that include powers of \f$\varepsilon\f$ greater
+than \f$N\f$ can be discarded, and under these truncation rules, \f$f\f$ provides a polynomial-to-polynomial
+transformation:
+\f[
+f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.
+\f]
+
+C++ includes the ability to overload operators and functions, and thus when \f$f\f$ is written as
+a template function that can receive and return a generic type, then it becomes clear how to perform automatic
+differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model
+polynomial arithmetic which drop all terms in \f$O\left(\varepsilon^{N+1}\right)\f$. The derivatives are then
+found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing
+to multiple independent variables.)
+
 \subsection requirements Requirements
 
-1. C++11 compiler. Visual Studio 2015 is not supported.
+1. C++11 compiler, but optimized for C++17. Visual Studio 2015 is not supported.
 2. Maximum derivative orders are set at compile-time. This allows for compile-time calculation of memory
    requirements for use with `std::array<>`, so that use of dynamic memory allocation is avoided.
-3. Mathematical functions should accept generic types (template variables) for the parameters that derivatives are
-   calculated with respect to, and internal function calls should allow for
+3. Mathematical functions, whose derivatives are desired, should accept generic types (template variables) for
+   the parameters that derivatives are calculated with respect to, and internal function calls should allow for
    [argument-dependent lookup](https://en.cppreference.com/w/cpp/language/adl) (ADL) on these parameters.
+
+\subsection quick-install Quick Install
+
+Since this is a header-only library, there is an easy way to use/test this library without having
+to install it system-wide or compile libraries ahead of time:
+
+1. Download the latest version of boost from https://www.boost.org/ (minimum 1.70.0).
+2. Unpack it anywhere. For example, `$HOME/boost_1_70_0`.
+3. Add the new directory to your include path when compiling. Example: `g++ -I$HOME/boost_1_70_0 $HOME/boost_1_70_0/libs/math/example/autodiff_fourth_power.cpp`
 
 \section examples Examples
 
 \subsection example-single-variable Example 1: Single-variable derivatives
 <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
+
+In this example, `autodiff::variable<double,5>` is a data type that can hold a polynomial of up to degree 5,
+and the initialization `autodiff::variable<double,5> x(2.0)` represents the polynomial \f$2.0 + \varepsilon\f$.
+Internally, this is modeled by a `std::array<double,6>` whose elements correspond to the 6 coefficients of the
+polynomial: `{2, 1, 0, 0, 0, 0}` upon initialization.
+
 \dontinclude fourth_power.cpp \skip #include
 \until **
 
@@ -47,6 +89,26 @@ The above calculates \f{alignat*}{{3}
 <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
 with a precision of about 100 decimal digits, where
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
+
+In this example, the data type `autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>` represents a polynomial in 4
+independent variables, where the highest powers of each are `Nw`, `Nx`, `Ny` and `Nz`. The underlying arithmetic
+data type, referred to as `root_type`, is `boost::multiprecision::cpp_dec_float_100`. The internal data type is
+`std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`.  In general, the `root_type`
+is always the first template parameter to `autodiff::variable<>` followed by the maximum derivative order that is
+to be calculated for each independent variable.
+
+Note that when variables are initialized, the position of the last derivative order given in the parameter pack
+determines which variable is taken to be independent. In other words, it determines which of the 4 different
+polynomial variables \f$\varepsilon_w,\varepsilon_x,\varepsilon_y,\f$ or \f$\varepsilon_z\f$ are to be added:
+\f{align*}
+\texttt{autodiff::variable<cpp_dec_float_100,Nw>(11)} &= 11+\varepsilon_w \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,Nx>(12)} &= 12+\varepsilon_x \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,0,Ny>(13)} &= 13+\varepsilon_y \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14)} &= 14+\varepsilon_z
+\f}
+Instances of different types are automatically promoted to the smallest multi-variable type that accommodates
+both when they are arithmetically combined (added, subtracted, multiplied, divided.)
+
 \dontinclude multiprecision.cpp \skip #include
 \until **
 
@@ -67,10 +129,8 @@ calculate derivatives, which is a form of code redundancy.
 <h3>Calculate mixed partial derivatives of
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
 at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
-\dontinclude mixed_partials.cpp \skip #include
-\until **
 
-The above calculates
+This example calculates
 \f[
 {\tt v.derivative(iw,ix,iy,iz)} =
 \frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
@@ -88,6 +148,9 @@ Out of the 240 calculated values, the maximum relative error between the values 
 the Boost Autodiff library is found to be about \f$6.82\times10^{-13}\f$ using the standard IEEE double precision
 floating point data type. Since the data type is a template variable, the error can be reduced arbitrarily by
 using a data type with greater precision.
+
+\dontinclude mixed_partials.cpp \skip #include
+\until **
 
 <hr>
 

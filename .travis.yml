@@ -122,6 +122,8 @@ script:
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
+  - echo "${TRAVIS_COMPILER}"
+  - echo "${TRAVIS_OS_NAME}"
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "{TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "{TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
 

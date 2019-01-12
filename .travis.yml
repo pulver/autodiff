@@ -116,12 +116,13 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff
+  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
-  - if which gcov-7 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -g $HOME/cache3/boost_1_69_0 -g /Applications; else if which gcov-4.8 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-4.8 -g $HOME/cache3/boost_1_69_0 -g /Applications; else bash <(curl -s https://codecov.io/bash) -X coveragepy -g $HOME/cache3/boost_1_69_0 -g /Applications; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "{TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "{TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
 
 

@@ -118,6 +118,8 @@ calculate derivatives, which is a form of code redundancy.
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
+using namespace boost::math::differentiation;
+
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
@@ -139,7 +141,7 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
+autodiff::promote<Price,Sigma,Tau,Rate>
     black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
@@ -153,8 +155,6 @@ boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
 
 int main()
 {
-  using namespace boost::math::differentiation;
-
   const double K = 100.0; // Strike price.
   const autodiff::variable<double,3> S(105); // Stock price.
   const autodiff::variable<double,0,3> sigma(5); // Volatility.

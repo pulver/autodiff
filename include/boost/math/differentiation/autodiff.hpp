@@ -106,6 +106,7 @@ polynomial variables \f$\varepsilon_w,\varepsilon_x,\varepsilon_y,\f$ or \f$\var
 \texttt{autodiff::variable<cpp_dec_float_100,0,0,Ny>(13)} &= 13+\varepsilon_y \\
 \texttt{autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14)} &= 14+\varepsilon_z
 \f}
+
 Instances of different types are automatically promoted to the smallest multi-variable type that accommodates
 both when they are arithmetically combined (added, subtracted, multiplied, divided.)
 

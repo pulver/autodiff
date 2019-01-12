@@ -58,8 +58,8 @@ Since this is a header-only library, there is an easy way to use/test this libra
 to install it system-wide or compile libraries ahead of time:
 
 1. Download the latest version of boost from https://www.boost.org/ (minimum 1.70.0).
-2. Unpack it anywhere. For example, `$HOME/boost_1_70_0`.
-3. Add the new directory to your include path when compiling. Example: `g++ -I$HOME/boost_1_70_0 $HOME/boost_1_70_0/libs/math/example/autodiff_fourth_power.cpp`
+2. Unpack it anywhere. For example, `./boost_1_70_0`.
+3. Add the new directory to your include path when compiling. Example: `g++ -I./boost_1_70_0 ./boost_1_70_0/libs/math/example/autodiff_fourth_power.cpp`
 
 \section examples Examples
 

@@ -122,6 +122,6 @@ script:
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
-  - if which gcov-7 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -G ./include -G ./tests; else if which gcov-4.8 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-4.8 -G ./include -G ./tests; else bash <(curl -s https://codecov.io/bash) -X coveragepy -G ./include -G ./tests; fi; fi
+  - if which gcov-7 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -G ./include/boost/math/differentiation -G ./test; else if which gcov-4.8 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-4.8 -G ./include/boost/math/differentiation -G ./test; else bash <(curl -s https://codecov.io/bash) -X coveragepy -G ./include/boost/math/differentiation -G ./test; fi; fi
 
 

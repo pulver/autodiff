@@ -124,6 +124,7 @@ script:
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
+  - ls $(which gcov | xargs dirname)
   - bash <(curl -s https://codecov.io/bash) -X coveragepy
 
 

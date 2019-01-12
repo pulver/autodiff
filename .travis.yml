@@ -116,7 +116,7 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -ftest-coverage -fprofile-arcs -o test_autodiff
+  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff
   - ./test_autodiff
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/

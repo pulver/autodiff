@@ -117,14 +117,13 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
+  - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -ftest-coverage -o test_autodiff
   - ./test_autodiff
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
   - curl -s https://codecov.io/bash > .codecov
-  - find ./ -type f -name "*codecov"
   - chmod +x .codecov
   - ./.codecov
  

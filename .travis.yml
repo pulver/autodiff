@@ -110,10 +110,7 @@ before_install:
 # - pip install --user awscli
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
   - if [ \! -d $HOME/cache3/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache3 -f -; fi
-  - eval "${MATRIX_EVAL}"
-  - if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
-  - pyenv shell 3.6
-  - pip3 install --user codecov
+  - pip3.6 install --user codecov
 
 script:
   - ls
@@ -124,7 +121,6 @@ script:
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
 after_success:
-  - ls $(which gcov | xargs dirname)
-  - bash <(curl -s https://codecov.io/bash) -X coveragepy
+  - if which gcov-7 > /dev/null; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7; else if which gcov-4.8 > /dev/null; bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-4.8; else bash <(curl -s https://codecov.io/bash) -X coveragepy; fi; fi
 
 

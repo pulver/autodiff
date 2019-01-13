@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(division)
     constexpr double cx = 16.0;
     auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
     constexpr double cy = 4.0;
-    auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    auto y = boost::math::differentiation::autodiff::variable<double,1,n>(cy);
     auto z = x*x / (y*y);
     BOOST_REQUIRE(z.derivative(0,0) == cx*cx / (cy*cy)); // x^2 * y^-2
     BOOST_REQUIRE(z.derivative(0,1) == cx*cx * (-2)*std::pow(cy,-3));

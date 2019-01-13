@@ -83,6 +83,14 @@ BOOST_AUTO_TEST_CASE(constructors)
             BOOST_REQUIRE(x.derivative(i) == 1.0);
         else
             BOOST_REQUIRE(x.derivative(i) == 0.0);
+    const boost::math::differentiation::autodiff::variable<double,n> xn = x;
+    for (int i=0 ; i<=n ; ++i)
+        if (i==0)
+            BOOST_REQUIRE(xn.derivative(i) == cx);
+        else if (i==1)
+            BOOST_REQUIRE(xn.derivative(i) == 1.0);
+        else
+            BOOST_REQUIRE(xn.derivative(i) == 0.0);
     // Second independent variable
     constexpr double cy = 100.0;
     const auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
@@ -480,7 +488,7 @@ BOOST_AUTO_TEST_CASE(division)
 {
     constexpr int m = 3;
     constexpr int n = 4;
-    constexpr double cx = 5.0;
+    constexpr double cx = 16.0;
     auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
     constexpr double cy = 4.0;
     auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
@@ -519,6 +527,19 @@ BOOST_AUTO_TEST_CASE(division)
     for (int i=1 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             BOOST_REQUIRE(z2.derivative(i,j) == 0.0);
+
+    const auto z3 = y / x;
+    BOOST_REQUIRE(z3.derivative(0,0) == cy / cx);
+    BOOST_REQUIRE(z3.derivative(0,1) ==  1 / cx);
+    BOOST_REQUIRE(z3.derivative(1,0) == -cy / std::pow(cx,2));
+    BOOST_REQUIRE(z3.derivative(1,1) ==  -1 / std::pow(cx,2));
+    BOOST_REQUIRE(z3.derivative(2,0) == 2*cy / std::pow(cx,3));
+    BOOST_REQUIRE(z3.derivative(2,1) ==    2 / std::pow(cx,3));
+    BOOST_REQUIRE(z3.derivative(3,0) == -6*cy / std::pow(cx,4));
+    BOOST_REQUIRE(z3.derivative(3,1) ==    -6 / std::pow(cx,4));
+    for (int i=0 ; i<=m ; ++i)
+        for (int j=2 ; j<=n ; ++j)
+            BOOST_REQUIRE(z3.derivative(i,j) == 0.0);
 }
 
 BOOST_AUTO_TEST_CASE(equality)
@@ -792,20 +813,26 @@ BOOST_AUTO_TEST_CASE(cos_and_sin)
     constexpr int m = 5;
     constexpr double cx = boost::math::constants::third_pi<double>();
     const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto cos = boost::math::differentiation::autodiff::cos(x);
-    BOOST_REQUIRE(cos.derivative(0) == std::cos(cx));
-    BOOST_REQUIRE_CLOSE(cos.derivative(1), -std::sin(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(cos.derivative(2), -std::cos(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(cos.derivative(3), std::sin(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(cos.derivative(4), std::cos(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(cos.derivative(5), -std::sin(cx), tolerance);
-    auto sin = boost::math::differentiation::autodiff::sin(x);
-    BOOST_REQUIRE(sin.derivative(0) == std::sin(cx));
-    BOOST_REQUIRE_CLOSE(sin.derivative(1), std::cos(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(sin.derivative(2), -std::sin(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(sin.derivative(3), -std::cos(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(sin.derivative(4), std::sin(cx), tolerance);
-    BOOST_REQUIRE_CLOSE(sin.derivative(5), std::cos(cx), tolerance);
+    auto cos5 = boost::math::differentiation::autodiff::cos(x);
+    BOOST_REQUIRE(cos5.derivative(0) == std::cos(cx));
+    BOOST_REQUIRE_CLOSE(cos5.derivative(1), -std::sin(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(cos5.derivative(2), -std::cos(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(cos5.derivative(3), std::sin(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(cos5.derivative(4), std::cos(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(cos5.derivative(5), -std::sin(cx), tolerance);
+    auto sin5 = boost::math::differentiation::autodiff::sin(x);
+    BOOST_REQUIRE(sin5.derivative(0) == std::sin(cx));
+    BOOST_REQUIRE_CLOSE(sin5.derivative(1), std::cos(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(sin5.derivative(2), -std::sin(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(sin5.derivative(3), -std::cos(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(sin5.derivative(4), std::sin(cx), tolerance);
+    BOOST_REQUIRE_CLOSE(sin5.derivative(5), std::cos(cx), tolerance);
+    // Test Order = 0 for codecov
+    auto cos0 = cos(boost::math::differentiation::autodiff::variable<double,0>(cx));
+    BOOST_REQUIRE(cos0.derivative(0) == std::cos(cx));
+    auto sin0 = sin(boost::math::differentiation::autodiff::variable<double,0>(cx));
+    BOOST_REQUIRE(sin0.derivative(0) == std::sin(cx));
+
 }
 
 BOOST_AUTO_TEST_CASE(acos)

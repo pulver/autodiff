@@ -552,7 +552,7 @@ This is the recommended way to initialize variables in autodiff.
 
 \section acknowledgments Acknowledgments
 
-- Kedar Bhat - C++11 compatibility and feedback.
+- Kedar Bhat - C++11 compatibility, codecov integration, and feedback.
 - Nick Thompson - Initial feedback and help with Boost integration.
 - John Maddock - Initial feedback and help with Boost integration.
 
@@ -1491,7 +1491,7 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
-    std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
+    root_type derivatives[order_sum()+1]; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
     for (size_t i=1 ; i<=order_sum() ; ++i)

@@ -6,6 +6,8 @@
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
+using namespace boost::math::differentiation;
+
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
@@ -27,7 +29,8 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
+autodiff::promote<Price,Sigma,Tau,Rate>
+    black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
@@ -41,10 +44,10 @@ auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& si
 int main()
 {
   const double K = 100.0; // Strike price.
-  const boost::math::autodiff::variable<double,3> S(105); // Stock price.
-  const boost::math::autodiff::variable<double,0,3> sigma(5); // Volatility.
-  const boost::math::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
-  const boost::math::autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
+  const autodiff::variable<double,3> S(105); // Stock price.
+  const autodiff::variable<double,0,3> sigma(5); // Volatility.
+  const autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
+  const autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
   const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
   const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
 
@@ -124,11 +127,7 @@ int main()
   return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z -Iinclude example/black_scholes.cpp
-
 Output:
-$ ./a.out
 autodiff black-scholes call price = 56.5136030677739
 autodiff black-scholes put  price = 51.4109161009333
 

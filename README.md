@@ -2,10 +2,23 @@
 
 [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff)
 [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master)
+[![codecov](https://codecov.io/gh/pulver/autodiff/branch/dev-boost/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff)
 
 ## Introduction and Quick-Start Examples
 
-Autodiff is a C++ header-only library to facilitate the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
+Autodiff is a header-only C++ library that facilitates the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
+
+The formula central to this implementation of automatic differentiation is the following [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function *f* at a point *x0*:
+
+![\begin{align*} f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\ &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right). \end{align*}](doc/images/taylor_series.png)
+
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f*. By selecting the proper polynomial as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One then multiplies by a factorial term to obtain the desired derivative of any order.
+
+Assume one is interested in the first *N* derivatives of *f* at *x0*. Then without any loss of precision to the calculation of the derivatives, all terms that include powers greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
+
+![\[ f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n. \]](doc/images/polynomial_transform.png)
+
+C++ includes the ability to overload operators and functions, and thus when *f* is written as a template function that can receive and return a generic type, then that is sufficient to perform automatic differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic that drop all terms with powers greater than *N*. The derivatives are then found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
 
 See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) for more details.
 
@@ -14,7 +27,7 @@ See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) fo
 ![Calculate derivatives for x to 4th power](doc/images/fourth_power.png)
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
 template<typename T>
@@ -26,16 +39,18 @@ T fourth_power(T x)
 
 int main()
 {
+    using namespace boost::math::differentiation;
+
     constexpr int Order=5; // The highest order derivative to be calculated.
-    const boost::math::autodiff::variable<double,Order> x(2.0); // Find derivatives at x=2.
-    const boost::math::autodiff::variable<double,Order> y = fourth_power(x);
+    const autodiff::variable<double,Order> x(2.0); // Find derivatives at x=2.
+    const autodiff::variable<double,Order> y = fourth_power(x);
     for (int i=0 ; i<=Order ; ++i)
         std::cout << "y.derivative("<<i<<") = " << y.derivative(i) << std::endl;
     return 0;
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/fourth_power.cpp
+$ g++ -std=c++1z example/fourth_power.cpp
 
 Output:
 $ ./a.out
@@ -57,7 +72,7 @@ The above calculates
 ![12th-order mixed-partial derivative with about 100 decimal digits](doc/images/mixed_partial_multiprecision.png)
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
+#include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <iostream>
 
@@ -71,18 +86,20 @@ T f(const T& w, const T& x, const T& y, const T& z)
 int main()
 {
   using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
-  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
-  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
+  using namespace boost::math::differentiation;
+
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
   constexpr int Nz=3; // Max order of derivative to calculate for z
-  using AdType = boost::math::autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>;
-  const AdType w = boost::math::autodiff::variable<cpp_dec_float_100,Nw>(11);
-  const AdType x = boost::math::autodiff::variable<cpp_dec_float_100,0,Nx>(12);
-  const AdType y = boost::math::autodiff::variable<cpp_dec_float_100,0,0,Ny>(13);
-  const AdType z = boost::math::autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14);
-  const AdType v = f(w,x,y,z);
+  using var = autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>;
+  const var w = autodiff::variable<cpp_dec_float_100,Nw>(11);
+  const var x = autodiff::variable<cpp_dec_float_100,0,Nx>(12);
+  const var y = autodiff::variable<cpp_dec_float_100,0,0,Ny>(13);
+  const var z = autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14);
+  const var v = f(w,x,y,z);
+  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
+  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
   std::cout << std::setprecision(std::numeric_limits<cpp_dec_float_100>::digits10)
     << "mathematica   : " << answer << '\n'
     << "autodiff      : " << v.derivative(Nw,Nx,Ny,Nz) << '\n'
@@ -91,7 +108,7 @@ int main()
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/multiprecision.cpp
+$ g++ -std=c++1z example/multiprecision.cpp
 
 Output:
 $ ./a.out
@@ -111,11 +128,10 @@ One of the primary benefits of using automatic differentiation is the eliminatio
 calculate derivatives, which is a form of code redundancy.
 
 ``` c++
-#include <boost/math/autodiff.hpp> // Currently proposed.
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <cmath>
-#include <limits>
+#include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
+
+using namespace boost::math::differentiation;
 
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
@@ -138,7 +154,8 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
+autodiff::promote<Price,Sigma,Tau,Rate>
+    black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
@@ -151,11 +168,11 @@ auto black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& si
 
 int main()
 {
-  const double K = 100.0; // Strike price
-  const boost::math::autodiff::variable<double,3> S(105); // Stock price.
-  const boost::math::autodiff::variable<double,0,3> sigma(5); // Volatility.
-  const boost::math::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
-  const boost::math::autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
+  const double K = 100.0; // Strike price.
+  const autodiff::variable<double,3> S(105); // Stock price.
+  const autodiff::variable<double,0,3> sigma(5); // Volatility.
+  const autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
+  const autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
   const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
   const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
 
@@ -236,7 +253,7 @@ int main()
 }
 /*
 Compile:
-$ g++ -std=c++1z -Iinclude example/black_scholes.cpp
+$ g++ -std=c++1z example/black_scholes.cpp
 
 Output:
 $ ./a.out
@@ -297,5 +314,5 @@ autodiff put  ultima = -0.0922426864775683
 
 ## Requirements
 
- - C++17 compiler that supports [constexpr if statements](https://en.cppreference.com/w/cpp/language/if).
+ - C++11 compiler, but optimized for C++17. Visual Studio 2015 is not presently supported.
  - [Boost](https://www.boost.org/) library. (Headers only; no linking required.)

@@ -8,6 +8,7 @@ language: cpp
 cache:
   directories:
     - $HOME/cache3
+    - $HOME/.sonar/cache
 
 matrix:
   include:

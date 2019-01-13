@@ -16,32 +16,31 @@ Autodiff is a header-only C++ library that facilitates the
 [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode)
 of mathematical functions in single and multiple variables.
 
-The formula central to this implementation of automatic differentiation is the following
-Taylor expansion of an analytic function \f$f\f$ at the point \f$x_0\f$:
+The formula central to this implementation of automatic differentiation is the following [Taylor
+series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function \f$f\f$ at the point \f$x_0\f$:
 \f{align*}
 f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\
   &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right).
 \f}
 
-Instead of thinking of \f$f\f$ just as a function that takes a number as input, and returns another number as output,
-change perspective for a moment and consider that the algorithm for \f$f\f$ can also take a polynomial as input,
-and return another polynomial as output. Taking \f$\varepsilon\f$ as the polynomial variable, the above expansion
-shows that \f$f\f$ performs a polynomial-to-infinite-series transformation.
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation by \f$f\f$. By
+selecting the proper polynomial \f$x_0+\varepsilon\f$ as input, the resulting polynomial contains the function's
+derivatives within the polynomial coefficients. One simply needs to multiply by a factorial term to obtain the
+desired derivative of any order.
 
-Assume one is only interested in the first \f$N\f$ derivatives of \f$f\f$ at \f$x_0\f$. Then without any loss
-of precision, all terms \f$O\left(\varepsilon^{N+1}\right)\f$ that include powers of \f$\varepsilon\f$ greater
-than \f$N\f$ can be discarded, and under these truncation rules, \f$f\f$ provides a polynomial-to-polynomial
-transformation:
+Assume one is interested in the first \f$N\f$ derivatives of \f$f\f$ at \f$x_0\f$. Then without any loss of
+precision to the calculation of the derivatives, all terms \f$O\left(\varepsilon^{N+1}\right)\f$ that include
+powers of \f$\varepsilon\f$ greater than \f$N\f$ can be discarded, and under these truncation rules, \f$f\f$
+provides a polynomial-to-polynomial transformation:
 \f[
 f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.
 \f]
 
-C++ includes the ability to overload operators and functions, and thus when \f$f\f$ is written as
-a template function that can receive and return a generic type, then it becomes clear how to perform automatic
-differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model
-polynomial arithmetic which drop all terms in \f$O\left(\varepsilon^{N+1}\right)\f$. The derivatives are then
-found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing
-to multiple independent variables.)
+C++ includes the ability to overload operators and functions, and thus when \f$f\f$ is written as a template
+function that can receive and return a generic type, then that is sufficient to perform automatic differentiation:
+Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic
+that drop all terms in \f$O\left(\varepsilon^{N+1}\right)\f$. The derivatives are then found in the coefficients of
+the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
 
 \subsection requirements Requirements
 
@@ -57,9 +56,12 @@ to multiple independent variables.)
 Since this is a header-only library, there is an easy way to use/test this library without having
 to install it system-wide or compile libraries ahead of time:
 
-1. Download the latest version of boost from https://www.boost.org/ (minimum 1.70.0).
-2. Unpack it anywhere. For example, `./boost_1_70_0`.
+1. Download the latest version of boost from https://www.boost.org/ (minimum 1.70.0) and uncompress it.
+2. A single directory is created, for example, `./boost_1_70_0`.
 3. Add the new directory to your include path when compiling. Example: `g++ -I./boost_1_70_0 ./boost_1_70_0/libs/math/example/autodiff_fourth_power.cpp`
+
+Long term it is recommended to install boost via a package manager specific to your operating system, or with
+the `INSTALL` directions provided in the download.
 
 \section examples Examples
 

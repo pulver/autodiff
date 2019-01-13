@@ -137,7 +137,7 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then build-wrapper-linux-x86-64 $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; else $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; else $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
   - ./test_autodiff
   - ls
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then sonar-scanner; fi

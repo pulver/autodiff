@@ -93,7 +93,7 @@ with a precision of about 100 decimal digits, where
 In this example, the data type `autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>` represents a polynomial in 4
 independent variables, where the highest powers of each are `Nw`, `Nx`, `Ny` and `Nz`. The underlying arithmetic
 data type, referred to as `root_type`, is `boost::multiprecision::cpp_dec_float_100`. The internal data type is
-`std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`.  In general, the `root_type`
+`std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`. In general, the `root_type`
 is always the first template parameter to `autodiff::variable<>` followed by the maximum derivative order that is
 to be calculated for each independent variable.
 
@@ -139,8 +139,8 @@ This example calculates
 \f]
 
 where \f$\mathbb{N}_i=\{0,1,2,...,i-1\}\f$.
-For testing purposes, the \f$4\times3\times5\times4=240\f$-element `answers[]`
-array was calculated independently by Mathematica (example/mixed_partials.nb) in 2 steps:
+For testing purposes, the \f$4\times3\times5\times4=240\f$-element `answers[]` array was calculated independently
+by Mathematica in 2 steps:
 
  1. <a href="https://reference.wolfram.com/language/tutorial/SymbolicComputation.html">Symbolic differentiation</a>
  2. <a href="https://reference.wolfram.com/language/tutorial/ArbitraryPrecisionNumbers.html">Arbitrary-precision computation</a> to calculate the answers to 20 decimal places.
@@ -330,7 +330,7 @@ f({\bf x}) &= f(x_0 + {\bf x}_\varepsilon) \\
 
 where \f$\varepsilon\f$ has been substituted with \f${\bf x}_\varepsilon\f$ in the \f$\varepsilon\f$-taylor series
 for \f$f(x)\f$. This form gives a recipe for calculating \f$f({\bf x})\f$ in general from regular numeric calculations
-\f$f(x_0)\f$, \f$f'(x_0)\f$, \f$f''(x_0)\f$, ...  and successive powers of the epsilon terms \f${\bf x}_\varepsilon\f$.
+\f$f(x_0)\f$, \f$f'(x_0)\f$, \f$f''(x_0)\f$, ... and successive powers of the epsilon terms \f${\bf x}_\varepsilon\f$.
 
 For an application in which we are interested in up to \f$N\f$ derivatives in \f$x\f$ the data structure to hold
 this information is an \f$(N+1)\f$-element array `v` whose general element is
@@ -399,8 +399,8 @@ To declare and initialize \f$x\f$:
 boost::math::differentiation::autodiff::variable<T,M> x(x0);
 \endcode
 
-where `x0` is a run-time value of type `T`.  Assuming `0 < M`, this represents the polynomial \f$ x_0 + \varepsilon
-\f$.  Internally, the member variable of type `std::array<T,M>` is `v = { x0, 1, 0, 0, ... }`, consistent with the
+where `x0` is a run-time value of type `T`. Assuming `0 < M`, this represents the polynomial \f$ x_0 + \varepsilon
+\f$. Internally, the member variable of type `std::array<T,M>` is `v = { x0, 1, 0, 0, ... }`, consistent with the
 above mathematical treatise.
 
 To find the derivatives \f$f^{(n)}(x_0)\f$ for \f$0\le n\le M\f$ of a function

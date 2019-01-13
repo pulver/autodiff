@@ -93,10 +93,6 @@ int main()
   return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z example/mixed_partials.cpp
-
 Output:
-$ ./a.out
 max_relative_error = 6.82e-13 out of 240 calculated values.
 **/

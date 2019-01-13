@@ -25,11 +25,7 @@ int main()
     return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z example/fourth_power.cpp
-
 Output:
-$ ./a.out
 y.derivative(0) = 16
 y.derivative(1) = 32
 y.derivative(2) = 48

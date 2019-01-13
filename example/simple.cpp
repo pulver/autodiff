@@ -19,11 +19,7 @@ int main()
     return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z example/simple.cpp
-
 Output:
-$ ./a.out
 z.derivative(2,0) = 20
 z.derivative(1,1) = 50
 z.derivative(0,2) = 200

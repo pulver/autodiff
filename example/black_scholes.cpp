@@ -127,11 +127,7 @@ int main()
   return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z example/black_scholes.cpp
-
 Output:
-$ ./a.out
 autodiff black-scholes call price = 56.5136030677739
 autodiff black-scholes put  price = 51.4109161009333
 

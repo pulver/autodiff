@@ -63,8 +63,11 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
+      sonarcloud:
+        organization: kedarbhat-github
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++17"
+
     - os: linux
       dist: trusty
       compiler: gcc
@@ -75,8 +78,11 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
+      sonarcloud:
+        organization: kedarbhat-github
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
+
     - os: linux
       dist: trusty
       compiler: gcc
@@ -87,8 +93,11 @@ matrix:
           packages:
             - g++-7
 #           - cppcheck # version 1.61 doesn't recognize if constexpr
+      sonarcloud:
+        organization: kedarbhat-github
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
+
     - os: osx
       osx_image: xcode9.3
       env:
@@ -117,6 +126,7 @@ script:
   - $COMPILER --version
   - $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then sonar-scanner; fi
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
@@ -124,5 +134,6 @@ after_success:
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
+
 
 

@@ -8,17 +8,17 @@
 
 Autodiff is a header-only C++ library that facilitates the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
 
-The formula central to this implementation of automatic differentiation is the following [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function ![$f$](doc/images/form_0.png) at the point ![$x_0$](doc/images/form_1.png):
+The formula central to this implementation of automatic differentiation is the following [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function *f* at a point *x0*:
 
-![\begin{align*} f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\ &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right). \end{align*}](doc/images/form_2.png)
+![\begin{align*} f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\ &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right). \end{align*}](doc/images/taylor_series.png)
 
-The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation by ![$f$](doc/images/form_0.png). By selecting the proper polynomial ![$x_0+\varepsilon$](doc/images/form_3.png) as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One simply needs to multiply by a factorial term to obtain the desired derivative of any order.
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation by *f* By selecting the proper polynomial as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One simply needs to multiply by a factorial term to obtain the desired derivative of any order.
 
-Assume one is interested in the first ![$N$](doc/images/form_4.png) derivatives of ![$f$](doc/images/form_0.png) at ![$x_0$](doc/images/form_1.png). Then without any loss of precision to the calculation of the derivatives, all terms ![$O\left(\varepsilon^{N+1}\right)$](doc/images/form_5.png) that include powers of ![$\varepsilon$](doc/images/form_6.png) greater than ![$N$](doc/images/form_4.png) can be discarded, and under these truncation rules, ![$f$](doc/images/form_0.png) provides a polynomial-to-polynomial transformation:
+Assume one is interested in the first *N* derivatives of *f* at *x0*. Then without any loss of precision to the calculation of the derivatives, all terms that include powers greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
 
-![\[ f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n. \]](doc/images/form_7.png)
+![\[ f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n. \]](doc/images/polynomial_transform.png)
 
-C++ includes the ability to overload operators and functions, and thus when ![$f$](doc/images/form_0.png) is written as a template function that can receive and return a generic type, then that is sufficient to perform automatic differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic that drop all terms in ![$O\left(\varepsilon^{N+1}\right)$](doc/images/form_5.png). The derivatives are then found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
+C++ includes the ability to overload operators and functions, and thus when *f* is written as a template function that can receive and return a generic type, then that is sufficient to perform automatic differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic that drop all terms with powers greater than *N*. The derivatives are then found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
 
 See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) for more details.
 

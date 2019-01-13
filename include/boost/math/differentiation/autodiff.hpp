@@ -23,10 +23,10 @@ f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsil
   &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right).
 \f}
 
-The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation by \f$f\f$. By
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of \f$f\f$. By
 selecting the proper polynomial \f$x_0+\varepsilon\f$ as input, the resulting polynomial contains the function's
-derivatives within the polynomial coefficients. One simply needs to multiply by a factorial term to obtain the
-desired derivative of any order.
+derivatives within the polynomial coefficients. One then multiplies by a factorial term to obtain the desired
+derivative of any order.
 
 Assume one is interested in the first \f$N\f$ derivatives of \f$f\f$ at \f$x_0\f$. Then without any loss of
 precision to the calculation of the derivatives, all terms \f$O\left(\varepsilon^{N+1}\right)\f$ that include

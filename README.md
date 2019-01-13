@@ -12,7 +12,7 @@ The formula central to this implementation of automatic differentiation is the f
 
 ![\begin{align*} f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\ &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right). \end{align*}](doc/images/taylor_series.png)
 
-The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation by *f* By selecting the proper polynomial as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One simply needs to multiply by a factorial term to obtain the desired derivative of any order.
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f*. By selecting the proper polynomial as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One then multiplies by a factorial term to obtain the desired derivative of any order.
 
 Assume one is interested in the first *N* derivatives of *f* at *x0*. Then without any loss of precision to the calculation of the derivatives, all terms that include powers greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
 

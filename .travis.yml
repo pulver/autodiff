@@ -130,7 +130,7 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then $COMPILATION_PREFIX; fi $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then echo "${COMPILATION_PREFIX}"; fi $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then sonar-scanner; fi
 # - cppcheck --version

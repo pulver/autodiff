@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff)
 [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master)
 [![codecov](https://codecov.io/gh/kedarbhat/autodiff/branch/dev-boost/graph/badge.svg)](https://codecov.io/gh/kedarbhat/autodiff)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=kedarbhat_autodiff&metric=alert_status)](https://sonarcloud.io/dashboard/index/kedarbhat_autodiff)
 ## Introduction and Quick-Start Examples
 
 Autodiff is a C++ header-only library to facilitate the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.

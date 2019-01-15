@@ -2,11 +2,24 @@
 
 [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff)
 [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master)
-[![codecov](https://codecov.io/gh/kedarbhat/autodiff/branch/dev-boost/graph/badge.svg)](https://codecov.io/gh/kedarbhat/autodiff)
+[![codecov](https://codecov.io/gh/pulver/autodiff/branch/dev-boost/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=kedarbhat_autodiff&metric=alert_status)](https://sonarcloud.io/dashboard/index/kedarbhat_autodiff)
+
 ## Introduction and Quick-Start Examples
 
-Autodiff is a C++ header-only library to facilitate the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
+Autodiff is a header-only C++ library that facilitates the [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode) of mathematical functions in single and multiple variables.
+
+The formula central to this implementation of automatic differentiation is the following [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function *f* at a point *x0*:
+
+![\begin{align*} f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\ &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right). \end{align*}](doc/images/taylor_series.png)
+
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f*. By selecting the proper polynomial as input, the resulting polynomial contains the function's derivatives within the polynomial coefficients. One then multiplies by a factorial term to obtain the desired derivative of any order.
+
+Assume one is interested in the first *N* derivatives of *f* at *x0*. Then without any loss of precision to the calculation of the derivatives, all terms that include powers greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
+
+![\[ f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n. \]](doc/images/polynomial_transform.png)
+
+C++ includes the ability to overload operators and functions, and thus when *f* is written as a template function that can receive and return a generic type, then that is sufficient to perform automatic differentiation: Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic that drop all terms with powers greater than *N*. The derivatives are then found in the coefficients of the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
 
 See the [autodiff documentation](http://www.unitytechgroup.com/doc/autodiff/) for more details.
 
@@ -119,6 +132,8 @@ calculate derivatives, which is a form of code redundancy.
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
+using namespace boost::math::differentiation;
+
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
@@ -140,7 +155,7 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
+autodiff::promote<Price,Sigma,Tau,Rate>
     black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
@@ -154,8 +169,6 @@ boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
 
 int main()
 {
-  using namespace boost::math::differentiation;
-
   const double K = 100.0; // Strike price.
   const autodiff::variable<double,3> S(105); // Stock price.
   const autodiff::variable<double,0,3> sigma(5); // Volatility.

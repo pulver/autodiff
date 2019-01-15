@@ -6,8 +6,10 @@
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
+using namespace boost::math::differentiation;
+
 template<typename W,typename X,typename Y,typename Z>
-boost::math::differentiation::autodiff::promote<W,X,Y,Z> f(const W& w, const X& x, const Y& y, const Z& z)
+autodiff::promote<W,X,Y,Z> f(const W& w, const X& x, const Y& y, const Z& z)
 {
   using namespace std;
   return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
@@ -66,8 +68,6 @@ const double answers[] = { 19878.406289804349223, 20731.748382749395173, 14667.6
 
 int main()
 {
-  using namespace boost::math::differentiation;
-
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
@@ -93,10 +93,6 @@ int main()
   return 0;
 }
 /*
-Compile:
-$ g++ -std=c++1z example/mixed_partials.cpp
-
 Output:
-$ ./a.out
 max_relative_error = 6.82e-13 out of 240 calculated values.
 **/

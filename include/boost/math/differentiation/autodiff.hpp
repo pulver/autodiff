@@ -16,19 +16,63 @@ Autodiff is a header-only C++ library that facilitates the
 [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) (forward mode)
 of mathematical functions in single and multiple variables.
 
+The formula central to this implementation of automatic differentiation is the following [Taylor
+series](https://en.wikipedia.org/wiki/Taylor_series) expansion of an analytic function \f$f\f$ at the point \f$x_0\f$:
+\f{align*}
+f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\
+  &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right).
+\f}
+
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of \f$f\f$. By
+selecting the proper polynomial \f$x_0+\varepsilon\f$ as input, the resulting polynomial contains the function's
+derivatives within the polynomial coefficients. One then multiplies by a factorial term to obtain the desired
+derivative of any order.
+
+Assume one is interested in the first \f$N\f$ derivatives of \f$f\f$ at \f$x_0\f$. Then without any loss of
+precision to the calculation of the derivatives, all terms \f$O\left(\varepsilon^{N+1}\right)\f$ that include
+powers of \f$\varepsilon\f$ greater than \f$N\f$ can be discarded, and under these truncation rules, \f$f\f$
+provides a polynomial-to-polynomial transformation:
+\f[
+f\quad:\quad x_0+\varepsilon\quad\mapsto\quad\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.
+\f]
+
+C++ includes the ability to overload operators and functions, and thus when \f$f\f$ is written as a template
+function that can receive and return a generic type, then that is sufficient to perform automatic differentiation:
+Create a class that models polynomials, and overload all of the arithmetic operators to model polynomial arithmetic
+that drop all terms in \f$O\left(\varepsilon^{N+1}\right)\f$. The derivatives are then found in the coefficients of
+the return value. This is essentially what the autodiff library does (generalizing to multiple independent variables.)
+
 \subsection requirements Requirements
 
-1. C++11 compiler. Visual Studio 2015 is not supported.
-2. Maximum derivative orders are set at compile-time. This allows for compile-time allocation of memory with
-   `std::array<>`, so that use of dynamic memory is avoided.
-3. Mathematical functions should accept generic types (template variables) for the parameters that derivatives are
-   calculated with respect to, and internal function calls should allow for
+1. C++11 compiler, but optimized for C++17. Visual Studio 2015 is not supported.
+2. Maximum derivative orders are set at compile-time. This allows for compile-time calculation of memory
+   requirements for use with `std::array<>`, so that use of dynamic memory allocation is avoided.
+3. Mathematical functions, whose derivatives are desired, should accept generic types (template variables) for
+   the parameters that derivatives are calculated with respect to, and internal function calls should allow for
    [argument-dependent lookup](https://en.cppreference.com/w/cpp/language/adl) (ADL) on these parameters.
+
+\subsection quick-install Quick Install
+
+Since this is a header-only library, there is an easy way to use/test this library without having
+to install it system-wide or compile libraries ahead of time:
+
+1. Download the latest version of boost from https://www.boost.org/ (minimum 1.70.0) and uncompress it.
+2. A single directory is created, for example, `./boost_1_70_0`.
+3. Add the new directory to your include path when compiling. Example: `g++ -I./boost_1_70_0 ./boost_1_70_0/libs/math/example/autodiff_fourth_power.cpp`
+
+Long term it is recommended to install boost via a package manager specific to your operating system, or with
+the `INSTALL` directions provided in the download.
 
 \section examples Examples
 
 \subsection example-single-variable Example 1: Single-variable derivatives
 <h3>Calculate derivatives of \f$f(x)=x^4\f$ at \f$x=2.0\f$.</h3>
+
+In this example, `autodiff::variable<double,5>` is a data type that can hold a polynomial of up to degree 5,
+and the initialization `autodiff::variable<double,5> x(2.0)` represents the polynomial \f$2.0 + \varepsilon\f$.
+Internally, this is modeled by a `std::array<double,6>` whose elements correspond to the 6 coefficients of the
+polynomial: `{2, 1, 0, 0, 0, 0}` upon initialization.
+
 \dontinclude fourth_power.cpp \skip #include
 \until **
 
@@ -47,6 +91,27 @@ The above calculates \f{alignat*}{{3}
 <h3>Calculate \f$\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)\f$
 with a precision of about 100 decimal digits, where
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$.</h3>
+
+In this example, the data type `autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>` represents a polynomial in 4
+independent variables, where the highest powers of each are `Nw`, `Nx`, `Ny` and `Nz`. The underlying arithmetic
+data type, referred to as `root_type`, is `boost::multiprecision::cpp_dec_float_100`. The internal data type is
+`std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`. In general, the `root_type`
+is always the first template parameter to `autodiff::variable<>` followed by the maximum derivative order that is
+to be calculated for each independent variable.
+
+Note that when variables are initialized, the position of the last derivative order given in the parameter pack
+determines which variable is taken to be independent. In other words, it determines which of the 4 different
+polynomial variables \f$\varepsilon_w,\varepsilon_x,\varepsilon_y,\f$ or \f$\varepsilon_z\f$ are to be added:
+\f{align*}
+\texttt{autodiff::variable<cpp_dec_float_100,Nw>(11)} &= 11+\varepsilon_w \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,Nx>(12)} &= 12+\varepsilon_x \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,0,Ny>(13)} &= 13+\varepsilon_y \\
+\texttt{autodiff::variable<cpp_dec_float_100,0,0,0,Nz>(14)} &= 14+\varepsilon_z
+\f}
+
+Instances of different types are automatically promoted to the smallest multi-variable type that accommodates
+both when they are arithmetically combined (added, subtracted, multiplied, divided.)
+
 \dontinclude multiprecision.cpp \skip #include
 \until **
 
@@ -67,10 +132,8 @@ calculate derivatives, which is a form of code redundancy.
 <h3>Calculate mixed partial derivatives of
 \f$f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}\f$
 at \f$(w,x,y,z)=(11,12,13,14)\f$.</h3>
-\dontinclude mixed_partials.cpp \skip #include
-\until **
 
-The above calculates
+This example calculates
 \f[
 {\tt v.derivative(iw,ix,iy,iz)} =
 \frac{\partial^{i_w+i_x+i_y+i_z}f}{\partial w^{i_w}\partial x^{i_x}\partial y^{i_y}\partial z^{i_z}}(11,12,13,14)
@@ -78,8 +141,8 @@ The above calculates
 \f]
 
 where \f$\mathbb{N}_i=\{0,1,2,...,i-1\}\f$.
-For testing purposes, the \f$4\times3\times5\times4=240\f$-element `answers[]`
-array was calculated independently by Mathematica (example/mixed_partials.nb) in 2 steps:
+For testing purposes, the \f$4\times3\times5\times4=240\f$-element `answers[]` array was calculated independently
+by Mathematica in 2 steps:
 
  1. <a href="https://reference.wolfram.com/language/tutorial/SymbolicComputation.html">Symbolic differentiation</a>
  2. <a href="https://reference.wolfram.com/language/tutorial/ArbitraryPrecisionNumbers.html">Arbitrary-precision computation</a> to calculate the answers to 20 decimal places.
@@ -88,6 +151,9 @@ Out of the 240 calculated values, the maximum relative error between the values 
 the Boost Autodiff library is found to be about \f$6.82\times10^{-13}\f$ using the standard IEEE double precision
 floating point data type. Since the data type is a template variable, the error can be reduced arbitrarily by
 using a data type with greater precision.
+
+\dontinclude mixed_partials.cpp \skip #include
+\until **
 
 <hr>
 
@@ -266,7 +332,7 @@ f({\bf x}) &= f(x_0 + {\bf x}_\varepsilon) \\
 
 where \f$\varepsilon\f$ has been substituted with \f${\bf x}_\varepsilon\f$ in the \f$\varepsilon\f$-taylor series
 for \f$f(x)\f$. This form gives a recipe for calculating \f$f({\bf x})\f$ in general from regular numeric calculations
-\f$f(x_0)\f$, \f$f'(x_0)\f$, \f$f''(x_0)\f$, ...  and successive powers of the epsilon terms \f${\bf x}_\varepsilon\f$.
+\f$f(x_0)\f$, \f$f'(x_0)\f$, \f$f''(x_0)\f$, ... and successive powers of the epsilon terms \f${\bf x}_\varepsilon\f$.
 
 For an application in which we are interested in up to \f$N\f$ derivatives in \f$x\f$ the data structure to hold
 this information is an \f$(N+1)\f$-element array `v` whose general element is
@@ -335,8 +401,8 @@ To declare and initialize \f$x\f$:
 boost::math::differentiation::autodiff::variable<T,M> x(x0);
 \endcode
 
-where `x0` is a run-time value of type `T`.  Assuming `0 < M`, this represents the polynomial \f$ x_0 + \varepsilon
-\f$.  Internally, the member variable of type `std::array<T,M>` is `v = { x0, 1, 0, 0, ... }`, consistent with the
+where `x0` is a run-time value of type `T`. Assuming `0 < M`, this represents the polynomial \f$ x_0 + \varepsilon
+\f$. Internally, the member variable of type `std::array<T,M>` is `v = { x0, 1, 0, 0, ... }`, consistent with the
 above mathematical treatise.
 
 To find the derivatives \f$f^{(n)}(x_0)\f$ for \f$0\le n\le M\f$ of a function
@@ -488,7 +554,7 @@ This is the recommended way to initialize variables in autodiff.
 
 \section acknowledgments Acknowledgments
 
-- Kedar Bhat - C++11 compatibility and feedback.
+- Kedar Bhat - C++11 compatibility, codecov integration, and feedback.
 - Nick Thompson - Initial feedback and help with Boost integration.
 - John Maddock - Initial feedback and help with Boost integration.
 
@@ -1427,7 +1493,7 @@ dimension<RealType,Order> dimension<RealType,Order>::inverse() const
 template<typename RealType,size_t Order>
 dimension<RealType,Order> dimension<RealType,Order>::inverse_apply() const
 {
-    std::array<root_type,order_sum()+1> derivatives; // derivatives of 1/x
+    root_type derivatives[order_sum()+1]; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
     for (size_t i=1 ; i<=order_sum() ; ++i)

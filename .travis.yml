@@ -10,107 +10,153 @@ cache:
     - $HOME/cache3
     - $HOME/.sonar/cache
 
-matrix:
+anchors:
+  clang-34: &clang-34 { apt: { packages: [ "clang-3.4"       ], sources: [ "llvm-toolchain-trusty-3.4" ] } }
+  clang-38: &clang-38 { apt: { packages: [ "clang-3.8",
+                                           "libstdc++-6-dev" ], sources: [ "llvm-toolchain-trusty-3.8",
+                                                                           "ubuntu-toolchain-r-test"   ] } }
+  clang-4:  &clang-4  { apt: { packages: [ "clang-4.0",
+                                           "libstdc++-6-dev" ], sources: [ "llvm-toolchain-trusty-4.0",
+                                                                           "ubuntu-toolchain-r-test"   ] } }
+  clang-5:  &clang-5  { apt: { packages: [ "clang-5.0",
+                                           "libstdc++-7-dev" ], sources: [ "llvm-toolchain-trusty-5.0",
+                                                                           "ubuntu-toolchain-r-test"   ] } }
+  clang-6:  &clang-6  { apt: { packages: [ "clang-6.0",
+                                           "libc++-dev",
+                                           "libstdc++-8-dev" ], sources: [ "llvm-toolchain-trusty-6.0",
+                                                                           "ubuntu-toolchain-r-test"   ] } }
+  gcc-44:   &gcc-44   { apt: { packages: [ "g++-4.4"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-46:   &gcc-46   { apt: { packages: [ "g++-4.6"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-48:   &gcc-48   { apt: { packages: [ "g++-4.8"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-8:    &gcc-8    { apt: { packages: [ "g++-8"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+
+jobs:
+  allow_failures:
+    - env:
+        - COPY="all the environment settings from your job"
+
   include:
-    - os: linux
-      dist: trusty
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libstdc++-7-dev
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++17"
-    - os: linux
-      dist: trusty
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libstdc++-7-dev
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"
-    - os: linux
-      dist: trusty
-      compiler: clang
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-            - libstdc++-7-dev
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"
-    - os: linux
-      dist: trusty
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-        sonarcloud:
-          organization: kedarbhat-github
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++17"
-    - os: linux
-      dist: trusty
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-        sonarcloud:
-          organization: kedarbhat-github
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
-    - os: linux
-      dist: trusty
-      compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-#           - cppcheck # version 1.61 doesn't recognize if constexpr
-        sonarcloud:
-          organization: kedarbhat-github
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
-    - os: osx
-      osx_image: xcode9.3
-      env:
-#       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
-        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++1z"
-    - os: osx
-      osx_image: xcode9.3
-      env:
-#       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
-        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++14"
-    - os: osx
-      osx_image: xcode9.3
-      env:
-#       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
-        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++11"
+    # libstdc++
+    - { os: "linux", env: [ "CC=gcc-4.4",     "CXX=g++-4.4",     "CXXSTD=11"               ], addons: *gcc-44    }
+    - { os: "linux", env: [ "CC=gcc-4.6",     "CXX=g++-4.6",     "CXXSTD=11"               ], addons: *gcc-46    }
+    - { os: "linux", env: [ "CC=gcc-4.8",     "CXX=g++-4.8",     "CXXSTD=11"               ], addons: *gcc-48    }
+    - { os: "linux", env: [ "CC=gcc-5",       "CXX=g++-5",       "CXXSTD=11"               ], addons: *gcc-5     }
+    - { os: "linux", env: [ "CC=gcc-6",       "CXX=g++-6",       "CXXSTD=11,14"            ], addons: *gcc-6     }
+    - { os: "linux", env: [ "CC=gcc-7",       "CXX=g++-7",       "CXXSTD=11,14,17"         ], addons: *gcc-7     }
+    - { os: "linux", env: [ "CC=gcc-8",       "CXX=g++-8",       "CXXSTD=11,14,17,2a"      ], addons: *gcc-8     }
+    - { os: "linux", env: [ "CC=clang-3.4",   "CXX=clang++-3.4", "CXXSTD=11"               ], addons: *clang-34  }
+    - { os: "linux", env: [ "CC=clang-3.8",   "CXX=clang++-3.8", "CXXSTD=11,14"            ], addons: *clang-38  }
+    - { os: "linux", env: [ "CC=clang-4.0",   "CXX=clang++-4.0", "CXXSTD=11,14"            ], addons: *clang-4   }
+    - { os: "linux", env: [ "CC=clang-5.0",   "CXX=clang++-5.0", "CXXSTD=11,14,17"         ], addons: *clang-5   }
+    - { os: "linux", env: [ "CC=clang-6.0",   "CXX=clang++-6.0", "CXXSTD=11,14,17,2a"      ], addons: *clang-6   }
+    # libc++
+    - { os: "linux", env: [ "CC=clang-6.0",   "CXX=clang++-6.0", "CXXSTD=03,11,14,17,2a",
+                            "CXXFLAGS=-stdlib=libc++"                                      ], addons: *clang-6   }
+
+#matrix:
+#  include:
+#    - os: linux
+#      dist: trusty
+#      compiler: clang
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#            - libstdc++-7-dev
+#      env:
+#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++17"
+#    - os: linux
+#      dist: trusty
+#      compiler: clang
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#            - libstdc++-7-dev
+#      env:
+#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"
+#    - os: linux
+#      dist: trusty
+#      compiler: clang
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#            - libstdc++-7-dev
+#      env:
+#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"
+#    - os: linux
+#      dist: trusty
+#      compiler: gcc
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - g++-7
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#        sonarcloud:
+#          organization: kedarbhat-github
+#      env:
+#        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++17"
+#    - os: linux
+#      dist: trusty
+#      compiler: gcc
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - g++-7
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#        sonarcloud:
+#          organization: kedarbhat-github
+#      env:
+#        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"
+#    - os: linux
+#      dist: trusty
+#      compiler: gcc
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - g++-7
+##           - cppcheck # version 1.61 doesn't recognize if constexpr
+#        sonarcloud:
+#          organization: kedarbhat-github
+#      env:
+#        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"
+#    - os: osx
+#      osx_image: xcode9.3
+#      env:
+##       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
+#        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++1z"
+#    - os: osx
+#      osx_image: xcode9.3
+#      env:
+##       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
+#        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++14"
+#    - os: osx
+#      osx_image: xcode9.3
+#      env:
+##       - MATRIX_EVAL="brew update && brew install gcc && brew install cppcheck && COMPILER=clang++ && CXXSTD=c++1z"
+#        - MATRIX_EVAL="COMPILER=clang++ && CXXSTD=c++11"
 
 before_install:
 # - mkdir -p ~/$TRAVIS_BUILD_NUMBER
@@ -118,18 +164,19 @@ before_install:
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
   - if [ \! -d $HOME/cache3/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache3 -f -; fi
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew update && brew install gcc; fi
-  - eval "${MATRIX_EVAL}"
+#  - eval "${MATRIX_EVAL}"
 
 script:
   - ls
   - $COMPILER --version
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; else $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+#  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff.cpp -std=c++$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; else $COMPILER test/test_autodiff.cpp -std=c++$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - $COMPILER test/test_autodiff.cpp -std=c++$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff
   - ./test_autodiff
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then sonar-scanner; fi
+#  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then sonar-scanner; fi
 # - cppcheck --version
 # - cppcheck --error-exitcode=1 -Iinclude example/
 
-after_success:
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
+#after_success:
+#  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
+#  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+#  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi

@@ -37,7 +37,7 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-4.8 && CXX=g++-4.8 && CXXSTD=c++11"  ], addons: *gcc-48    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-4.8 && CXX=g++-4.8 && COMPILER=g++-4.8 && CXXSTD=c++11"  ], addons: *gcc-48    }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-5 && CXX=g++-5 && COMPILER=g++-5 && CXXSTD=c++11"  ], addons: *gcc-5    }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++11"  ], addons: *gcc-6 }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++14"  ], addons: *gcc-6 }

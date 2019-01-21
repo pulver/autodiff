@@ -69,7 +69,7 @@ jobs:
     - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=c++14" ], osx_image: "xcode9.3" }
     - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=c++17" ], osx_image: "xcode9.3" }
 
-   # SonarCloud (GCC)
+   # SonarCloud, CodeCov (Latest GCC)
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++11 && CODE_ANALYSIS=1"  ], addons: *gcc-8 }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++14 && CODE_ANALYSIS=1"  ], addons: *gcc-8 }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++17 && CODE_ANALYSIS=1"  ], addons: *gcc-8 }

@@ -649,6 +649,8 @@ class fvar
     fvar<RealType,Order>(const fvar<RealType2,Order2>&);
 
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
+    template<typename ArithmeticType>
+    explicit fvar(const typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type& ca);
     explicit fvar(const root_type&); // Initialize a constant. (No epsilon terms.)
 
     // r = cr | RealType& | Assignment operator.
@@ -1019,20 +1021,6 @@ struct is_fvar : std::false_type {};
 template<typename RealType, size_t Order>
 struct is_fvar<fvar<RealType,Order>> : std::true_type {};
 
-/*
-template<typename RealType, size_t Order>
-fvar<RealType,Order>::fvar(const root_type& ca, typename std::enable_if<!is_fvar<RealType>::value,bool>::type is_variable)
-:    v{{ca}}
-{
-}
-
-template<typename RealType, size_t Order>
-fvar<RealType,Order>::fvar(const root_type& ca, typename std::enable_if<is_fvar<RealType>::value,bool>::type is_variable)
-:    v{{ca}}
-{
-}
-*/
-
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const root_type& ca, bool is_variable)
@@ -1066,6 +1054,13 @@ fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
             v[i] = cr.v[i];
     if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
         std::fill(v.begin()+(Order2+1), v.end(), RealType{0});
+}
+
+template<typename RealType, size_t Order>
+template<typename ArithmeticType>
+fvar<RealType,Order>::fvar(const typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type& ca)
+:    v{{static_cast<RealType>(ca)}}
+{
 }
 
 template<typename RealType, size_t Order>

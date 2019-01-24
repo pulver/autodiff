@@ -610,8 +610,12 @@ struct promote_args_n<RealType0,RealType1>
     using type = typename boost::math::tools::promote_args_2<RealType0,RealType1>::type;
 };
 
+} // namespace detail
+
 template<typename RealType0, typename RealType1, typename... RealTypes>
-using promote = typename promote_args_n<RealType0,RealType1,RealTypes...>::type;
+using promote = typename detail::promote_args_n<RealType0,RealType1,RealTypes...>::type;
+
+namespace detail {
 
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>

@@ -638,6 +638,7 @@ class fvar
 
     fvar() = default;
 
+    // Initialize a variable or constant.
     fvar(const root_type&, bool is_variable);
 
     // RealType(cr) | RealType | RealType is copy constructible.
@@ -855,6 +856,12 @@ private:
 
 // C++11 Compatibility
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR
+    template<typename RootType>
+    void fvar_cpp11(std::true_type, const RootType& ca, bool is_variable);
+
+    template<typename RootType>
+    void fvar_cpp11(std::false_type, const RootType& ca, bool is_variable);
+
     template<typename... Orders>
     get_type_at<RealType, sizeof...(Orders)> at_cpp11(std::true_type, size_t order, Orders... orders) const;
 
@@ -1026,24 +1033,26 @@ fvar<RealType,Order>::fvar(const root_type& ca, typename std::enable_if<is_fvar<
 }
 */
 
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const root_type& ca, bool is_variable)
 {
-    if BOOST_AUTODIFF_IF_CONSTEXPR (is_fvar<RealType>::value)
+    if constexpr (is_fvar<RealType>::value)
     {
-        v[0] = RealType(ca, is_variable);
-        if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
-            std::fill(v.begin()+1, v.end(), RealType(0));
+        v.front() = RealType(ca, is_variable);
+        if constexpr (0 < Order)
+            std::fill(v.begin()+1, v.end(), static_cast<RealType>(0));
     }
     else
     {
-        v[0] = ca;
-        if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
+        v.front() = ca;
+        if constexpr (0 < Order)
             v[1] = static_cast<root_type>(static_cast<int>(is_variable));
-        if BOOST_AUTODIFF_IF_CONSTEXPR (1 < Order)
-            std::fill(v.begin()+2, v.end(), RealType(0));
+        if constexpr (1 < Order)
+            std::fill(v.begin()+2, v.end(), static_cast<RealType>(0));
     }
 }
+#endif
 
 template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>

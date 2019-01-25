@@ -579,7 +579,6 @@ Distributed under the Boost Software License, Version 1.0.<br/>
 #include <array>
 #include <cmath>
 #include <functional>
-#include <initializer_list>
 #include <limits>
 #include <numeric>
 #include <ostream>
@@ -628,13 +627,11 @@ struct get_order_sum<fvar<RealType,Order>> : std::integral_constant<size_t,get_o
 
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
-struct type_at;
-
-template<typename RealType>
-struct type_at<RealType,0> { using type = RealType; };
+struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
-struct type_at<fvar<RealType,Order>,Depth> { using type = typename type_at<RealType,Depth-1>::type; };
+struct type_at<fvar<RealType,Order>,Depth> { using type =
+    typename std::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -665,7 +662,7 @@ class fvar
     template<typename ArithmeticType>
     explicit fvar(const typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type& ca);
     explicit fvar(const root_type&); // Initialize a constant. (No epsilon terms.)
-    explicit fvar(const std::initializer_list<root_type>&); // required by C++11, else fvar{2.0} is ambiguous.
+    //explicit fvar(const std::initializer_list<root_type>&);
 
     // r = cr | RealType& | Assignment operator.
     fvar& operator=(const fvar&) = default;
@@ -1101,6 +1098,7 @@ fvar<RealType,Order>::fvar(const root_type& ca)
 {
 }
 
+/*
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const std::initializer_list<root_type>& list)
 :    v{}
@@ -1108,6 +1106,7 @@ fvar<RealType,Order>::fvar(const std::initializer_list<root_type>& list)
     for (size_t i=0 ; i<std::min(Order+1,list.size()) ; ++i)
         v[i] = *(list.begin()+i);
 }
+*/
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::operator=(const root_type& ca)
@@ -1509,7 +1508,8 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::apply_with_horner(const std::function<root_type(size_t)>& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    auto accumulator = fvar<RealType,Order>(f(order_sum)/boost::math::factorial<root_type>(order_sum));
+    auto accumulator = fvar<RealType,Order>( // Cast needed for types where operator/() does not return root_type.
+        static_cast<root_type>(f(order_sum) / boost::math::factorial<root_type>(order_sum)));
     for (size_t i=order_sum ; i-- ;)
         (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
     return accumulator;
@@ -1847,7 +1847,7 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
         return fvar<RealType,0>(d0);
     else
     {
-        auto d1 = fvar<root_type,order-1>(static_cast<root_type>(cr));
+        auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         d1 = ((d1*=d1)+=1).inverse(); // atan'(x) = 1 / (x*x+1).
         return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }

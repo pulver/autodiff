@@ -16,9 +16,10 @@
 
 #include <iostream>
 
+using namespace boost::math::differentiation;
+
 template<typename W,typename X,typename Y,typename Z>
-boost::math::differentiation::autodiff::promote<W,X,Y,Z>
-    mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
+promote<W,X,Y,Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
 {
     using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
@@ -45,7 +46,7 @@ enum CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
 template<typename Price,typename Sigma,typename Tau,typename Rate>
-boost::math::differentiation::autodiff::promote<Price,Sigma,Tau,Rate>
+promote<Price,Sigma,Tau,Rate>
     black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
   using namespace std;
@@ -66,16 +67,16 @@ BOOST_AUTO_TEST_CASE(constructors)
     constexpr int m = 3;
     constexpr int n = 4;
     // Verify value-initialized instance has all 0 entries.
-    const boost::math::differentiation::autodiff::variable<double,m> empty1 = boost::math::differentiation::autodiff::variable<double,m>();
+    const autodiff_fvar<double,m> empty1 = autodiff_fvar<double,m>();
     for (int i=0 ; i<=m ; ++i)
         BOOST_REQUIRE(empty1.derivative(i) == 0.0);
-    const auto empty2 = boost::math::differentiation::autodiff::variable<double,m,n>();
+    const auto empty2 = autodiff_fvar<double,m,n>();
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             BOOST_REQUIRE(empty2.derivative(i,j) == 0.0);
     // Single variable
     constexpr double cx = 10.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     for (int i=0 ; i<=m ; ++i)
         if (i==0)
             BOOST_REQUIRE(x.derivative(i) == cx);
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(constructors)
             BOOST_REQUIRE(x.derivative(i) == 1.0);
         else
             BOOST_REQUIRE(x.derivative(i) == 0.0);
-    const boost::math::differentiation::autodiff::variable<double,n> xn = x;
+    const autodiff_fvar<double,n> xn = x;
     for (int i=0 ; i<=n ; ++i)
         if (i==0)
             BOOST_REQUIRE(xn.derivative(i) == cx);
@@ -93,7 +94,7 @@ BOOST_AUTO_TEST_CASE(constructors)
             BOOST_REQUIRE(xn.derivative(i) == 0.0);
     // Second independent variable
     constexpr double cy = 100.0;
-    const auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
+    const auto y = make_fvar<double,m,n>(cy);
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             if (i==0 && j==0)
@@ -110,9 +111,9 @@ BOOST_AUTO_TEST_CASE(assignment)
     constexpr int n = 4;
     constexpr double cx = 10.0;
     constexpr double cy = 10.0;
-    boost::math::differentiation::autodiff::variable<double,m,n> empty; // Uninitialized variable<> may have non-zero values.
+    autodiff_fvar<double,m,n> empty; // Uninitialized variable<> may have non-zero values.
     // Single variable
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x = make_fvar<double,m>(cx);
     empty = static_cast<decltype(empty)>(x); // Test static_cast of single-variable to double-variable type.
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -122,7 +123,7 @@ BOOST_AUTO_TEST_CASE(assignment)
                 BOOST_REQUIRE(empty.derivative(i,j) == 1.0);
             else
                 BOOST_REQUIRE(empty.derivative(i,j) == 0.0);
-    auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
+    auto y = make_fvar<double,m,n>(cy);
     empty = y; // default assignment operator
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -146,9 +147,9 @@ BOOST_AUTO_TEST_CASE(addition_assignment)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 10.0;
-    auto sum = boost::math::differentiation::autodiff::variable<double,m,n>(); // zero-initialized
+    auto sum = autodiff_fvar<double,m,n>(); // zero-initialized
     // Single variable
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     sum += x;
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -175,9 +176,9 @@ BOOST_AUTO_TEST_CASE(subtraction_assignment)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 10.0;
-    auto sum = boost::math::differentiation::autodiff::variable<double,m,n>(); // zero-initialized
+    auto sum = autodiff_fvar<double,m,n>(); // zero-initialized
     // Single variable
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     sum -= x;
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -204,9 +205,9 @@ BOOST_AUTO_TEST_CASE(multiplication_assignment)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 10.0;
-    auto product = boost::math::differentiation::autodiff::variable<double,m,n>{1}; // unit constant
+    auto product = autodiff_fvar<double,m,n>(1); // unit constant
     // Single variable
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x = make_fvar<double,m>(cx);
     product *= x;
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -227,7 +228,7 @@ BOOST_AUTO_TEST_CASE(multiplication_assignment)
             else
                 BOOST_REQUIRE(product.derivative(i,j) == 0.0);
     // 0 * inf = nan
-    x = boost::math::differentiation::autodiff::variable<double,m>(0.0);
+    x = make_fvar<double,m>(0.0);
     x *= std::numeric_limits<double>::infinity();
     //std::cout << "x = " << x << std::endl;
     for (int i=0 ; i<=m ; ++i)
@@ -245,9 +246,9 @@ BOOST_AUTO_TEST_CASE(division_assignment)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 16.0;
-    auto quotient = boost::math::differentiation::autodiff::variable<double,m,n>{1}; // unit constant
+    auto quotient = autodiff_fvar<double,m,n>(1); // unit constant
     // Single variable
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     quotient /= x;
     BOOST_REQUIRE(quotient.derivative(0,0) == 1/cx);
     BOOST_REQUIRE(quotient.derivative(1,0) == -1/std::pow(cx,2));
@@ -273,9 +274,9 @@ BOOST_AUTO_TEST_CASE(unary_signs)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 16.0;
-    boost::math::differentiation::autodiff::variable<double,m,n> lhs;
+    autodiff_fvar<double,m,n> lhs;
     // Single variable
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     lhs = static_cast<decltype(lhs)>(-x);
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
@@ -303,7 +304,7 @@ BOOST_AUTO_TEST_CASE(cast_double)
     constexpr double ca = 13.0;
     constexpr int i = 12;
     constexpr int m = 3;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(ca);
+    const auto x = make_fvar<double,m>(ca);
     BOOST_REQUIRE(i < x);
     BOOST_REQUIRE(i*x == i*ca);
 }
@@ -311,11 +312,11 @@ BOOST_AUTO_TEST_CASE(cast_double)
 BOOST_AUTO_TEST_CASE(int_double_casting)
 {
     constexpr double ca = 3.0;
-    const auto x0 = boost::math::differentiation::autodiff::variable<double,0>(ca);
+    const auto x0 = make_fvar<double,0>(ca);
     BOOST_REQUIRE(static_cast<double>(x0) == ca);
-    const auto x1 = boost::math::differentiation::autodiff::variable<double,1>(ca);
+    const auto x1 = make_fvar<double,1>(ca);
     BOOST_REQUIRE(static_cast<double>(x1) == ca);
-    const auto x2 = boost::math::differentiation::autodiff::variable<double,2>(ca);
+    const auto x2 = make_fvar<double,2>(ca);
     BOOST_REQUIRE(static_cast<double>(x2) == ca);
 }
 
@@ -323,11 +324,11 @@ BOOST_AUTO_TEST_CASE(scalar_addition)
 {
     constexpr double ca = 3.0;
     constexpr double cb = 4.0;
-    const auto sum0 = boost::math::differentiation::autodiff::variable<double,0>(ca) + boost::math::differentiation::autodiff::variable<double,0>(cb);
+    const auto sum0 = autodiff_fvar<double,0>(ca) + autodiff_fvar<double,0>(cb);
     BOOST_REQUIRE(ca+cb == static_cast<double>(sum0));
-    const auto sum1 = boost::math::differentiation::autodiff::variable<double,0>(ca) + cb;
+    const auto sum1 = autodiff_fvar<double,0>(ca) + cb;
     BOOST_REQUIRE(ca+cb == static_cast<double>(sum1));
-    const auto sum2 = ca + boost::math::differentiation::autodiff::variable<double,0>(cb);
+    const auto sum2 = ca + autodiff_fvar<double,0>(cb);
     BOOST_REQUIRE(ca+cb == static_cast<double>(sum2));
 }
 
@@ -335,7 +336,7 @@ BOOST_AUTO_TEST_CASE(power8)
 {
     constexpr int n = 8;
     constexpr double ca = 3.0;
-    auto x = boost::math::differentiation::autodiff::variable<double,n>(ca);
+    auto x = make_fvar<double,n>(ca);
     // Test operator*=()
     x *= x;
     x *= x;
@@ -343,7 +344,7 @@ BOOST_AUTO_TEST_CASE(power8)
     const double power_factorial = boost::math::factorial<double>(n);
     for (int i=0 ; i<=n ; ++i)
         BOOST_REQUIRE(x.derivative(i) == power_factorial/boost::math::factorial<double>(n-i)*std::pow(ca,n-i));
-    x = boost::math::differentiation::autodiff::variable<double,n>(ca);
+    x = make_fvar<double,n>(ca);
     // Test operator*()
     x = x*x*x*x * x*x*x*x;
     for (int i=0 ; i<=n ; ++i)
@@ -355,8 +356,8 @@ BOOST_AUTO_TEST_CASE(dim1_multiplication)
     constexpr int m = 2;
     constexpr int n = 3;
     constexpr double cy = 4.0;
-    auto y0 = boost::math::differentiation::autodiff::variable<double,m>(cy);
-    auto y  = boost::math::differentiation::autodiff::variable<double,n>(cy);
+    auto y0 = make_fvar<double,m>(cy);
+    auto y  = make_fvar<double,n>(cy);
     y *= y0;
     BOOST_REQUIRE(y.derivative(0) == cy*cy);
     BOOST_REQUIRE(y.derivative(1) == 2*cy);
@@ -375,8 +376,8 @@ BOOST_AUTO_TEST_CASE(dim1and2_multiplication)
     constexpr int n = 3;
     constexpr double cx = 3.0;
     constexpr double cy = 4.0;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
+    auto x = make_fvar<double,m>(cx);
+    auto y = make_fvar<double,m,n>(cy);
     y *= x;
     BOOST_REQUIRE(y.derivative(0,0) == cx*cy);
     BOOST_REQUIRE(y.derivative(0,1) == cx);
@@ -395,12 +396,12 @@ BOOST_AUTO_TEST_CASE(dim2_addition)
     constexpr int m = 2;
     constexpr int n = 3;
     constexpr double cx = 3.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     BOOST_REQUIRE(x.derivative(0) == cx);
     BOOST_REQUIRE(x.derivative(1) == 1.0);
     BOOST_REQUIRE(x.derivative(2) == 0.0);
     constexpr double cy = 4.0;
-    const auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
+    const auto y = make_fvar<double,m,n>(cy);
     BOOST_REQUIRE(static_cast<double>(y.derivative(0)) == cy);
     BOOST_REQUIRE(static_cast<double>(y.derivative(1)) == 0.0); // partial of y w.r.t. x.
 
@@ -425,9 +426,9 @@ BOOST_AUTO_TEST_CASE(dim2_multiplication)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 6.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     constexpr double cy = 5.0;
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto y = make_fvar<double,0,n>(cy);
     const auto z = x*x * y*y*y;
     BOOST_REQUIRE(z.derivative(0,0) == cx*cx * cy*cy*cy); // x^2 * y^3
     BOOST_REQUIRE(z.derivative(0,1) == cx*cx * 3*cy*cy); // x^2 * 3y^2
@@ -456,9 +457,9 @@ BOOST_AUTO_TEST_CASE(dim2_multiplication_and_subtraction)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 6.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     constexpr double cy = 5.0;
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto y = make_fvar<double,0,n>(cy);
     const auto z = x*x - y*y;
     BOOST_REQUIRE(z.derivative(0,0) == cx*cx - cy*cy);
     BOOST_REQUIRE(z.derivative(0,1) == -2*cy);
@@ -476,7 +477,7 @@ BOOST_AUTO_TEST_CASE(inverse)
 {
     constexpr int m = 3;
     constexpr double cx = 4.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     const auto xinv = x.inverse();
     BOOST_REQUIRE(xinv.derivative(0) == 1/cx);
     BOOST_REQUIRE(xinv.derivative(1) == -1/std::pow(cx,2));
@@ -489,9 +490,9 @@ BOOST_AUTO_TEST_CASE(division)
     constexpr int m = 3;
     constexpr int n = 4;
     constexpr double cx = 16.0;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x = make_fvar<double,m>(cx);
     constexpr double cy = 4.0;
-    auto y = boost::math::differentiation::autodiff::variable<double,1,n>(cy);
+    auto y = make_fvar<double,1,n>(cy);
     auto z = x*x / (y*y);
     BOOST_REQUIRE(z.derivative(0,0) == cx*cx / (cy*cy)); // x^2 * y^-2
     BOOST_REQUIRE(z.derivative(0,1) == cx*cx * (-2)*std::pow(cy,-3));
@@ -511,13 +512,13 @@ BOOST_AUTO_TEST_CASE(division)
     for (int j=0 ; j<=n ; ++j)
         BOOST_REQUIRE(z.derivative(3,j) == 0.0);
 
-    auto x1 = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x1 = make_fvar<double,m>(cx);
     auto z1 = x1/cy;
     BOOST_REQUIRE(z1.derivative(0) == cx/cy);
     BOOST_REQUIRE(z1.derivative(1) == 1/cy);
     BOOST_REQUIRE(z1.derivative(2) == 0.0);
     BOOST_REQUIRE(z1.derivative(3) == 0.0);
-    auto y2 = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
+    auto y2 = make_fvar<double,m,n>(cy);
     auto z2 = cx/y2;
     BOOST_REQUIRE(z2.derivative(0,0) == cx/cy);
     BOOST_REQUIRE(z2.derivative(0,1) == -cx/std::pow(cy,2));
@@ -548,8 +549,8 @@ BOOST_AUTO_TEST_CASE(equality)
     constexpr int n = 4;
     constexpr double cx = 10.0;
     constexpr double cy = 10.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,0,n>(cy);
     BOOST_REQUIRE((x == y));
     BOOST_REQUIRE((x == cy));
     BOOST_REQUIRE((cx == y));
@@ -563,8 +564,8 @@ BOOST_AUTO_TEST_CASE(inequality)
     constexpr int n = 4;
     constexpr double cx = 10.0;
     constexpr double cy = 11.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,0,n>(cy);
     BOOST_REQUIRE((x != y));
     BOOST_REQUIRE((x != cy));
     BOOST_REQUIRE((cx != y));
@@ -578,8 +579,8 @@ BOOST_AUTO_TEST_CASE(less_than_or_equal_to)
     constexpr int n = 4;
     constexpr double cx = 10.0;
     constexpr double cy = 11.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,0,n>(cy);
     BOOST_REQUIRE((x <= y));
     BOOST_REQUIRE((x <= y-1));
     BOOST_REQUIRE((x < y));
@@ -597,8 +598,8 @@ BOOST_AUTO_TEST_CASE(greater_than_or_equal_to)
     constexpr int n = 4;
     constexpr double cx = 11.0;
     constexpr double cy = 10.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,0,n>(cy);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,0,n>(cy);
     BOOST_REQUIRE((x >= y));
     BOOST_REQUIRE((x >= y+1));
     BOOST_REQUIRE((x > y));
@@ -610,31 +611,31 @@ BOOST_AUTO_TEST_CASE(greater_than_or_equal_to)
     BOOST_REQUIRE((cx > y));
 }
 
-BOOST_AUTO_TEST_CASE(abs)
+BOOST_AUTO_TEST_CASE(abs_test)
 {
     constexpr int m = 3;
     constexpr double cx = 11.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto abs = boost::math::differentiation::autodiff::abs(x);
-    BOOST_REQUIRE(abs.derivative(0) == std::abs(cx));
-    BOOST_REQUIRE(abs.derivative(1) == 1.0);
-    BOOST_REQUIRE(abs.derivative(2) == 0.0);
-    BOOST_REQUIRE(abs.derivative(3) == 0.0);
-    abs = boost::math::differentiation::autodiff::abs(-x);
-    BOOST_REQUIRE(abs.derivative(0) == std::abs(cx));
-    BOOST_REQUIRE(abs.derivative(1) == 1.0); // abs(-x) = abs(x)
-    BOOST_REQUIRE(abs.derivative(2) == 0.0);
-    BOOST_REQUIRE(abs.derivative(3) == 0.0);
-    const auto xneg = boost::math::differentiation::autodiff::variable<double,m>(-cx);
-    abs = boost::math::differentiation::autodiff::abs(xneg);
-    BOOST_REQUIRE(abs.derivative(0) == std::abs(cx));
-    BOOST_REQUIRE(abs.derivative(1) == -1.0);
-    BOOST_REQUIRE(abs.derivative(2) == 0.0);
-    BOOST_REQUIRE(abs.derivative(3) == 0.0);
-    const auto zero = boost::math::differentiation::autodiff::variable<double,m>(0);
-    abs = boost::math::differentiation::autodiff::abs(zero);
+    const auto x = make_fvar<double,m>(cx);
+    auto a = abs(x);
+    BOOST_REQUIRE(a.derivative(0) == std::abs(cx));
+    BOOST_REQUIRE(a.derivative(1) == 1.0);
+    BOOST_REQUIRE(a.derivative(2) == 0.0);
+    BOOST_REQUIRE(a.derivative(3) == 0.0);
+    a = abs(-x);
+    BOOST_REQUIRE(a.derivative(0) == std::abs(cx));
+    BOOST_REQUIRE(a.derivative(1) == 1.0); // abs(-x) = abs(x)
+    BOOST_REQUIRE(a.derivative(2) == 0.0);
+    BOOST_REQUIRE(a.derivative(3) == 0.0);
+    const auto xneg = make_fvar<double,m>(-cx);
+    a = abs(xneg);
+    BOOST_REQUIRE(a.derivative(0) == std::abs(cx));
+    BOOST_REQUIRE(a.derivative(1) == -1.0);
+    BOOST_REQUIRE(a.derivative(2) == 0.0);
+    BOOST_REQUIRE(a.derivative(3) == 0.0);
+    const auto zero = make_fvar<double,m>(0);
+    a = abs(zero);
     for (int i=0 ; i<=m ; ++i)
-        BOOST_REQUIRE(abs.derivative(i) == 0.0);
+        BOOST_REQUIRE(a.derivative(i) == 0.0);
 }
 
 BOOST_AUTO_TEST_CASE(ceil_and_floor)
@@ -643,15 +644,15 @@ BOOST_AUTO_TEST_CASE(ceil_and_floor)
     double tests[] { -1.5, 0.0, 1.5 };
     for (unsigned t=0 ; t<sizeof(tests)/sizeof(*tests) ; ++t)
     {
-        const auto x = boost::math::differentiation::autodiff::variable<double,m>(tests[t]);
-        auto ceil = boost::math::differentiation::autodiff::ceil(x);
-        auto floor = boost::math::differentiation::autodiff::floor(x);
-        BOOST_REQUIRE(ceil.derivative(0) == std::ceil(tests[t]));
-        BOOST_REQUIRE(floor.derivative(0) == std::floor(tests[t]));
+        const auto x = make_fvar<double,m>(tests[t]);
+        auto c = ceil(x);
+        auto f = floor(x);
+        BOOST_REQUIRE(c.derivative(0) == std::ceil(tests[t]));
+        BOOST_REQUIRE(f.derivative(0) == std::floor(tests[t]));
         for (int i=1 ; i<=m ; ++i)
         {
-            BOOST_REQUIRE(ceil.derivative(i) == 0.0);
-            BOOST_REQUIRE(floor.derivative(i) == 0.0);
+            BOOST_REQUIRE(c.derivative(i) == 0.0);
+            BOOST_REQUIRE(f.derivative(i) == 0.0);
         }
     }
 }
@@ -660,7 +661,7 @@ BOOST_AUTO_TEST_CASE(one_over_one_plus_x_squared)
 {
     constexpr int m = 4;
     constexpr double cx = 1.0;
-    auto f = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto f = make_fvar<double,m>(cx);
     //f = ((f *= f) += 1).inverse(); // Microsoft Visual C++ version 14.0: fatal error C1001: An internal error has occurred in the compiler. on call to order_sum() in inverse_apply().
     f = 1 / ((f *= f) += 1);
     BOOST_REQUIRE(f.derivative(0) == 0.5);
@@ -670,40 +671,40 @@ BOOST_AUTO_TEST_CASE(one_over_one_plus_x_squared)
     BOOST_REQUIRE(f.derivative(4) == -3.0);
 }
 
-BOOST_AUTO_TEST_CASE(exp)
+BOOST_AUTO_TEST_CASE(exp_test)
 {
     constexpr int m = 4;
     constexpr double cx = 2.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::exp(x);
+    const auto x = make_fvar<double,m>(cx);
+    auto y = exp(x);
     for (int i=0 ; i<=m ; ++i)
         BOOST_REQUIRE(y.derivative(i) == std::exp(cx));
 }
 
-BOOST_AUTO_TEST_CASE(pow)
+BOOST_AUTO_TEST_CASE(pow_test)
 {
     constexpr double tolerance = 100e-15; // percent
     constexpr int m = 5;
     constexpr int n = 4;
     constexpr double cx = 2.0;
     constexpr double cy = 3.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
-    auto z0 = boost::math::differentiation::autodiff::pow(x,cy);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,m,n>(cy);
+    auto z0 = pow(x,cy);
     BOOST_REQUIRE(z0.derivative(0) == std::pow(cx,cy));
     BOOST_REQUIRE(z0.derivative(1) == cy*std::pow(cx,cy-1));
     BOOST_REQUIRE(z0.derivative(2) == cy*(cy-1)*std::pow(cx,cy-2));
     BOOST_REQUIRE(z0.derivative(3) == cy*(cy-1)*(cy-2)*std::pow(cx,cy-3));
     BOOST_REQUIRE(z0.derivative(4) == 0.0);
     BOOST_REQUIRE(z0.derivative(5) == 0.0);
-    auto z1 = boost::math::differentiation::autodiff::pow(cx,y);
+    auto z1 = pow(cx,y);
     BOOST_REQUIRE_CLOSE(z1.derivative(0,0), std::pow(cx,cy), tolerance);
     for (int j=1 ; j<=n ; ++j)
         BOOST_REQUIRE_CLOSE(z1.derivative(0,j), std::pow(std::log(cx),j)*std::exp(cy*std::log(cx)), tolerance);
     for (int i=1 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             BOOST_REQUIRE(z1.derivative(i,j) == 0.0);
-    auto z2 = boost::math::differentiation::autodiff::pow(x,y);
+    auto z2 = pow(x,y);
     for (int j=0 ; j<=n ; ++j)
         BOOST_REQUIRE_CLOSE(z2.derivative(0,j), std::pow(cx,cy)*std::pow(std::log(cx),j), tolerance);
     for (int j=0 ; j<=n ; ++j)
@@ -715,41 +716,41 @@ BOOST_AUTO_TEST_CASE(pow)
     BOOST_REQUIRE_CLOSE(z2.derivative(2,4), std::pow(cx,cy-2)*std::pow(std::log(cx),2)*(4*(2*cy-1)*std::log(cx)+(4-1)*4+(cy-1)*cy*std::pow(std::log(cx),2)), tolerance);
 }
 
-BOOST_AUTO_TEST_CASE(sqrt)
+BOOST_AUTO_TEST_CASE(sqrt_test)
 {
     constexpr int m = 5;
     constexpr double cx = 4.0;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::sqrt(x);
+    auto x = make_fvar<double,m>(cx);
+    auto y = sqrt(x);
     BOOST_REQUIRE(y.derivative(0) == std::sqrt(cx));
     BOOST_REQUIRE(y.derivative(1) == 0.5*std::pow(cx,-0.5));
     BOOST_REQUIRE(y.derivative(2) == -0.5*0.5*std::pow(cx,-1.5));
     BOOST_REQUIRE(y.derivative(3) == 0.5*0.5*1.5*std::pow(cx,-2.5));
     BOOST_REQUIRE(y.derivative(4) == -0.5*0.5*1.5*2.5*std::pow(cx,-3.5));
     BOOST_REQUIRE(y.derivative(5) == 0.5*0.5*1.5*2.5*3.5*std::pow(cx,-4.5));
-    x = boost::math::differentiation::autodiff::variable<double,m>(0);
-    y = boost::math::differentiation::autodiff::sqrt(x);
-    //std::cout << "boost::math::differentiation::autodiff::sqrt(0) = " << y << std::endl; // (0,inf,-inf,inf,-inf,inf)
+    x = make_fvar<double,m>(0);
+    y = sqrt(x);
+    //std::cout << "sqrt(0) = " << y << std::endl; // (0,inf,-inf,inf,-inf,inf)
     BOOST_REQUIRE(y.derivative(0) == 0.0);
     for (int i=1; i<=m ; ++i)
         BOOST_REQUIRE(y.derivative(i) == (i&1?1:-1)*std::numeric_limits<double>::infinity());
 }
 
-BOOST_AUTO_TEST_CASE(log)
+BOOST_AUTO_TEST_CASE(log_test)
 {
     constexpr int m = 5;
     constexpr double cx = 2.0;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::log(x);
+    auto x = make_fvar<double,m>(cx);
+    auto y = log(x);
     BOOST_REQUIRE(y.derivative(0) == std::log(cx));
     BOOST_REQUIRE(y.derivative(1) == 1/cx);
     BOOST_REQUIRE(y.derivative(2) == -1/std::pow(cx,2));
     BOOST_REQUIRE(y.derivative(3) == 2/std::pow(cx,3));
     BOOST_REQUIRE(y.derivative(4) == -6/std::pow(cx,4));
     BOOST_REQUIRE(y.derivative(5) == 24/std::pow(cx,5));
-    x = boost::math::differentiation::autodiff::variable<double,m>(0);
-    y = boost::math::differentiation::autodiff::log(x);
-    //std::cout << "boost::math::differentiation::autodiff::log(0) = " << y << std::endl; // boost::math::differentiation::autodiff::log(0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
+    x = make_fvar<double,m>(0);
+    y = log(x);
+    //std::cout << "log(0) = " << y << std::endl; // log(0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
     for (int i=0; i<=m ; ++i)
         BOOST_REQUIRE(y.derivative(i) == (i&1?1:-1)*std::numeric_limits<double>::infinity());
 }
@@ -761,9 +762,9 @@ BOOST_AUTO_TEST_CASE(ylogx)
     constexpr int n = 4;
     constexpr double cx = 2.0;
     constexpr double cy = 3.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    const auto y = boost::math::differentiation::autodiff::variable<double,m,n>(cy);
-    auto z = y*boost::math::differentiation::autodiff::log(x);
+    const auto x = make_fvar<double,m>(cx);
+    const auto y = make_fvar<double,m,n>(cy);
+    auto z = y*log(x);
     BOOST_REQUIRE(z.derivative(0,0) == cy*std::log(cx));
     BOOST_REQUIRE(z.derivative(0,1) == std::log(cx));
     BOOST_REQUIRE(z.derivative(0,2) == 0.0);
@@ -776,17 +777,17 @@ BOOST_AUTO_TEST_CASE(ylogx)
     for (size_t i=1 ; i<=m ; ++i)
         for (size_t j=2 ; j<=n ; ++j)
             BOOST_REQUIRE(z.derivative(i,j) == 0.0);
-    auto z1 = boost::math::differentiation::autodiff::exp(z);
+    auto z1 = exp(z);
     BOOST_REQUIRE_CLOSE(z1.derivative(2,4), std::pow(cx,cy-2)*std::pow(std::log(cx),2)*(4*(2*cy-1)*std::log(cx)+(4-1)*4+(cy-1)*cy*std::pow(std::log(cx),2)), tolerance); // RHS is confirmed by https://www.wolframalpha.com/input/?i=D%5Bx%5Ey,%7Bx,2%7D,%7By,4%7D%5D+%2F.+%7Bx-%3E2.0,+y-%3E3.0%7D
 }
 
-BOOST_AUTO_TEST_CASE(frexp)
+BOOST_AUTO_TEST_CASE(frexp_test)
 {
     constexpr int m = 3;
     constexpr double cx = 3.5;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     int exp, testexp;
-    auto y = boost::math::differentiation::autodiff::frexp(x,&exp);
+    auto y = frexp(x,&exp);
     BOOST_REQUIRE(y.derivative(0) == std::frexp(cx,&testexp));
     BOOST_REQUIRE(exp == testexp);
     BOOST_REQUIRE(y.derivative(1) == std::exp2(-exp));
@@ -794,13 +795,13 @@ BOOST_AUTO_TEST_CASE(frexp)
     BOOST_REQUIRE(y.derivative(3) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE(ldexp)
+BOOST_AUTO_TEST_CASE(ldexp_test)
 {
     constexpr int m = 3;
     constexpr double cx = 3.5;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    const auto x = make_fvar<double,m>(cx);
     constexpr int exp = 3;
-    auto y = boost::math::differentiation::autodiff::ldexp(x,exp);
+    auto y = ldexp(x,exp);
     BOOST_REQUIRE(y.derivative(0) == std::ldexp(cx,exp));
     BOOST_REQUIRE(y.derivative(1) == std::exp2(exp));
     BOOST_REQUIRE(y.derivative(2) == 0.0);
@@ -812,15 +813,15 @@ BOOST_AUTO_TEST_CASE(cos_and_sin)
     constexpr double tolerance = 100e-15; // percent
     constexpr int m = 5;
     constexpr double cx = boost::math::constants::third_pi<double>();
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto cos5 = boost::math::differentiation::autodiff::cos(x);
+    const auto x = make_fvar<double,m>(cx);
+    auto cos5 = cos(x);
     BOOST_REQUIRE(cos5.derivative(0) == std::cos(cx));
     BOOST_REQUIRE_CLOSE(cos5.derivative(1), -std::sin(cx), tolerance);
     BOOST_REQUIRE_CLOSE(cos5.derivative(2), -std::cos(cx), tolerance);
     BOOST_REQUIRE_CLOSE(cos5.derivative(3), std::sin(cx), tolerance);
     BOOST_REQUIRE_CLOSE(cos5.derivative(4), std::cos(cx), tolerance);
     BOOST_REQUIRE_CLOSE(cos5.derivative(5), -std::sin(cx), tolerance);
-    auto sin5 = boost::math::differentiation::autodiff::sin(x);
+    auto sin5 = sin(x);
     BOOST_REQUIRE(sin5.derivative(0) == std::sin(cx));
     BOOST_REQUIRE_CLOSE(sin5.derivative(1), std::cos(cx), tolerance);
     BOOST_REQUIRE_CLOSE(sin5.derivative(2), -std::sin(cx), tolerance);
@@ -828,20 +829,19 @@ BOOST_AUTO_TEST_CASE(cos_and_sin)
     BOOST_REQUIRE_CLOSE(sin5.derivative(4), std::sin(cx), tolerance);
     BOOST_REQUIRE_CLOSE(sin5.derivative(5), std::cos(cx), tolerance);
     // Test Order = 0 for codecov
-    auto cos0 = cos(boost::math::differentiation::autodiff::variable<double,0>(cx));
+    auto cos0 = cos(make_fvar<double,0>(cx));
     BOOST_REQUIRE(cos0.derivative(0) == std::cos(cx));
-    auto sin0 = sin(boost::math::differentiation::autodiff::variable<double,0>(cx));
+    auto sin0 = sin(make_fvar<double,0>(cx));
     BOOST_REQUIRE(sin0.derivative(0) == std::sin(cx));
-
 }
 
-BOOST_AUTO_TEST_CASE(acos)
+BOOST_AUTO_TEST_CASE(acos_test)
 {
     constexpr double tolerance = 100e-15; // percent
     constexpr int m = 5;
     constexpr double cx = 0.5;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::acos(x);
+    auto x = make_fvar<double,m>(cx);
+    auto y = acos(x);
     BOOST_REQUIRE(y.derivative(0) == std::acos(cx));
     BOOST_REQUIRE_CLOSE(y.derivative(1), -1/std::sqrt(1-cx*cx), tolerance);
     BOOST_REQUIRE_CLOSE(y.derivative(2), -cx/std::pow(1-cx*cx,1.5), tolerance);
@@ -850,13 +850,13 @@ BOOST_AUTO_TEST_CASE(acos)
     BOOST_REQUIRE_CLOSE(y.derivative(5), -(24*(cx*cx+3)*cx*cx+9)/std::pow(1-cx*cx,4.5), tolerance);
 }
 
-BOOST_AUTO_TEST_CASE(asin)
+BOOST_AUTO_TEST_CASE(asin_test)
 {
     constexpr double tolerance = 100e-15; // percent
     constexpr int m = 5;
     constexpr double cx = 0.5;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::asin(x);
+    auto x = make_fvar<double,m>(cx);
+    auto y = asin(x);
     BOOST_REQUIRE(y.derivative(0) == std::asin(cx));
     BOOST_REQUIRE_CLOSE(y.derivative(1), 1/std::sqrt(1-cx*cx), tolerance);
     BOOST_REQUIRE_CLOSE(y.derivative(2), cx/std::pow(1-cx*cx,1.5), tolerance);
@@ -868,9 +868,9 @@ BOOST_AUTO_TEST_CASE(asin)
 BOOST_AUTO_TEST_CASE(asin_infinity)
 {
     constexpr int m = 5;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(1);
-    auto y = boost::math::differentiation::autodiff::asin(x);
-    //std::cout << "boost::math::differentiation::autodiff::asin(1) = " << y << std::endl; // depth(1)(1.5707963267949,inf,inf,-nan,-nan,-nan)
+    auto x = make_fvar<double,m>(1);
+    auto y = asin(x);
+    //std::cout << "asin(1) = " << y << std::endl; // depth(1)(1.5707963267949,inf,inf,-nan,-nan,-nan)
     BOOST_REQUIRE(y.derivative(0) == boost::math::constants::half_pi<double>());
     BOOST_REQUIRE(y.derivative(1) == std::numeric_limits<double>::infinity());
 }
@@ -880,14 +880,14 @@ BOOST_AUTO_TEST_CASE(asin_derivative)
     constexpr double tolerance = 100e-15; // percent
     constexpr int m = 4;
     constexpr double cx = 0.5;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x = make_fvar<double,m>(cx);
     auto y = 1-x*x;
     BOOST_REQUIRE(y.derivative(0) == 1-cx*cx);
     BOOST_REQUIRE(y.derivative(1) == -2*cx);
     BOOST_REQUIRE(y.derivative(2) == -2);
     BOOST_REQUIRE(y.derivative(3) == 0);
     BOOST_REQUIRE(y.derivative(4) == 0);
-    y = boost::math::differentiation::autodiff::sqrt(y);
+    y = sqrt(y);
     BOOST_REQUIRE(y.derivative(0) == std::sqrt(1-cx*cx));
     BOOST_REQUIRE_CLOSE(y.derivative(1), -cx/std::sqrt(1-cx*cx), tolerance);
     BOOST_REQUIRE_CLOSE(y.derivative(2), -1/std::pow(1-cx*cx,1.5), tolerance);
@@ -901,13 +901,13 @@ BOOST_AUTO_TEST_CASE(asin_derivative)
     BOOST_REQUIRE_CLOSE(y.derivative(4), (24*(cx*cx+3)*cx*cx+9)/std::pow(1-cx*cx,4.5), tolerance);
 }
 
-BOOST_AUTO_TEST_CASE(tan)
+BOOST_AUTO_TEST_CASE(tan_test)
 {
     constexpr double tolerance = 200e-15; // percent
     constexpr int m = 5;
     constexpr double cx = boost::math::constants::third_pi<double>();
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::tan(x);
+    const auto x = make_fvar<double,m>(cx);
+    auto y = tan(x);
     BOOST_REQUIRE_CLOSE(y.derivative(0), std::sqrt(3), tolerance);
     BOOST_REQUIRE_CLOSE(y.derivative(1), 4.0, tolerance);
     BOOST_REQUIRE_CLOSE(y.derivative(2), 8*std::sqrt(3), tolerance);
@@ -916,12 +916,12 @@ BOOST_AUTO_TEST_CASE(tan)
     BOOST_REQUIRE_CLOSE(y.derivative(5), 5824.0, tolerance);
 }
 
-BOOST_AUTO_TEST_CASE(atan)
+BOOST_AUTO_TEST_CASE(atan_test)
 {
     constexpr int m = 5;
     constexpr double cx = 1.0;
-    const auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::atan(x);
+    const auto x = make_fvar<double,m>(cx);
+    auto y = atan(x);
     BOOST_REQUIRE(y.derivative(0) == boost::math::constants::pi<double>()/4);
     BOOST_REQUIRE(y.derivative(1) == 0.5);
     BOOST_REQUIRE(y.derivative(2) == -0.5);
@@ -930,13 +930,13 @@ BOOST_AUTO_TEST_CASE(atan)
     BOOST_REQUIRE(y.derivative(5) == -3.0);
 }
 
-BOOST_AUTO_TEST_CASE(fmod)
+BOOST_AUTO_TEST_CASE(fmod_test)
 {
     constexpr int m = 3;
     constexpr double cx = 3.25;
     constexpr double cy = 0.5;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::fmod(x,cy);
+    auto x = make_fvar<double,m>(cx);
+    auto y = fmod(x,cy);
     BOOST_REQUIRE(y.derivative(0) == 0.25);
     BOOST_REQUIRE(y.derivative(1) == 1.0);
     BOOST_REQUIRE(y.derivative(2) == 0.0);
@@ -947,13 +947,13 @@ BOOST_AUTO_TEST_CASE(round_and_trunc)
 {
     constexpr int m = 3;
     constexpr double cx = 3.25;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    auto y = boost::math::differentiation::autodiff::round(x);
+    auto x = make_fvar<double,m>(cx);
+    auto y = round(x);
     BOOST_REQUIRE(y.derivative(0) == std::round(cx));
     BOOST_REQUIRE(y.derivative(1) == 0.0);
     BOOST_REQUIRE(y.derivative(2) == 0.0);
     BOOST_REQUIRE(y.derivative(3) == 0.0);
-    y = boost::math::differentiation::autodiff::trunc(x);
+    y = trunc(x);
     BOOST_REQUIRE(y.derivative(0) == std::trunc(cx));
     BOOST_REQUIRE(y.derivative(1) == 0.0);
     BOOST_REQUIRE(y.derivative(2) == 0.0);
@@ -965,7 +965,7 @@ BOOST_AUTO_TEST_CASE(iround_and_itrunc)
     using namespace boost::math;
     constexpr int m = 3;
     constexpr double cx = 3.25;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
+    auto x = make_fvar<double,m>(cx);
     int y = iround(x);
     BOOST_REQUIRE(y == iround(cx));
     y = itrunc(x);
@@ -976,12 +976,12 @@ BOOST_AUTO_TEST_CASE(lround_llround_truncl)
 {
     constexpr int m = 3;
     constexpr double cx = 3.25;
-    auto x = boost::math::differentiation::autodiff::variable<double,m>(cx);
-    long yl = boost::math::differentiation::autodiff::lround(x);
+    auto x = make_fvar<double,m>(cx);
+    long yl = lround(x);
     BOOST_REQUIRE(yl == std::lround(cx));
-    long long yll = boost::math::differentiation::autodiff::llround(x);
+    long long yll = llround(x);
     BOOST_REQUIRE(yll == std::llround(cx));
-    long double yld = boost::math::differentiation::autodiff::truncl(x);
+    long double yld = truncl(x);
     BOOST_REQUIRE(yld == std::truncl(cx));
 }
 
@@ -994,11 +994,11 @@ BOOST_AUTO_TEST_CASE(mixed_partials)
     constexpr int Nx=2;
     constexpr int Ny=4;
     constexpr int Nz=3;
-    const boost::math::differentiation::autodiff::variable<double,Nw> w(11);
-    const boost::math::differentiation::autodiff::variable<double,0,Nx> x(12);
-    const boost::math::differentiation::autodiff::variable<double,0,0,Ny> y(13);
-    const boost::math::differentiation::autodiff::variable<double,0,0,0,Nz> z(14);
-    const auto v = mixed_partials_f(w,x,y,z); // auto = boost::math::differentiation::autodiff::variable<double,Nw,Nx,Ny,Nz>
+    const auto w = make_fvar<double,Nw>(11);
+    const auto x = make_fvar<double,0,Nx>(12);
+    const auto y = make_fvar<double,0,0,Ny>(13);
+    const auto z = make_fvar<double,0,0,0,Nz>(14);
+    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<double,Nw,Nx,Ny,Nz>
     int ia=0;
     for (int iw=0 ; iw<=Nw ; ++iw)
         for (int ix=0 ; ix<=Nx ; ++ix)
@@ -1017,11 +1017,11 @@ BOOST_AUTO_TEST_CASE(multiprecision)
     constexpr int Nx=2;
     constexpr int Ny=4;
     constexpr int Nz=3;
-    const boost::math::differentiation::autodiff::variable<cpp_dec_float_100,Nw> w(11);
-    const boost::math::differentiation::autodiff::variable<cpp_dec_float_100,0,Nx> x(12);
-    const boost::math::differentiation::autodiff::variable<cpp_dec_float_100,0,0,Ny> y(13);
-    const boost::math::differentiation::autodiff::variable<cpp_dec_float_100,0,0,0,Nz> z(14);
-    const auto v = mixed_partials_f(w,x,y,z); // auto = boost::math::differentiation::autodiff::variable<cpp_dec_float_100,Nw,Nx,Ny,Nz>
+    const auto w = make_fvar<cpp_dec_float_100,Nw>(11);
+    const auto x = make_fvar<cpp_dec_float_100,0,Nx>(12);
+    const auto y = make_fvar<cpp_dec_float_100,0,0,Ny>(13);
+    const auto z = make_fvar<cpp_dec_float_100,0,0,0,Nz>(14);
+    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>
     // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, tolerance); Doesn't compile on travis-ci trusty.
     using std::fabs;
     const cpp_dec_float_100 relative_error = fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1);
@@ -1031,14 +1031,11 @@ BOOST_AUTO_TEST_CASE(multiprecision)
 BOOST_AUTO_TEST_CASE(black_scholes)
 {
   constexpr double tolerance = 100e-14; // percent
-  using boost::math::differentiation::autodiff::exp;
-  using boost::math::differentiation::autodiff::log;
-  using boost::math::differentiation::autodiff::sqrt;
   const double K = 100.0; // Strike price
-  const boost::math::differentiation::autodiff::variable<double,3> S(105); // Stock price.
-  const boost::math::differentiation::autodiff::variable<double,0,3> sigma(5); // Volatility.
-  const boost::math::differentiation::autodiff::variable<double,0,0,1> tau(30.0/365); // Time to expiration in years. (30 days).
-  const boost::math::differentiation::autodiff::variable<double,0,0,0,1> r(1.25/100); // Interest rate.
+  const auto S     = make_fvar<double,3>(105); // Stock price.
+  const auto sigma = make_fvar<double,0,3>(5); // Volatility.
+  const auto tau   = make_fvar<double,0,0,1>(30.0/365); // Time to expiration in years. (30 days).
+  const auto r     = make_fvar<double,0,0,0,1>(1.25/100); // Interest rate.
   const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
   const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
   // Compare automatically calculated greeks by autodiff with formulas for greeks.

@@ -600,21 +600,17 @@ struct get_root_type { using type = RealType; }; // specialized for fvar<> below
 template<typename RealType, size_t Order>
 struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
 
-// TODO reduce number of template params.
-template<typename RealType0, typename RealType1, typename... RealTypes>
-struct promote_args_n { using type = typename boost::math::tools::promote_args_2<RealType0,
-    typename promote_args_n<RealType1,RealTypes...>::type>::type; };
+template<typename RealType, typename... RealTypes>
+struct promote_args_n { using type = typename boost::math::tools::promote_args_2<RealType,
+    typename promote_args_n<RealTypes...>::type>::type; };
 
-template<typename RealType0, typename RealType1>
-struct promote_args_n<RealType0,RealType1>
-{
-    using type = typename boost::math::tools::promote_args_2<RealType0,RealType1>::type;
-};
+template<typename RealType>
+struct promote_args_n<RealType> { using type = typename boost::math::tools::promote_arg<RealType>::type; };
 
 } // namespace detail
 
-template<typename RealType0, typename RealType1, typename... RealTypes>
-using promote = typename detail::promote_args_n<RealType0,RealType1,RealTypes...>::type;
+template<typename RealType, typename... RealTypes>
+using promote = typename detail::promote_args_n<RealType,RealTypes...>::type;
 
 namespace detail {
 

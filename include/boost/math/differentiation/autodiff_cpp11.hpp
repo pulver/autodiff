@@ -125,7 +125,7 @@ template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type,
     SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
-    const RealType zero{0};
+    const RealType zero(0);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
     const size_t m1 = order_sum() + isum1 < Order + z1 ? Order + z1 - (order_sum() + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
@@ -140,7 +140,7 @@ template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type,
     SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
-    const RealType zero{0};
+    const RealType zero(0);
     const size_t m0 = order_sum() + isum0 < Order + z0 ? Order + z0 - (order_sum() + isum0) : 0;
     const size_t m1 = order_sum() + isum1 < Order + z1 ? Order + z1 - (order_sum() + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;

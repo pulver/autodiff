@@ -9,7 +9,7 @@
 using namespace boost::math::differentiation;
 
 template<typename W,typename X,typename Y,typename Z>
-autodiff::promote<W,X,Y,Z> f(const W& w, const X& x, const Y& y, const Z& z)
+promote<W,X,Y,Z> f(const W& w, const X& x, const Y& y, const Z& z)
 {
   using namespace std;
   return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
@@ -72,11 +72,11 @@ int main()
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
   constexpr int Nz=3; // Max order of derivative to calculate for z
-  const autodiff::variable<double,Nw> w(11);
-  const autodiff::variable<double,0,Nx> x(12);
-  const autodiff::variable<double,0,0,Ny> y(13);
-  const autodiff::variable<double,0,0,0,Nz> z(14);
-  const auto v = f(w,x,y,z); // auto = autodiff::variable<double,Nw,Nx,Ny,Nz>
+  const auto w = make_fvar<double,Nw>(11);
+  const auto x = make_fvar<double,0,Nx>(12);
+  const auto y = make_fvar<double,0,0,Ny>(13);
+  const auto z = make_fvar<double,0,0,0,Nz>(14);
+  const auto v = f(w,x,y,z); // auto = autodiff_fvar<double,Nw,Nx,Ny,Nz>
   int ia=0;
   double max_relative_error=0;
   for (int iw=0 ; iw<=Nw ; ++iw)

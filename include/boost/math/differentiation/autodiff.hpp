@@ -659,10 +659,10 @@ class fvar
     fvar(const fvar<RealType2,Order2>&);
 
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
-    template<typename ArithmeticType>
-    explicit fvar(const typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type& ca);
     explicit fvar(const root_type&); // Initialize a constant. (No epsilon terms.)
-    //explicit fvar(const std::initializer_list<root_type>&);
+
+    template<typename ArithmeticType>
+    fvar(const ArithmeticType&); // Implicitly initialize a constant from the arithmetic types.
 
     // r = cr | RealType& | Assignment operator.
     fvar& operator=(const fvar&) = default;
@@ -1087,9 +1087,11 @@ fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
 
 template<typename RealType, size_t Order>
 template<typename ArithmeticType>
-fvar<RealType,Order>::fvar(const typename std::enable_if<std::is_arithmetic<ArithmeticType>::value>::type& ca)
+fvar<RealType,Order>::fvar(const ArithmeticType& ca)
 :    v{{static_cast<RealType>(ca)}}
 {
+    static_assert(std::is_arithmetic<ArithmeticType>::value,
+        "Implicit casting to autodiff_fvar is only allowed from other autodiff_fvar or arithmetic types.");
 }
 
 template<typename RealType, size_t Order>
@@ -1097,16 +1099,6 @@ fvar<RealType,Order>::fvar(const root_type& ca)
 :    v{{static_cast<RealType>(ca)}}
 {
 }
-
-/*
-template<typename RealType, size_t Order>
-fvar<RealType,Order>::fvar(const std::initializer_list<root_type>& list)
-:    v{}
-{
-    for (size_t i=0 ; i<std::min(Order+1,list.size()) ; ++i)
-        v[i] = *(list.begin()+i);
-}
-*/
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::operator=(const root_type& ca)

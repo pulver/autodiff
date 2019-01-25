@@ -60,6 +60,15 @@ promote<Price,Sigma,Tau,Rate>
     return exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1);
 }
 
+template<typename T>
+T uncast_return(const T& x)
+{
+    if (x == 0)
+        return 0;
+    else
+        return 1;
+}
+
 BOOST_AUTO_TEST_SUITE(test_autodiff)
 
 BOOST_AUTO_TEST_CASE(constructors)
@@ -103,6 +112,17 @@ BOOST_AUTO_TEST_CASE(constructors)
                 BOOST_REQUIRE(y.derivative(i,j) == 1.0);
             else
                 BOOST_REQUIRE(y.derivative(i,j) == 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(implicit_constructors)
+{
+    constexpr int m = 3;
+    const autodiff_fvar<double,m> x = 3;
+    const autodiff_fvar<double,m> one = uncast_return(x);
+    const autodiff_fvar<double,m> two_and_a_half = 2.5;
+    BOOST_REQUIRE(static_cast<double>(x) == 3.0);
+    BOOST_REQUIRE(static_cast<double>(one) == 1.0);
+    BOOST_REQUIRE(static_cast<double>(two_and_a_half) == 2.5);
 }
 
 BOOST_AUTO_TEST_CASE(assignment)

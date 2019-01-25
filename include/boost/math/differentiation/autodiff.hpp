@@ -651,7 +651,7 @@ class fvar
 
     // Be aware of implicit casting from one fvar<> type to another by this copy constructor.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>(const fvar<RealType2,Order2>&);
+    fvar(const fvar<RealType2,Order2>&);
 
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
     template<typename ArithmeticType>
@@ -815,10 +815,10 @@ class fvar
 
     // Will throw std::out_of_range if Order < order.
     template<typename... Orders>
-    get_type_at<RealType,sizeof...(Orders)> at(size_t order, Orders... orders) const;
+    get_type_at<RealType, sizeof...(Orders)> at(size_t order, Orders... orders) const;
 
     template<typename... Orders>
-    get_type_at<RealType,sizeof...(Orders)-1> derivative(Orders... orders) const;
+    get_type_at<RealType, sizeof...(Orders)-1> derivative(Orders... orders) const;
 
     fvar<RealType,Order> inverse() const; // Multiplicative inverse.
 
@@ -1096,7 +1096,7 @@ fvar<RealType,Order>::fvar(const root_type& ca)
 {
 }
 
-template<typename RealType,size_t Order>
+template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const std::initializer_list<root_type>& list)
 :    v{}
 {

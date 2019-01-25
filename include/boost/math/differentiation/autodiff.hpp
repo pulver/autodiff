@@ -618,6 +618,12 @@ using promote = typename detail::promote_args_n<RealType0,RealType1,RealTypes...
 
 namespace detail {
 
+template <typename>
+struct get_depth : std::integral_constant<size_t, 0> {};
+
+template <typename RealType, size_t Order>
+struct get_depth<fvar<RealType,Order>> : std::integral_constant<size_t,get_depth<RealType>::value+1> {};
+
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
 struct type_at;
@@ -822,9 +828,9 @@ class fvar
 
     fvar inverse() const; // Multiplicative inverse.
 
-    static constexpr size_t depth(); // Number of nested std::array<RealType,Order>.
+    static constexpr size_t depth = get_depth<fvar>::value; // Number of nested std::array<RealType,Order>.
 
-    static constexpr size_t order_sum();
+    static constexpr size_t order_sum(); // = get_order_sum<fvar>::value;
 
     explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
@@ -1526,21 +1532,10 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, Orders... orders) const
 {
-    if constexpr (0 < sizeof...(orders))
+    if constexpr (0 < sizeof...(Orders))
         return v.at(order).at(orders...);
     else
         return v.at(order);
-}
-#endif
-
-#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
-template<typename RealType, size_t Order>
-constexpr size_t fvar<RealType,Order>::depth()
-{
-    if constexpr (is_fvar<RealType>::value)
-        return 1 + RealType::depth();
-    else
-        return 1;
 }
 #endif
 
@@ -1561,7 +1556,7 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)-1> fvar<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(orders) <= depth(),
+    static_assert(sizeof...(orders) <= depth,
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the fvar<...>.");
     return at(orders...) * (... * boost::math::factorial<root_type>(orders));
 }
@@ -1571,7 +1566,7 @@ template<typename RealType, size_t Order>
 RealType fvar<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
     const fvar<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const
 {
-    static_assert(is_fvar<RealType>::value, "epsilon_inner_product() must have 1 < depth().");
+    static_assert(is_fvar<RealType>::value, "epsilon_inner_product() must have 1 < depth.");
     RealType accumulator = RealType();
     const size_t i0_max = m1 < j ? j-m1 : 0;
     for (size_t i0=m0, i1=j-m0 ; i0<=i0_max ; ++i0, --i1)
@@ -1908,7 +1903,7 @@ int itrunc(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 std::ostream& operator<<(std::ostream& out, const fvar<RealType,Order>& cr)
 {
-    out << "depth(" << cr.depth() << ')';
+    out << "depth(" << cr.depth << ')';
     for (size_t i=0 ; i<cr.v.size() ; ++i)
         out << (i?',':'(') << cr.v[i];
     return out << ')';

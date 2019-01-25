@@ -74,18 +74,6 @@ get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, O
 }
 
 template <typename>
-struct depth_cpp11 : std::integral_constant<size_t, 0> {};
-
-template <typename RealType, size_t Order>
-struct depth_cpp11<fvar<RealType,Order>> : std::integral_constant<size_t,depth_cpp11<RealType>::value+1> {};
-
-template<typename RealType, size_t Order>
-constexpr size_t fvar<RealType,Order>::depth()
-{
-    return depth_cpp11<fvar<RealType,Order>>::value;
-}
-
-template <typename>
 struct order_sum_cpp11 : std::integral_constant<size_t, 0> {};
 
 template <typename RealType, size_t Order>
@@ -115,7 +103,7 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)-1> fvar<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(Orders) <= depth(),
+    static_assert(sizeof...(Orders) <= depth,
         "Number of parameters to derivative(...) cannot exceed the number of dimensions in the fvar<...>.");
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
 }

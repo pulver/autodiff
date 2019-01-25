@@ -29,9 +29,9 @@ class fvar
 
     // All of the arithmetic operators are overloaded.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>& operator+=(const fvar<RealType2,Order2>&);
+    fvar& operator+=(const fvar<RealType2,Order2>&);
 
-    fvar<RealType,Order>& operator+=(const root_type&);
+    fvar& operator+=(const root_type&);
 
     // ...
 };

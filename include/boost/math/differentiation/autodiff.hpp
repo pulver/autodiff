@@ -647,7 +647,7 @@ class fvar
     fvar(const root_type&, bool is_variable);
 
     // RealType(cr) | RealType | RealType is copy constructible.
-    fvar(const fvar<RealType,Order>&) = default;
+    fvar(const fvar&) = default;
 
     // Be aware of implicit casting from one fvar<> type to another by this copy constructor.
     template<typename RealType2, size_t Order2>
@@ -660,51 +660,51 @@ class fvar
     explicit fvar(const std::initializer_list<root_type>&); // required by C++11, else fvar{2.0} is ambiguous.
 
     // r = cr | RealType& | Assignment operator.
-    fvar<RealType,Order>& operator=(const fvar<RealType,Order>&) = default;
+    fvar& operator=(const fvar&) = default;
 
     // r = ca | RealType& | Assignment operator from the arithmetic types.
-    fvar<RealType,Order>& operator=(const root_type&); // Set a constant.
+    fvar& operator=(const root_type&); // Set a constant.
 
     // r += cr | RealType& | Adds cr to r.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>& operator+=(const fvar<RealType2,Order2>&);
+    fvar& operator+=(const fvar<RealType2,Order2>&);
 
     // r += ca | RealType& | Adds ar to r.
-    fvar<RealType,Order>& operator+=(const root_type&);
+    fvar& operator+=(const root_type&);
 
     // r -= cr | RealType& | Subtracts cr from r.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>& operator-=(const fvar<RealType2,Order2>&);
+    fvar& operator-=(const fvar<RealType2,Order2>&);
 
     // r -= ca | RealType& | Subtracts ca from r.
-    fvar<RealType,Order>& operator-=(const root_type&);
+    fvar& operator-=(const root_type&);
 
     // r *= cr | RealType& | Multiplies r by cr.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>& operator*=(const fvar<RealType2,Order2>&);
+    fvar& operator*=(const fvar<RealType2,Order2>&);
 
     // r *= ca | RealType& | Multiplies r by ca.
-    fvar<RealType,Order>& operator*=(const root_type&);
+    fvar& operator*=(const root_type&);
 
     // r /= cr | RealType& | Divides r by cr.
     template<typename RealType2, size_t Order2>
-    fvar<RealType,Order>& operator/=(const fvar<RealType2,Order2>&);
+    fvar& operator/=(const fvar<RealType2,Order2>&);
 
     // r /= ca | RealType& | Divides r by ca.
-    fvar<RealType,Order>& operator/=(const root_type&);
+    fvar& operator/=(const root_type&);
 
     // -r | RealType | Unary Negation.
-    fvar<RealType,Order> operator-() const;
+    fvar operator-() const;
 
     // +r | RealType& | Identity Operation.
-    const fvar<RealType,Order>& operator+() const;
+    const fvar& operator+() const;
 
     // cr + cr2 | RealType | Binary Addition
     template<typename RealType2, size_t Order2>
-    promote<fvar<RealType,Order>,fvar<RealType2,Order2>> operator+(const fvar<RealType2,Order2>&) const;
+    promote<fvar,fvar<RealType2,Order2>> operator+(const fvar<RealType2,Order2>&) const;
 
     // cr + ca | RealType | Binary Addition
-    fvar<RealType,Order> operator+(const root_type&) const;
+    fvar operator+(const root_type&) const;
 
     // ca + cr | RealType | Binary Addition
     template<typename RealType2, size_t Order2>
@@ -713,10 +713,10 @@ class fvar
 
     // cr - cr2 | RealType | Binary Subtraction
     template<typename RealType2, size_t Order2>
-    promote<fvar<RealType,Order>,fvar<RealType2,Order2>> operator-(const fvar<RealType2,Order2>&) const;
+    promote<fvar,fvar<RealType2,Order2>> operator-(const fvar<RealType2,Order2>&) const;
 
     // cr - ca | RealType | Binary Subtraction
-    fvar<RealType,Order> operator-(const root_type&) const;
+    fvar operator-(const root_type&) const;
 
     // ca - cr | RealType | Binary Subtraction
     template<typename RealType2, size_t Order2>
@@ -725,10 +725,10 @@ class fvar
 
     // cr * cr2 | RealType | Binary Multiplication
     template<typename RealType2, size_t Order2>
-    promote<fvar<RealType,Order>,fvar<RealType2,Order2>> operator*(const fvar<RealType2,Order2>&) const;
+    promote<fvar,fvar<RealType2,Order2>> operator*(const fvar<RealType2,Order2>&) const;
 
     // cr * ca | RealType | Binary Multiplication
-    fvar<RealType,Order> operator*(const root_type&) const;
+    fvar operator*(const root_type&) const;
 
     // ca * cr | RealType | Binary Multiplication
     template<typename RealType2, size_t Order2>
@@ -737,10 +737,10 @@ class fvar
 
     // cr / cr2 | RealType | Binary Subtraction
     template<typename RealType2, size_t Order2>
-    promote<fvar<RealType,Order>,fvar<RealType2,Order2>> operator/(const fvar<RealType2,Order2>&) const;
+    promote<fvar,fvar<RealType2,Order2>> operator/(const fvar<RealType2,Order2>&) const;
 
     // cr / ca | RealType | Binary Subtraction
-    fvar<RealType,Order> operator/(const root_type&) const;
+    fvar operator/(const root_type&) const;
 
     // ca / cr | RealType | Binary Subtraction
     template<typename RealType2, size_t Order2>
@@ -820,7 +820,7 @@ class fvar
     template<typename... Orders>
     get_type_at<RealType, sizeof...(Orders)-1> derivative(Orders... orders) const;
 
-    fvar<RealType,Order> inverse() const; // Multiplicative inverse.
+    fvar inverse() const; // Multiplicative inverse.
 
     static constexpr size_t depth(); // Number of nested std::array<RealType,Order>.
 
@@ -828,33 +828,32 @@ class fvar
 
     explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
-    fvar<RealType,Order>& set_root(const root_type&);
+    fvar& set_root(const root_type&);
 
     // Use when function returns derivatives.
-    fvar<RealType,Order> apply(const std::function<root_type(size_t)>&) const;
+    fvar apply(const std::function<root_type(size_t)>&) const;
 
     // Use when function returns derivative(i)/factorial(i) (slightly more efficient than apply().)
-    fvar<RealType,Order> apply_with_factorials(const std::function<root_type(size_t)>&) const;
+    fvar apply_with_factorials(const std::function<root_type(size_t)>&) const;
 
     // Same as apply() but uses horner method. May be more accurate in some cases but not as good with inf derivatives.
-    fvar<RealType,Order> apply_with_horner(const std::function<root_type(size_t)>&) const;
+    fvar apply_with_horner(const std::function<root_type(size_t)>&) const;
 
     // Same as apply_with_factorials() but uses horner method.
-    fvar<RealType,Order> apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
+    fvar apply_with_horner_factorials(const std::function<root_type(size_t)>&) const;
 
 private:
 
     RealType epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
-        const fvar<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
+        const fvar& cr, size_t z1, size_t isum1, size_t m1, size_t j) const;
 
-    fvar<RealType,Order> epsilon_multiply(size_t z0, size_t isum0,
-        const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    fvar epsilon_multiply(size_t z0, size_t isum0, const fvar& cr, size_t z1, size_t isum1) const;
 
-    fvar<RealType,Order> epsilon_multiply(size_t z0, size_t isum0, const root_type& ca) const;
+    fvar epsilon_multiply(size_t z0, size_t isum0, const root_type& ca) const;
 
-    fvar<RealType,Order> inverse_apply() const;
+    fvar inverse_apply() const;
 
-    fvar<RealType,Order>& multiply_assign_by_root_type(bool is_root, const root_type&);
+    fvar& multiply_assign_by_root_type(bool is_root, const root_type&);
 
     template<typename RealType2, size_t Orders2>
     friend class fvar;
@@ -877,32 +876,30 @@ private:
     get_type_at<RealType, sizeof...(Orders)> at_cpp11(std::false_type, size_t order, Orders... orders) const;
 
     template<typename SizeType>
-    fvar<RealType,Order> epsilon_multiply_cpp11(std::true_type, SizeType z0, size_t isum0,
-        const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    fvar epsilon_multiply_cpp11(std::true_type,
+        SizeType z0, size_t isum0, const fvar& cr, size_t z1, size_t isum1) const;
 
     template<typename SizeType>
-    fvar<RealType,Order> epsilon_multiply_cpp11(std::false_type, SizeType z0, size_t isum0,
-        const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const;
+    fvar epsilon_multiply_cpp11(std::false_type,
+        SizeType z0, size_t isum0, const fvar& cr, size_t z1, size_t isum1) const;
 
     template<typename SizeType>
-    fvar<RealType,Order> epsilon_multiply_cpp11(std::true_type, SizeType z0, size_t isum0,
-        const root_type& ca) const;
+    fvar epsilon_multiply_cpp11(std::true_type, SizeType z0, size_t isum0, const root_type& ca) const;
 
     template<typename SizeType>
-    fvar<RealType,Order> epsilon_multiply_cpp11(std::false_type, SizeType z0, size_t isum0,
-        const root_type& ca) const;
+    fvar epsilon_multiply_cpp11(std::false_type, SizeType z0, size_t isum0, const root_type& ca) const;
 
     template<typename RootType>
-    fvar<RealType,Order>& multiply_assign_by_root_type_cpp11(std::true_type, bool is_root, const RootType& ca);
+    fvar& multiply_assign_by_root_type_cpp11(std::true_type, bool is_root, const RootType& ca);
 
     template<typename RootType>
-    fvar<RealType,Order>& multiply_assign_by_root_type_cpp11(std::false_type, bool is_root, const RootType& ca);
+    fvar& multiply_assign_by_root_type_cpp11(std::false_type, bool is_root, const RootType& ca);
 
     template<typename RootType>
-    fvar<RealType,Order>& set_root_cpp11(std::true_type, const RootType& root);
+    fvar& set_root_cpp11(std::true_type, const RootType& root);
 
     template<typename RootType>
-    fvar<RealType,Order>& set_root_cpp11(std::false_type, const RootType& root);
+    fvar& set_root_cpp11(std::false_type, const RootType& root);
 #endif
 };
 
@@ -1909,14 +1906,11 @@ int itrunc(const fvar<RealType,Order>& cr)
 }
 
 template<typename RealType, size_t Order>
-std::ostream& operator<<(std::ostream& out, const fvar<RealType,Order>& dim)
+std::ostream& operator<<(std::ostream& out, const fvar<RealType,Order>& cr)
 {
-    const std::streamsize original_precision = out.precision();
-    out.precision(std::numeric_limits<typename fvar<RealType,Order>::root_type>::digits10);
-    out << "depth(" << dim.depth() << ')';
-    for (size_t i=0 ; i<dim.v.size() ; ++i)
-        out << (i?',':'(') << dim.v[i];
-    out.precision(original_precision);
+    out << "depth(" << cr.depth() << ')';
+    for (size_t i=0 ; i<cr.v.size() ; ++i)
+        out << (i?',':'(') << cr.v[i];
     return out << ')';
 }
 

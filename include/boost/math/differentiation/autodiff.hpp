@@ -637,6 +637,7 @@ template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
 
 // Satisfies Boost's Conceptual Requirements for Real Number Types.
+// https://www.boost.org/libs/math/doc/html/math_toolkit/real_concepts.html
 template<typename RealType, size_t Order>
 class fvar
 {

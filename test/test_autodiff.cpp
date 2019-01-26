@@ -9,6 +9,7 @@
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <boost/math/special_functions/round.hpp> // iround
 #include <boost/math/special_functions/trunc.hpp> // itrunc
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
@@ -71,21 +72,22 @@ T uncast_return(const T& x)
 
 BOOST_AUTO_TEST_SUITE(test_autodiff)
 
-BOOST_AUTO_TEST_CASE(constructors)
+template<typename T>
+void constructors_test()
 {
     constexpr int m = 3;
     constexpr int n = 4;
     // Verify value-initialized instance has all 0 entries.
-    const autodiff_fvar<double,m> empty1 = autodiff_fvar<double,m>();
+    const autodiff_fvar<T,m> empty1 = autodiff_fvar<T,m>();
     for (int i=0 ; i<=m ; ++i)
         BOOST_REQUIRE(empty1.derivative(i) == 0.0);
-    const auto empty2 = autodiff_fvar<double,m,n>();
+    const auto empty2 = autodiff_fvar<T,m,n>();
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             BOOST_REQUIRE(empty2.derivative(i,j) == 0.0);
     // Single variable
     constexpr double cx = 10.0;
-    const auto x = make_fvar<double,m>(cx);
+    const auto x = make_fvar<T,m>(cx);
     for (int i=0 ; i<=m ; ++i)
         if (i==0)
             BOOST_REQUIRE(x.derivative(i) == cx);
@@ -93,7 +95,7 @@ BOOST_AUTO_TEST_CASE(constructors)
             BOOST_REQUIRE(x.derivative(i) == 1.0);
         else
             BOOST_REQUIRE(x.derivative(i) == 0.0);
-    const autodiff_fvar<double,n> xn = x;
+    const autodiff_fvar<T,n> xn = x;
     for (int i=0 ; i<=n ; ++i)
         if (i==0)
             BOOST_REQUIRE(xn.derivative(i) == cx);
@@ -103,7 +105,7 @@ BOOST_AUTO_TEST_CASE(constructors)
             BOOST_REQUIRE(xn.derivative(i) == 0.0);
     // Second independent variable
     constexpr double cy = 100.0;
-    const auto y = make_fvar<double,m,n>(cy);
+    const auto y = make_fvar<T,m,n>(cy);
     for (int i=0 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             if (i==0 && j==0)
@@ -112,6 +114,14 @@ BOOST_AUTO_TEST_CASE(constructors)
                 BOOST_REQUIRE(y.derivative(i,j) == 1.0);
             else
                 BOOST_REQUIRE(y.derivative(i,j) == 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(constructors)
+{
+    constructors_test<float>();
+    constructors_test<double>();
+    constructors_test<long double>();
+    constructors_test<boost::multiprecision::cpp_bin_float_50>();
 }
 
 BOOST_AUTO_TEST_CASE(implicit_constructors)

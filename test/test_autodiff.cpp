@@ -5,6 +5,8 @@
 
 #include <boost/math/differentiation/autodiff.hpp>
 
+#include <boost/fusion/include/algorithm.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <boost/math/special_functions/round.hpp> // iround
@@ -16,6 +18,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <iostream>
+
+boost::fusion::vector<float,double,long double,boost::multiprecision::cpp_bin_float_50> floating_point_types;
 
 using namespace boost::math::differentiation;
 
@@ -72,56 +76,56 @@ T uncast_return(const T& x)
 
 BOOST_AUTO_TEST_SUITE(test_autodiff)
 
-template<typename T>
-void constructors_test()
+struct constructors_test
 {
-    constexpr int m = 3;
-    constexpr int n = 4;
-    // Verify value-initialized instance has all 0 entries.
-    const autodiff_fvar<T,m> empty1 = autodiff_fvar<T,m>();
-    for (int i=0 ; i<=m ; ++i)
-        BOOST_REQUIRE(empty1.derivative(i) == 0.0);
-    const auto empty2 = autodiff_fvar<T,m,n>();
-    for (int i=0 ; i<=m ; ++i)
-        for (int j=0 ; j<=n ; ++j)
-            BOOST_REQUIRE(empty2.derivative(i,j) == 0.0);
-    // Single variable
-    constexpr double cx = 10.0;
-    const auto x = make_fvar<T,m>(cx);
-    for (int i=0 ; i<=m ; ++i)
-        if (i==0)
-            BOOST_REQUIRE(x.derivative(i) == cx);
-        else if (i==1)
-            BOOST_REQUIRE(x.derivative(i) == 1.0);
-        else
-            BOOST_REQUIRE(x.derivative(i) == 0.0);
-    const autodiff_fvar<T,n> xn = x;
-    for (int i=0 ; i<=n ; ++i)
-        if (i==0)
-            BOOST_REQUIRE(xn.derivative(i) == cx);
-        else if (i==1)
-            BOOST_REQUIRE(xn.derivative(i) == 1.0);
-        else
-            BOOST_REQUIRE(xn.derivative(i) == 0.0);
-    // Second independent variable
-    constexpr double cy = 100.0;
-    const auto y = make_fvar<T,m,n>(cy);
-    for (int i=0 ; i<=m ; ++i)
-        for (int j=0 ; j<=n ; ++j)
-            if (i==0 && j==0)
-                BOOST_REQUIRE(y.derivative(i,j) == cy);
-            else if (i==0 && j==1)
-                BOOST_REQUIRE(y.derivative(i,j) == 1.0);
+    template<typename T>
+    void operator()(const T&) const
+    {
+        constexpr int m = 3;
+        constexpr int n = 4;
+        // Verify value-initialized instance has all 0 entries.
+        const autodiff_fvar<T,m> empty1 = autodiff_fvar<T,m>();
+        for (int i=0 ; i<=m ; ++i)
+            BOOST_REQUIRE(empty1.derivative(i) == 0.0);
+        const auto empty2 = autodiff_fvar<T,m,n>();
+        for (int i=0 ; i<=m ; ++i)
+            for (int j=0 ; j<=n ; ++j)
+                BOOST_REQUIRE(empty2.derivative(i,j) == 0.0);
+        // Single variable
+        constexpr double cx = 10.0;
+        const auto x = make_fvar<T,m>(cx);
+        for (int i=0 ; i<=m ; ++i)
+            if (i==0)
+                BOOST_REQUIRE(x.derivative(i) == cx);
+            else if (i==1)
+                BOOST_REQUIRE(x.derivative(i) == 1.0);
             else
-                BOOST_REQUIRE(y.derivative(i,j) == 0.0);
-}
+                BOOST_REQUIRE(x.derivative(i) == 0.0);
+        const autodiff_fvar<T,n> xn = x;
+        for (int i=0 ; i<=n ; ++i)
+            if (i==0)
+                BOOST_REQUIRE(xn.derivative(i) == cx);
+            else if (i==1)
+                BOOST_REQUIRE(xn.derivative(i) == 1.0);
+            else
+                BOOST_REQUIRE(xn.derivative(i) == 0.0);
+        // Second independent variable
+        constexpr double cy = 100.0;
+        const auto y = make_fvar<T,m,n>(cy);
+        for (int i=0 ; i<=m ; ++i)
+            for (int j=0 ; j<=n ; ++j)
+                if (i==0 && j==0)
+                    BOOST_REQUIRE(y.derivative(i,j) == cy);
+                else if (i==0 && j==1)
+                    BOOST_REQUIRE(y.derivative(i,j) == 1.0);
+                else
+                    BOOST_REQUIRE(y.derivative(i,j) == 0.0);
+    }
+};
 
 BOOST_AUTO_TEST_CASE(constructors)
 {
-    constructors_test<float>();
-    constructors_test<double>();
-    constructors_test<long double>();
-    constructors_test<boost::multiprecision::cpp_bin_float_50>();
+    boost::fusion::for_each(floating_point_types, constructors_test());
 }
 
 BOOST_AUTO_TEST_CASE(implicit_constructors)

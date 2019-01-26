@@ -667,7 +667,7 @@ class fvar
     fvar& operator=(const fvar&) = default;
 
     // r = ca | RealType& | Assignment operator from the arithmetic types.
-    fvar& operator=(const root_type&); // Set a constant.
+    //fvar& operator=(const root_type&); // Set a constant.
 
     // r += cr | RealType& | Adds cr to r.
     template<typename RealType2, size_t Order2>
@@ -1091,6 +1091,7 @@ fvar<RealType,Order>::fvar(const RealType2& ca)
 {
 }
 
+/*
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::operator=(const root_type& ca)
 {
@@ -1099,6 +1100,7 @@ fvar<RealType,Order>& fvar<RealType,Order>::operator=(const root_type& ca)
         std::fill(v.begin()+1, v.end(), static_cast<RealType>(0));
     return *this;
 }
+*/
 
 template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>

@@ -659,10 +659,8 @@ class fvar
     fvar(const fvar<RealType2,Order2>&);
 
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
-    explicit fvar(const root_type&); // Initialize a constant. (No epsilon terms.)
-
-    template<typename ArithmeticType>
-    fvar(const ArithmeticType&); // Implicitly initialize a constant from the arithmetic types.
+    template<typename RealType2>
+    fvar(const RealType2& ca); // Supports any RealType2 for which static_cast<root_type>(ca) compiles.
 
     // r = cr | RealType& | Assignment operator.
     fvar& operator=(const fvar&) = default;
@@ -1086,17 +1084,9 @@ fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
 }
 
 template<typename RealType, size_t Order>
-template<typename ArithmeticType>
-fvar<RealType,Order>::fvar(const ArithmeticType& ca)
-:    v{{static_cast<RealType>(ca)}}
-{
-    static_assert(std::is_arithmetic<ArithmeticType>::value,
-        "Implicit casting to autodiff_fvar is only allowed from other autodiff_fvar or arithmetic types.");
-}
-
-template<typename RealType, size_t Order>
-fvar<RealType,Order>::fvar(const root_type& ca)
-:    v{{static_cast<RealType>(ca)}}
+template<typename RealType2>
+fvar<RealType,Order>::fvar(const RealType2& ca)
+:    v{{static_cast<RealType>(ca)}} // Can cause compiler error if RealType2 cannot be cast to root_type.
 {
 }
 

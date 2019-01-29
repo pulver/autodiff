@@ -660,6 +660,8 @@ class fvar
     fvar(const fvar<RealType2,Order2>&);
 
     // RealType(ca) | RealType | RealType is copy constructible from the arithmetic types.
+    explicit fvar(const root_type&); // Initialize a constant. (No epsilon terms.)
+
     template<typename RealType2>
     fvar(const RealType2& ca); // Supports any RealType2 for which static_cast<root_type>(ca) compiles.
 
@@ -667,6 +669,7 @@ class fvar
     fvar& operator=(const fvar&) = default;
 
     // r = ca | RealType& | Assignment operator from the arithmetic types.
+    // Handled by constructor that takes a single parameter of generic type.
     //fvar& operator=(const root_type&); // Set a constant.
 
     // r += cr | RealType& | Adds cr to r.
@@ -1085,6 +1088,12 @@ fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
 }
 
 template<typename RealType, size_t Order>
+fvar<RealType,Order>::fvar(const root_type& ca)
+:    v{{static_cast<RealType>(ca)}}
+{
+}
+
+template<typename RealType, size_t Order>
 template<typename RealType2>
 fvar<RealType,Order>::fvar(const RealType2& ca)
 :    v{{static_cast<RealType>(ca)}} // Can cause compiler error if RealType2 cannot be cast to root_type.
@@ -1224,8 +1233,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator+(const root_type& ca) const
 }
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    operator+(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
+fvar<RealType,Order> operator+(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
     return cr + ca;
 }
@@ -1256,8 +1264,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator-(const root_type& ca) const
 }
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    operator-(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
+fvar<RealType,Order> operator-(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
     return -cr += ca;
 }
@@ -1285,8 +1292,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator*(const root_type& ca) const
 }
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    operator*(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
+fvar<RealType,Order> operator*(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
     return cr * ca;
 }
@@ -1325,8 +1331,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator/(const root_type& ca) const
 }
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    operator/(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
+fvar<RealType,Order> operator/(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
     fvar<RealType,Order> retval;
     retval.v.front() = ca / cr.v.front();

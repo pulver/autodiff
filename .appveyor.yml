@@ -30,7 +30,7 @@ install:
 
 build_script:
 # - cl.exe /EHsc /IC:\Libraries\boost_1_67_0 /Iinclude test/test_autodiff.cpp
-  - cl.exe /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
+  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
 
 test_script:
   - test_autodiff
@@ -40,3 +40,4 @@ test_script:
 # * Adding /EHsc resolved both warnings:
 #   * C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\xlocale(319): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 #   * c:\libraries\boost_1_67_0\boost\test\impl\execution_monitor.ipp(277) : warning C4717: 'boost::detail::report_error': recursive on all control paths, function will cause runtime stack overflow
+# * C:\projects\autodiff\test\test_autodiff.cpp : fatal error C1128: number of sections exceeded object file format limit: compile with /bigobj

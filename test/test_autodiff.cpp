@@ -1283,11 +1283,12 @@ struct asin_infinity_test
   template<typename T>
   void operator()(const T&) const
   {
+    const T eps = 100*std::numeric_limits<T>::epsilon(); // percent
     constexpr int m = 5;
     auto x = make_fvar<T,m>(1);
     auto y = asin(x);
     //std::cout << "asin(1) = " << y << std::endl; // depth(1)(1.5707963267949,inf,inf,-nan,-nan,-nan)
-    BOOST_REQUIRE(y.derivative(0) == boost::math::constants::half_pi<T>());
+    BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::half_pi<T>(), eps); // MacOS is not exact
     BOOST_REQUIRE(y.derivative(1) == std::numeric_limits<T>::infinity());
   }
 };
@@ -1554,7 +1555,7 @@ struct black_scholes_test
   void operator()(const T&) const
   {
     using std::fabs;
-    const T eps = 1700e2*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 2040e2*std::numeric_limits<T>::epsilon(); // percent
     const float K = 100.0; // Strike price
     const auto S     = make_fvar<T,3>(105); // Stock price.
     const auto sigma = make_fvar<T,0,3>(5); // Volatility.

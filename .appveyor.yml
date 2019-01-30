@@ -5,6 +5,16 @@
 
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 32-bit
+      configuration: Debug
+      INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 32-bit
+      configuration: Release
+      INSTALL_SCRIPT1: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86'
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 64-bit
+      configuration: Debug
+      INSTALL_SCRIPT1: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
+      INSTALL_SCRIPT2: 'call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64'
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015 # 64-bit
       configuration: Release
       INSTALL_SCRIPT1: 'call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64'
@@ -29,7 +39,6 @@ install:
   - ls
 
 build_script:
-# - cl.exe /EHsc /IC:\Libraries\boost_1_67_0 /Iinclude test/test_autodiff.cpp
   - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
 
 test_script:
@@ -37,7 +46,8 @@ test_script:
 
 # Notes:
 #
+# * Adding /bigojb resolved (but not needed for Visual Studio 2017 32-bit)
+#   * C:\projects\autodiff\test\test_autodiff.cpp : fatal error C1128: number of sections exceeded object file format limit: compile with /bigobj
 # * Adding /EHsc resolved both warnings:
 #   * C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.16.27023\include\xlocale(319): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 #   * c:\libraries\boost_1_67_0\boost\test\impl\execution_monitor.ipp(277) : warning C4717: 'boost::detail::report_error': recursive on all control paths, function will cause runtime stack overflow
-# * C:\projects\autodiff\test\test_autodiff.cpp : fatal error C1128: number of sections exceeded object file format limit: compile with /bigobj

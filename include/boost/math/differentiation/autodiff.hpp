@@ -475,8 +475,6 @@ struct nest_fvar<RealType,Order> { using type = fvar<RealType,Order>; };
 
 } // namespace detail
 
-// autodiff_fvar<> alias is the primary template for declaring autodiff instances.
-// However use make_fvar<>() for initializing variables.
 template<typename RealType, size_t Order, size_t... Orders>
 using autodiff_fvar = typename detail::nest_fvar<RealType,Order,Orders...>::type;
 
@@ -1167,7 +1165,27 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
 template<typename RealType, size_t Order>
 fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 {
-    return pow(cr,0.5);
+    using std::sqrt;
+    using root_type = typename fvar<RealType,Order>::root_type;
+    constexpr size_t order = fvar<RealType,Order>::order_sum;
+    std::array<root_type,order+1> derivatives;
+    const root_type x = static_cast<root_type>(cr);
+    derivatives.front() = sqrt(x);
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+        return fvar<RealType,Order>(derivatives.front());
+    else
+    {
+        double numerator = 0.5;
+        root_type powers = 1;
+        derivatives[1] = numerator / derivatives.front();
+        for (size_t i=2 ; i<=order ; ++i)
+        {
+            numerator *= -0.5 * ((i<<1)-3);
+            powers *= x;
+            derivatives[i] = numerator / (powers * derivatives.front());
+        }
+        return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
+    }
 }
 
 // Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
@@ -1179,7 +1197,7 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = log(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         const auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
@@ -1212,7 +1230,7 @@ fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
     using root_type = typename fvar<RealType,Order>::root_type;
     const root_type d0 = cos(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (fvar<RealType,Order>::order_sum == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         const root_type d1 = -sin(static_cast<root_type>(cr));
@@ -1229,7 +1247,7 @@ fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
     using root_type = typename fvar<RealType,Order>::root_type;
     const root_type d0 = sin(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (fvar<RealType,Order>::order_sum == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         const root_type d1 = cos(static_cast<root_type>(cr));
@@ -1246,7 +1264,7 @@ fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = asin(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr)); // asin'(x) = 1 / sqrt(1-x*x).
@@ -1270,7 +1288,7 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = atan(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
@@ -1335,7 +1353,7 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = acos(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
@@ -1352,7 +1370,7 @@ fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = erfc(static_cast<root_type>(cr));
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,0>(d0);
+        return fvar<RealType,Order>(d0);
     else
     {
         auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr));

@@ -19,9 +19,10 @@
 
 #include <iostream>
 
+//boost::fusion::vector<float,double,long double,boost::multiprecision::cpp_bin_float_50> bin_float_types;
+boost::fusion::vector<float,double,long double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-boost::fusion::vector<float,double,long double> fundamental_float_types;
-//boost::fusion::vector<boost::multiprecision::cpp_bin_float_50,boost::multiprecision::cpp_dec_float_50>
+//boost::fusion::vector<boost::multiprecision::cpp_dec_float_50>
 boost::fusion::vector<> multiprecision_float_types;
 
 using namespace boost::math::differentiation;
@@ -29,7 +30,6 @@ using namespace boost::math::differentiation;
 template<typename W,typename X,typename Y,typename Z>
 promote<W,X,Y,Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
 {
-    using namespace std;
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
 }
 
@@ -40,14 +40,14 @@ promote<W,X,Y,Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z
 template<typename T>
 T phi(const T& x)
 {
-  return boost::math::constants::one_div_root_two_pi<double>()*exp(-0.5*x*x);
+  return boost::math::constants::one_div_root_two_pi<T>()*exp(-0.5*x*x);
 }
 
 // Standard normal cumulative distribution function
 template<typename T>
 T Phi(const T& x)
 {
-  return 0.5*erfc(-boost::math::constants::one_div_root_two<double>()*x);
+  return 0.5*erfc(-boost::math::constants::one_div_root_two<T>()*x);
 }
 
 enum CP { call, put };
@@ -57,7 +57,6 @@ template<typename Price,typename Sigma,typename Tau,typename Rate>
 promote<Price,Sigma,Tau,Rate>
     black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma, const Tau& tau, const Rate& r)
 {
-  using namespace std;
   const auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
   const auto d2 = (log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau));
   static_assert(std::is_same<decltype(S*Phi(d1) - exp(-r*tau)*K*Phi(d2)),
@@ -128,7 +127,7 @@ struct constructors_test
 
 BOOST_AUTO_TEST_CASE(constructors)
 {
-    boost::fusion::for_each(fundamental_float_types, constructors_test());
+    boost::fusion::for_each(bin_float_types, constructors_test());
     boost::fusion::for_each(multiprecision_float_types, constructors_test());
 }
 
@@ -149,7 +148,7 @@ struct implicit_constructors_test
 
 BOOST_AUTO_TEST_CASE(implicit_constructors)
 {
-    boost::fusion::for_each(fundamental_float_types, implicit_constructors_test());
+    boost::fusion::for_each(bin_float_types, implicit_constructors_test());
     boost::fusion::for_each(multiprecision_float_types, implicit_constructors_test());
 }
 
@@ -196,7 +195,7 @@ struct assignment_test
 
 BOOST_AUTO_TEST_CASE(assignment)
 {
-    boost::fusion::for_each(fundamental_float_types, assignment_test());
+    boost::fusion::for_each(bin_float_types, assignment_test());
     boost::fusion::for_each(multiprecision_float_types, assignment_test());
 }
 
@@ -235,7 +234,7 @@ struct addition_assignment_test
 
 BOOST_AUTO_TEST_CASE(addition_assignment)
 {
-    boost::fusion::for_each(fundamental_float_types, addition_assignment_test());
+    boost::fusion::for_each(bin_float_types, addition_assignment_test());
     boost::fusion::for_each(multiprecision_float_types, addition_assignment_test());
 }
 
@@ -274,7 +273,7 @@ struct subtraction_assignment_test
 
 BOOST_AUTO_TEST_CASE(subtraction_assignment)
 {
-    boost::fusion::for_each(fundamental_float_types, subtraction_assignment_test());
+    boost::fusion::for_each(bin_float_types, subtraction_assignment_test());
     boost::fusion::for_each(multiprecision_float_types, subtraction_assignment_test());
 }
 
@@ -325,7 +324,7 @@ struct multiplication_assignment_test
 
 BOOST_AUTO_TEST_CASE(multiplication_assignment)
 {
-    boost::fusion::for_each(fundamental_float_types, multiplication_assignment_test());
+    boost::fusion::for_each(bin_float_types, multiplication_assignment_test());
     boost::fusion::for_each(multiprecision_float_types, multiplication_assignment_test());
 }
 
@@ -363,7 +362,7 @@ struct division_assignment_test
 
 BOOST_AUTO_TEST_CASE(division_assignment)
 {
-    boost::fusion::for_each(fundamental_float_types, division_assignment_test());
+    boost::fusion::for_each(bin_float_types, division_assignment_test());
     boost::fusion::for_each(multiprecision_float_types, division_assignment_test());
 }
 
@@ -401,7 +400,7 @@ struct unary_signs_test
 
 BOOST_AUTO_TEST_CASE(unary_signs)
 {
-    boost::fusion::for_each(fundamental_float_types, unary_signs_test());
+    boost::fusion::for_each(bin_float_types, unary_signs_test());
     boost::fusion::for_each(multiprecision_float_types, unary_signs_test());
 }
 
@@ -423,7 +422,7 @@ struct cast_double_test
 
 BOOST_AUTO_TEST_CASE(cast_double)
 {
-    boost::fusion::for_each(fundamental_float_types, cast_double_test());
+    boost::fusion::for_each(bin_float_types, cast_double_test());
     boost::fusion::for_each(multiprecision_float_types, cast_double_test());
 }
 
@@ -444,7 +443,7 @@ struct int_double_casting_test
 
 BOOST_AUTO_TEST_CASE(int_double_casting)
 {
-    boost::fusion::for_each(fundamental_float_types, int_double_casting_test());
+    boost::fusion::for_each(bin_float_types, int_double_casting_test());
     boost::fusion::for_each(multiprecision_float_types, int_double_casting_test());
 }
 
@@ -466,7 +465,7 @@ struct scalar_addition_test
 
 BOOST_AUTO_TEST_CASE(scalar_addition)
 {
-    boost::fusion::for_each(fundamental_float_types, scalar_addition_test());
+    boost::fusion::for_each(bin_float_types, scalar_addition_test());
     boost::fusion::for_each(multiprecision_float_types, scalar_addition_test());
 }
 
@@ -495,7 +494,7 @@ struct power8_test
 
 BOOST_AUTO_TEST_CASE(power8)
 {
-    boost::fusion::for_each(fundamental_float_types, power8_test());
+    boost::fusion::for_each(bin_float_types, power8_test());
     boost::fusion::for_each(multiprecision_float_types, power8_test());
 }
 
@@ -524,7 +523,7 @@ struct dim1_multiplication_test
 
 BOOST_AUTO_TEST_CASE(dim1_multiplication)
 {
-    boost::fusion::for_each(fundamental_float_types, dim1_multiplication_test());
+    boost::fusion::for_each(bin_float_types, dim1_multiplication_test());
     boost::fusion::for_each(multiprecision_float_types, dim1_multiplication_test());
 }
 
@@ -555,7 +554,7 @@ struct dim1and2_multiplication_test
 
 BOOST_AUTO_TEST_CASE(dim1and2_multiplication)
 {
-    boost::fusion::for_each(fundamental_float_types, dim1and2_multiplication_test());
+    boost::fusion::for_each(bin_float_types, dim1and2_multiplication_test());
     boost::fusion::for_each(multiprecision_float_types, dim1and2_multiplication_test());
 }
 
@@ -596,7 +595,7 @@ struct dim2_addition_test
 
 BOOST_AUTO_TEST_CASE(dim2_addition)
 {
-    boost::fusion::for_each(fundamental_float_types, dim2_addition_test());
+    boost::fusion::for_each(bin_float_types, dim2_addition_test());
     boost::fusion::for_each(multiprecision_float_types, dim2_addition_test());
 }
 
@@ -637,7 +636,7 @@ struct dim2_multiplication_test
 
 BOOST_AUTO_TEST_CASE(dim2_multiplication)
 {
-    boost::fusion::for_each(fundamental_float_types, dim2_multiplication_test());
+    boost::fusion::for_each(bin_float_types, dim2_multiplication_test());
     boost::fusion::for_each(multiprecision_float_types, dim2_multiplication_test());
 }
 
@@ -668,7 +667,7 @@ struct dim2_multiplication_and_subtraction_test
 
 BOOST_AUTO_TEST_CASE(dim2_multiplication_and_subtraction)
 {
-    boost::fusion::for_each(fundamental_float_types, dim2_multiplication_and_subtraction_test());
+    boost::fusion::for_each(bin_float_types, dim2_multiplication_and_subtraction_test());
     boost::fusion::for_each(multiprecision_float_types, dim2_multiplication_and_subtraction_test());
 }
 
@@ -690,7 +689,7 @@ struct inverse_test
 
 BOOST_AUTO_TEST_CASE(inverse)
 {
-    boost::fusion::for_each(fundamental_float_types, inverse_test());
+    boost::fusion::for_each(bin_float_types, inverse_test());
     boost::fusion::for_each(multiprecision_float_types, inverse_test());
 }
 
@@ -758,7 +757,7 @@ struct division_test
 
 BOOST_AUTO_TEST_CASE(division)
 {
-    boost::fusion::for_each(fundamental_float_types, division_test());
+    boost::fusion::for_each(bin_float_types, division_test());
     boost::fusion::for_each(multiprecision_float_types, division_test());
 }
 
@@ -783,7 +782,7 @@ struct equality_test
 
 BOOST_AUTO_TEST_CASE(equality)
 {
-    boost::fusion::for_each(fundamental_float_types, equality_test());
+    boost::fusion::for_each(bin_float_types, equality_test());
     boost::fusion::for_each(multiprecision_float_types, equality_test());
 }
 
@@ -808,7 +807,7 @@ struct inequality_test
 
 BOOST_AUTO_TEST_CASE(inequality)
 {
-    boost::fusion::for_each(fundamental_float_types, inequality_test());
+    boost::fusion::for_each(bin_float_types, inequality_test());
     boost::fusion::for_each(multiprecision_float_types, inequality_test());
 }
 
@@ -837,7 +836,7 @@ struct less_than_or_equal_to_test
 
 BOOST_AUTO_TEST_CASE(less_than_or_equal_to)
 {
-    boost::fusion::for_each(fundamental_float_types, less_than_or_equal_to_test());
+    boost::fusion::for_each(bin_float_types, less_than_or_equal_to_test());
     boost::fusion::for_each(multiprecision_float_types, less_than_or_equal_to_test());
 }
 
@@ -866,7 +865,7 @@ struct greater_than_or_equal_to_test
 
 BOOST_AUTO_TEST_CASE(greater_than_or_equal_to)
 {
-    boost::fusion::for_each(fundamental_float_types, greater_than_or_equal_to_test());
+    boost::fusion::for_each(bin_float_types, greater_than_or_equal_to_test());
     boost::fusion::for_each(multiprecision_float_types, greater_than_or_equal_to_test());
 }
 
@@ -903,7 +902,7 @@ struct abs_test_test
 
 BOOST_AUTO_TEST_CASE(abs_test)
 {
-    boost::fusion::for_each(fundamental_float_types, abs_test_test());
+    boost::fusion::for_each(bin_float_types, abs_test_test());
     boost::fusion::for_each(multiprecision_float_types, abs_test_test());
 }
 
@@ -932,7 +931,7 @@ struct ceil_and_floor_test
 
 BOOST_AUTO_TEST_CASE(ceil_and_floor)
 {
-    boost::fusion::for_each(fundamental_float_types, ceil_and_floor_test());
+    boost::fusion::for_each(bin_float_types, ceil_and_floor_test());
     boost::fusion::for_each(multiprecision_float_types, ceil_and_floor_test());
 }
 
@@ -956,7 +955,7 @@ struct one_over_one_plus_x_squared_test
 
 BOOST_AUTO_TEST_CASE(one_over_one_plus_x_squared)
 {
-    boost::fusion::for_each(fundamental_float_types, one_over_one_plus_x_squared_test());
+    boost::fusion::for_each(bin_float_types, one_over_one_plus_x_squared_test());
     boost::fusion::for_each(multiprecision_float_types, one_over_one_plus_x_squared_test());
 }
 
@@ -981,7 +980,7 @@ struct exp_test_test
 
 BOOST_AUTO_TEST_CASE(exp_test)
 {
-    boost::fusion::for_each(fundamental_float_types, exp_test_test());
+    boost::fusion::for_each(bin_float_types, exp_test_test());
     boost::fusion::for_each(multiprecision_float_types, exp_test_test());
 }
 
@@ -991,6 +990,9 @@ struct pow_test_test
   void operator()(const T&) const
   {
     const T eps = 201*std::numeric_limits<T>::epsilon(); // percent
+    using std::exp;
+    using std::log;
+    using std::pow;
     constexpr int m = 5;
     constexpr int n = 4;
     const T cx = 2.0;
@@ -998,35 +1000,35 @@ struct pow_test_test
     const auto x = make_fvar<T,m>(cx);
     const auto y = make_fvar<T,m,n>(cy);
     auto z0 = pow(x,cy);
-    BOOST_REQUIRE(z0.derivative(0) == std::pow(cx,cy));
-    BOOST_REQUIRE(z0.derivative(1) == cy*std::pow(cx,cy-1));
-    BOOST_REQUIRE(z0.derivative(2) == cy*(cy-1)*std::pow(cx,cy-2));
-    BOOST_REQUIRE(z0.derivative(3) == cy*(cy-1)*(cy-2)*std::pow(cx,cy-3));
+    BOOST_REQUIRE(z0.derivative(0) == pow(cx,cy));
+    BOOST_REQUIRE(z0.derivative(1) == cy*pow(cx,cy-1));
+    BOOST_REQUIRE(z0.derivative(2) == cy*(cy-1)*pow(cx,cy-2));
+    BOOST_REQUIRE(z0.derivative(3) == cy*(cy-1)*(cy-2)*pow(cx,cy-3));
     BOOST_REQUIRE(z0.derivative(4) == 0.0);
     BOOST_REQUIRE(z0.derivative(5) == 0.0);
     auto z1 = pow(cx,y);
-    BOOST_REQUIRE_CLOSE(z1.derivative(0,0), std::pow(cx,cy), eps);
+    BOOST_REQUIRE_CLOSE(z1.derivative(0,0), pow(cx,cy), eps);
     for (int j=1 ; j<=n ; ++j)
-        BOOST_REQUIRE_CLOSE(z1.derivative(0,j), std::pow(std::log(cx),j)*std::exp(cy*std::log(cx)), eps);
+        BOOST_REQUIRE_CLOSE(z1.derivative(0,j), pow(log(cx),j)*exp(cy*log(cx)), eps);
     for (int i=1 ; i<=m ; ++i)
         for (int j=0 ; j<=n ; ++j)
             BOOST_REQUIRE(z1.derivative(i,j) == 0.0);
     auto z2 = pow(x,y);
     for (int j=0 ; j<=n ; ++j)
-        BOOST_REQUIRE_CLOSE(z2.derivative(0,j), std::pow(cx,cy)*std::pow(std::log(cx),j), eps);
+        BOOST_REQUIRE_CLOSE(z2.derivative(0,j), pow(cx,cy)*pow(log(cx),j), eps);
     for (int j=0 ; j<=n ; ++j)
-        BOOST_REQUIRE_CLOSE(z2.derivative(1,j), std::pow(cx,cy-1)*std::pow(std::log(cx),j-1)*(cy*std::log(cx)+j), eps);
-    BOOST_REQUIRE_CLOSE(z2.derivative(2,0), std::pow(cx,cy-2)*cy*(cy-1), eps);
-    BOOST_REQUIRE_CLOSE(z2.derivative(2,1), std::pow(cx,cy-2)*(cy*(cy-1)*std::log(cx)+2*cy-1), eps);
+        BOOST_REQUIRE_CLOSE(z2.derivative(1,j), pow(cx,cy-1)*pow(log(cx),j-1)*(cy*log(cx)+j), eps);
+    BOOST_REQUIRE_CLOSE(z2.derivative(2,0), pow(cx,cy-2)*cy*(cy-1), eps);
+    BOOST_REQUIRE_CLOSE(z2.derivative(2,1), pow(cx,cy-2)*(cy*(cy-1)*log(cx)+2*cy-1), eps);
     for (int j=2 ; j<=n ; ++j)
-        BOOST_REQUIRE_CLOSE(z2.derivative(2,j), std::pow(cx,cy-2)*std::pow(std::log(cx),j-2)*(j*(2*cy-1)*std::log(cx)+(j-1)*j+(cy-1)*cy*std::pow(std::log(cx),2)), eps);
-    BOOST_REQUIRE_CLOSE(z2.derivative(2,4), std::pow(cx,cy-2)*std::pow(std::log(cx),2)*(4*(2*cy-1)*std::log(cx)+(4-1)*4+(cy-1)*cy*std::pow(std::log(cx),2)), eps);
+        BOOST_REQUIRE_CLOSE(z2.derivative(2,j), pow(cx,cy-2)*pow(log(cx),j-2)*(j*(2*cy-1)*log(cx)+(j-1)*j+(cy-1)*cy*pow(log(cx),2)), eps);
+    BOOST_REQUIRE_CLOSE(z2.derivative(2,4), pow(cx,cy-2)*pow(log(cx),2)*(4*(2*cy-1)*log(cx)+(4-1)*4+(cy-1)*cy*pow(log(cx),2)), eps);
   }
 };
 
 BOOST_AUTO_TEST_CASE(pow_test)
 {
-    boost::fusion::for_each(fundamental_float_types, pow_test_test());
+    boost::fusion::for_each(bin_float_types, pow_test_test());
 }
 
 struct sqrt_test_test
@@ -1057,7 +1059,7 @@ struct sqrt_test_test
 
 BOOST_AUTO_TEST_CASE(sqrt_test)
 {
-    boost::fusion::for_each(fundamental_float_types, sqrt_test_test());
+    boost::fusion::for_each(bin_float_types, sqrt_test_test());
     boost::fusion::for_each(multiprecision_float_types, sqrt_test_test());
 }
 
@@ -1088,7 +1090,7 @@ struct log_test_test
 
 BOOST_AUTO_TEST_CASE(log_test)
 {
-    boost::fusion::for_each(fundamental_float_types, log_test_test());
+    boost::fusion::for_each(bin_float_types, log_test_test());
     boost::fusion::for_each(multiprecision_float_types, log_test_test());
 }
 
@@ -1097,7 +1099,6 @@ struct ylogx_test
   template<typename T>
   void operator()(const T&) const
   {
-    using std::fabs;
     using std::log;
     using std::pow;
     const T eps = 100*std::numeric_limits<T>::epsilon(); // percent
@@ -1130,7 +1131,7 @@ struct ylogx_test
 
 BOOST_AUTO_TEST_CASE(ylogx)
 {
-    boost::fusion::for_each(fundamental_float_types, ylogx_test());
+    boost::fusion::for_each(bin_float_types, ylogx_test());
 }
 
 struct frexp_test_test
@@ -1155,7 +1156,7 @@ struct frexp_test_test
 
 BOOST_AUTO_TEST_CASE(frexp_test)
 {
-    boost::fusion::for_each(fundamental_float_types, frexp_test_test());
+    boost::fusion::for_each(bin_float_types, frexp_test_test());
     boost::fusion::for_each(multiprecision_float_types, frexp_test_test());
 }
 
@@ -1180,7 +1181,7 @@ struct ldexp_test_test
 
 BOOST_AUTO_TEST_CASE(ldexp_test)
 {
-    boost::fusion::for_each(fundamental_float_types, ldexp_test_test());
+    boost::fusion::for_each(bin_float_types, ldexp_test_test());
     boost::fusion::for_each(multiprecision_float_types, ldexp_test_test());
 }
 
@@ -1219,7 +1220,7 @@ struct cos_and_sin_test
 
 BOOST_AUTO_TEST_CASE(cos_and_sin)
 {
-    boost::fusion::for_each(fundamental_float_types, cos_and_sin_test());
+    boost::fusion::for_each(bin_float_types, cos_and_sin_test());
 }
 
 struct acos_test_test
@@ -1227,9 +1228,8 @@ struct acos_test_test
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 150*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
     using std::acos;
-    using std::fabs;
     using std::pow;
     using std::sqrt;
     constexpr int m = 5;
@@ -1247,7 +1247,7 @@ struct acos_test_test
 
 BOOST_AUTO_TEST_CASE(acos_test)
 {
-    boost::fusion::for_each(fundamental_float_types, acos_test_test());
+    boost::fusion::for_each(bin_float_types, acos_test_test());
 }
 
 struct asin_test_test
@@ -1255,9 +1255,8 @@ struct asin_test_test
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 150*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
     using std::asin;
-    using std::fabs;
     using std::pow;
     using std::sqrt;
     constexpr int m = 5;
@@ -1275,7 +1274,7 @@ struct asin_test_test
 
 BOOST_AUTO_TEST_CASE(asin_test)
 {
-    boost::fusion::for_each(fundamental_float_types, asin_test_test());
+    boost::fusion::for_each(bin_float_types, asin_test_test());
 }
 
 struct asin_infinity_test
@@ -1295,7 +1294,7 @@ struct asin_infinity_test
 
 BOOST_AUTO_TEST_CASE(asin_infinity)
 {
-    boost::fusion::for_each(fundamental_float_types, asin_infinity_test());
+    boost::fusion::for_each(bin_float_types, asin_infinity_test());
     boost::fusion::for_each(multiprecision_float_types, asin_infinity_test());
 }
 
@@ -1304,8 +1303,7 @@ struct asin_derivative_test
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 200*std::numeric_limits<T>::epsilon(); // percent
-    using std::fabs;
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
     using std::pow;
     using std::sqrt;
     constexpr int m = 4;
@@ -1334,7 +1332,7 @@ struct asin_derivative_test
 
 BOOST_AUTO_TEST_CASE(asin_derivative)
 {
-    boost::fusion::for_each(fundamental_float_types, asin_derivative_test());
+    boost::fusion::for_each(bin_float_types, asin_derivative_test());
 }
 
 struct tan_test_test
@@ -1343,7 +1341,6 @@ struct tan_test_test
   void operator()(const T&) const
   {
     const T eps = 800*std::numeric_limits<T>::epsilon(); // percent
-    using std::fabs;
     using std::sqrt;
     constexpr int m = 5;
     const T cx = boost::math::constants::third_pi<T>();
@@ -1361,7 +1358,7 @@ struct tan_test_test
 
 BOOST_AUTO_TEST_CASE(tan_test)
 {
-    boost::fusion::for_each(fundamental_float_types, tan_test_test());
+    boost::fusion::for_each(bin_float_types, tan_test_test());
 }
 
 struct atan_test_test
@@ -1384,7 +1381,7 @@ struct atan_test_test
 
 BOOST_AUTO_TEST_CASE(atan_test)
 {
-    boost::fusion::for_each(fundamental_float_types, atan_test_test());
+    boost::fusion::for_each(bin_float_types, atan_test_test());
     boost::fusion::for_each(multiprecision_float_types, atan_test_test());
 }
 
@@ -1407,7 +1404,7 @@ struct fmod_test_test
 
 BOOST_AUTO_TEST_CASE(fmod_test)
 {
-    boost::fusion::for_each(fundamental_float_types, fmod_test_test());
+    boost::fusion::for_each(bin_float_types, fmod_test_test());
     boost::fusion::for_each(multiprecision_float_types, fmod_test_test());
 }
 
@@ -1436,7 +1433,7 @@ struct round_and_trunc_test
 
 BOOST_AUTO_TEST_CASE(round_and_trunc)
 {
-    boost::fusion::for_each(fundamental_float_types, round_and_trunc_test());
+    boost::fusion::for_each(bin_float_types, round_and_trunc_test());
     boost::fusion::for_each(multiprecision_float_types, round_and_trunc_test());
 }
 
@@ -1458,7 +1455,7 @@ struct iround_and_itrunc_test
 
 BOOST_AUTO_TEST_CASE(iround_and_itrunc)
 {
-    boost::fusion::for_each(fundamental_float_types, iround_and_itrunc_test());
+    boost::fusion::for_each(bin_float_types, iround_and_itrunc_test());
     boost::fusion::for_each(multiprecision_float_types, iround_and_itrunc_test());
 }
 
@@ -1484,7 +1481,7 @@ struct lround_llround_truncl_test
 
 BOOST_AUTO_TEST_CASE(lround_llround_truncl)
 {
-    boost::fusion::for_each(fundamental_float_types, lround_llround_truncl_test());
+    boost::fusion::for_each(bin_float_types, lround_llround_truncl_test());
     boost::fusion::for_each(multiprecision_float_types, lround_llround_truncl_test());
 }
 
@@ -1516,7 +1513,7 @@ struct mixed_partials_test
 
 BOOST_AUTO_TEST_CASE(mixed_partials)
 {
-    boost::fusion::for_each(fundamental_float_types, mixed_partials_test());
+    boost::fusion::for_each(bin_float_types, mixed_partials_test());
 }
 
 struct multiprecision_test
@@ -1546,7 +1543,7 @@ struct multiprecision_test
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    boost::fusion::for_each(fundamental_float_types, multiprecision_test());
+    boost::fusion::for_each(bin_float_types, multiprecision_test());
 }
 
 struct black_scholes_test
@@ -1554,13 +1551,12 @@ struct black_scholes_test
   template<typename T>
   void operator()(const T&) const
   {
-    using std::fabs;
-    const T eps = 2040e2*std::numeric_limits<T>::epsilon(); // percent
-    const float K = 100.0; // Strike price
+    const T eps = 2725*std::numeric_limits<T>::epsilon(); // percent
+    const double K = 100.0; // Strike price
     const auto S     = make_fvar<T,3>(105); // Stock price.
     const auto sigma = make_fvar<T,0,3>(5); // Volatility.
-    const auto tau   = make_fvar<T,0,0,1>(30.0/365); // Time to expiration in years. (30 days).
-    const auto r     = make_fvar<T,0,0,0,1>(1.25/100); // Interest rate.
+    const auto tau   = make_fvar<T,0,0,1>(T(30.0)/365); // Time to expiration in years. (30 days).
+    const auto r     = make_fvar<T,0,0,0,1>(T(1.25)/100); // Interest rate.
     const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
     const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
     // Compare automatically calculated greeks by autodiff with formulas for greeks.
@@ -1626,13 +1622,7 @@ struct black_scholes_test
 
 BOOST_AUTO_TEST_CASE(black_scholes)
 {
-    boost::fusion::for_each(fundamental_float_types, black_scholes_test());
-    //black_scholes_test test;
-    //test<float>();
-    //test<double>();
-    //test<long double>();
-    // test<boost::multiprecision::cpp_bin_float_50>();
-    // Produces ambiguous overload errors since intermediate
+    boost::fusion::for_each(bin_float_types, black_scholes_test());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

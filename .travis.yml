@@ -24,8 +24,6 @@ anchors:
                                            "libc++-dev",
                                            "libstdc++-8-dev" ], sources: [ "llvm-toolchain-trusty-6.0",
                                                                            "ubuntu-toolchain-r-test"   ] } }
-  gcc-48:   &gcc-48   { apt: { packages: [ "g++-4.8"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
-  gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-8:    &gcc-8    { apt: { packages: [ "g++-8"           ], sources: [ "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
@@ -37,8 +35,6 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-4.8 && CXX=g++-4.8 && COMPILER=g++-4.8 && CXXSTD=c++11"                                      ], addons: *gcc-48   }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-5 && CXX=g++-5 && COMPILER=g++-5 && CXXSTD=c++11"                                            ], addons: *gcc-5    }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++11"                                            ], addons: *gcc-6    }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++14"                                            ], addons: *gcc-6    }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"                                            ], addons: *gcc-7    }

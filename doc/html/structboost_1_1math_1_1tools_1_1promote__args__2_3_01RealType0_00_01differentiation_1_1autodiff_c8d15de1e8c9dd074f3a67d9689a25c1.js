@@ -1,4 +1,0 @@
-var structboost_1_1math_1_1tools_1_1promote__args__2_3_01RealType0_00_01differentiation_1_1autodiff_c8d15de1e8c9dd074f3a67d9689a25c1 =
-[
-    [ "type", "structboost_1_1math_1_1tools_1_1promote__args__2_3_01RealType0_00_01differentiation_1_1autodiff_c8d15de1e8c9dd074f3a67d9689a25c1.html#aafcd3fd8da64e7f746ab9b87206f7d58", null ]
-];

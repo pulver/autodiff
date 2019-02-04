@@ -70,10 +70,7 @@ promote<Price,Sigma,Tau,Rate>
 template<typename T>
 T uncast_return(const T& x)
 {
-    if (x == 0)
-        return 0;
-    else
-        return 1;
+    return x == 0 ? 0 : 1;
 }
 
 BOOST_AUTO_TEST_SUITE(test_autodiff)

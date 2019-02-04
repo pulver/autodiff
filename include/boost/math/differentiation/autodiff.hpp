@@ -1036,10 +1036,11 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
-    std::array<root_type,order_sum+1> derivatives; // derivatives of 1/x
+    constexpr size_t order = order_sum;
+    std::array<root_type,order+1> derivatives; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
-    for (size_t i=1 ; i<=order_sum ; ++i)
+    for (size_t i=1 ; i<=order ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }

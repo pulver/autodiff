@@ -120,5 +120,3 @@ autodiff      : 1976.31960074779771777988187529041872090812118921875499076582535
 relative error: 6.47e-99
 */
 ```
-
-Test of $\LaTeX$: $y_0=f(x_0)$, $\sum_{n=0}^Ny_n\varepsilon^n=f(x_0+\varepsilon)$.

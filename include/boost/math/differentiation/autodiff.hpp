@@ -8,7 +8,7 @@
 
 #include <boost/config.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <boost/math/special_functions/factorials.hpp>
+#include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
 
 #include <algorithm>
@@ -450,6 +450,9 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> erfc(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long lround(const fvar<RealType,Order>&);
@@ -1038,7 +1041,7 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
     root_type derivatives[order_sum+1]; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
-    derivatives[0] = 1 / x0;
+    *derivatives = 1 / x0;
     for (size_t i=1 ; i<=order_sum ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
@@ -1203,18 +1206,16 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
 {
-    using std::exp2;
     using std::frexp;
     using root_type = typename fvar<RealType,Order>::root_type;
     frexp(static_cast<root_type>(cr), exp);
-    return cr * exp2(-*exp);
+    return cr * std::exp2(-*exp);
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
-    using std::exp2;
-    return cr * exp2(exp);
+    return cr * std::exp2(exp);
 }
 
 template<typename RealType, size_t Order>
@@ -1371,6 +1372,44 @@ fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
         auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         d1 = -2*boost::math::constants::one_div_root_pi<root_type>()*exp(-(d1*=d1)); // erfc'(x)=-2/sqrt(pi)*exp(-x*x)
         return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+    }
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
+{
+    using boost::math::lambert_w0;
+    using std::exp;
+    using root_type = typename fvar<RealType,Order>::root_type;
+    constexpr size_t order = fvar<RealType,Order>::order_sum;
+    root_type derivatives[order+1];
+    *derivatives = lambert_w0(static_cast<root_type>(cr));
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+        return fvar<RealType,Order>(*derivatives);
+    else
+    {
+        const root_type expw = exp(*derivatives);
+        derivatives[1] = 1 / (static_cast<root_type>(cr) + expw);
+        if BOOST_AUTODIFF_IF_CONSTEXPR (order == 1)
+            return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
+        else
+        {
+            root_type d1powers = derivatives[1] * derivatives[1];
+            const root_type x = derivatives[1] * expw;
+            derivatives[2] = d1powers * (-1 - x);
+            std::array<root_type,order> coef { -1, -1 }; // as in derivatives[2].
+            for (size_t n=3 ; n<=order ; ++n)
+            {
+                coef[n-1] = coef[n-2] * -static_cast<root_type>(2*n-3);
+                for (size_t j=n-2 ; j!=0 ; --j)
+                    (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];
+                coef[0] *= -static_cast<root_type>(n-1);
+                d1powers *= derivatives[1];
+                derivatives[n] = d1powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
+                    [&x](const root_type& a, const root_type& b) { return a*x + b; });
+            }
+            return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
+        }
     }
 }
 

@@ -1487,6 +1487,49 @@ BOOST_AUTO_TEST_CASE(iround_and_itrunc)
     boost::fusion::for_each(multiprecision_float_types, iround_and_itrunc_test());
 }
 
+struct lambert_w0_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 1000*std::numeric_limits<T>::epsilon(); // percent
+    constexpr int m = 10;
+    constexpr T cx = 3;
+    // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]
+    const char* const answers[m+1] {
+        "1.049908894964039959988697070552897904589466943706341",
+        "0.1707244807388472968312949774415522047470762509741737",
+        "-0.04336545501146252734105411312976167858858970875797718",
+        "0.02321456264324789334313200360870492961288748451791104",
+        "-0.01909049778427783072663170526188353869136655225133878",
+        "0.02122935002563637629500975949987796094687564718834156",
+        "-0.02979093848448877259041971538394953658978044986784643",
+        "0.05051290266216717699803334605370337985567016837482099",
+        "-0.1004503154972645060971099914384090562800544486549660",
+        "0.2292464437392250211967939182075930820454464472006425",
+        "-0.5905839053125614593682763387470654123192290838719517"};
+    auto x = make_fvar<T,m>(cx);
+    auto y = lambert_w0(x);
+    for (int i=0 ; i<=m ; ++i)
+    {
+        const T answer = boost::lexical_cast<T>(answers[i]);
+        BOOST_REQUIRE_CLOSE(y.derivative(i), answer, eps);
+    }
+    //const T cx0 = -1 / boost::math::constants::e<T>();
+    //auto edge = lambert_w0(make_fvar<T,m>(cx0));
+    //std::cout << "edge = " << edge << std::endl;
+    //edge = depth(1)(-1,inf,-inf,inf,-inf,inf,-inf,inf,-inf,inf,-inf)
+    //edge = depth(1)(-1,inf,-inf,inf,-inf,inf,-inf,inf,-inf,inf,-inf)
+    //edge = depth(1)(-1,3.68935e+19,-9.23687e+57,4.62519e+96,-2.89497e+135,2.02945e+174,-1.52431e+213,1.19943e+252,-9.75959e+290,8.14489e+329,-6.93329e+368)
+  }
+};
+
+BOOST_AUTO_TEST_CASE(lambert_w0)
+{
+    boost::fusion::for_each(bin_float_types, lambert_w0_test());
+    boost::fusion::for_each(multiprecision_float_types, lambert_w0_test());
+}
+
 struct lround_llround_truncl_test
 {
   template<typename T>
@@ -1494,7 +1537,7 @@ struct lround_llround_truncl_test
   {
     using std::lround;
     using std::llround;
-    //using std::truncl; // truncl not supported by cpp_dec_float<>.
+    using std::truncl; // truncl not supported by cpp_dec_float<>.
     constexpr int m = 3;
     constexpr float cx = 3.25;
     auto x = make_fvar<T,m>(cx);
@@ -1502,8 +1545,8 @@ struct lround_llround_truncl_test
     BOOST_REQUIRE(yl == lround(cx));
     long long yll = llround(x);
     BOOST_REQUIRE(yll == llround(cx));
-    //long double yld = truncl(x);
-    //BOOST_REQUIRE(yld == truncl(cx));
+    long double yld = truncl(x);
+    BOOST_REQUIRE(yld == truncl(cx));
   }
 };
 

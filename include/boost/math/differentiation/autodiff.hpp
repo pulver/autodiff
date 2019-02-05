@@ -1036,11 +1036,10 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
-    constexpr size_t order = order_sum;
-    std::array<root_type,order+1> derivatives; // derivatives of 1/x
+    root_type derivatives[order_sum+1]; // derivatives of 1/x
     const root_type x0 = static_cast<root_type>(*this);
     derivatives[0] = 1 / x0;
-    for (size_t i=1 ; i<=order ; ++i)
+    for (size_t i=1 ; i<=order_sum ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
@@ -1132,7 +1131,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x,const typename fvar<RealT
     using std::pow;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
-    std::array<root_type,order+1> derivatives; // array of derivatives
+    root_type derivatives[order+1]; // array of derivatives
     const root_type x0 = static_cast<root_type>(x);
     size_t i = 0;
     root_type coef = 1;
@@ -1164,21 +1163,21 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
     using std::sqrt;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
-    std::array<root_type,order+1> derivatives;
+    root_type derivatives[order+1];
     const root_type x = static_cast<root_type>(cr);
-    derivatives.front() = sqrt(x);
+    *derivatives = sqrt(x);
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return fvar<RealType,Order>(derivatives.front());
+        return fvar<RealType,Order>(*derivatives);
     else
     {
         root_type numerator = 0.5;
         root_type powers = 1;
-        derivatives[1] = numerator / derivatives.front();
+        derivatives[1] = numerator / *derivatives;
         for (size_t i=2 ; i<=order ; ++i)
         {
             numerator *= -0.5 * ((i<<1)-3);
             powers *= x;
-            derivatives[i] = numerator / (powers * derivatives.front());
+            derivatives[i] = numerator / (powers * *derivatives);
         }
         return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
     }

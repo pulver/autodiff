@@ -708,6 +708,10 @@ struct inverse_test
     BOOST_REQUIRE(xinv.derivative(1) == -1/std::pow(cx,2));
     BOOST_REQUIRE(xinv.derivative(2) == 2/std::pow(cx,3));
     BOOST_REQUIRE(xinv.derivative(3) == -6/std::pow(cx,4));
+    const auto zero = make_fvar<T,m>(0);
+    const auto inf = zero.inverse();
+    for (int i=0 ; i<=m ; ++i)
+        BOOST_REQUIRE(inf.derivative(i) == (i&1?-1:1)*std::numeric_limits<T>::infinity());
   }
 };
 
@@ -967,8 +971,8 @@ struct one_over_one_plus_x_squared_test
     constexpr int m = 4;
     constexpr float cx = 1.0;
     auto f = make_fvar<T,m>(cx);
-    //f = ((f *= f) += 1).inverse(); // Microsoft Visual C++ version 14.0: fatal error C1001: An internal error has occurred in the compiler. on call to order_sum() in inverse_apply().
-    f = 1 / ((f *= f) += 1);
+    //f = 1 / ((f *= f) += 1);
+    f = ((f *= f) += 1).inverse();
     BOOST_REQUIRE(f.derivative(0) == 0.5);
     BOOST_REQUIRE(f.derivative(1) == -0.5);
     BOOST_REQUIRE(f.derivative(2) == 0.5);

@@ -1039,7 +1039,7 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
-    root_type derivatives[order_sum+1]; // derivatives of 1/x
+    root_type derivatives[order_sum+1]; // LCOV_EXCL_LINE
     const root_type x0 = static_cast<root_type>(*this);
     *derivatives = 1 / x0;
     for (size_t i=1 ; i<=order_sum ; ++i)
@@ -1134,7 +1134,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x,const typename fvar<RealT
     using std::pow;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
-    root_type derivatives[order+1]; // array of derivatives
+    root_type derivatives[order+1];
     const root_type x0 = static_cast<root_type>(x);
     size_t i = 0;
     root_type coef = 1;

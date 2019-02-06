@@ -424,9 +424,10 @@ fvar<RealType,Order> tan(const fvar<RealType,Order>&);
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>&);
 
-// fmod(cr1) | RealType
-template<typename RealType, size_t Order>
-fvar<RealType,Order> fmod(const fvar<RealType,Order>&, const typename fvar<RealType,Order>::root_type&);
+// fmod(cr1,cr2) | RealType
+template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
+promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
+    fmod(const fvar<RealType1,Order1>&, const fvar<RealType2,Order2>&);
 
 // round(cr1) | RealType
 template<typename RealType, size_t Order>
@@ -449,10 +450,28 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> acos(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
+fvar<RealType,Order> acosh(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> asinh(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> atanh(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> cosh(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
 fvar<RealType,Order> erfc(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> sinh(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> tanh(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long lround(const fvar<RealType,Order>&);
@@ -1039,7 +1058,7 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
-    root_type derivatives[order_sum+1]; // LCOV_EXCL_LINE
+    root_type derivatives[order_sum+1]; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
     const root_type x0 = static_cast<root_type>(*this);
     *derivatives = 1 / x0;
     for (size_t i=1 ; i<=order_sum ; ++i)
@@ -1293,13 +1312,14 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
     }
 }
 
-template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    fmod(const fvar<RealType,Order>& cr, const typename fvar<RealType,Order>::root_type& ca)
+template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
+promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
+    fmod(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
-    using std::fmod;
-    using root_type = typename fvar<RealType,Order>::root_type;
-    return fvar<RealType,Order>(cr).set_root(0) += fmod(static_cast<root_type>(cr), ca);
+    using std::trunc;
+    const auto numer = static_cast<typename fvar<RealType1,Order1>::root_type>(cr1);
+    const auto denom = static_cast<typename fvar<RealType2,Order2>::root_type>(cr2);
+    return cr1 - cr2 * trunc(numer/denom);
 }
 
 template<typename RealType, size_t Order>
@@ -1359,6 +1379,30 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 }
 
 template<typename RealType, size_t Order>
+fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
+{
+    return log(sqrt(cr*cr-=1) += cr);
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
+{
+    return log(sqrt(cr*cr+=1) += cr);
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
+{
+    return log((cr+1)/=(1-cr)) *= 0.5;
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
+{
+    return (exp(cr) += exp(-cr)) *= 0.5;
+}
+
+template<typename RealType, size_t Order>
 fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
 {
     using std::erfc;
@@ -1411,6 +1455,19 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
             return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
         }
     }
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
+{
+    return (exp(cr) - exp(-cr)) * 0.5;
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> tanh(const fvar<RealType,Order>& cr)
+{
+    const fvar<RealType,Order> exp2cr = exp(cr*2);
+    return (exp2cr - 1) / (exp2cr + 1);
 }
 
 template<typename RealType, size_t Order>

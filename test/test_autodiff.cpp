@@ -1729,29 +1729,26 @@ struct multiprecision_test
   template<typename T>
   void operator()(const T&) const
   {
-    constexpr double tolerance = 100e-98; // percent
-    using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
-    // Calculated from Mathematica symbolic differentiation. See example/multiprecision.nb for script.
-    const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
+    const T eps = 600*std::numeric_limits<T>::epsilon(); // percent
     constexpr int Nw=3;
     constexpr int Nx=2;
     constexpr int Ny=4;
     constexpr int Nz=3;
-    const auto w = make_fvar<cpp_dec_float_100,Nw>(11);
-    const auto x = make_fvar<cpp_dec_float_100,0,Nx>(12);
-    const auto y = make_fvar<cpp_dec_float_100,0,0,Ny>(13);
-    const auto z = make_fvar<cpp_dec_float_100,0,0,0,Nz>(14);
-    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>
-    // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, tolerance); Doesn't compile on travis-ci trusty.
-    using std::fabs;
-    const cpp_dec_float_100 relative_error = fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1);
-    BOOST_REQUIRE(100*relative_error.convert_to<T>() < tolerance);
+    const auto w = make_fvar<T,Nw>(11);
+    const auto x = make_fvar<T,0,Nx>(12);
+    const auto y = make_fvar<T,0,0,Ny>(13);
+    const auto z = make_fvar<T,0,0,0,Nz>(14);
+    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<T,Nw,Nx,Ny,Nz>
+    // Calculated from Mathematica symbolic differentiation.
+    const T answer = boost::lexical_cast<T>("1976.3196007477977177798818752904187209081211892187"
+        "5499076582535951111845769110560421820940516423255314");
+    BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps);
   }
 };
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    multiprecision_test()(boost::multiprecision::cpp_dec_float_100());
+    multiprecision_test()(boost::multiprecision::cpp_bin_float_50());
 }
 
 struct black_scholes_test

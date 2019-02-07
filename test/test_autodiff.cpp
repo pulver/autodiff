@@ -606,7 +606,6 @@ struct dim2_addition_test
     BOOST_REQUIRE(y.derivative(0,1) == 1.0);
     BOOST_REQUIRE(y.derivative(1,0) == 0.0);
     BOOST_REQUIRE(y.derivative(1,1) == 0.0);
-    //const auto z = x + y; // ambiguous operator when root_type=cpp_bin_float_50
     const auto z = x + y;
     BOOST_REQUIRE(z.derivative(0,0) == cx + cy);
     BOOST_REQUIRE(z.derivative(0,1) == 1.0);
@@ -1781,13 +1780,16 @@ struct multiprecision_test
     // Calculated from Mathematica symbolic differentiation.
     const T answer = boost::lexical_cast<T>("1976.3196007477977177798818752904187209081211892187"
         "5499076582535951111845769110560421820940516423255314");
-    BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps);
+    // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
+    using std::fabs;
+    const double relative_error = static_cast<double>(fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1));
+    BOOST_REQUIRE(100*relative_error < eps);
   }
 };
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    multiprecision_test()(boost::multiprecision::cpp_bin_float_50());
+    multiprecision_test()(boost::multiprecision::cpp_dec_float_50());
 }
 
 struct black_scholes_test

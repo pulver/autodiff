@@ -1621,7 +1621,7 @@ BOOST_AUTO_TEST_CASE(iround_and_itrunc)
     boost::fusion::for_each(multiprecision_float_types, iround_and_itrunc_test());
 }
 
-struct lambert_w0_test
+struct lambert_w0_test_test
 {
   template<typename T>
   void operator()(const T&) const
@@ -1658,10 +1658,10 @@ struct lambert_w0_test
   }
 };
 
-BOOST_AUTO_TEST_CASE(lambert_w0)
+BOOST_AUTO_TEST_CASE(lambert_w0_test)
 {
-    boost::fusion::for_each(bin_float_types, lambert_w0_test());
-    boost::fusion::for_each(multiprecision_float_types, lambert_w0_test());
+    boost::fusion::for_each(bin_float_types, lambert_w0_test_test());
+    boost::fusion::for_each(multiprecision_float_types, lambert_w0_test_test());
 }
 
 struct lround_llround_truncl_test

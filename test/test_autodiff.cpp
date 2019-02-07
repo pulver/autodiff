@@ -1494,6 +1494,45 @@ BOOST_AUTO_TEST_CASE(erf_test)
     boost::fusion::for_each(multiprecision_float_types, erf_test_test());
 }
 
+struct sinc_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 5000*std::numeric_limits<T>::epsilon(); // percent
+    using std::sin;
+    using std::cos;
+    constexpr int m = 5;
+    const T cx = 1;
+    auto x = make_fvar<T,m>(cx);
+    auto y = sinc(x);
+    BOOST_REQUIRE_CLOSE(y.derivative(0), sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(1), cos(1)-sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), sin(1)-2*cos(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 5*cos(1)-3*sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 13*sin(1)-20*cos(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), 101*cos(1)-65*sin(1), eps);
+    // Test at x = 0
+    auto y2 = sinc(make_fvar<T,10>(0));
+    BOOST_REQUIRE_CLOSE(y2.derivative(0), 1, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(1), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(2), -static_cast<T>(1)/3, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(3), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(4), static_cast<T>(1)/5, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(5), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(6), -static_cast<T>(1)/7, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(7), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(8), static_cast<T>(1)/9, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(9), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(10), -static_cast<T>(1)/11, eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(sinc_test)
+{
+    boost::fusion::for_each(bin_float_types, sinc_test_test());
+}
+
 struct sinh_and_cosh_test
 {
   template<typename T>

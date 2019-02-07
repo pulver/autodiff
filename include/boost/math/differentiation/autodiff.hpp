@@ -471,6 +471,9 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
+fvar<RealType,Order> sinc(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
 fvar<RealType,Order> sinh(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
@@ -1516,6 +1519,25 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
             }
             return cr.apply([&derivatives](size_t i) { return derivatives[i]; });
         }
+    }
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
+{
+    if (cr != 0)
+        return sin(cr) / cr;
+    using root_type = typename fvar<RealType,Order>::root_type;
+    constexpr size_t order = fvar<RealType,Order>::order_sum;
+    root_type taylor[order+1];
+    *taylor = 1; // sinc(0) = 1
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+        return fvar<RealType,Order>(*taylor);
+    else
+    {
+        for (size_t n=1 ; n<=order ; ++n)
+            taylor[n] = n&1 ? 0 : (n&2 ? -1 : 1) / boost::math::factorial<root_type>(n+1);
+        return cr.apply_with_factorials([&taylor](size_t i) { return taylor[i]; });
     }
 }
 

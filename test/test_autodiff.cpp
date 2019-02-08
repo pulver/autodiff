@@ -23,7 +23,7 @@
 //boost::fusion::vector<float,double,long double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70
 boost::fusion::vector<double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70 // TEST
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-//boost::fusion::vector<boost::multiprecision::cpp_dec_float_50>
+//boost::fusion::vector<boost::multiprecision::cpp_dec_float_50> multiprecision_float_types;
 boost::fusion::vector<> multiprecision_float_types;
 
 using namespace boost::math::differentiation;
@@ -1719,6 +1719,16 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)) == math::airy_bi_prime(static_cast<T>(1)));
     BOOST_REQUIRE(math::asinh(make_fvar<T,m>(0.5)) == math::asinh(static_cast<T>(0.5)));
     BOOST_REQUIRE(math::atanh(make_fvar<T,m>(0.5)) == math::atanh(static_cast<T>(0.5)));
+    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == math::bernoulli_b2n<T>(1));
+    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == static_cast<T>(1/6.0)); // b_2 == 1/6
+
+    //TODO(kbhat): beta.hpp
+    // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
+    // BOOST_REQUIRE(static_cast<T>(math::beta(make_fvar<T,m>(1.1),make_fvar<T,m>(1.2))) == static_cast<T>(math::beta(static_cast<T>(1.1),static_cast<T>(1.2))));
+    // Skipped other beta functions.
+
+    BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
+
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_j(0,static_cast<T>(0.5)));
     //BOOST_REQUIRE(math::cyl_neumann(0,make_fvar<T,m>(0.5)) == math::cyl_neumann(0,static_cast<T>(0.5)));
@@ -1744,9 +1754,7 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::cyl_hankel_2(0,make_fvar<T,m>(0.5)).real() == math::cyl_hankel_2(0,static_cast<T>(0.5)).real());
     //BOOST_REQUIRE(math::sph_hankel_1(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_1(0,static_cast<T>(0.5)).real());
     //BOOST_REQUIRE(math::sph_hankel_2(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_2(0,static_cast<T>(0.5)).real());
-    // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
-    // BOOST_REQUIRE(static_cast<T>(math::beta(make_fvar<T,m>(1.1),make_fvar<T,m>(1.2))) == static_cast<T>(math::beta(static_cast<T>(1.1),static_cast<T>(1.2))));
-    // Skipped other beta functions.
+
     std::cout.precision(20);
     // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
     //BOOST_REQUIRE(math::cbrt(make_fvar<T,m>(0.5)) == math::cbrt(static_cast<T>(0.5)));
@@ -1769,8 +1777,8 @@ struct boost_special_functions_test
 BOOST_AUTO_TEST_CASE(boost_special_functions)
 {
     boost_special_functions_test()(static_cast<double>(0));
-    //boost::fusion::for_each(bin_float_types, boost_special_functions_test());
-    //boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test());
+    boost::fusion::for_each(bin_float_types, boost_special_functions_test());
+    boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

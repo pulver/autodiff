@@ -1529,14 +1529,13 @@ fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
         return sin(cr) / cr;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
-    root_type taylor[order+1];
-    *taylor = 1; // sinc(0) = 1
+    root_type taylor[order+1] { 1 }; // sinc(0) = 1
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return fvar<RealType,Order>(*taylor);
     else
     {
-        for (size_t n=1 ; n<=order ; ++n)
-            taylor[n] = n&1 ? 0 : (n&2 ? -1 : 1) / boost::math::factorial<root_type>(n+1);
+        for (size_t n=2 ; n<=order ; n+=2)
+            taylor[n] = (1-static_cast<int>(n&2)) / boost::math::factorial<root_type>(n+1);
         return cr.apply_with_factorials([&taylor](size_t i) { return taylor[i]; });
     }
 }

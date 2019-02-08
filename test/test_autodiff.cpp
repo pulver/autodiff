@@ -1731,7 +1731,7 @@ struct boost_special_functions_test
     BOOST_REQUIRE(static_cast<T>(math::cos_pi(iround(make_fvar<T,m>(0.0)))) == static_cast<T>(math::cos_pi(0)));
     BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(static_cast<T>(0.5)));
     BOOST_REQUIRE_THROW(math::ellint_1(1.01), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5) == static_cast<T>(math::ellint_1(0.5))));
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5)));
 
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_j(0,static_cast<T>(0.5)));

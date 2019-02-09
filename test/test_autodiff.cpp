@@ -3,8 +3,6 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/math/differentiation/autodiff.hpp>
-
 #include <boost/fusion/include/algorithm.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/math/special_functions/factorials.hpp>
@@ -13,6 +11,8 @@
 #include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+
+#include <boost/math/differentiation/autodiff.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
@@ -120,6 +120,8 @@ struct constructors_test
                 BOOST_REQUIRE(y.derivative(i,j) == 1.0);
             else
                 BOOST_REQUIRE(y.derivative(i,j) == 0.0);
+    // Test ostream operator<<
+    std::cout << "x = " << x << std::endl;
   }
 };
 
@@ -604,7 +606,6 @@ struct dim2_addition_test
     BOOST_REQUIRE(y.derivative(0,1) == 1.0);
     BOOST_REQUIRE(y.derivative(1,0) == 0.0);
     BOOST_REQUIRE(y.derivative(1,1) == 0.0);
-    //const auto z = x + y; // ambiguous operator when root_type=cpp_bin_float_50
     const auto z = x + y;
     BOOST_REQUIRE(z.derivative(0,0) == cx + cy);
     BOOST_REQUIRE(z.derivative(0,1) == 1.0);
@@ -1279,6 +1280,32 @@ BOOST_AUTO_TEST_CASE(acos_test)
     boost::fusion::for_each(bin_float_types, acos_test_test());
 }
 
+struct acosh_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
+    using std::acosh;
+    constexpr int m = 5;
+    const T cx = 2;
+    auto x = make_fvar<T,m>(cx);
+    auto y = acosh(x);
+    //BOOST_REQUIRE(y.derivative(0) == acosh(cx)); // FAILS! acosh(2) is overloaded for integral types
+    BOOST_REQUIRE(y.derivative(0) == acosh(static_cast<T>(x)));
+    BOOST_REQUIRE_CLOSE(y.derivative(1), 1/boost::math::constants::root_three<T>(), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), -2/(3*boost::math::constants::root_three<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 1/boost::math::constants::root_three<T>(), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), -22/(9*boost::math::constants::root_three<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), 227/(27*boost::math::constants::root_three<T>()), eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(acosh_test)
+{
+    boost::fusion::for_each(bin_float_types, acosh_test_test());
+}
+
 struct asin_test_test
 {
   template<typename T>
@@ -1364,30 +1391,55 @@ BOOST_AUTO_TEST_CASE(asin_derivative)
     boost::fusion::for_each(bin_float_types, asin_derivative_test());
 }
 
-struct tan_test_test
+struct asinh_test_test
 {
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 800*std::numeric_limits<T>::epsilon(); // percent
-    using std::sqrt;
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
+    using std::asinh;
     constexpr int m = 5;
-    const T cx = boost::math::constants::third_pi<T>();
-    const T root_three = boost::math::constants::root_three<T>();
-    const auto x = make_fvar<T,m>(cx);
-    auto y = tan(x);
-    BOOST_REQUIRE_CLOSE(y.derivative(0), root_three, eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(1), 4.0, eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(2), 8*root_three, eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(3), 80.0, eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(4), 352*root_three, eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(5), 5824.0, eps);
+    const T cx = 1;
+    auto x = make_fvar<T,m>(cx);
+    auto y = asinh(x);
+    BOOST_REQUIRE(y.derivative(0) == asinh(cx));
+    BOOST_REQUIRE_CLOSE(y.derivative(1), 1/boost::math::constants::root_two<T>(), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), -1/(2*boost::math::constants::root_two<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 1/(4*boost::math::constants::root_two<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 3/(8*boost::math::constants::root_two<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), -39/(16*boost::math::constants::root_two<T>()), eps);
   }
 };
 
-BOOST_AUTO_TEST_CASE(tan_test)
+BOOST_AUTO_TEST_CASE(asinh_test)
 {
-    boost::fusion::for_each(bin_float_types, tan_test_test());
+    boost::fusion::for_each(bin_float_types, asinh_test_test());
+}
+
+struct atanh_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
+    using std::atanh;
+    constexpr int m = 5;
+    const T cx = 0.5;
+    auto x = make_fvar<T,m>(cx);
+    auto y = atanh(x);
+    // BOOST_REQUIRE(y.derivative(0) == atanh(cx)); // fails due to overload
+    BOOST_REQUIRE(y.derivative(0) == atanh(static_cast<T>(x)));
+    BOOST_REQUIRE_CLOSE(y.derivative(1), static_cast<T>(4)/3, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), static_cast<T>(16)/9, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), static_cast<T>(224)/27, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), static_cast<T>(1280)/27, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), static_cast<T>(31232)/81, eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(atanh_test)
+{
+    boost::fusion::for_each(bin_float_types, atanh_test_test());
 }
 
 struct atan_test_test
@@ -1412,6 +1464,125 @@ BOOST_AUTO_TEST_CASE(atan_test)
 {
     boost::fusion::for_each(bin_float_types, atan_test_test());
     boost::fusion::for_each(multiprecision_float_types, atan_test_test());
+}
+
+struct erf_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
+    using std::erf;
+    using namespace boost;
+    constexpr int m = 5;
+    constexpr float cx = 1.0;
+    const auto x = make_fvar<T,m>(cx);
+    auto y = erf(x);
+    BOOST_REQUIRE(y.derivative(0) == erf(static_cast<T>(x)));
+    BOOST_REQUIRE_CLOSE(y.derivative(1), 2/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), -4/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 4/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 8/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), -40/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(erf_test)
+{
+    boost::fusion::for_each(bin_float_types, erf_test_test());
+    boost::fusion::for_each(multiprecision_float_types, erf_test_test());
+}
+
+struct sinc_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 5000*std::numeric_limits<T>::epsilon(); // percent
+    using std::sin;
+    using std::cos;
+    constexpr int m = 5;
+    const T cx = 1;
+    auto x = make_fvar<T,m>(cx);
+    auto y = sinc(x);
+    BOOST_REQUIRE_CLOSE(y.derivative(0), sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(1), cos(1)-sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), sin(1)-2*cos(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 5*cos(1)-3*sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 13*sin(1)-20*cos(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), 101*cos(1)-65*sin(1), eps);
+    // Test at x = 0
+    auto y2 = sinc(make_fvar<T,10>(0));
+    BOOST_REQUIRE_CLOSE(y2.derivative(0), 1, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(1), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(2), -static_cast<T>(1)/3, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(3), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(4), static_cast<T>(1)/5, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(5), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(6), -static_cast<T>(1)/7, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(7), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(8), static_cast<T>(1)/9, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(9), 0, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(10), -static_cast<T>(1)/11, eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(sinc_test)
+{
+    boost::fusion::for_each(bin_float_types, sinc_test_test());
+}
+
+struct sinh_and_cosh_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
+    using std::sinh;
+    constexpr int m = 5;
+    const T cx = 1;
+    auto x = make_fvar<T,m>(cx);
+    auto s = sinh(x);
+    auto c = cosh(x);
+    BOOST_REQUIRE(s.derivative(0) == sinh(static_cast<T>(x)));
+    BOOST_REQUIRE(c.derivative(0) == cosh(static_cast<T>(x)));
+    for (size_t i=0 ; i<=m ; ++i)
+    {
+        BOOST_REQUIRE_CLOSE(s.derivative(i), static_cast<T>(i&1?c:s), eps);
+        BOOST_REQUIRE_CLOSE(c.derivative(i), static_cast<T>(i&1?s:c), eps);
+    }
+  }
+};
+
+BOOST_AUTO_TEST_CASE(sinh_and_cosh)
+{
+    boost::fusion::for_each(bin_float_types, sinh_and_cosh_test());
+}
+
+struct tan_test_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    const T eps = 800*std::numeric_limits<T>::epsilon(); // percent
+    using std::sqrt;
+    constexpr int m = 5;
+    const T cx = boost::math::constants::third_pi<T>();
+    const T root_three = boost::math::constants::root_three<T>();
+    const auto x = make_fvar<T,m>(cx);
+    auto y = tan(x);
+    BOOST_REQUIRE_CLOSE(y.derivative(0), root_three, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(1), 4.0, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), 8*root_three, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 80.0, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 352*root_three, eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), 5824.0, eps);
+  }
+};
+
+BOOST_AUTO_TEST_CASE(tan_test)
+{
+    boost::fusion::for_each(bin_float_types, tan_test_test());
 }
 
 struct fmod_test_test
@@ -1488,7 +1659,7 @@ BOOST_AUTO_TEST_CASE(iround_and_itrunc)
     boost::fusion::for_each(multiprecision_float_types, iround_and_itrunc_test());
 }
 
-struct lambert_w0_test
+struct lambert_w0_test_test
 {
   template<typename T>
   void operator()(const T&) const
@@ -1525,10 +1696,10 @@ struct lambert_w0_test
   }
 };
 
-BOOST_AUTO_TEST_CASE(lambert_w0)
+BOOST_AUTO_TEST_CASE(lambert_w0_test)
 {
-    boost::fusion::for_each(bin_float_types, lambert_w0_test());
-    boost::fusion::for_each(multiprecision_float_types, lambert_w0_test());
+    boost::fusion::for_each(bin_float_types, lambert_w0_test_test());
+    boost::fusion::for_each(multiprecision_float_types, lambert_w0_test_test());
 }
 
 struct lround_llround_truncl_test
@@ -1596,29 +1767,29 @@ struct multiprecision_test
   template<typename T>
   void operator()(const T&) const
   {
-    constexpr double tolerance = 100e-98; // percent
-    using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
-    // Calculated from Mathematica symbolic differentiation. See example/multiprecision.nb for script.
-    const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076582535951111845769110560421820940516423255314");
+    const T eps = 600*std::numeric_limits<T>::epsilon(); // percent
     constexpr int Nw=3;
     constexpr int Nx=2;
     constexpr int Ny=4;
     constexpr int Nz=3;
-    const auto w = make_fvar<cpp_dec_float_100,Nw>(11);
-    const auto x = make_fvar<cpp_dec_float_100,0,Nx>(12);
-    const auto y = make_fvar<cpp_dec_float_100,0,0,Ny>(13);
-    const auto z = make_fvar<cpp_dec_float_100,0,0,0,Nz>(14);
-    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>
-    // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, tolerance); Doesn't compile on travis-ci trusty.
+    const auto w = make_fvar<T,Nw>(11);
+    const auto x = make_fvar<T,0,Nx>(12);
+    const auto y = make_fvar<T,0,0,Ny>(13);
+    const auto z = make_fvar<T,0,0,0,Nz>(14);
+    const auto v = mixed_partials_f(w,x,y,z); // auto = autodiff_fvar<T,Nw,Nx,Ny,Nz>
+    // Calculated from Mathematica symbolic differentiation.
+    const T answer = boost::lexical_cast<T>("1976.3196007477977177798818752904187209081211892187"
+        "5499076582535951111845769110560421820940516423255314");
+    // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
     using std::fabs;
-    const cpp_dec_float_100 relative_error = fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1);
-    BOOST_REQUIRE(100*relative_error.convert_to<T>() < tolerance);
+    const double relative_error = static_cast<double>(fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1));
+    BOOST_REQUIRE(100*relative_error < eps);
   }
 };
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    multiprecision_test()(boost::multiprecision::cpp_dec_float_100());
+    multiprecision_test()(boost::multiprecision::cpp_dec_float_50());
 }
 
 struct black_scholes_test

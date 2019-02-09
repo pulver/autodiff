@@ -130,10 +130,11 @@ transformation:
 f \qquad : \qquad x_0+\varepsilon \qquad \mapsto \qquad
     \sum_{n=0}^Ny_n\varepsilon^n=\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.
 \]
-C++'s ability to overload operators and functions allows for the creation of a class {\tt fvar} that represents
-polynomials in $\varepsilon$. Thus the same algorithm that calculates the numeric value of $y_0=f(x_0)$ is also
-used to calculate the polynomial $\sum_{n=0}^Ny_n\varepsilon^n=f(x_0+\varepsilon)$. The derivatives are then found
-from the product of the respective factorial and coefficient:
+C++'s ability to overload operators and functions allows for the creation of a class {\tt fvar}
+({\bf f}orward-mode autodiff {\bf var}iable) that represents polynomials in $\varepsilon$. Thus the
+same algorithm that calculates the numeric value of $y_0=f(x_0)$ is also used to calculate the polynomial
+$\sum_{n=0}^Ny_n\varepsilon^n=f(x_0+\varepsilon)$. The derivatives are then found from the product of the respective
+factorial and coefficient:
 
 \[ f^{(n)}(x_0)=n!y_n. \]
 
@@ -193,14 +194,14 @@ The above calculates
 
 \subsection{Example 2: Multi-variable mixed partial derivatives with multi-precision data type}
 \subsubsection{Calculate $\frac{\partial^{12}f}{\partial w^{3}\partial x^{2}\partial y^{4}\partial z^{3}}(11,12,13,14)$
-with a precision of about 100 decimal digits,\\
+with a precision of about 50 decimal digits,\\
 where $f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}{xy}}\right)+\frac{w^2}{\tan(z)}$.}
 
-In this example, the data type {\tt autodiff\_fvar<cpp\_dec\_float\_100,Nw,Nx,Ny,Nz>} represents
+In this example, the data type {\tt autodiff\_fvar<cpp\_bin\_float\_50,Nw,Nx,Ny,Nz>} represents
 a multivariate polynomial in 4 independent variables, where the highest powers of each are {\tt Nw}, {\tt Nx},
 {\tt Ny} and {\tt Nz}. The underlying arithmetic data type, referred to as {\tt root\_type}, is
-{\tt boost::multiprecision::cpp\_dec\_float\_100}. The internal data type is
-{\tt std::array<std::array<std::array<std::array<cpp\_dec\_float\_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>}. In general, the
+{\tt boost::multiprecision::cpp\_bin\_float\_50}. The internal data type is
+{\tt std::array<std::array<std::array<std::array<cpp\_bin\_float\_50,Nz+1>,Ny+1>,Nx+1>,Nw+1>}. In general, the
 {\tt root\_type} is always the first template parameter to {\tt autodiff\_fvar<>} followed by the maximum
 derivative order that is to be calculated for each independent variable.
 
@@ -210,17 +211,17 @@ which of the 4 different polynomial variables $\varepsilon_w,\varepsilon_x,\vare
 are to be added to the constant term:
 
 \begin{align*}
-\texttt{make\_fvar<cpp\_dec\_float\_100,Nw>(11)} &= 11+\varepsilon_w \\
-\texttt{make\_fvar<cpp\_dec\_float\_100,0,Nx>(12)} &= 12+\varepsilon_x \\
-\texttt{make\_fvar<cpp\_dec\_float\_100,0,0,Ny>(13)} &= 13+\varepsilon_y \\
-\texttt{make\_fvar<cpp\_dec\_float\_100,0,0,0,Nz>(14)} &= 14+\varepsilon_z
+\texttt{make\_fvar<cpp\_bin\_float\_50,Nw>(11)} &= 11+\varepsilon_w \\
+\texttt{make\_fvar<cpp\_bin\_float\_50,0,Nx>(12)} &= 12+\varepsilon_x \\
+\texttt{make\_fvar<cpp\_bin\_float\_50,0,0,Ny>(13)} &= 13+\varepsilon_y \\
+\texttt{make\_fvar<cpp\_bin\_float\_50,0,0,0,Nz>(14)} &= 14+\varepsilon_z
 \end{align*}
 Instances of different types are automatically promoted to the smallest multi-variable type that accommodates
 both when they are arithmetically combined (added, subtracted, multiplied, divided.)
 
 \begin{verbatim}
 #include <boost/math/differentiation/autodiff.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
 
 template<typename T>
@@ -232,31 +233,35 @@ T f(const T& w, const T& x, const T& y, const T& z)
 
 int main()
 {
-  using cpp_dec_float_100 = boost::multiprecision::cpp_dec_float_100;
+  using cpp_bin_float_50 = boost::multiprecision::cpp_bin_float_50;
   using namespace boost::math::differentiation;
 
   constexpr int Nw=3; // Max order of derivative to calculate for w
   constexpr int Nx=2; // Max order of derivative to calculate for x
   constexpr int Ny=4; // Max order of derivative to calculate for y
   constexpr int Nz=3; // Max order of derivative to calculate for z
-  using var = autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>;
-  const var w = make_fvar<cpp_dec_float_100,Nw>(11);
-  const var x = make_fvar<cpp_dec_float_100,0,Nx>(12);
-  const var y = make_fvar<cpp_dec_float_100,0,0,Ny>(13);
-  const var z = make_fvar<cpp_dec_float_100,0,0,0,Nz>(14);
+  using var = autodiff_fvar<cpp_bin_float_50,Nw,Nx,Ny,Nz>;
+  const var w = make_fvar<cpp_bin_float_50,Nw>(11);
+  const var x = make_fvar<cpp_bin_float_50,0,Nx>(12);
+  const var y = make_fvar<cpp_bin_float_50,0,0,Ny>(13);
+  const var z = make_fvar<cpp_bin_float_50,0,0,0,Nz>(14);
   const var v = f(w,x,y,z);
-  // Calculated from Mathematica symbolic differentiation. See multiprecision.nb for script.
-  const cpp_dec_float_100 answer("1976.31960074779771777988187529041872090812118921875499076"
-    "582535951111845769110560421820940516423255314");
-  std::cout << std::setprecision(std::numeric_limits<cpp_dec_float_100>::digits10)
+  // Calculated from Mathematica symbolic differentiation.
+  const cpp_bin_float_50 answer("1976.319600747797717779881875290418720908121189218755");
+  std::cout << std::setprecision(std::numeric_limits<cpp_bin_float_50>::digits10)
     << "mathematica   : " << answer << '\n'
     << "autodiff      : " << v.derivative(Nw,Nx,Ny,Nz) << '\n'
     << "relative error: " << std::setprecision(3) << (v.derivative(Nw,Nx,Ny,Nz)/answer-1)
     << std::endl;
   return 0;
 }
+/*
+Output:
+mathematica   : 1976.3196007477977177798818752904187209081211892188
+autodiff      : 1976.3196007477977177798818752904187209081211892188
+relative error: 2.67e-50
+**/
 \end{verbatim}
-The relative error between the calculated and actual value is about $6.47\times10^{-99}$.
 
 \section{Mathematics}
 
@@ -478,7 +483,7 @@ specified at compile-time:
 
 \begin{enumerate}
 \item The numeric data type {\tt T} of $x_0$. Examples: {\tt double},
-    {\tt boost::multiprecision::cpp\_dec\_float\_100}, etc.
+    {\tt boost::multiprecision::cpp\_bin\_float\_50}, etc.
 \item The maximum derivative order $M$ that is to be calculated with respect to $x$.
 \end{enumerate}
 Note that both of these requirements are entirely analogous to declaring and using a {\tt std::array<T,N>}. {\tt T}

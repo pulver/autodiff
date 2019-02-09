@@ -17,7 +17,9 @@
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
+//TODO(kbhat): remove below includes
 #include <iostream>
+#include <typeinfo>
 
 //boost::fusion::vector<float,double,long double,boost::multiprecision::cpp_bin_float_50> bin_float_types;
 //boost::fusion::vector<float,double,long double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70
@@ -1911,15 +1913,16 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(0.5, 0.5));
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == math::ellint_1(0.5));
 
-    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
-    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
-
-    //TODO(kbhat): Promote issues
-    //BOOST_REQUIRE(math::ellint_2(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
-    //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
-    //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5)));
+    {
+      const T eps = 2600e2 * std::numeric_limits<T>::epsilon(); // percent - requied by OSX
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
+      BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
+      BOOST_REQUIRE_CLOSE(math::ellint_2(0.5, make_fvar<T, m>(0.5)), math::ellint_2(0.5, 0.5), eps);
+      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)), math::ellint_2(0.5, 0.5), eps);
+      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5)), math::ellint_2(0.5), eps);
+    }
 
     {
       const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());

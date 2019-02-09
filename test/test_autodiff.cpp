@@ -1495,7 +1495,7 @@ struct lambert_w0_test
   {
     const T eps = 1000*std::numeric_limits<T>::epsilon(); // percent
     constexpr int m = 10;
-    constexpr T cx = 3;
+    const T cx = 3;
     // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]
     const char* const answers[m+1] {
         "1.049908894964039959988697070552897904589466943706341",
@@ -1718,10 +1718,10 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)) == math::airy_bi(static_cast<T>(1)));
     //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)) == math::airy_ai_prime(static_cast<T>(1)));
     //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)) == math::airy_bi_prime(static_cast<T>(1)));
-    BOOST_REQUIRE(math::asinh(make_fvar<T,m>(0.5)) == math::asinh(static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::atanh(make_fvar<T,m>(0.5)) == math::atanh(static_cast<T>(0.5)));
+    BOOST_REQUIRE(math::asinh(make_fvar<T,m>(0.5)) == math::asinh(0.5));
+    BOOST_REQUIRE(math::atanh(make_fvar<T,m>(0.5)) == math::atanh(0.5));
     BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == math::bernoulli_b2n<T>(1));
-    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == static_cast<T>(1/6.0)); // b_2 == 1/6
+    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == 1/6.0); // b_2 == 1/6
 
     //TODO(kbhat): beta.hpp
     // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
@@ -1729,38 +1729,45 @@ struct boost_special_functions_test
     // Skipped other beta functions.
 
     BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
-    BOOST_REQUIRE(static_cast<T>(math::cos_pi(iround(make_fvar<T,m>(0.0)))) == static_cast<T>(math::cos_pi(0)));
-    BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(static_cast<T>(0.5)));
+    BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T,m>(0.0))) == math::cos_pi(0));
+    BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(0.5));
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1)), boost::wrapexcept<std::overflow_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1)), boost::wrapexcept<std::overflow_error>);
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), static_cast<T>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
-    BOOST_REQUIRE(math::ellint_1(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5)));
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), 0.5) == math::ellint_1(0.5, 0.5));
+    BOOST_REQUIRE(math::ellint_1(0.5, make_fvar<T,m>(0.5)) == math::ellint_1(0.5, 0.5));
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(0.5, 0.5));
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == math::ellint_1(0.5));
 
     BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
     BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
     BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
+
     //TODO(kbhat): Promote issues
     //BOOST_REQUIRE(math::ellint_2(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
     //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
     //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5)));
 
-    auto n = sin(math::constants::third_pi<T>());
-    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(1.01), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(-1.01), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(1), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(-1), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(1.01, n*n), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(-1.01, n*n), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(1, n*n), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_3(-1, n*n), boost::wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_3(make_fvar<T,m>(0.5), static_cast<T>(n*n)) == math::ellint_3(0.5, n*n));
-    BOOST_REQUIRE(math::ellint_3(make_fvar<T,m>(0.5), make_fvar<T,m>(n*n)) == math::ellint_3(0.5, n*n));
-    BOOST_REQUIRE(math::ellint_3(static_cast<T>(0.5), make_fvar<T,m>(n*n)) == math::ellint_3(0.5, n*n));
+    {
+      const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1.01), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(-1.01), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(-1), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(1.01, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(-1.01, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(1, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(-1, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_3(make_fvar<T, m>(0.5), sin_sq_pi_over_3) == math::ellint_3(0.5, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_3(make_fvar<T, m>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(0.5, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_3(0.5, make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(0.5, sin_sq_pi_over_3));
+    }
 
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_j(0,static_cast<T>(0.5)));

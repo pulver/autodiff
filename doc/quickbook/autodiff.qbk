@@ -86,10 +86,10 @@ than /N/ can be discarded, and under these truncation rules, /f/ provides a poly
     \sum_{n=0}^Ny_n\varepsilon^n=\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.$$ ]
 [:[:[autodiff_equation polynomial_transform.svg]]]
 
-C++'s ability to overload operators and functions allows for the creation of a class `fvar` that represents
-polynomials in ['\u03b5]. Thus the same algorithm that calculates the numeric value of ['y[sub 0]=f(x[sub 0])]
-is also used to calculate the polynomial ['\u03a3[sub n]y[sub n]\u03b5[super n]=f(x[sub 0]+\u03b5)].
-The derivatives are then found from the product of the respective factorial and coefficient:
+C++'s ability to overload operators and functions allows for the creation of a class `fvar` (_f_orward-mode autodiff
+_var_iable) that represents polynomials in ['\u03b5]. Thus the same algorithm that calculates the numeric value of
+['y[sub 0]=f(x[sub 0])] is also used to calculate the polynomial ['\u03a3[sub n]y[sub n]\u03b5[super n]=f(x[sub
+0]+\u03b5)].  The derivatives are then found from the product of the respective factorial and coefficient:
 
 [/ \Large$$f^{(n)}(x_0)=n!y_n.$$ ]
 [:[:[autodiff_equation derivative_formula.svg]]]

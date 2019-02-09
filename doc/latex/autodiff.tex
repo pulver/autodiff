@@ -684,12 +684,12 @@ defined in this manner:
                 return x; // also g(nan) is nan
         }
     \end{verbatim}
-This give sensible values for both $g(0)=0$ and $g'(0)=\frac{1}{2}$.
+This returns sensible values for both $g(0)=0$ and $g'(0)=\frac{1}{2}$.
 \end{itemize}
 
 \subsection{Indeterminate Forms}
 
-\begin{table}
+\begin{table}[h]
 \centering\begin{tabular}{m{7em}||c|c|c}
  & $\displaystyle f(x)=\left(\frac{a}{x}\right)\times(bx^2)$ & $\displaystyle g(x)=\left(\frac{a}{x}\right)\times(bx)$ & $\displaystyle h(x)=\left(\frac{a}{x^2}\right)\times(bx)$ \\[0.618em]
 \hline\hline
@@ -715,12 +715,6 @@ or sensitivities).
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
 
-// Standard normal probability density function
-double phi(double x)
-{
-  return boost::math::constants::one_div_root_two_pi<double>()*std::exp(-0.5*x*x);
-}
-
 // Standard normal cumulative distribution function
 double Phi(double x)
 {
@@ -729,12 +723,12 @@ double Phi(double x)
 
 enum CP { call, put };
 
-// Assume zero annual dividend yield (q=0).
+// Black-Scholes pricing function, assuming zero annual dividend yield (q=0).
 double bs_price(CP cp, double K, double S, double sigma, double tau, double r)
 {
   double d1 = (std::log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*std::sqrt(tau));
   double d2 = (std::log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*std::sqrt(tau));
-  if (cp == call)
+  if (cp == CP::call)
     return S*Phi(d1) - std::exp(-r*tau)*K*Phi(d2);
   else
     return std::exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1);
@@ -746,10 +740,10 @@ To apply autodiff for calculating derivatives of a given function:
 \begin{enumerate}
 \item {\tt \#include <boost/math/differentiation/autodiff.hpp>}
 \item {\tt using namespace boost::math::differentiation;}
-\item Select which function parameters will be variables of differentation (aka autodiff variables).  All the rest
-  shall remain constant, and no changes need to be made to them. (Note that the use of the word {\it constant}\/
-  here is different than the {\tt const} C/C++ keyword. You can have {\tt const} variables of differentiation,
-  as well as non-{\tt const} constants, for example, as seen below.)
+\item Select which function parameters will be variables of differentation (aka autodiff variables). The
+  non-variables are called constant. (Note that the use of the word {\it constant}\/ here is different than the
+  {\tt const} C/C++ keyword. You can have {\tt const} variables of differentiation, as well as non-{\tt const}
+  constants, for example, as seen below.)
 \item For each function that takes at least one variable of differentation as a parameter:
   \begin{enumerate}
   \item Replace the data type (e.g. {\tt double}) of each variable parameter with a generic template type.
@@ -758,19 +752,20 @@ To apply autodiff for calculating derivatives of a given function:
   \item Replace the return value with {\tt promote<T1,T2,T3>} where {\tt T1}, {\tt T2}, {\tt T3} are the template
     types created in the previous step. There can be any number of types. (If there is only 1 type {\tt T} then the
     return type can simply be {\tt T} instead of {\tt promote<T>}).
-  \item Replace all intermediate data types by {\tt auto} (easiest) or where that is not possible, then use
-    {\tt promote<...>} that combines the data types involves in the intermediate calculation. It is important to
-    not accidentally omit any data types from {\tt promote<>}, otherwise this can lead to incorrect results.
-  \item Remove the namespace prefix from mathematical function calls applied to variables, to allow for overloaded
-    functions to be called via argument-dependent lookup (ADL). This requires that the function exist in the
-    autodiff library of overloaded functions (E.g. {\tt exp}, {\tt log}, {\tt erfc}, etc.). If it doesn't, then an
-    appropriate alternative must be made available.
+  \item Update the data type of all temporary variables that depend on an autodiff variable by {\tt auto} (easiest)
+    or where that is not possible, then use {\tt promote<...>} to combine the data types of the autodiff variables
+    in the intermediate calculation. It is important to not accidentally omit any data types from {\tt promote<>},
+    otherwise this can lead to incorrect results.
+  \item Remove the namespace prefix from mathematical function calls applied to autodiff variables, to allow
+    for overloaded functions to be called via argument-dependent lookup (ADL). This requires that the function exist
+    in the autodiff library of overloaded functions (E.g. {\tt exp}, {\tt log}, {\tt erfc}, etc.). If it doesn't,
+    then an appropriate alternative must be made available.
   \end{enumerate}
 \item Each variable of differentiation must be separately declared and initialized by calling the
   {\tt make\_fvar<...>()} template function. Say there are $M$ such variables. For each variable:
   \begin{enumerate}
   \item Select the underlying {\tt root\_type} for the variable. E.g. {\tt float}, {\tt double}, {\tt long double},\\
-    {\tt boost::multiprecision::cpp\_bin\_float\_50}, etc. This is the always the first template parameter.
+    {\tt boost::multiprecision::cpp\_bin\_float\_50}, etc. This is always the first template parameter.
   \item Select what the highest order derivative $N_i$ will be calculated for it, where $i\in\{1,2,...,M\}$.
     That, and all lower order derivatives will be available in the result. This must be a compile-time, or
     {\tt constexpr} value. Specify this value as the $i^\text{th}$ template parameter to {\tt make\_fvar},
@@ -794,7 +789,9 @@ To apply autodiff for calculating derivatives of a given function:
   \end{enumerate}
 \item For best performance, compile with the C++17 flag, or highest available, with C++11 at a minimum.
 \end{enumerate}
-Each point above is now applied to the Black-Scholes pricing function:
+Each point above is now applied to the Black-Scholes pricing function. A {\tt main()} function is added to demonstrate
+how to initialize 4 independent variables with {\tt make\_fvar<>()}, invoke the function {\tt bs\_price()}, and
+retrieve its derivatives:
 
 \begingroup
 \fontsize{10pt}{10pt}\selectfont
@@ -806,14 +803,6 @@ Each point above is now applied to the Black-Scholes pricing function:
 #include <boost/math/differentiation/autodiff.hpp>
 using namespace boost::math::differentiation;
 
-// Standard normal probability density function
-template<typename T>
-T phi(const T& x)
-{
-  using std::exp;
-  return boost::math::constants::one_div_root_two_pi<T>()*exp(-0.5*x*x);
-}
-
 // Standard normal cumulative distribution function
 template<typename T>
 T Phi(const T& x)
@@ -824,7 +813,7 @@ T Phi(const T& x)
 
 enum CP { call, put };
 
-// Assume zero annual dividend yield (q=0).
+// Black-Scholes pricing function, assuming zero annual dividend yield (q=0).
 template<typename T1, typename T2, typename T3, typename T4>
 promote<T1,T2,T3,T4>
   bs_price(CP cp, double K, const T1& S, const T2& sigma, const T3& tau, const T4& r)
@@ -832,7 +821,7 @@ promote<T1,T2,T3,T4>
   using namespace std;
   auto d1 = (log(S/K) + (r+sigma*sigma/2)*tau) / (sigma*sqrt(tau));
   auto d2 = (log(S/K) + (r-sigma*sigma/2)*tau) / (sigma*sqrt(tau));
-  if (cp == call)
+  if (cp == CP::call)
     return S*Phi(d1) - exp(-r*tau)*K*Phi(d2);
   else
     return exp(-r*tau)*K*Phi(-d2) - S*Phi(-d1);
@@ -840,13 +829,13 @@ promote<T1,T2,T3,T4>
 
 int main()
 {
-  double K   = 100.0;
-  auto S     = make_fvar<double,3>(105);
-  auto sigma = make_fvar<double,0,3>(5);
-  auto tau   = make_fvar<double,0,0,1>(30.0/365);
-  auto r     = make_fvar<double,0,0,0,1>(1.25/100);
-  auto call_price = bs_price(call, K, S, sigma, tau, r);
-  auto put_price  = bs_price(put , K, S, sigma, tau, r);
+  double K   = 100.0; // Strike price
+  auto S     = make_fvar<double,3>(105); // Spot price
+  auto sigma = make_fvar<double,0,3>(5); // Volatility
+  auto tau   = make_fvar<double,0,0,1>(30.0/365); // 30 days to expiration
+  auto r     = make_fvar<double,0,0,0,1>(1.25/100); // 1.25% interest rate
+  auto call_price = bs_price(CP::call, K, S, sigma, tau, r);
+  auto put_price  = bs_price(CP::put , K, S, sigma, tau, r);
 
   std::cout << std::setprecision(std::numeric_limits<double>::digits10)
     << "call price  = " <<  call_price.derivative(0,0,0,0) << '\n'
@@ -885,14 +874,31 @@ int main()
 }
 \end{verbatim}
 \endgroup
-The above example demonstrates how to transform a regular mathematical function into one to which autodiff can be
-applied.
+Note the correspondence between the number of template parameters to {\tt make\_fvar<...>} and the order
+of parameters to {\tt derivative(...)}. The 4 independent variables are initialized as:
+
+\begin{verbatim}
+  auto S     = make_fvar<double,3>(105); // Spot price
+  auto sigma = make_fvar<double,0,3>(5); // Volatility
+  auto tau   = make_fvar<double,0,0,1>(30.0/365); // 30 days to expiration
+  auto r     = make_fvar<double,0,0,0,1>(1.25/100); // 1.25% interest rate
+\end{verbatim}
+This means the variable {\tt S} corresponds to variable 1, {\tt sigma} to 2, {\tt tau} to 3, and {\tt r} to 4.
+The maximum number of derivatives to be calculated for each are 3, 3, 1, and 1, respectively.
+
+Taking for example the calculation of color:
+
+\begin{verbatim}
+    << "call color  = " <<  call_price.derivative(2,0,1,0) << '\n'
+\end{verbatim}
+This returns the \nth{2} partial derivative of {\tt call\_price} with respect to variable 1 ({\tt S})
+and the \nth{1} partial derivative with respect to variable 3 ({\tt tau}).
 
 \subsection{Advantages of Automatic Differentiation}
 This example also provides an opportunity to point out some of the advantages of using autodiff:
 \begin{itemize}
-\item Elimination of code redundancy. The separate calculation of $N$ derivatives is a form of code redundancy,
-  with all the liabilities that come with it:
+\item Elimination of code redundancy. The existance of $N$ separate functions to calculate derivatives is a form
+  of code redundancy, with all the liabilities that come with it:
   \begin{itemize}
     \item Changes to one component require $N$ additional changes. Consider how much larger and inter-dependent
         the above code base would be if a separate function were written for
@@ -903,10 +909,10 @@ This example also provides an opportunity to point out some of the advantages of
         the code base is smaller and able to be intuitively grasped.
   \end{itemize}
 \item Accuracy of derivatives over finite difference methods. Finite difference methods always include a
-   $\Delta x$ free variable that must be carefully chosen for each application. If $\Delta x$ is too small,
-   then numerical errors become large. If $\Delta x$ is too large, then mathematical errors become large.
-   With autodiff, there is no free variable and the accuracy of the answer is generally superior to finite
-   difference even with the best choice of $\Delta x$.
+   $\Delta x$ free variable that must be carefully chosen for each application. If $\Delta x$ is too small, then
+   numerical errors become large. If $\Delta x$ is too large, then mathematical errors become large.  With autodiff,
+   there are no free variables to set and the accuracy of the answer is generally superior to finite difference
+   methods even with the best choice of $\Delta x$.
 \end{itemize}
 
 \section{Acknowledgments}

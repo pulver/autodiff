@@ -1709,6 +1709,7 @@ struct boost_special_functions_test
   {
     using namespace boost;
     constexpr int m = 3;
+
     BOOST_REQUIRE(math::acosh(make_fvar<T,m>(1.5)) == math::acosh(static_cast<T>(1.5)));
     // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
     // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
@@ -1730,8 +1731,36 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
     BOOST_REQUIRE(static_cast<T>(math::cos_pi(iround(make_fvar<T,m>(0.0)))) == static_cast<T>(math::cos_pi(0)));
     BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(static_cast<T>(0.5)));
-    BOOST_REQUIRE_THROW(math::ellint_1(1.01), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1)), boost::wrapexcept<std::overflow_error>);
+    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1)), boost::wrapexcept<std::overflow_error>);
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), static_cast<T>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
+    BOOST_REQUIRE(math::ellint_1(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
+    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5, 0.5)));
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_1(0.5)));
+
+    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
+    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
+    //TODO(kbhat): Promote issues
+    //BOOST_REQUIRE(math::ellint_2(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
+    //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5, 0.5)));
+    //BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(0.5)) == static_cast<T>(math::ellint_2(0.5)));
+
+    auto n = sin(math::constants::third_pi<T>());
+    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(1.01), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(-1.01), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(1), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T,m>(-1), make_fvar<T,m>(n*n)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(1.01, n*n), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(-1.01, n*n), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(1, n*n), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_3(-1, n*n), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_3(make_fvar<T,m>(0.5), static_cast<T>(n*n)) == math::ellint_3(0.5, n*n));
+    BOOST_REQUIRE(math::ellint_3(make_fvar<T,m>(0.5), make_fvar<T,m>(n*n)) == math::ellint_3(0.5, n*n));
+    BOOST_REQUIRE(math::ellint_3(static_cast<T>(0.5), make_fvar<T,m>(n*n)) == math::ellint_3(0.5, n*n));
 
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_j(0,static_cast<T>(0.5)));

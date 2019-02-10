@@ -1951,6 +1951,20 @@ struct boost_special_functions_test
       BOOST_REQUIRE(math::ellint_3(0.5, make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(0.5, sin_sq_pi_over_3));
     }
 
+    {
+      const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());
+      BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(1.01), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(-1.01), make_fvar<T, m>(sin_sq_pi_over_3)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_d(1.01, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_d(-1.01, sin_sq_pi_over_3), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(1), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(1, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(-1), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(-1, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(0.5), sin_sq_pi_over_3) == math::ellint_d(0.5, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(0.5, sin_sq_pi_over_3));
+      BOOST_REQUIRE(math::ellint_d(0.5, make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(0.5, sin_sq_pi_over_3));
+    }
 
 
     // Policy parameter prevents ADL.

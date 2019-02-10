@@ -1904,8 +1904,12 @@ struct boost_special_functions_test
 
     // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
     BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T,m>(0.5)), math::cbrt(0.5), pct_epsilon);
-    BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T,m>(0.0))) == math::cos_pi(0));
-    BOOST_REQUIRE(math::sin_pi(iround(make_fvar<T,m>(math::constants::pi<T>()))) == math::sin_pi(math::iround(math::constants::pi<T>())));
+
+    // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
+    BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T,m>(math::constants::sixth_pi<T>()))) == math::cos_pi(math::iround(math::constants::sixth_pi<T>())));
+    // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
+    BOOST_REQUIRE(math::sin_pi(iround(make_fvar<T,m>(math::constants::sixth_pi<T>()))) == math::sin_pi(math::iround(math::constants::sixth_pi<T>())));
+
     BOOST_REQUIRE(math::log1p(make_fvar<T,m>(math::constants::pi<T>())) == math::log1p(math::constants::pi<T>()));
     BOOST_REQUIRE(math::expm1(make_fvar<T,m>(math::constants::pi<T>())) == math::expm1(math::constants::pi<T>()));
     BOOST_REQUIRE(math::sqrt1pm1(make_fvar<T,m>(math::constants::pi<T>())) == math::sqrt1pm1(math::constants::pi<T>()));
@@ -1966,6 +1970,25 @@ struct boost_special_functions_test
       BOOST_REQUIRE(math::ellint_d(0.5, make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(0.5, sin_sq_pi_over_3));
     }
 
+    BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rf(1.01, 0.51, 0.01));
+
+    BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rd(1.01, 0.51, 0.01));
+
+    BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0), make_fvar<T,m>(0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_CLOSE(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01), make_fvar<T, m>(1.0)), math::ellint_rj(1.01, 0.51, 0.01, 1.0), pct_epsilon);
+
+    BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_CLOSE(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51)), math::ellint_rc(1.01, 0.51), pct_epsilon);
+
+    BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(-1.0), make_fvar<T, m>(0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rg(1.01, 0.51, 0.01));
 
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)), math::cyl_bessel_j(0,static_cast<T>(0.5)), pct_epsilon);

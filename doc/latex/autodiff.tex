@@ -689,6 +689,34 @@ This returns sensible values for both $g(0)=0$ and $g'(0)=\frac{1}{2}$.
 
 \subsection{Indeterminate Forms}
 
+To write a function that lends itself to the accurate calculation of derivatives with autodiff,
+there are two primary guildelines:
+
+\begin{enumerate}
+\item Write functions that are piecewise analytic on open intervals. Points on the edge of two adjacent intervals
+    should be evaluated as the arithmetic average of each branch.
+\item Avoid indeterminate values.
+\end{enumerate}
+Let us look at each point in greater detail.
+
+\subsubsection{Write Functions as Piecewise Analytic on Open Intervals}
+
+Consider the implementation of a real function $f:D\rightarrow\mathbb{R}$ where $D\subseteq\mathbb{R}$.
+Depending on the value of $x\in D$, different branches of logic are executed resulting in different
+formulas being applied to $x$ resulting in the final value of $f(x)$. These branches of logic partition $D$
+into a finite number of disjoint subsets $D_i$, each of which re
+
+
+\subsubsection{Avoid Indetermine Values}
+
+
+
+To calculate derivatives accurately:
+
+\begin{enumerate}
+\item All computations must be done using overloaded autodiff operators or functions.
+\end{enumerate}
+
 \begin{table}[h]
 \centering\begin{tabular}{m{7em}||c|c|c}
  & $\displaystyle f(x)=\left(\frac{a}{x}\right)\times(bx^2)$ & $\displaystyle g(x)=\left(\frac{a}{x}\right)\times(bx)$ & $\displaystyle h(x)=\left(\frac{a}{x^2}\right)\times(bx)$ \\[0.618em]
@@ -702,12 +730,13 @@ Floating Point\newline Arithmetic
 \caption{Automatic differentiation does not compute limits. Indeterminate forms must be simplified manually.}
 \end{table}
 
-\subsection{Example: Black-Scholes Option Pricing with Automatic Greeks}
+\section{Migrating Code for Autodiff Compatibility}
 
-In this example, we will start with a regular C/C++ function that calculates option prices using the standard
+In this section, a general procedure is given for transforming an existing C++
+mathematical function for compatibility with autodiff, so that single and/or multi-variable
+derivatives can be automatically calculated for it. The example used here is the standard
 \href{https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks}{Black-Scholes pricing
-model} and show step-by-step how to apply autodiff in order to automatically calculate greeks (aka derivatives,
-or sensitivities).
+model} for pricing European options:
 
 \begingroup
 \fontsize{10pt}{10pt}\selectfont
@@ -735,14 +764,16 @@ double bs_price(CP cp, double K, double S, double sigma, double tau, double r)
 }
 \end{verbatim}
 \endgroup
+
+\subsection{General Rules for Transforming a C++ Function}
 To apply autodiff for calculating derivatives of a given function:
 
 \begin{enumerate}
 \item {\tt \#include <boost/math/differentiation/autodiff.hpp>}
 \item {\tt using namespace boost::math::differentiation;}
 \item Select which function parameters will be variables of differentation (aka autodiff variables). The
-  non-variables are called constant. (Note that the use of the word {\it constant}\/ here is different than the
-  {\tt const} C/C++ keyword. You can have {\tt const} variables of differentiation, as well as non-{\tt const}
+  non-variables are called constants. (Note that the use of the word {\it constant}\/ here is different than the
+  {\tt const} C/C++ keyword. There can be {\tt const} variables of differentiation, as well as non-{\tt const}
   constants, for example, as seen below.)
 \item For each function that takes at least one variable of differentation as a parameter:
   \begin{enumerate}
@@ -754,8 +785,8 @@ To apply autodiff for calculating derivatives of a given function:
     return type can simply be {\tt T} instead of {\tt promote<T>}).
   \item Update the data type of all temporary variables that depend on an autodiff variable by {\tt auto} (easiest)
     or where that is not possible, then use {\tt promote<...>} to combine the data types of the autodiff variables
-    in the intermediate calculation. It is important to not accidentally omit any data types from {\tt promote<>},
-    otherwise this can lead to incorrect results.
+    in the intermediate calculation. Omitting any necessary data types from {\tt promote<>} can lead to incorrect
+    results, which can be avoided by using {\tt auto}.
   \item Remove the namespace prefix from mathematical function calls applied to autodiff variables, to allow
     for overloaded functions to be called via argument-dependent lookup (ADL). This requires that the function exist
     in the autodiff library of overloaded functions (E.g. {\tt exp}, {\tt log}, {\tt erfc}, etc.). If it doesn't,
@@ -779,19 +810,23 @@ To apply autodiff for calculating derivatives of a given function:
   \end{enumerate}
   For example, to set the \nth{3} variable to 2.0, and calculate up to $N_3=5$ derivatives for it, the initialization
   would be {\tt auto x3 = make\_fvar<double,0,0,5>(2.0);}
-\item Call the function, and store the result as type {\tt auto} (easiest):\\
-  {\tt auto y = f(x1, x2, x3, x4);}
+\item Call the function, and store the result as type {\tt auto} (easiest) or of type {\tt promote<T1,T2,T3,...>}:\\
+  {\tt auto y = f(x1, x2, x3, ...);}
 \item Call {\tt y.derivative(...)} to obtain all mixed partial derivatives, with the following requirements:
   \begin{enumerate}
-  \item {\tt derivative(...)} must be called with exactly $M$ parameters.
+  \item {\tt derivative(...)} must be called with exactly $M$ parameters (one for each variable.)
   \item The $i^\text{th}$ parameter to {\tt derivative(...)} (where $i=1$ corresponds to the first parameter) must
     be of type {\tt size\_t} with a maximum value of $N_i$.
   \end{enumerate}
 \item For best performance, compile with the C++17 flag, or highest available, with C++11 at a minimum.
 \end{enumerate}
-Each point above is now applied to the Black-Scholes pricing function. A {\tt main()} function is added to demonstrate
-how to initialize 4 independent variables with {\tt make\_fvar<>()}, invoke the function {\tt bs\_price()}, and
-retrieve its derivatives:
+
+\subsection{Example: Black-Scholes Option Pricing with Automatic Greeks}
+Each point above is now applied to the Black-Scholes pricing function {\tt bs\_price()} given previously. Though
+{\tt bs\_price()} takes 6 parameters, the first 2 (call/put ({\tt cp}) and strike price ({\tt K})) are constant,
+since no derivatives are calculated with respect to them, and the remaining 4 are autodiff variables. A {\tt main()}
+function is added to demonstrate how to initialize the $M=4$ independent variables with {\tt make\_fvar<>()},
+invoke the function {\tt bs\_price()}, and retrieve its derivatives:
 
 \begingroup
 \fontsize{10pt}{10pt}\selectfont
@@ -884,9 +919,9 @@ of parameters to {\tt derivative(...)}. The 4 independent variables are initiali
   auto r     = make_fvar<double,0,0,0,1>(1.25/100); // 1.25% interest rate
 \end{verbatim}
 This means the variable {\tt S} corresponds to variable 1, {\tt sigma} to 2, {\tt tau} to 3, and {\tt r} to 4.
-The maximum number of derivatives to be calculated for each are 3, 3, 1, and 1, respectively.
+The maximum number of derivatives to be calculated for each are $N_1=3$, $N_2=3$, $N_3=1$, and $N_4=1$, respectively.
 
-Taking for example the calculation of color:
+Taking for example the calculation of \href{https://en.wikipedia.org/wiki/Greeks_(finance)#Color}{color}:
 
 \begin{verbatim}
     << "call color  = " <<  call_price.derivative(2,0,1,0) << '\n'
@@ -900,8 +935,8 @@ This example also provides an opportunity to point out some of the advantages of
 \item Elimination of code redundancy. The existance of $N$ separate functions to calculate derivatives is a form
   of code redundancy, with all the liabilities that come with it:
   \begin{itemize}
-    \item Changes to one component require $N$ additional changes. Consider how much larger and inter-dependent
-        the above code base would be if a separate function were written for
+    \item Changes to one function require $N$ additional changes to other functions. Consider how much larger
+        and inter-dependent the above code base would be if a separate function were written for
         \href{https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks}{each greek} value.
     \item Dependencies upon a derivative function for a different purpose will break when changes are made to
         the original function. These dependencies won't exist if such derivative functions don't exist.
@@ -924,7 +959,8 @@ This example also provides an opportunity to point out some of the advantages of
 \end{itemize}
 
 \begin{thebibliography}{1}
-\bibitem{ad} https://en.wikipedia.org/wiki/Automatic\_differentiation
+\bibitem{ad} \url{https://en.wikipedia.org/wiki/Automatic\_differentiation}
+\bibitem{ed} Andreas Griewank, Andrea Walther, \textit{Evaluating Derivatives}, SIAM, 2nd ed. 2008.
 \end{thebibliography}
 
 \end{document}

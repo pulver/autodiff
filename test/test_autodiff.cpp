@@ -1882,6 +1882,7 @@ struct boost_special_functions_test
   {
     using namespace boost;
     constexpr int m = 3;
+    const T pct_epsilon = 100*std::numeric_limits<T>::epsilon();
 
     BOOST_REQUIRE(math::acosh(make_fvar<T,m>(1.5)) == math::acosh(static_cast<T>(1.5)));
     // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
@@ -1894,15 +1895,24 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::asinh(make_fvar<T,m>(0.5)) == math::asinh(0.5));
     BOOST_REQUIRE(math::atanh(make_fvar<T,m>(0.5)) == math::atanh(0.5));
     BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == math::bernoulli_b2n<T>(1));
-    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == 1/6.0); // b_2 == 1/6
+    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == 1/6.0);
 
-    //TODO(kbhat): beta.hpp
     // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
-    // BOOST_REQUIRE(static_cast<T>(math::beta(make_fvar<T,m>(1.1),make_fvar<T,m>(1.2))) == static_cast<T>(math::beta(static_cast<T>(1.1),static_cast<T>(1.2))));
-    // Skipped other beta functions.
+    BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T,m>(1.1), make_fvar<T,m>(1.2)), math::beta(1.1, 1.2), 1.5*pct_epsilon);
 
     BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
+
+    // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
+    BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T,m>(0.5)), math::cbrt(0.5), pct_epsilon);
     BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T,m>(0.0))) == math::cos_pi(0));
+    BOOST_REQUIRE(math::sin_pi(iround(make_fvar<T,m>(math::constants::pi<T>()))) == math::sin_pi(math::iround(math::constants::pi<T>())));
+    BOOST_REQUIRE(math::log1p(make_fvar<T,m>(math::constants::pi<T>())) == math::log1p(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::expm1(make_fvar<T,m>(math::constants::pi<T>())) == math::expm1(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::sqrt1pm1(make_fvar<T,m>(math::constants::pi<T>())) == math::sqrt1pm1(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::powm1(make_fvar<T,m>(1.01), make_fvar<T,m>(0.001)) == math::powm1(1.01, 0.001));
+    BOOST_REQUIRE(math::hypot(make_fvar<T,m>(3), make_fvar<T,m>(4)) == math::hypot(3, 4));
+    BOOST_REQUIRE(math::pow<2>(make_fvar<T,m>(3)) == math::pow<2>(3));
+
     BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(0.5));
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
@@ -1913,16 +1923,14 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(0.5, 0.5));
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == math::ellint_1(0.5));
 
-    {
-      const T eps = 2600e2 * std::numeric_limits<T>::epsilon(); // percent - requied by OSX
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
-      BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
-      BOOST_REQUIRE_CLOSE(math::ellint_2(0.5, make_fvar<T, m>(0.5)), math::ellint_2(0.5, 0.5), eps);
-      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)), math::ellint_2(0.5, 0.5), eps);
-      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5)), math::ellint_2(0.5), eps);
-    }
+
+    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), boost::wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(-1));
+    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(1));
+    BOOST_REQUIRE_CLOSE(math::ellint_2(0.5, make_fvar<T, m>(0.5)), math::ellint_2(0.5, 0.5), pct_epsilon);
+    BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)), math::ellint_2(0.5, 0.5), pct_epsilon);
+    BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5)), math::ellint_2(0.5), pct_epsilon);
 
     {
       const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());
@@ -1943,11 +1951,13 @@ struct boost_special_functions_test
       BOOST_REQUIRE(math::ellint_3(0.5, make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(0.5, sin_sq_pi_over_3));
     }
 
+
+
     // Policy parameter prevents ADL.
-    //BOOST_REQUIRE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_j(0,static_cast<T>(0.5)));
-    //BOOST_REQUIRE(math::cyl_neumann(0,make_fvar<T,m>(0.5)) == math::cyl_neumann(0,static_cast<T>(0.5)));
-    //BOOST_REQUIRE(math::cyl_bessel_j_zero(make_fvar<T,m>(0.5),0) == math::cyl_bessel_j_zero(static_cast<T>(0.5),0));
-    //BOOST_REQUIRE(math::cyl_neumann_zero(make_fvar<T,m>(0.5),0) == math::cyl_neumann_zero(static_cast<T>(0.5),0));
+    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)), math::cyl_bessel_j(0,static_cast<T>(0.5)), pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.5)), math::cyl_neumann(0,static_cast<T>(0.5)), pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j_zero(make_fvar<T,m>(0.5),0), math::cyl_bessel_j_zero(static_cast<T>(0.5),0), pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_neumann_zero(make_fvar<T,m>(0.5),0),  math::cyl_neumann_zero(static_cast<T>(0.5),0), pct_epsilon);
     // Required sinh() (added) but then has policy parameter ADL issue.
     //BOOST_REQUIRE(math::cyl_bessel_i(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_i(0,static_cast<T>(0.5)));
     BOOST_REQUIRE(math::cyl_bessel_k(0,make_fvar<T,m>(0.5)) == math::cyl_bessel_k(0,static_cast<T>(0.5)));
@@ -1969,11 +1979,9 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::sph_hankel_1(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_1(0,static_cast<T>(0.5)).real());
     //BOOST_REQUIRE(math::sph_hankel_2(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_2(0,static_cast<T>(0.5)).real());
 
-    std::cout.precision(20);
-    // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
-    BOOST_REQUIRE(math::cbrt(make_fvar<T,m>(0.5)) == math::cbrt(static_cast<T>(0.5)));
+    //std::cout.precision(20);
+
     //Skipping other Basic Functions
-    //std::cout << math::cbrt(make_fvar<T,m>(0.5)) << "\t" << math::cbrt(0.5) << std::endl;
     BOOST_REQUIRE(math::chebyshev_next(make_fvar<T,m>(0.5),make_fvar<T,m>(0.5),make_fvar<T,m>(0.5)) ==
         math::chebyshev_next(static_cast<T>(0.5),static_cast<T>(0.5),static_cast<T>(0.5)));
     // Requires acosh() (added)

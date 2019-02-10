@@ -1984,6 +1984,10 @@ struct boost_special_functions_test
     BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
     BOOST_REQUIRE(math::jacobi_zeta(make_fvar<T, m>(1.0), make_fvar<T, m>(math::constants::half_pi<T>())) == math::jacobi_zeta(static_cast<T>(1.0), math::constants::half_pi<T>()));
 
+    BOOST_REQUIRE_THROW(math::heuman_lambda(make_fvar<T, m>(1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
+    BOOST_REQUIRE_THROW(math::heuman_lambda(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
+    BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0), make_fvar<T, m>(0.5)) == math::heuman_lambda(static_cast<T>(0), static_cast<T>(0.5)));
+
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)), math::cyl_bessel_j(0,static_cast<T>(0.5)), pct_epsilon);
     //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.5)), math::cyl_neumann(0,static_cast<T>(0.5)), pct_epsilon);

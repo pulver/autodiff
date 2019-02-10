@@ -1971,8 +1971,9 @@ struct boost_special_functions_test
 
     std::cout.precision(20);
     // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
-    //BOOST_REQUIRE(math::cbrt(make_fvar<T,m>(0.5)) == math::cbrt(static_cast<T>(0.5)));
+    BOOST_REQUIRE(math::cbrt(make_fvar<T,m>(0.5)) == math::cbrt(static_cast<T>(0.5)));
     //Skipping other Basic Functions
+    //std::cout << math::cbrt(make_fvar<T,m>(0.5)) << "\t" << math::cbrt(0.5) << std::endl;
     BOOST_REQUIRE(math::chebyshev_next(make_fvar<T,m>(0.5),make_fvar<T,m>(0.5),make_fvar<T,m>(0.5)) ==
         math::chebyshev_next(static_cast<T>(0.5),static_cast<T>(0.5),static_cast<T>(0.5)));
     // Requires acosh() (added)

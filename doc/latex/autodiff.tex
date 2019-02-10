@@ -348,20 +348,17 @@ values of the form
 {\bf x} = x_0 + x_1\varepsilon + x_2\varepsilon^2 +\cdots+ x_N\varepsilon^N
 \]
 and the final return value is of this polynomial form as well. In other words, the normal arithmetic operators
-$+,-,\times,\div$ applied to numbers $x$ are instead applied to polynomials $\bf x$. Through the
-overloading of C++ operators and functions, floating point data types are replaced with data types that represent
-these polynomials. More specifically, C++ types such as `double` are replaced with `std::array<double,N+1>`, which
-hold the above $N+1$ coefficients $x_i$, and are wrapped in a `class` that overloads all of the arithmetic
-operators.
+$+,-,\times,\div$ applied to numbers $x$ are instead applied to polynomials $\bf x$. Through the overloading of C++
+operators and functions, floating point data types are replaced with data types that represent these polynomials. More
+specifically, C++ types such as {\tt double} are replaced with {\tt std::array<double,N+1>}, which hold the above
+$N+1$ coefficients $x_i$, and are wrapped in a {\tt class} that overloads all of the arithmetic operators.
 
 The logic of these arithmetic operators simply mirror that which is applied to polynomials. We'll look at
 each of the 4 arithmetic operators in detail.
 
-\subsubsection arithmetic-addition Addition
+\subsubsection{Addition}
 
-Given polynomials $\bf x$ and $\bf y$, how is $\bf z=x+y$ calculated?
-
-To answer this, one simply expands $\bf x$ and $\bf y$ into their polynomial forms and add them together:
+The addition of polynomials $\bf x$ and $\bf y$ is done component-wise:
 
 \begin{align*}
 {\bf z} &= {\bf x} + {\bf y} \\
@@ -476,416 +473,186 @@ array {\tt v} whose element at $(i,j)$ is
 {\tt v[i][j]} = \frac{1}{i!j!}\frac{\partial^{i+j}f}{\partial x^i\partial y^j}(x_0,y_0)
     \qquad \text{for}\; (i,j)\in\{0,1,2,...,M\}\times\{0,1,2,...,N\}.
 \]
-The generalization to additional independent variables follows the same pattern. This is made more concrete with
-C++ code in the next section.
+The generalization to additional independent variables follows the same pattern.
+%This is made more concrete with C++ code in the next section.
 
-\section{Usage}
-
-\subsection{Single Variable}
-
-To calculate derivatives of a single variable $x$, at a particular value $x_0$, the following must be
-specified at compile-time:
-
-\begin{enumerate}
-\item The numeric data type {\tt T} of $x_0$. Examples: {\tt double},
-    {\tt boost::multiprecision::cpp\_bin\_float\_50}, etc.
-\item The maximum derivative order $M$ that is to be calculated with respect to $x$.
-\end{enumerate}
-Note that both of these requirements are entirely analogous to declaring and using a {\tt std::array<T,N>}. {\tt T}
-and {\tt N} must be set as compile-time, but which elements in the array are accessed can be determined at run-time,
-just as the choice of what derivatives to query in autodiff can be made during run-time.
-
-To declare and initialize $x$:
-
-\begin{verbatim}
-    using namespace boost::math::differentiation;
-    autodiff_fvar<T,M> x = make_fvar<T,M>(x0);
-\end{verbatim}
-where {\tt x0} is a run-time value of type {\tt T}. Assuming {\tt 0 < M}, this represents the polynomial $x_0 +
-\varepsilon$. Internally, the member variable of type {\tt std::array<T,M>} is {\tt v = \{ x0, 1, 0, 0, ... \}},
-consistent with the above mathematical treatise.
-
-To find the derivatives $f^{(n)}(x_0)$ for $0\le n\le M$ of a function
-$f : \mathbb{R}\rightarrow\mathbb{R}$, the function can be represented as a template
-
-\begin{verbatim}
-    template<typename T>
-    T f(T x);
-\end{verbatim}
-Using a generic type {\tt T} allows for {\tt x} to be of a regular type such as {\tt double}, but also allows for\\
-{\tt boost::math::differentiation::autodiff\_fvar<>} types.
-
-Internal calls to mathematical functions must allow for
-\href{https://en.cppreference.com/w/cpp/language/adl}{argument-dependent lookup} (ADL). Many standard library functions
-are overloaded in the {\tt boost::math::differentiation} namespace. For example, instead of calling {\tt std::cos(x)}
-from within {\tt f}, include the line {\tt using std::cos;} and call {\tt cos(x)} without a namespace prefix.
-
-Calling $f$ and retrieving the calculated value and derivatives:
-
-\begin{verbatim}
-    using namespace boost::math::differentiation;
-    autodiff_fvar<T,M> x = make_fvar<T,M>(x0);
-    autodiff_fvar<T,M> y = f(x);
-    for (int n=0 ; n<=M ; ++n)
-        std::cout << "y.derivative("<<n<<") == " << y.derivative(n) << std::endl;
-\end{verbatim}
-{\tt y.derivative(0)} returns the undifferentiated value $f(x_0)$, and {\tt y.derivative(n)} returns $f^{(n)}(x_0)$.
-Casting {\tt y} to type {\tt T} also gives the undifferentiated value. In other words, the following 3 values
-are equal:
-
-\begin{enumerate}
-\item {\tt f(x0)}
-\item {\tt y.derivative(0)}
-\item {\tt static\_cast<T>(y)}
-\end{enumerate}
-
-\subsection{Multiple Variables}
-
-Independent variables are represented in autodiff as independent dimensions within a multi-dimensional array.
-This is perhaps best illustrated with examples. The {\tt namespace boost::math::differentiation} is assumed.
-
-The following instantiates a variable of $x=13$ with up to 3 orders of derivatives:
-
-\begin{verbatim}
-    autodiff_fvar<double,3> x = make_fvar<double,3>(13);
-\end{verbatim}
-This instantiates {\bf an independent} value of $y=14$ with up to 4 orders of derivatives:
-
-\begin{verbatim}
-    autodiff_fvar<double,0,4> y = make_fvar<double,0,4>(14);
-\end{verbatim}
-Combining them together {\bf promotes} their data type automatically to the smallest multidimensional array that
-accommodates both.
-
-\begin{verbatim}
-    // z is promoted to autodiff_fvar<double,3,4>
-    auto z = 10*x*x + 50*x*y + 100*y*y;
-\end{verbatim}
-The object {\tt z} holds a 2-dimensional array, thus {\tt derivative(...)} is a 2-parameter method:
-
-\[
-{\tt z.derivative(i,j)} = \frac{\partial^{i+j}f}{\partial x^i\partial y^j}(13,14)
-    \qquad \text{for}\; (i,j)\in\{0,1,2,3\}\times\{0,1,2,3,4\}.
-\]
-A few values of the result can be confirmed through inspection:
-
-\begin{verbatim}
-    z.derivative(2,0) == 20
-    z.derivative(1,1) == 50
-    z.derivative(0,2) == 200
-\end{verbatim}
-Note how the position of the parameters in {\tt derivative(...)} match how {\tt x} and {\tt y} were declared.
-This will be clarified next.
-
-\subsubsection{Two Rules of Variable Initialization}
-
-In general, there are two rules to keep in mind when dealing with multiple variables:
-
-\begin{enumerate}
-\item Independent variables correspond to parameter position, in both the initialization {\tt make\_fvar<T,...>}
-    and calls to {\tt derivative(...)}.
-\item The last template position in {\tt make\_fvar<T,...>} determines which variable a derivative will be
-   taken with respect to.
-\end{enumerate}
-Both rules are illustrated with an example in which there are 3 independent variables $x,y,z$ and 1 dependent
-variable $w=f(x,y,z)$, though the following code readily generalizes to any number of independent variables, limited
-only by the C++ compiler/memory/platform. The maximum derivative order of each variable is {\tt Nx}, {\tt Ny}, and
-{\tt Nz}, respectively. Then the type for {\tt w} is {\tt boost::math::differentiation::autodiff\_fvar<T,Nx,Ny,Nz>}
-and all possible mixed partial derivatives are available via
-
-\[
-{\tt w.derivative(nx,ny,nz)} =
-    \frac{\partial^{n_x+n_y+n_z}f}{\partial x^{n_x}\partial y^{n_y}\partial z^{n_z} }(x_0,y_0,z_0)
-\]
-for $(n_x,n_y,n_z)\in\{0,1,2,...,N_x\}\times\{0,1,2,...,N_y\}\times\{0,1,2,...,N_z\}$ where $x_0, y_0, z_0$ are
-the numerical values at which the function $f$ and its derivatives are evaluated.
-
-In code:
-\begin{verbatim}
-    using namespace boost::math::differentiation;
-
-    using var = autodiff_fvar<double,Nx,Ny,Nz>; // Nx, Ny, Nz are constexpr size_t.
-
-    var x = make_fvar<double,Nx>(x0);       // x0 is of type double
-    var y = make_fvar<double,Nx,Ny>(y0);    // y0 is of type double
-    var z = make_fvar<double,Nx,Ny,Nz>(z0); // z0 is of type double
-
-    var w = f(x,y,z);
-
-    for (size_t nx=0 ; nx<=Nx ; ++nx)
-        for (size_t ny=0 ; ny<=Ny ; ++ny)
-            for (size_t nz=0 ; nz<=Nz ; ++nz)
-                std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == "
-                    << w.derivative(nx,ny,nz) << std::endl;
-\end{verbatim}
-Note how {\tt x}, {\tt y}, and {\tt z} are initialized: the last template parameter determines which variable
-$x, y,$ or $z$ a derivative is taken with respect to. In terms of the $\varepsilon$-polynomials
-above, this determines whether to add $\varepsilon_x, \varepsilon_y,$ or $\varepsilon_z$ to
-$x_0, y_0,$ or $z_0$, respectively.
-
-In contrast, the following initialization of {\tt x} would be INCORRECT:
-
-\begin{verbatim}
-    var x = make_fvar<T,Nx,0>(x0); // WRONG
-\end{verbatim}
-Mathematically, this represents $x_0+\varepsilon_y$, since the last template parameter corresponds to the
-$y$ variable, and thus the resulting value will be invalid.
-
-\subsubsection{Type Promotion}
-
-The previous example can be optimized to save some unnecessary computation, by declaring smaller arrays,
-and relying on autodiff's automatic type-promotion:
-
-\begin{verbatim}
-    using namespace boost::math::differentiation;
-
-    autodiff_fvar<double,Nx> x = make_fvar<double,Nx>(x0);
-    autodiff_fvar<double,0,Ny> y = make_fvar<double,0,Ny>(y0);
-    autodiff_fvar<double,0,0,Nz> z = make_fvar<double,0,0,Nz>(z0);
-
-    autodiff_fvar<double,Nx,Ny,Nz> w = f(x,y,z);
-
-    for (size_t nx=0 ; nx<=Nx ; ++nx)
-        for (size_t ny=0 ; ny<=Ny ; ++ny)
-            for (size_t nz=0 ; nz<=Nz ; ++nz)
-                std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == "
-                    << w.derivative(nx,ny,nz) << std::endl;
-\end{verbatim}
-For example, if one of the first steps in the computation of $f$ was {\tt z*z}, then a significantly less number of
-multiplications and additions may occur if {\tt z} is declared as {\tt autodiff\_fvar<double,0,0,Nz>} as opposed to \\
-{\tt autodiff\_fvar<double,Nx,Ny,Nz>}. There is no loss of precision with the former, since the extra dimensions
-represent 0 values. Once {\tt z} is combined with {\tt x} and {\tt y} during the computation, the types will be
-promoted as necessary.  This is the recommended way to initialize variables in autodiff.
-
-\section{Function Writing Guidelines}
-
-At a high level there is one fairly simple principle, intuitively speaking, to writing functions for which autodiff
-can effectively calculate derivatives for: \\
-
-{\bf Autodiff Function Principle (AFP)}
-\begin{displayquote}
-A function that is piecewise analytic over non-singleton intervals, with smooth transitions between the intervals,
-and is free of indeterminate forms in the final value and higher order derivatives, will work fine with autodiff.
-\end{displayquote}
-Stating this with greater mathematical rigor can be done. However what seems to be more practical, in this
-case, is to give examples and categories of examples of what works, what doesn't, and how to remedy some of the
-common problems that may be encountered. That is the approach taken here.
-
-\subsection{Example 1: $f(x)=\max(0,x)$}
-
-One potential implementation of $f(x)=\max(0,x)$ is:
-
-\begin{verbatim}
-    template<typename T>
-    T f(const T& x)
-    {
-        return 0 < x ? x : 0;
-    }
-\end{verbatim}
-Though this is consistent with Section~\ref{migrate}, there are two problems with it:
-
-\begin{enumerate}
-\item {\tt f(nan) = 0}. This problem is independent of autodiff, but is worth addressing anyway. If there is
-    an indeterminate form that arises within a calculation and is input into $f$, then it gets ``covered up'' by
-    this implementation leading to an unknowingly incorrect result. Better for functions in general to propagate
-    NaN values, so that the developer can track down where the NaN originated from and remedy it if possible.
-\item $f'(0) = 0$ when autodiff is applied. This is because {\tt f} returns 0 as a constant when {\tt x==0}, wiping
-    out any of the derivatives (or sensitivities) that {\tt x} was holding as an autodiff variable. Instead, let us
-    apply the AFP and identify the two intervals over which $f$ is defined: $(-\infty,0]\cup(0,\infty)$.
-    Though the function itself is not analytic at $x=0$, we can attempt somewhat to smooth out this transition
-    point by averaging the calculation of $f(x)$ for $x=0$ from each interval. If $x<0$ then the result is simply
-    0, and if $0<x$ then the result is $x$. The average is $\frac{1}{2}(0 + x)$ which will allow autodiff to
-    calculate $f'(0)=\frac{1}{2}$. This is a more reasonable answer.
-\end{enumerate}
-A better implementation that resolves both issues is:
-\begin{verbatim}
-    template<typename T>
-    T f(const T& x)
-    {
-        if (x < 0)
-            return 0;
-        else if (x == 0)
-            return 0.5*x;
-        else
-            return x;
-    }
-\end{verbatim}
-
-\subsection{Example 2: $f(x)=\sinc(x)$}
-
-The definition of $\sinc:\mathbb{R}\rightarrow\mathbb{R}$ is
-
-\[
-\sinc(x) = \begin{cases}
-    1 &\text{if}\; x = 0 \\
-    \frac{\sin(x)}{x} &\text{otherwise.}\end{cases}
-\]
-A potential implementation is:
-
-\begin{verbatim}
-    template<typename T>
-    T sinc(const T& x)
-    {
-        using std::sin;
-        return x == 0 ? 1 : sin(x) / x;
-    }
-\end{verbatim}
-Though this is again consistent with Section~\ref{migrate}, and returns correct non-derivative values,
-it returns a constant when {\tt x==0} thereby losing all derivative information contained in {\tt x} and
-contributions from $\sinc$. For example, though $\sinc''(0)=-\frac{1}{3}$, {\tt y.derivative(2) == 0} when
-{\tt y = sinc(make\_fvar<double,2>(0))} using the above incorrect implementation. Applying the AFP, the intervals
-upon which separate branches of logic are applied are $(-\infty,0)\cup[0,0]\cup(0,\infty)$. The violation occurs
-due to the singleton interval $[0,0]$, even though a constant function of 1 is technically analytic. The remedy
-is to define a custom $\sinc$ overload and add it to the autodiff library. This has been done. Mathematically, it
-is well-defined and free of indeterminate forms, as is the \nth{3} expression in the equalities
-\[
-\frac{1}{x}\sin(x) = \frac{1}{x}\sum_{n=0}^\infty\frac{(-1)^n}{(2n+1)!}x^{2n+1}
-    = \sum_{n=0}^\infty\frac{(-1)^n}{(2n+1)!}x^{2n}.
-\]
-The autodiff library contains helper functions to help write function overloads when the derivatives of a function
-are known. This is an advanced feature and documentation for this will be added at a later time.
-
-For now, it worth understanding the ways in which indeterminate forms can occur within a mathematical calculation,
-and avoid them when possible, by rewriting the function. Table~\ref{3nans} compares 3 types of indeterminate
-forms. Assume the product {\tt a*b} is a positive finite value.
-
-\begin{table}[h]
-\centering\begin{tabular}{m{7em}||c|c|c}
- & $\displaystyle f(x)=\left(\frac{a}{x}\right)\times(bx^2)$
- & $\displaystyle g(x)=\left(\frac{a}{x}\right)\times(bx)$
- & $\displaystyle h(x)=\left(\frac{a}{x^2}\right)\times(bx)$ \\[0.618em]
-\hline\hline
-Mathematical\newline Limit
- & $\displaystyle\lim_{x\rightarrow0}f(x) = 0$
- & $\displaystyle\lim_{x\rightarrow0}g(x) = ab$
- & $\displaystyle\lim_{x\rightarrow0}h(x) = \infty$ \\
-\hline
-Floating Point\newline Arithmetic
- & {\tt f(0) = inf*0 = nan} & {\tt g(0) = inf*0 = nan} & {\tt h(0) = inf*0 = nan}
-\end{tabular}
-\caption{Automatic differentiation does not compute limits.
-Indeterminate forms must be simplified manually. (These cases are not meant to be exhaustive.)}\label{3nans}
-\end{table}
-
-Indeterminate forms result in NaN values within a calculation. Mathematically, if they occur at singular points, then
-we generally prefer the mathematical limit as the result, even if it is infinite. As demonstrated in Table~\ref{3nans},
-depending upon the nature of the indeterminate form, the mathematical limit can be 0 (no matter the values of
-$a$ or $b$), or $ab$, or $\infty$, but these 3 cases cannot be distinguished by the floating point result of nan
-directly. Floating point arithmetic does not perform limits (directly), and neither does the autodiff library.
-Thus it is up to the diligence of the developer to keep a watchful eye over where indeterminate forms can arise.
-
-\subsection{Example 3: $f(x)=\sqrt x$ and $f'(0)=\infty$}
-
-When working with functions that have infinite higher order derivatives, this can very quickly result in nans in
-higher order derivatives as the computation progresses, since {\tt 0*inf} and {\tt inf-inf} both result in {\tt nan}.
-See Table~\ref{sqrtnan} for an example.
-
-\begin{table}[h]
-\centering\begin{tabular}{c||c|c|c|c}
-$f(x)$ & $f(0)$ & $f'(0)$ & $f''(0)$ & $f'''(0)$ \\
-\hline\hline
-{\tt sqrt(x)} & {\tt 0} & {\tt inf} & {\tt -inf} & {\tt inf} \\
-\hline
-{\tt sqr(sqrt(x)+1)} & {\tt 1} & {\tt inf} & {\tt nan} & {\tt nan} \\
-\hline
-{\tt x+2*sqrt(x)+1} & {\tt 1} & {\tt inf} & {\tt -inf}& {\tt inf}
-\end{tabular}
-\caption{Indetermine forms in higher order derivatives. {\tt sqr(x) == x*x}.}\label{sqrtnan}
-\end{table}
-
-Calling the autodiff-overloaded implementation of $f(x)=\sqrt x$ at the value {\tt x==0} results the \nth{1}
-row (after the header row) of Table~\ref{sqrtnan}, as is mathematically correct. The \nth{2} row in which
-$f(x)=(\sqrt{x}+1)^2$ results in {\tt nan} values for $f''(0)$ and all higher order derivatives. This is due
-to the internal arithmetic in which {\tt inf} was added to {\tt -inf} during the squaring, resulting in a
-{\tt nan} value for $f''(0)$ and all higher orders. This is typical of {\tt inf} values in autodiff. Where they
-show up, they are correct, however they can quickly introduce {\tt nan} values into the computation upon the
-addition of oppositely signed {\tt inf} values, division by {\tt inf}, or multiplication by {\tt 0}. It is
-worth noting that the infection of {\tt nan} only spreads upward in the order of derivatives, since lower
-orders do not depend upon high orders (which is also why ignoring higher order terms in an autodiff computation
-does not result in the loss of precision for lower order terms.)
-
-The resolution in this case is to manually perform the squaring, replacing the \nth{2} row with the \nth{3}:
-$f(x)=x+2\sqrt{x}+1$. Though mathematically equivalent, it allows autodiff to avoid {\tt nan} values since
-$\sqrt x$ is more ``isolated'' in the computation. That is, the {\tt inf} values that unavoidably show up
-in the derivatives of {\tt sqrt(x)} for {\tt x==0} do not have the chance to interact with other {\tt inf} as
-with the squaring.
-
-\subsection{Summary}
-
-The AFP gives a high-level unified guiding principle for writing C++ template functions that autodiff can
-effectively evaluate derivatives for.
-
-Examples have been given to illustrate some common items to avoid doing:
-
-\begin{enumerate}
-\item It is not enough for functions to be piecewise continuous. On boundary points between intervals, return the
-    average value of both intervals. Example: $\max(0,x)$ at $x=0$.
-\item Avoid returning individual constant values (e.g. $\sinc(0)=1$.) Values must be computed uniformly along
-    with other values in its local interval. If that is not possible, then the function must be overloaded to
-    compute the derivatives precisely.
-\item Avoid intermediate indeterminate values in both the value ($\sinc(x)$ at $x=0$) and derivatives
-    ($(\sqrt{x}+1)^2$ at $x=0$). Try to isolate expressions that may contain infinite values/derivatives so
-    that they do not introduce NaN values into the computation.
-\end{enumerate}
-This is not an exhaustive list, and will be added to as examples are encountered.
-
-%In order to write a function that accurately calculates derivatives for use with autodiff, there are a few guidelines
-%that will help in getting accurate derivatives:
+%\section{Usage}
 %
-%\begin{itemize}
-%\item Operate on open intervals of real numbers as a whole, rather than individual points.  Avoid
-%returning values based on individual point values in the domain.  For example, if an implementation of the
-%{\tt fourth\_power()} function above has as its first statement {\tt if (x == 2) return 16; } then no
-%derivatives will be available for $x=2$; instead {\tt y.derivative(i) == 0} for all {\tt i>0}. Each value within a
-%connected subset of real numbers must be calculated in terms of an analytic function. The extent to which it is not
-%will be reflected in the inaccuracy of the derivatives.
-%\item Avoid intermediate singularities in both the calculated value and its derivatives. For example, $y=\sqrt{x}$
-%followed by $z=y^2$ may appear to be safe for $x\ge0$ however when $x=0$ then all non-zero derivatives of $z$ will
-%be NaN. This is due to the infinite derivative of $y=\sqrt{x}$ at $x=0$.
-%\item When constructing a piecewise analytic function, take the average value of each side of the domain for points
-%on the boundary between analytic functions. For example, the function $g(x) = \max(0,x)$ should be
-%defined in this manner:
-%    \begin{verbatim}
-%        template<typename T>
-%        T g(const T& x)
-%        {
-%            if (x < 0)
-%                return static_cast<T>(0);
-%            else if (x == 0)
-%                return 0.5*x;
-%            else
-%                return x; // also g(nan) is nan
-%        }
-%    \end{verbatim}
-%This returns sensible values for both $g(0)=0$ and $g'(0)=\frac{1}{2}$.
-%\end{itemize}
-
-%\subsection{Indeterminate Forms}
+%\subsection{Single Variable}
 %
-%To write a function that lends itself to the accurate calculation of derivatives with autodiff,
-%there are two primary guildelines:
+%To calculate derivatives of a single variable $x$, at a particular value $x_0$, the following must be
+%specified at compile-time:
 %
 %\begin{enumerate}
-%\item Write functions that are piecewise analytic on open intervals. Points on the edge of two adjacent intervals
-%    should be evaluated as the arithmetic average of each branch.
-%\item Avoid indeterminate values.
+%\item The numeric data type {\tt T} of $x_0$. Examples: {\tt double},
+%    {\tt boost::multiprecision::cpp\_bin\_float\_50}, etc.
+%\item The maximum derivative order $M$ that is to be calculated with respect to $x$.
 %\end{enumerate}
-%Let us look at each point in greater detail.
+%Note that both of these requirements are entirely analogous to declaring and using a {\tt std::array<T,N>}. {\tt T}
+%and {\tt N} must be set as compile-time, but which elements in the array are accessed can be determined at run-time,
+%just as the choice of what derivatives to query in autodiff can be made during run-time.
 %
-%\subsubsection{Write Functions as Piecewise Analytic on Open Intervals}
+%To declare and initialize $x$:
 %
-%Consider the implementation of a real function $f:D\rightarrow\mathbb{R}$ where $D\subseteq\mathbb{R}$.
-%Depending on the value of $x\in D$, different branches of logic are executed resulting in different
-%formulas being applied to $x$ resulting in the final value of $f(x)$. These branches of logic partition $D$
-%into a finite number of disjoint subsets $D_i$, each of which re
+%\begin{verbatim}
+%    using namespace boost::math::differentiation;
+%    autodiff_fvar<T,M> x = make_fvar<T,M>(x0);
+%\end{verbatim}
+%where {\tt x0} is a run-time value of type {\tt T}. Assuming {\tt 0 < M}, this represents the polynomial $x_0 +
+%\varepsilon$. Internally, the member variable of type {\tt std::array<T,M>} is {\tt v = \{ x0, 1, 0, 0, ... \}},
+%consistent with the above mathematical treatise.
 %
-%\subsubsection{Avoid Indeterminate Values}
-
-%To calculate derivatives accurately:
+%To find the derivatives $f^{(n)}(x_0)$ for $0\le n\le M$ of a function
+%$f : \mathbb{R}\rightarrow\mathbb{R}$, the function can be represented as a template
+%
+%\begin{verbatim}
+%    template<typename T>
+%    T f(T x);
+%\end{verbatim}
+%Using a generic type {\tt T} allows for {\tt x} to be of a regular type such as {\tt double}, but also allows for\\
+%{\tt boost::math::differentiation::autodiff\_fvar<>} types.
+%
+%Internal calls to mathematical functions must allow for
+%\href{https://en.cppreference.com/w/cpp/language/adl}{argument-dependent lookup} (ADL). Many standard library functions
+%are overloaded in the {\tt boost::math::differentiation} namespace. For example, instead of calling {\tt std::cos(x)}
+%from within {\tt f}, include the line {\tt using std::cos;} and call {\tt cos(x)} without a namespace prefix.
+%
+%Calling $f$ and retrieving the calculated value and derivatives:
+%
+%\begin{verbatim}
+%    using namespace boost::math::differentiation;
+%    autodiff_fvar<T,M> x = make_fvar<T,M>(x0);
+%    autodiff_fvar<T,M> y = f(x);
+%    for (int n=0 ; n<=M ; ++n)
+%        std::cout << "y.derivative("<<n<<") == " << y.derivative(n) << std::endl;
+%\end{verbatim}
+%{\tt y.derivative(0)} returns the undifferentiated value $f(x_0)$, and {\tt y.derivative(n)} returns $f^{(n)}(x_0)$.
+%Casting {\tt y} to type {\tt T} also gives the undifferentiated value. In other words, the following 3 values
+%are equal:
 %
 %\begin{enumerate}
-%\item All computations must be done using overloaded autodiff operators or functions.
+%\item {\tt f(x0)}
+%\item {\tt y.derivative(0)}
+%\item {\tt static\_cast<T>(y)}
 %\end{enumerate}
+%
+%\subsection{Multiple Variables}
+%
+%Independent variables are represented in autodiff as independent dimensions within a multi-dimensional array.
+%This is perhaps best illustrated with examples. The {\tt namespace boost::math::differentiation} is assumed.
+%
+%The following instantiates a variable of $x=13$ with up to 3 orders of derivatives:
+%
+%\begin{verbatim}
+%    autodiff_fvar<double,3> x = make_fvar<double,3>(13);
+%\end{verbatim}
+%This instantiates {\bf an independent} value of $y=14$ with up to 4 orders of derivatives:
+%
+%\begin{verbatim}
+%    autodiff_fvar<double,0,4> y = make_fvar<double,0,4>(14);
+%\end{verbatim}
+%Combining them together {\bf promotes} their data type automatically to the smallest multidimensional array that
+%accommodates both.
+%
+%\begin{verbatim}
+%    // z is promoted to autodiff_fvar<double,3,4>
+%    auto z = 10*x*x + 50*x*y + 100*y*y;
+%\end{verbatim}
+%The object {\tt z} holds a 2-dimensional array, thus {\tt derivative(...)} is a 2-parameter method:
+%
+%\[
+%{\tt z.derivative(i,j)} = \frac{\partial^{i+j}f}{\partial x^i\partial y^j}(13,14)
+%    \qquad \text{for}\; (i,j)\in\{0,1,2,3\}\times\{0,1,2,3,4\}.
+%\]
+%A few values of the result can be confirmed through inspection:
+%
+%\begin{verbatim}
+%    z.derivative(2,0) == 20
+%    z.derivative(1,1) == 50
+%    z.derivative(0,2) == 200
+%\end{verbatim}
+%Note how the position of the parameters in {\tt derivative(...)} match how {\tt x} and {\tt y} were declared.
+%This will be clarified next.
+%
+%\subsubsection{Two Rules of Variable Initialization}
+%
+%In general, there are two rules to keep in mind when dealing with multiple variables:
+%
+%\begin{enumerate}
+%\item Independent variables correspond to parameter position, in both the initialization {\tt make\_fvar<T,...>}
+%    and calls to {\tt derivative(...)}.
+%\item The last template position in {\tt make\_fvar<T,...>} determines which variable a derivative will be
+%   taken with respect to.
+%\end{enumerate}
+%Both rules are illustrated with an example in which there are 3 independent variables $x,y,z$ and 1 dependent
+%variable $w=f(x,y,z)$, though the following code readily generalizes to any number of independent variables, limited
+%only by the C++ compiler/memory/platform. The maximum derivative order of each variable is {\tt Nx}, {\tt Ny}, and
+%{\tt Nz}, respectively. Then the type for {\tt w} is {\tt boost::math::differentiation::autodiff\_fvar<T,Nx,Ny,Nz>}
+%and all possible mixed partial derivatives are available via
+%
+%\[
+%{\tt w.derivative(nx,ny,nz)} =
+%    \frac{\partial^{n_x+n_y+n_z}f}{\partial x^{n_x}\partial y^{n_y}\partial z^{n_z} }(x_0,y_0,z_0)
+%\]
+%for $(n_x,n_y,n_z)\in\{0,1,2,...,N_x\}\times\{0,1,2,...,N_y\}\times\{0,1,2,...,N_z\}$ where $x_0, y_0, z_0$ are
+%the numerical values at which the function $f$ and its derivatives are evaluated.
+%
+%In code:
+%\begin{verbatim}
+%    using namespace boost::math::differentiation;
+%
+%    using var = autodiff_fvar<double,Nx,Ny,Nz>; // Nx, Ny, Nz are constexpr size_t.
+%
+%    var x = make_fvar<double,Nx>(x0);       // x0 is of type double
+%    var y = make_fvar<double,Nx,Ny>(y0);    // y0 is of type double
+%    var z = make_fvar<double,Nx,Ny,Nz>(z0); // z0 is of type double
+%
+%    var w = f(x,y,z);
+%
+%    for (size_t nx=0 ; nx<=Nx ; ++nx)
+%        for (size_t ny=0 ; ny<=Ny ; ++ny)
+%            for (size_t nz=0 ; nz<=Nz ; ++nz)
+%                std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == "
+%                    << w.derivative(nx,ny,nz) << std::endl;
+%\end{verbatim}
+%Note how {\tt x}, {\tt y}, and {\tt z} are initialized: the last template parameter determines which variable
+%$x, y,$ or $z$ a derivative is taken with respect to. In terms of the $\varepsilon$-polynomials
+%above, this determines whether to add $\varepsilon_x, \varepsilon_y,$ or $\varepsilon_z$ to
+%$x_0, y_0,$ or $z_0$, respectively.
+%
+%In contrast, the following initialization of {\tt x} would be INCORRECT:
+%
+%\begin{verbatim}
+%    var x = make_fvar<T,Nx,0>(x0); // WRONG
+%\end{verbatim}
+%Mathematically, this represents $x_0+\varepsilon_y$, since the last template parameter corresponds to the
+%$y$ variable, and thus the resulting value will be invalid.
+%
+%\subsubsection{Type Promotion}
+%
+%The previous example can be optimized to save some unnecessary computation, by declaring smaller arrays,
+%and relying on autodiff's automatic type-promotion:
+%
+%\begin{verbatim}
+%    using namespace boost::math::differentiation;
+%
+%    autodiff_fvar<double,Nx> x = make_fvar<double,Nx>(x0);
+%    autodiff_fvar<double,0,Ny> y = make_fvar<double,0,Ny>(y0);
+%    autodiff_fvar<double,0,0,Nz> z = make_fvar<double,0,0,Nz>(z0);
+%
+%    autodiff_fvar<double,Nx,Ny,Nz> w = f(x,y,z);
+%
+%    for (size_t nx=0 ; nx<=Nx ; ++nx)
+%        for (size_t ny=0 ; ny<=Ny ; ++ny)
+%            for (size_t nz=0 ; nz<=Nz ; ++nz)
+%                std::cout << "w.derivative("<<nx<<','<<ny<<','<<nz<<") == "
+%                    << w.derivative(nx,ny,nz) << std::endl;
+%\end{verbatim}
+%For example, if one of the first steps in the computation of $f$ was {\tt z*z}, then a significantly less number of
+%multiplications and additions may occur if {\tt z} is declared as {\tt autodiff\_fvar<double,0,0,Nz>} as opposed to \\
+%{\tt autodiff\_fvar<double,Nx,Ny,Nz>}. There is no loss of precision with the former, since the extra dimensions
+%represent 0 values. Once {\tt z} is combined with {\tt x} and {\tt y} during the computation, the types will be
+%promoted as necessary.  This is the recommended way to initialize variables in autodiff.
 
 \section{Migrating Code for Autodiff Compatibility}\label{migrate}
 
@@ -1107,10 +874,184 @@ This example also provides an opportunity to point out some of the advantages of
    methods even with the best choice of $\Delta x$.
 \end{itemize}
 
+\section{Function Writing Guidelines}
+
+At a high level there is one fairly simple principle, intuitively speaking, to writing functions for which autodiff
+can effectively calculate derivatives for: \\
+
+{\bf Autodiff Function Principle (AFP)}
+\begin{displayquote}
+A function that is piecewise analytic over non-singleton intervals, with smooth transitions between the intervals,
+and is free of indeterminate forms in the calculated value and higher order derivatives, will work fine with autodiff.
+\end{displayquote}
+Stating this with greater mathematical rigor can be done. However what seems to be more practical, in this
+case, is to give examples and categories of examples of what works, what doesn't, and how to remedy some of the
+common problems that may be encountered. That is the approach taken here.
+
+\subsection{Example 1: $f(x)=\max(0,x)$}
+
+One potential implementation of $f(x)=\max(0,x)$ is:
+
+\begin{verbatim}
+    template<typename T>
+    T f(const T& x)
+    {
+        return 0 < x ? x : 0;
+    }
+\end{verbatim}
+Though this is consistent with Section~\ref{migrate}, there are two problems with it:
+
+\begin{enumerate}
+\item {\tt f(nan) = 0}. This problem is independent of autodiff, but is worth addressing anyway. If there is
+    an indeterminate form that arises within a calculation and is input into $f$, then it gets ``covered up'' by
+    this implementation leading to an unknowingly incorrect result. Better for functions in general to propagate
+    NaN values, so that the user knows something went wrong and doesn't rely on an incorrect result, and likewise
+    the developer can track down where the NaN originated from and remedy it.
+\item $f'(0) = 0$ when autodiff is applied. This is because {\tt f} returns 0 as a constant when {\tt x==0}, wiping
+    out any of the derivatives (or sensitivities) that {\tt x} was holding as an autodiff variable. Instead, let us
+    apply the AFP and identify the two intervals over which $f$ is defined: $(-\infty,0]\cup(0,\infty)$.
+    Though the function itself is not analytic at $x=0$, we can attempt somewhat to smooth out this transition
+    point by averaging the calculation of $f(x)$ at $x=0$ from each interval. If $x<0$ then the result is simply
+    0, and if $0<x$ then the result is $x$. The average is $\frac{1}{2}(0 + x)$ which will allow autodiff to
+    calculate $f'(0)=\frac{1}{2}$. This is a more reasonable answer.
+\end{enumerate}
+A better implementation that resolves both issues is:
+\begin{verbatim}
+    template<typename T>
+    T f(const T& x)
+    {
+        if (x < 0)
+            return 0;
+        else if (x == 0)
+            return 0.5*x;
+        else
+            return x;
+    }
+\end{verbatim}
+
+\subsection{Example 2: $f(x)=\sinc(x)$}
+
+The definition of $\sinc:\mathbb{R}\rightarrow\mathbb{R}$ is
+
+\[
+\sinc(x) = \begin{cases}
+    1 &\text{if}\; x = 0 \\
+    \frac{\sin(x)}{x} &\text{otherwise.}\end{cases}
+\]
+A potential implementation is:
+
+\begin{verbatim}
+    template<typename T>
+    T sinc(const T& x)
+    {
+        using std::sin;
+        return x == 0 ? 1 : sin(x) / x;
+    }
+\end{verbatim}
+Though this is again consistent with Section~\ref{migrate}, and returns correct non-derivative values,
+it returns a constant when {\tt x==0} thereby losing all derivative information contained in {\tt x} and
+contributions from $\sinc$. For example, though $\sinc''(0)=-\frac{1}{3}$, {\tt y.derivative(2) == 0} when
+{\tt y = sinc(make\_fvar<double,2>(0))} using the above incorrect implementation. Applying the AFP, the intervals
+upon which separate branches of logic are applied are $(-\infty,0)\cup[0,0]\cup(0,\infty)$. The violation occurs
+due to the singleton interval $[0,0]$, even though a constant function of 1 is technically analytic. The remedy
+is to define a custom $\sinc$ overload and add it to the autodiff library. This has been done. Mathematically, it
+is well-defined and free of indeterminate forms, as is the \nth{3} expression in the equalities
+\[
+\frac{1}{x}\sin(x) = \frac{1}{x}\sum_{n=0}^\infty\frac{(-1)^n}{(2n+1)!}x^{2n+1}
+    = \sum_{n=0}^\infty\frac{(-1)^n}{(2n+1)!}x^{2n}.
+\]
+The autodiff library contains helper functions to help write function overloads when the derivatives of a function
+are known. This is an advanced feature and documentation for this will be added at a later time.
+
+For now, it is worth understanding the ways in which indeterminate forms can occur within a mathematical calculation,
+and avoid them when possible, by rewriting the function. Table~\ref{3nans} compares 3 types of indeterminate
+forms. Assume the product {\tt a*b} is a positive finite value.
+
+\begin{table}[h]
+\centering\begin{tabular}{m{7em}||c|c|c}
+ & $\displaystyle f(x)=\left(\frac{a}{x}\right)\times(bx^2)$
+ & $\displaystyle g(x)=\left(\frac{a}{x}\right)\times(bx)$
+ & $\displaystyle h(x)=\left(\frac{a}{x^2}\right)\times(bx)$ \\[0.618em]
+\hline\hline
+Mathematical\newline Limit
+ & $\displaystyle\lim_{x\rightarrow0}f(x) = 0$
+ & $\displaystyle\lim_{x\rightarrow0}g(x) = ab$
+ & $\displaystyle\lim_{x\rightarrow0}h(x) = \infty$ \\
+\hline
+Floating Point\newline Arithmetic
+ & {\tt f(0) = inf*0 = nan} & {\tt g(0) = inf*0 = nan} & {\tt h(0) = inf*0 = nan}
+\end{tabular}
+\caption{Automatic differentiation does not compute limits.
+Indeterminate forms must be simplified manually. (These cases are not meant to be exhaustive.)}\label{3nans}
+\end{table}
+
+Indeterminate forms result in NaN values within a calculation. Mathematically, if they occur at singular points, then
+we generally prefer the mathematical limit as the result, even if it is infinite. As demonstrated in Table~\ref{3nans},
+depending upon the nature of the indeterminate form, the mathematical limit can be 0 (no matter the values of
+$a$ or $b$), or $ab$, or $\infty$, but these 3 cases cannot be distinguished by the floating point result of nan
+directly. Floating point arithmetic does not perform limits (directly), and neither does the autodiff library.
+Thus it is up to the diligence of the developer to keep a watchful eye over where indeterminate forms can arise.
+
+\subsection{Example 3: $f(x)=\sqrt x$ and $f'(0)=\infty$}
+
+When working with functions that have infinite higher order derivatives, this can very quickly result in nans
+in higher order derivatives as the computation progresses, as {\tt inf-inf}, {\tt inf/inf}, and {\tt 0*inf} and
+result in {\tt nan}. See Table~\ref{sqrtnan} for an example.
+
+\begin{table}[h]
+\centering\begin{tabular}{c||c|c|c|c}
+$f(x)$ & $f(0)$ & $f'(0)$ & $f''(0)$ & $f'''(0)$ \\
+\hline\hline
+{\tt sqrt(x)} & {\tt 0} & {\tt inf} & {\tt -inf} & {\tt inf} \\
+\hline
+{\tt sqr(sqrt(x)+1)} & {\tt 1} & {\tt inf} & {\tt nan} & {\tt nan} \\
+\hline
+{\tt x+2*sqrt(x)+1} & {\tt 1} & {\tt inf} & {\tt -inf}& {\tt inf}
+\end{tabular}
+\caption{Indetermine forms in higher order derivatives. {\tt sqr(x) == x*x}.}\label{sqrtnan}
+\end{table}
+
+Calling the autodiff-overloaded implementation of $f(x)=\sqrt x$ at the value {\tt x==0} results in the
+\nth{1} row (after the header row) of Table~\ref{sqrtnan}, as is mathematically correct. The \nth{2} row shows
+$f(x)=(\sqrt{x}+1)^2$ resulting in {\tt nan} values for $f''(0)$ and all higher order derivatives. This is due to
+the internal arithmetic in which {\tt inf} was added to {\tt -inf} during the squaring, resulting in a {\tt nan}
+value for $f''(0)$ and all higher orders. This is typical of {\tt inf} values in autodiff. Where they show up,
+they are correct, however they can quickly introduce {\tt nan} values into the computation upon the addition of
+oppositely signed {\tt inf} values, division by {\tt inf}, or multiplication by {\tt 0}. It is worth noting that
+the infection of {\tt nan} only spreads upward in the order of derivatives, since lower orders do not depend upon
+higher orders (which is also why dropping higher order terms in an autodiff computation does not result in any
+loss of precision for lower order terms.)
+
+The resolution in this case is to manually perform the squaring in the computation, replacing the \nth{2} row
+with the \nth{3}: $f(x)=x+2\sqrt{x}+1$. Though mathematically equivalent, it allows autodiff to avoid {\tt nan}
+values since $\sqrt x$ is more ``isolated'' in the computation. That is, the {\tt inf} values that unavoidably
+show up in the derivatives of {\tt sqrt(x)} for {\tt x==0} do not have the chance to interact with other {\tt inf}
+as with the squaring.
+
+\subsection{Summary}
+
+The AFP gives a high-level unified guiding principle for writing C++ template functions that autodiff can
+effectively evaluate derivatives for.
+
+Examples have been given to illustrate some common items to avoid doing:
+
+\begin{enumerate}
+\item It is not enough for functions to be piecewise continuous. On boundary points between intervals, return the
+    average expression of both intervals, rather than just one of them. Example: $\max(0,x)$ at $x=0$.
+\item Avoid returning individual constant values (e.g. $\sinc(0)=1$.) Values must be computed uniformly along
+    with other values in its local interval. If that is not possible, then the function must be overloaded to
+    compute the derivatives precisely.
+\item Avoid intermediate indeterminate values in both the value ($\sinc(x)$ at $x=0$) and derivatives
+    ($(\sqrt{x}+1)^2$ at $x=0$). Try to isolate expressions that may contain infinite values/derivatives so
+    that they do not introduce NaN values into the computation.
+\end{enumerate}
+This is not an exhaustive list, and will be added to as examples are encountered.
+
 \section{Acknowledgments}
 
 \begin{itemize}
-\item Kedar Bhat --- C++11 compatibility, Boost Special Functions compatibility, codecov integration, and feedback.
+\item Kedar Bhat --- C++11 compatibility, Boost Special Functions compatibility testing, codecov integration,
+    and feedback.
 \item Nick Thompson --- Initial feedback and help with Boost integration.
 \item John Maddock --- Initial feedback and help with Boost integration.
 \end{itemize}

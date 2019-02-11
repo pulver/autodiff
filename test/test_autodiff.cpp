@@ -1998,24 +1998,21 @@ struct boost_special_functions_test
         // i=0.125 -> 1.576986771215812988 != 1.57698677121581321
         BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(i)), math::ellint_1(static_cast<T>(i)), pct_epsilon);
       }
-      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {0.875, -4.0}, {-0.625, 8.0}, {0.875,1e-5}, {0.009765625, 1e5}}) {
+      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {0.875, -4.0}, {-0.625, 8.0}, {0.875,1e-5}, {100/1024.0, 1e5}}) {
         BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(p.first), make_fvar<T,m>(p.second)), math::ellint_1(static_cast<T>(p.first), static_cast<T>(p.second)), pct_epsilon);
       }
     }
 
     // ellint_2.hpp
     {
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(1.01)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(-1.01)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE(math::ellint_2(make_fvar<T, m>(-1)) == math::ellint_2(static_cast<T>(-1)));
-      BOOST_REQUIRE(math::ellint_2(make_fvar<T, m>(1)) == math::ellint_2(static_cast<T>(1)));
-      BOOST_REQUIRE_CLOSE(math::ellint_2(static_cast<T>(0.5), make_fvar<T, m>(0.5)),
-                          math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(0.5), make_fvar<T, m>(0.5)),
-                          math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(0.5)), math::ellint_2(static_cast<T>(0.5)), pct_epsilon);
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
+      for (auto i : {-1024.0, -900.0, -800.0, -600.0, -512.0, 0.0, 100.0, 200.0, 300.0, 400.0}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(i/1024)), math::ellint_2(static_cast<T>(i/1024)), 1.5*pct_epsilon);
+      }
+      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {900/1024.0, -4.0}, {-600/1024.0, 8.0}, {800.0/1024,1e-5}, {100/1024.0, 1e5}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(p.first), make_fvar<T,m>(p.second)), math::ellint_2(static_cast<T>(p.first), static_cast<T>(p.second)), pct_epsilon*1.5);
+      }
     }
 
     // ellint_3.hpp, ellint_d.hpp

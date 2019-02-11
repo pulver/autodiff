@@ -30,6 +30,7 @@ boost::fusion::vector<> multiprecision_float_types;
 
 using namespace boost::math::differentiation;
 
+
 template<typename W,typename X,typename Y,typename Z>
 promote<W,X,Y,Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z)
 {
@@ -1874,6 +1875,7 @@ BOOST_AUTO_TEST_CASE(black_scholes)
     boost::fusion::for_each(bin_float_types, black_scholes_test());
 }
 
+
 // Compilation tests for boost special functions.
 struct boost_special_functions_test
 {
@@ -1966,6 +1968,8 @@ struct boost_special_functions_test
       }
     }
 
+    //TODO(kbhat): chebyshev_transform.hpp
+
     // cos_pi.hpp
     {
       // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
@@ -1998,8 +2002,8 @@ struct boost_special_functions_test
         // i=0.125 -> 1.576986771215812988 != 1.57698677121581321
         BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(i)), math::ellint_1(static_cast<T>(i)), pct_epsilon);
       }
-      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {0.875, -4.0}, {-0.625, 8.0}, {0.875,1e-5}, {100/1024.0, 1e5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(p.first), make_fvar<T,m>(p.second)), math::ellint_1(static_cast<T>(p.first), static_cast<T>(p.second)), pct_epsilon);
+      for (auto p : std::initializer_list<std::tuple<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {0.875, -4.0}, {-0.625, 8.0}, {0.875,1e-5}, {100/1024.0, 1e5}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(std::get<0>(p)), make_fvar<T,m>(std::get<1>(p))), math::ellint_1(std::get<0>(p), std::get<1>(p)), pct_epsilon);
       }
     }
 
@@ -2010,34 +2014,40 @@ struct boost_special_functions_test
       for (auto i : {-1024.0, -900.0, -800.0, -600.0, -512.0, 0.0, 100.0, 200.0, 300.0, 400.0}) {
         BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(i/1024)), math::ellint_2(static_cast<T>(i/1024)), 1.5*pct_epsilon);
       }
-      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {900/1024.0, -4.0}, {-600/1024.0, 8.0}, {800.0/1024,1e-5}, {100/1024.0, 1e5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(p.first), make_fvar<T,m>(p.second)), math::ellint_2(static_cast<T>(p.first), static_cast<T>(p.second)), pct_epsilon*1.5);
+      for (auto p : std::initializer_list<std::tuple<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {900/1024.0, -4.0}, {-600/1024.0, 8.0}, {800.0/1024,1e-5}, {100/1024.0, 1e5}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(std::get<0>(p)), make_fvar<T,m>(std::get<1>(p))), math::ellint_2(std::get<0>(p), std::get<1>(p)), 1.5*pct_epsilon);
       }
     }
 
-    // ellint_3.hpp, ellint_d.hpp
+    // ellint_3.hpp
     {
-      const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1.01), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(-1.01), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(-1), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(static_cast<T>(1.01), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(static_cast<T>(-1.01), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(static_cast<T>(1), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(static_cast<T>(-1), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE(math::ellint_3(make_fvar<T, m>(0.5), sin_sq_pi_over_3) == math::ellint_3(static_cast<T>(0.5), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_3(make_fvar<T, m>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(static_cast<T>(0.5), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_3(static_cast<T>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_3(static_cast<T>(0.5), sin_sq_pi_over_3));
-      BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(1.01), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(-1.01), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_d(static_cast<T>(1.01), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_d(static_cast<T>(-1.01), sin_sq_pi_over_3), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(1), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(static_cast<T>(1), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(-1), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(static_cast<T>(-1), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(0.5), sin_sq_pi_over_3) == math::ellint_d(static_cast<T>(0.5), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_d(make_fvar<T, m>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(static_cast<T>(0.5), sin_sq_pi_over_3));
-      BOOST_REQUIRE(math::ellint_d(static_cast<T>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(static_cast<T>(0.5), sin_sq_pi_over_3));
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(1.0001), make_fvar<T,m>(-1), make_fvar<T,m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(0.5), make_fvar<T,m>(20), make_fvar<T,m>(1.5)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(1.0001), make_fvar<T,m>(-1)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(0.5), make_fvar<T,m>(1)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(0.5), make_fvar<T,m>(2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(1), make_fvar<T,m>(0.5), make_fvar<T,m>(2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(1), make_fvar<T,m>(-0.5), make_fvar<T,m>(2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T,m>(1), make_fvar<T,m>(-0.5), make_fvar<T,m>(-2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(0.5), make_fvar<T,m>(2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T,m>(2)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T,m>(-2)), wrapexcept<std::domain_error>);
+      for (auto p : std::initializer_list<std::tuple<T,T>>{{0.2,0.0}, {0.4,0.0}, {0.0,0.0}, {0.0,0.5}, {0.3,-4.0}, {-0.5,-1e5}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_3(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))), math::ellint_3(std::get<0>(p), std::get<1>(p)), pct_epsilon);
+      }
+    }
+    // ellint_d.hpp
+    {
+      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T,m>(1)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T,m>(-1)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T,m>(1.5)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T,m>(-1.5)), wrapexcept<std::domain_error>);
+      for (auto p : { 0.5, 1.0/1024 }) {
+        BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(p)), math::ellint_d(p), pct_epsilon);
+      }
+      for (auto p : std::initializer_list<std::tuple<T,T>>{{0.5,0.5}, {0.5,0}, {0.5,1}, {1,1}, {1,-1}, {0.5,-1}, {0.5,-10}, {-0.5,10}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))), math::ellint_d(std::get<0>(p), std::get<1>(p)), pct_epsilon);
+      }
     }
 
 

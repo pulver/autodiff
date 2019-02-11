@@ -1882,23 +1882,47 @@ struct boost_special_functions_test
   {
     using namespace boost;
     constexpr int m = 3;
-    const T pct_epsilon = 100*std::numeric_limits<T>::epsilon();
+    constexpr T pct_epsilon = math::tools::epsilon<T>() * 100;
+    {
+      // adapted from boost/math/test/test_inv_hyp.cpp
+      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(262145)/262144L), math::acosh(static_cast<T>(262145)/262144L), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(2)), math::acosh(static_cast<T>(2)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(40)), math::acosh(static_cast<T>(40)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(262145L)), math::acosh(static_cast<T>(262145L)), pct_epsilon);
 
-    BOOST_REQUIRE(math::acosh(make_fvar<T,m>(1.5)) == math::acosh(static_cast<T>(1.5)));
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(0)), math::asinh(static_cast<T>(0)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(1) / 262145L), math::asinh(static_cast<T>(1)/262145L), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(0.25)), math::asinh(static_cast<T>(0.25)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(1)), math::asinh(static_cast<T>(1)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(10)), math::asinh(static_cast<T>(10)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(262145L)), math::asinh(static_cast<T>(262145L)), pct_epsilon);
+
+      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(0)), math::atanh(static_cast<T>(0)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(1/262145L)), math::atanh(static_cast<T>(1/262145L)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-1/262145L)), math::atanh(static_cast<T>(-1/262145L)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(0.5)), math::atanh(static_cast<T>(0.5)), pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-0.5)), math::atanh(static_cast<T>(-0.5)), pct_epsilon);
+    }
+
+
+
     // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
     // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
     // then autodiff's iround would properly be called via ADL.
-    //BOOST_REQUIRE(math::airy_ai(make_fvar<T,m>(1)) == math::airy_ai(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)) == math::airy_bi(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)) == math::airy_ai_prime(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)) == math::airy_bi_prime(static_cast<T>(1)));
-    BOOST_REQUIRE(math::asinh(make_fvar<T,m>(0.5)) == math::asinh(0.5));
-    BOOST_REQUIRE(math::atanh(make_fvar<T,m>(0.5)) == math::atanh(0.5));
+    //BOOST_REQUIRE(math::airy_ai(make_fvar<T,m>(1)), math::airy_ai(static_cast<T>(1)));
+    //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
+    //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
+    //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
     BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == math::bernoulli_b2n<T>(1));
     BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == 1/6.0);
 
     // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
     BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T,m>(1.1), make_fvar<T,m>(1.2)), math::beta(static_cast<T>(1.1), static_cast<T>(1.2)), 1.5*pct_epsilon);
+
+    // policy issue
+    //BOOST_REQUIRE(math::ibeta(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.25)), math::ibeta(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.25)));
+    //BOOST_REQUIRE(math::ibetac(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.825)), math::ibetac(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.825)));
+    //BOOST_REQUIRE(math::betac(make_fvar<T,m>(12), make_fvar<T,m>(15), make_fvar<T,m>(0.25))==math::betac(static_cast<T>(12), static_cast<T>(15), static_cast<T>(0.5)));
 
     BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
 
@@ -1926,7 +1950,6 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::ellint_1(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5), static_cast<T>(0.5)));
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5), static_cast<T>(0.5)));
     BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5)));
-
 
     BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
@@ -1984,10 +2007,12 @@ struct boost_special_functions_test
     BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
     BOOST_REQUIRE(math::jacobi_zeta(make_fvar<T, m>(1.0), make_fvar<T, m>(math::constants::half_pi<T>())) == math::jacobi_zeta(static_cast<T>(1.0), math::constants::half_pi<T>()));
 
-    BOOST_REQUIRE_THROW(math::heuman_lambda(make_fvar<T, m>(1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::heuman_lambda(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0), make_fvar<T, m>(0.5)) == math::heuman_lambda(static_cast<T>(0), static_cast<T>(0.5)));
-
+    {
+      BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0), make_fvar<T, m>(0.5)) == math::heuman_lambda(static_cast<T>(0), static_cast<T>(0.5)));
+      BOOST_REQUIRE_NO_THROW(math::heuman_lambda(static_cast<T>(0.25), static_cast<T>(0.5)));
+      BOOST_REQUIRE_NO_THROW(math::heuman_lambda(static_cast<T>(-0.25), static_cast<T>(0.5)));
+      BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0.5), make_fvar<T, m>(1)) == static_cast<T>(0.792745183008071035953588061452801838417979005666066982987549));
+    }
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)), math::cyl_bessel_j(0,static_cast<T>(0.5)), pct_epsilon);
     //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.5)), math::cyl_neumann(0,static_cast<T>(0.5)), pct_epsilon);

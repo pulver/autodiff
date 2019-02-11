@@ -1883,6 +1883,19 @@ struct boost_special_functions_test
     using namespace boost;
     constexpr int m = 3;
     constexpr T pct_epsilon = math::tools::epsilon<T>() * 100;
+
+    // airy.hpp
+    {
+      // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
+      // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
+      // then autodiff's iround would properly be called via ADL.
+      //BOOST_REQUIRE(math::airy_ai(make_fvar<T,m>(1)), math::airy_ai(static_cast<T>(1)));
+      //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
+      //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
+      //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
+    }
+
+    // acosh.hpp, asinh.hpp, atanh.hpp
     {
       // adapted from boost/math/test/test_inv_hyp.cpp
       BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(262145)/262144L), math::acosh(static_cast<T>(262145)/262144L), pct_epsilon);
@@ -1904,14 +1917,7 @@ struct boost_special_functions_test
       BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-0.5)), math::atanh(static_cast<T>(-0.5)), pct_epsilon);
     }
 
-    // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
-    // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
-    // then autodiff's iround would properly be called via ADL.
-    //BOOST_REQUIRE(math::airy_ai(make_fvar<T,m>(1)), math::airy_ai(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
-    //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
-
+    // bernoulli.hpp
     {
       for (auto idx = 1; idx < 26; ++idx) {
         BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(idx))) == math::bernoulli_b2n<T>(idx));
@@ -1919,23 +1925,69 @@ struct boost_special_functions_test
       }
     }
 
-    // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
-    BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T,m>(1.1), make_fvar<T,m>(1.2)), math::beta(static_cast<T>(1.1), static_cast<T>(1.2)), 1.5*pct_epsilon);
+    // beta.hpp
+    {
+      // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
+      BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T, m>(1.1), make_fvar<T, m>(1.2)),
+                          math::beta(static_cast<T>(1.1), static_cast<T>(1.2)),
+                          1.5 * pct_epsilon);
+      // policy issue
+      //BOOST_REQUIRE(math::ibeta(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.25)) == math::ibeta(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.25)));
+      //BOOST_REQUIRE(math::ibetac(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.825)) == math::ibetac(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.825)));
+      //BOOST_REQUIRE(math::betac(make_fvar<T,m>(12), make_fvar<T,m>(15), make_fvar<T,m>(0.25))==math::betac(static_cast<T>(12), static_cast<T>(15), static_cast<T>(0.5)));
+    }
 
-    // policy issue
-    //BOOST_REQUIRE(math::ibeta(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.25)), math::ibeta(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.25)));
-    //BOOST_REQUIRE(math::ibetac(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.825)), math::ibetac(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.825)));
-    //BOOST_REQUIRE(math::betac(make_fvar<T,m>(12), make_fvar<T,m>(15), make_fvar<T,m>(0.25))==math::betac(static_cast<T>(12), static_cast<T>(15), static_cast<T>(0.5)));
+    // binomial.hpp
+    {
+      for (auto r = 0; r <= 20; ++r) {
+        BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T, m>(20)), iround(make_fvar<T, m>(r)))
+                          == math::binomial_coefficient<T>(20, r));
+      }
+    }
 
-    BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T,m>(10)), iround(make_fvar<T,m>(2))) == math::binomial_coefficient<T>(10, 2));
+    // cbrt.hpp
+    {
+      // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
+      BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T, m>(0.5)), math::cbrt(static_cast<T>(0.5)), pct_epsilon);
+    }
 
-    // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
-    BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T,m>(0.5)), math::cbrt(static_cast<T>(0.5)), pct_epsilon);
+    // chebyshev.hpp
+    {
+      BOOST_REQUIRE(math::chebyshev_next(make_fvar<T,m>(0.5),make_fvar<T,m>(0.5),make_fvar<T,m>(0.5)) ==
+          math::chebyshev_next(static_cast<T>(0.5),static_cast<T>(0.5),static_cast<T>(0.5)));
+      // Requires acosh() (added)
+      BOOST_REQUIRE(math::chebyshev_t(0,make_fvar<T,m>(0.5)) == math::chebyshev_t(0,static_cast<T>(0.5)));
+      BOOST_REQUIRE(math::chebyshev_u(0,make_fvar<T,m>(0.5)) == math::chebyshev_u(0,static_cast<T>(0.5)));
+      BOOST_REQUIRE(math::chebyshev_t_prime(0,make_fvar<T,m>(0.5)) == math::chebyshev_t_prime(0,static_cast<T>(0.5)));
+      {
+        std::array<double,4> c{14.2, -13.7, 82.3, 96};
+        // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error: cannot convert ‘boost::math::differentiation::autodiff_v1::detail::fvar<double, 3>’ to ‘double’ in return
+        //BOOST_REQUIRE(math::chebyshev_clenshaw_recurrence(c.data(),c.size(),make_fvar<T,m>(0.5)) == math::chebyshev_clenshaw_recurrence(c.data(),c.size(),static_cast<T>(0.5)));
+      }
+    }
 
-    // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
-    BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T,m>(math::constants::sixth_pi<T>()))) == math::cos_pi(math::iround(math::constants::sixth_pi<T>())));
-    // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
-    BOOST_REQUIRE(math::sin_pi(iround(make_fvar<T,m>(math::constants::sixth_pi<T>()))) == math::sin_pi(math::iround(math::constants::sixth_pi<T>())));
+    // cos_pi.hpp
+    {
+      // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
+      for (auto idx = -10; idx < 11; ++idx) {
+        BOOST_REQUIRE(math::cos_pi(iround(make_fvar<T, m>(math::constants::pi<T>() * idx * 0.25)))
+                          == math::cos_pi(math::iround(math::constants::pi<T>() * idx * 0.25)));
+      }
+    }
+
+    // digamma.hpp
+    {
+      BOOST_REQUIRE(math::digamma(make_fvar<T, m>(std::ldexp(1.0, -100))) == math::digamma(static_cast<T>(std::ldexp(1.0, -100))));
+      BOOST_REQUIRE(math::digamma(make_fvar<T, m>(-std::ldexp(1.0, -100))) == math::digamma(static_cast<T>(-std::ldexp(1.0, -100))));
+      BOOST_REQUIRE(math::digamma(make_fvar<T, m>(1.0)) == math::digamma(static_cast<T>(1.0)));
+      BOOST_REQUIRE(math::digamma(make_fvar<T, m>(-1 + std::ldexp(1.0, -20))) == math::digamma(static_cast<T>(-1 + std::ldexp(1.0, -20))));
+      // 1048576.4227818125 != 1048576.4227818127
+      BOOST_REQUIRE_CLOSE(math::digamma(make_fvar<T, m>(-1 - std::ldexp(1.0, -20))), math::digamma(static_cast<T>(-1 - std::ldexp(1.0, -20))), pct_epsilon);
+      for (auto i = 0; i < 3; ++i) {
+        BOOST_REQUIRE_THROW(math::digamma(make_fvar<T, m>(-1.0*i)), wrapexcept<std::domain_error>);
+      }
+    }
+
 
     BOOST_REQUIRE(math::log1p(make_fvar<T,m>(math::constants::pi<T>())) == math::log1p(math::constants::pi<T>()));
     BOOST_REQUIRE(math::expm1(make_fvar<T,m>(math::constants::pi<T>())) == math::expm1(math::constants::pi<T>()));
@@ -1944,7 +1996,6 @@ struct boost_special_functions_test
     BOOST_REQUIRE(math::hypot(make_fvar<T,m>(3), make_fvar<T,m>(4)) == math::hypot(static_cast<T>(3), static_cast<T>(4)));
     BOOST_REQUIRE(math::pow<2>(make_fvar<T,m>(3)) == math::pow<2>(static_cast<T>(3)));
 
-    BOOST_REQUIRE(math::digamma(make_fvar<T,m>(0.5)) == math::digamma(static_cast<T>(0.5)));
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
     BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1)), wrapexcept<std::overflow_error>);
@@ -2042,21 +2093,14 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::sph_hankel_1(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_1(0,static_cast<T>(0.5)).real());
     //BOOST_REQUIRE(math::sph_hankel_2(0,make_fvar<T,m>(0.5)).real() == math::sph_hankel_2(0,static_cast<T>(0.5)).real());
 
-    //std::cout.precision(20);
-
-    //Skipping other Basic Functions
-    BOOST_REQUIRE(math::chebyshev_next(make_fvar<T,m>(0.5),make_fvar<T,m>(0.5),make_fvar<T,m>(0.5)) ==
-        math::chebyshev_next(static_cast<T>(0.5),static_cast<T>(0.5),static_cast<T>(0.5)));
-    // Requires acosh() (added)
-    BOOST_REQUIRE(math::chebyshev_t(0,make_fvar<T,m>(0.5)) == math::chebyshev_t(0,static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::chebyshev_u(0,make_fvar<T,m>(0.5)) == math::chebyshev_u(0,static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::chebyshev_t_prime(0,make_fvar<T,m>(0.5)) == math::chebyshev_t_prime(0,static_cast<T>(0.5)));
+    // sin_pi.hpp
     {
-        std::array<double,4> c{14.2, -13.7, 82.3, 96};
-        // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error: cannot convert ‘boost::math::differentiation::autodiff_v1::detail::fvar<double, 3>’ to ‘double’ in return
-        //BOOST_REQUIRE(math::chebyshev_clenshaw_recurrence(c.data(),c.size(),make_fvar<T,m>(0.5)) == math::chebyshev_clenshaw_recurrence(c.data(),c.size(),static_cast<T>(0.5)));
+      // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
+      for (auto idx = -10; idx < 11; ++idx) {
+        BOOST_REQUIRE(math::sin_pi(iround(make_fvar<T, m>(math::constants::pi<T>() * idx * 0.25)))
+                          == math::sin_pi(math::iround(math::constants::pi<T>() * idx * 0.25)));
+      }
     }
-    // TODO Continue alphabetically through <boost/math/special_functions.hpp>
   }
 };
 

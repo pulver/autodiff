@@ -11,7 +11,6 @@
 #include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/math/tools/test_data.hpp>
 
 #include <boost/math/differentiation/autodiff.hpp>
 

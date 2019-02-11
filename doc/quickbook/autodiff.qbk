@@ -67,6 +67,7 @@ automatic differentiation] (forward mode) of mathematical functions of single an
 This implementation is based upon the [@https://en.wikipedia.org/wiki/Taylor_series Taylor series] expansion of
 an analytic function /f/ at the point ['x[sub 0]]:
 
+[/ Thanks to http://www.tlhiv.org/ltxpreview/ for LaTeX-to-SVG conversions. ]
 [/ \Large\begin{align*}
 f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsilon^2 + \frac{f'''(x_0)}{3!}\varepsilon^3 + \cdots \\
   &= \sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n + O\left(\varepsilon^{N+1}\right).
@@ -78,9 +79,10 @@ the first-order polynomial ['x[sub 0]+\u03b5], the resulting polynomial in ['\u0
 derivatives within the coefficients. Each coefficient is equal to a derivative of its respective order, divided
 by the factorial of the order.
 
-Assume one is interested in the first /N/ derivatives of /f/ at ['x[sub 0]]. Then without any loss of precision
-to the calculation of the derivatives, all terms ['O(\u03b5[super N+1])] that include powers of ['\u03b5] greater
-than /N/ can be discarded, and under these truncation rules, /f/ provides a polynomial-to-polynomial transformation:
+Assume one is interested in calculating the first /N/ derivatives of /f/ at ['x[sub 0]]. Then without any loss of
+precision to the calculation of the derivatives, all terms ['O(\u03b5[super N+1])] that include powers of ['\u03b5]
+greater than /N/ can be discarded, and under these truncation rules, /f/ provides a polynomial-to-polynomial
+transformation:
 
 [/ \Large$$f \qquad : \qquad x_0+\varepsilon \qquad \mapsto \qquad
     \sum_{n=0}^Ny_n\varepsilon^n=\sum_{n=0}^N\frac{f^{(n)}(x_0)}{n!}\varepsilon^n.$$ ]
@@ -91,7 +93,7 @@ _var_iable) that represents polynomials in ['\u03b5]. Thus the same algorithm th
 ['y[sub 0]=f(x[sub 0])] is also used to calculate the polynomial ['\u03a3[sub n]y[sub n]\u03b5[super n]=f(x[sub
 0]+\u03b5)].  The derivatives are then found from the product of the respective factorial and coefficient:
 
-[/ \Large$$f^{(n)}(x_0)=n!y_n.$$ ]
+[/ \Large$$\frac{d^nf}{dx^n}(x_0)=n!y_n.$$ ]
 [:[:[autodiff_equation derivative_formula.svg]]]
 
 
@@ -157,12 +159,12 @@ Example 2: Multi-variable mixed partial derivatives with multi-precision data ty
 [h3 Calculate [autodiff_equation mixed12.svg] with a precision of about 100 decimal digits,
 where [autodiff_equation example2f.svg].]
 
-In this example, the data type `autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>` represents a multivariate polynomial
-in 4 independent variables, where the highest powers of each are `Nw`, `Nx`, `Ny` and `Nz`. The underlying
-arithmetic data type, aliased as `root_type`, is `boost::multiprecision::cpp_dec_float_100`. The internal data
-type is `std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`.  The `root_type`
-is always the first template parameter to `autodiff_fvar<...>` followed by the maximum derivative orders that are
-to be calculated for each independent variable.
+In this example, the data type `autodiff_fvar<cpp_dec_float_100,Nw,Nx,Ny,Nz>` represents a multivariate polynomial in
+4 independent variables, where the highest powers of each are `Nw`, `Nx`, `Ny` and `Nz`. The underlying arithmetic
+data type, aliased as `root_type`, is `boost::multiprecision::cpp_dec_float_100`. The internal data structure
+is `std::array<std::array<std::array<std::array<cpp_dec_float_100,Nz+1>,Ny+1>,Nx+1>,Nw+1>`.  The `root_type` is
+always the first template parameter to `autodiff_fvar<...>` followed by the maximum derivative orders that are to
+be calculated for each independent variable.
 
 When variables are initialized with `make_fvar<...>()`, the position of the last derivative order given in the
 template parameter pack determines which variable is taken to be independent. In other words, it determines which

@@ -123,10 +123,10 @@ the first-order polynomial $x_0+\varepsilon$, the resulting polynomial in $\vare
 derivatives within the coefficients. Each coefficient is equal to a derivative of its respective order, divided
 by the factorial of the order.
 
-Assume one is interested in the first $N$ derivatives of $f$ at $x_0$. Then without any loss of precision to the
-calculation of the derivatives, all terms $O\left(\varepsilon^{N+1}\right)$ that include powers of $\varepsilon$
-greater than $N$ can be discarded, and under these truncation rules, $f$ provides a polynomial-to-polynomial
-transformation:
+Assume one is interested in calculating the first $N$ derivatives of $f$ at $x_0$. Then without any loss of
+precision to the calculation of the derivatives, all terms $O\left(\varepsilon^{N+1}\right)$ that include
+powers of $\varepsilon$ greater than $N$ can be discarded, and under these truncation rules, $f$ provides a
+polynomial-to-polynomial transformation:
 
 \[
 f \qquad : \qquad x_0+\varepsilon \qquad \mapsto \qquad
@@ -138,7 +138,7 @@ the same algorithm that calculates the numeric value of $y_0=f(x_0)$ is also use
 $\sum_{n=0}^Ny_n\varepsilon^n=f(x_0+\varepsilon)$. The derivatives are then found from the product of the respective
 factorial and coefficient:
 
-\[ f^{(n)}(x_0)=n!y_n. \]
+\[ \frac{d^nf}{dx^n}(x_0)=n!y_n. \]
 
 \section{Examples}
 
@@ -202,7 +202,7 @@ where $f(w,x,y,z)=\exp\left(w\sin\left(\frac{x\log(y)}{z}\right)+\sqrt{\frac{wz}
 In this example, the data type {\tt autodiff\_fvar<cpp\_bin\_float\_50,Nw,Nx,Ny,Nz>} represents
 a multivariate polynomial in 4 independent variables, where the highest powers of each are {\tt Nw}, {\tt Nx},
 {\tt Ny} and {\tt Nz}. The underlying arithmetic data type, referred to as {\tt root\_type}, is
-{\tt boost::multiprecision::cpp\_bin\_float\_50}. The internal data type is
+{\tt boost::multiprecision::cpp\_bin\_float\_50}. The internal data structure is
 {\tt std::array<std::array<std::array<std::array<cpp\_bin\_float\_50,Nz+1>,Ny+1>,Nx+1>,Nw+1>}. In general, the
 {\tt root\_type} is always the first template parameter to {\tt autodiff\_fvar<>} followed by the maximum
 derivative order that is to be calculated for each independent variable.
@@ -462,7 +462,7 @@ f(x_0+\varepsilon_x,y_0+\varepsilon_y) &= \sum_{j=0}^N\frac{1}{j!}\frac{\partial
    \varepsilon_x^i\varepsilon_y^j + O\left(\varepsilon_x^{M+1}\right) + O\left(\varepsilon_y^{N+1}\right).
 \end{align*}
 
-Similarly to the single-variable case, for an application in which we are interested in up to $M$ derivatives in
+Similar to the single-variable case, for an application in which we are interested in up to $M$ derivatives in
 $x$ and $N$ derivatives in $y$, the data structure to hold this information is an $(M+1)\times(N+1)$
 array {\tt v} whose element at $(i,j)$ is
 
@@ -873,13 +873,14 @@ This example also provides an opportunity to point out some of the advantages of
 
 \section{Function Writing Guidelines}
 
-At a high level there is one fairly simple principle, intuitively speaking, to writing functions for which autodiff
-can effectively calculate derivatives: \\
+At a high level there is one fairly simple principle, loosely and intuitively speaking, to writing functions for
+which autodiff can effectively calculate derivatives: \\
 
 {\bf Autodiff Function Principle (AFP)}
 \begin{displayquote}
-A function that is piecewise analytic over non-singleton intervals, with smooth transitions between the intervals,
-and is free of indeterminate forms in the calculated value and higher order derivatives, will work fine with autodiff.
+A function whose branches in logic correspond to piecewise analytic calculations over non-singleton intervals,
+with smooth transitions between the intervals, and is free of indeterminate forms in the calculated value and
+higher order derivatives, will work fine with autodiff.
 \end{displayquote}
 Stating this with greater mathematical rigor can be done. However what seems to be more practical, in this
 case, is to give examples and categories of examples of what works, what doesn't, and how to remedy some of the
@@ -947,7 +948,7 @@ A potential implementation is:
 \end{verbatim}
 Though this is again consistent with Section~\ref{migrate}, and returns correct non-derivative values,
 it returns a constant when {\tt x==0} thereby losing all derivative information contained in {\tt x} and
-contributions from $\sinc$. For example, though $\sinc''(0)=-\frac{1}{3}$, {\tt y.derivative(2) == 0} when
+contributions from $\sinc$. For example, $\sinc''(0)=-\frac{1}{3}$, however {\tt y.derivative(2) == 0} when
 {\tt y = sinc(make\_fvar<double,2>(0))} using the above incorrect implementation. Applying the AFP, the intervals
 upon which separate branches of logic are applied are $(-\infty,0)\cup[0,0]\cup(0,\infty)$. The violation occurs
 due to the singleton interval $[0,0]$, even though a constant function of 1 is technically analytic. The remedy
@@ -982,11 +983,11 @@ Floating Point\newline Arithmetic
 Indeterminate forms must be simplified manually. (These cases are not meant to be exhaustive.)}\label{3nans}
 \end{table}
 
-Indeterminate forms result in NaN values within a calculation. Mathematically, if they occur at singular points, then
-we generally prefer the mathematical limit as the result, even if it is infinite. As demonstrated in Table~\ref{3nans},
-depending upon the nature of the indeterminate form, the mathematical limit can be 0 (no matter the values of
-$a$ or $b$), or $ab$, or $\infty$, but these 3 cases cannot be distinguished by the floating point result of nan
-directly. Floating point arithmetic does not perform limits (directly), and neither does the autodiff library.
+Indeterminate forms result in NaN values within a calculation. Mathematically, if they occur at locally isolated
+points, then we generally prefer the mathematical limit as the result, even if it is infinite. As demonstrated in
+Table~\ref{3nans}, depending upon the nature of the indeterminate form, the mathematical limit can be 0 (no matter
+the values of $a$ or $b$), or $ab$, or $\infty$, but these 3 cases cannot be distinguished by the floating point
+result of nan. Floating point arithmetic does not perform limits (directly), and neither does the autodiff library.
 Thus it is up to the diligence of the developer to keep a watchful eye over where indeterminate forms can arise.
 
 \subsection{Example 3: $f(x)=\sqrt x$ and $f'(0)=\infty$}

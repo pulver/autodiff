@@ -1988,31 +1988,37 @@ struct boost_special_functions_test
       }
     }
 
+    // ellint_1.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1)), wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1)), wrapexcept<std::overflow_error>);
+      for (auto i : {0.0, 0.125, 0.25, 0.29296875, 0.390625, -0.5, -0.75, 0.875, 0.9990234375}) {
+        // i=0.125 -> 1.576986771215812988 != 1.57698677121581321
+        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(i)), math::ellint_1(static_cast<T>(i)), pct_epsilon);
+      }
+      for (auto p : std::initializer_list<std::pair<T,T>>{{0.0, 0.0}, {0.0, -10.0}, {-1.0, -1.0}, {0.875, -4.0}, {-0.625, 8.0}, {0.875,1e-5}, {0.009765625, 1e5}}) {
+        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T,m>(p.first), make_fvar<T,m>(p.second)), math::ellint_1(static_cast<T>(p.first), static_cast<T>(p.second)), pct_epsilon);
+      }
+    }
 
-    BOOST_REQUIRE(math::log1p(make_fvar<T,m>(math::constants::pi<T>())) == math::log1p(math::constants::pi<T>()));
-    BOOST_REQUIRE(math::expm1(make_fvar<T,m>(math::constants::pi<T>())) == math::expm1(math::constants::pi<T>()));
-    BOOST_REQUIRE(math::sqrt1pm1(make_fvar<T,m>(math::constants::pi<T>())) == math::sqrt1pm1(math::constants::pi<T>()));
-    BOOST_REQUIRE(math::powm1(make_fvar<T,m>(1.01), make_fvar<T,m>(0.001)) == math::powm1(static_cast<T>(1.01), static_cast<T>(0.001)));
-    BOOST_REQUIRE(math::hypot(make_fvar<T,m>(3), make_fvar<T,m>(4)) == math::hypot(static_cast<T>(3), static_cast<T>(4)));
-    BOOST_REQUIRE(math::pow<2>(make_fvar<T,m>(3)) == math::pow<2>(static_cast<T>(3)));
+    // ellint_2.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(1.01)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(-1.01)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_2(make_fvar<T, m>(-1)) == math::ellint_2(static_cast<T>(-1)));
+      BOOST_REQUIRE(math::ellint_2(make_fvar<T, m>(1)) == math::ellint_2(static_cast<T>(1)));
+      BOOST_REQUIRE_CLOSE(math::ellint_2(static_cast<T>(0.5), make_fvar<T, m>(0.5)),
+                          math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)),
+                          pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(0.5), make_fvar<T, m>(0.5)),
+                          math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)),
+                          pct_epsilon);
+      BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(0.5)), math::ellint_2(static_cast<T>(0.5)), pct_epsilon);
+    }
 
-    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(-1)), wrapexcept<std::overflow_error>);
-    BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T,m>(1)), wrapexcept<std::overflow_error>);
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), static_cast<T>(0.5)) == math::ellint_1(static_cast<T>(0.5), static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::ellint_1(static_cast<T>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5), static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5), static_cast<T>(0.5)));
-    BOOST_REQUIRE(math::ellint_1(make_fvar<T,m>(0.5)) == math::ellint_1(static_cast<T>(0.5)));
-
-    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(1.01)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T,m>(-1.01)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(-1)) == math::ellint_2(static_cast<T>(-1)));
-    BOOST_REQUIRE(math::ellint_2(make_fvar<T,m>(1)) == math::ellint_2(static_cast<T>(1)));
-    BOOST_REQUIRE_CLOSE(math::ellint_2(static_cast<T>(0.5), make_fvar<T, m>(0.5)), math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)), pct_epsilon);
-    BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5)), math::ellint_2(static_cast<T>(0.5), static_cast<T>(0.5)), pct_epsilon);
-    BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T,m>(0.5)), math::ellint_2(static_cast<T>(0.5)), pct_epsilon);
-
+    // ellint_3.hpp, ellint_d.hpp
     {
       const auto sin_sq_pi_over_3 = sin(math::constants::third_pi<T>()) * sin(math::constants::third_pi<T>());
       BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1.01), make_fvar<T, m>(sin_sq_pi_over_3)), wrapexcept<std::domain_error>);
@@ -2037,36 +2043,64 @@ struct boost_special_functions_test
       BOOST_REQUIRE(math::ellint_d(static_cast<T>(0.5), make_fvar<T, m>(sin_sq_pi_over_3)) == math::ellint_d(static_cast<T>(0.5), sin_sq_pi_over_3));
     }
 
-    BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rf(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
 
-    BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rd(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
+    BOOST_REQUIRE(math::log1p(make_fvar<T,m>(math::constants::pi<T>())) == math::log1p(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::expm1(make_fvar<T,m>(math::constants::pi<T>())) == math::expm1(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::sqrt1pm1(make_fvar<T,m>(math::constants::pi<T>())) == math::sqrt1pm1(math::constants::pi<T>()));
+    BOOST_REQUIRE(math::powm1(make_fvar<T,m>(1.01), make_fvar<T,m>(0.001)) == math::powm1(static_cast<T>(1.01), static_cast<T>(0.001)));
+    BOOST_REQUIRE(math::hypot(make_fvar<T,m>(3), make_fvar<T,m>(4)) == math::hypot(static_cast<T>(3), static_cast<T>(4)));
+    BOOST_REQUIRE(math::pow<2>(make_fvar<T,m>(3)) == math::pow<2>(static_cast<T>(3)));
 
-    BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0), make_fvar<T,m>(0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_CLOSE(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01), make_fvar<T, m>(1.0)), math::ellint_rj(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01), static_cast<T>(1.0)), pct_epsilon);
+    // ellint_rf.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_rf(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rf(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
+    }
 
-    BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_CLOSE(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51)), math::ellint_rc(static_cast<T>(1.01), static_cast<T>(0.51)), pct_epsilon);
+    // ellint_rd.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_rd(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rd(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
+    }
 
-    BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(-1.0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rg(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
+    // ellint_rj.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0), make_fvar<T, m>(0), make_fvar<T,m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_CLOSE(math::ellint_rj(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01), make_fvar<T, m>(1.0)), math::ellint_rj(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01), static_cast<T>(1.0)), pct_epsilon);
+    }
 
-    BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
-    BOOST_REQUIRE(math::jacobi_zeta(make_fvar<T, m>(1.0), make_fvar<T, m>(math::constants::half_pi<T>())) == math::jacobi_zeta(static_cast<T>(1.0), math::constants::half_pi<T>()));
+    // ellint_rc.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_CLOSE(math::ellint_rc(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51)), math::ellint_rc(static_cast<T>(1.01), static_cast<T>(0.51)), pct_epsilon);
+    }
 
+    // ellint_rg.hpp
+    {
+      BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(-1.0), make_fvar<T, m>(0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(0.51), make_fvar<T, m>(0.01)) == math::ellint_rg(static_cast<T>(1.01), static_cast<T>(0.51), static_cast<T>(0.01)));
+    }
+
+    // jacobi_zeta.hpp
+    {
+      BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(-1.01), make_fvar<T, m>(math::constants::half_pi<T>())), wrapexcept<std::domain_error>);
+      BOOST_REQUIRE(math::jacobi_zeta(make_fvar<T, m>(1.0), make_fvar<T, m>(math::constants::half_pi<T>())) == math::jacobi_zeta(static_cast<T>(1.0), math::constants::half_pi<T>()));
+    }
+
+    // heuman_lambda.hpp
     {
       BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0), make_fvar<T, m>(0.5)) == math::heuman_lambda(static_cast<T>(0), static_cast<T>(0.5)));
       BOOST_REQUIRE_NO_THROW(math::heuman_lambda(static_cast<T>(0.25), static_cast<T>(0.5)));
       BOOST_REQUIRE_NO_THROW(math::heuman_lambda(static_cast<T>(-0.25), static_cast<T>(0.5)));
-      BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0.5), make_fvar<T, m>(1)) == static_cast<T>(0.792745183008071035953588061452801838417979005666066982987549));
+      BOOST_REQUIRE(math::heuman_lambda(make_fvar<T, m>(0.5), make_fvar<T, m>(1)) == math::heuman_lambda(0.5, 1.0));
     }
+
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.5)), math::cyl_bessel_j(0,static_cast<T>(0.5)), pct_epsilon);
     //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.5)), math::cyl_neumann(0,static_cast<T>(0.5)), pct_epsilon);
@@ -2106,9 +2140,10 @@ struct boost_special_functions_test
 
 BOOST_AUTO_TEST_CASE(boost_special_functions)
 {
-    boost_special_functions_test()(static_cast<double>(0));
-    boost::fusion::for_each(bin_float_types, boost_special_functions_test());
-    boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test());
+    boost_special_functions_test{}(static_cast<double>(0));
+    boost::fusion::for_each(bin_float_types, boost_special_functions_test{});
+    boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test{});
 }
+
 
 BOOST_AUTO_TEST_SUITE_END()

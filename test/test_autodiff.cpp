@@ -1904,8 +1904,6 @@ struct boost_special_functions_test
       BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-0.5)), math::atanh(static_cast<T>(-0.5)), pct_epsilon);
     }
 
-
-
     // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
     // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
     // then autodiff's iround would properly be called via ADL.
@@ -1913,8 +1911,13 @@ struct boost_special_functions_test
     //BOOST_REQUIRE(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
     //BOOST_REQUIRE(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
     //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
-    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == math::bernoulli_b2n<T>(1));
-    BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(1))) == 1/6.0);
+
+    {
+      for (auto idx = 1; idx < 26; ++idx) {
+        BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(idx))) == math::bernoulli_b2n<T>(idx));
+        BOOST_REQUIRE(math::tangent_t2n<T>(iround(make_fvar<T, m>(idx))) == math::tangent_t2n<T>(idx));
+      }
+    }
 
     // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
     BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T,m>(1.1), make_fvar<T,m>(1.2)), math::beta(static_cast<T>(1.1), static_cast<T>(1.2)), 1.5*pct_epsilon);

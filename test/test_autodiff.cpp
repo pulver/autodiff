@@ -13,6 +13,7 @@
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/range/irange.hpp>
 #include <random>
+#include <tuple>
 
 #include <boost/math/differentiation/autodiff.hpp>
 
@@ -21,7 +22,6 @@
 
 //TODO(kbhat): remove below includes
 #include <iostream>
-#include <typeinfo>
 
 //boost::fusion::vector<float,double,long double,boost::multiprecision::cpp_bin_float_50> bin_float_types;
 //boost::fusion::vector<float,double,long double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70
@@ -1916,7 +1916,8 @@ struct boost_special_functions_test
     // acosh.hpp
     {
       RandomSample<T> sampler{1, std::numeric_limits<T>::max()};
-      for (auto _ : boost::irange(n_samples)) {
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
         auto sample = sampler.next();
         BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), pct_epsilon);
       }
@@ -1925,9 +1926,10 @@ struct boost_special_functions_test
     // asinh.hpp
     {
       RandomSample<T> sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
-      for (auto _ : boost::irange(n_samples)) {
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
         auto sample = sampler.next();
-        if (std::isfinite<T>(sample)) {
+        if (std::isfinite(sample)) {
           BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
@@ -1938,7 +1940,8 @@ struct boost_special_functions_test
     // atanh.hpp
     {
       RandomSample<T> sampler{-1, 1};
-      for (auto _ : boost::irange(n_samples)) {
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
         auto sample = sampler.next();
         if (abs(sample) == 1) {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
@@ -1962,7 +1965,8 @@ struct boost_special_functions_test
     {
       RandomSample<T> x_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
       RandomSample<T> y_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
-      for (auto _ : boost::irange(n_samples)) {
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
         auto x = x_sampler.next();
         auto y = y_sampler.next();
         if (x < 1 || y < 1) {

@@ -11,6 +11,8 @@
 #include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/range/irange.hpp>
+#include <random>
 
 #include <boost/math/differentiation/autodiff.hpp>
 
@@ -1879,11 +1881,26 @@ BOOST_AUTO_TEST_CASE(black_scholes)
 // Compilation tests for boost special functions.
 struct boost_special_functions_test
 {
+
+  template<typename T>
+  struct RandomSample {
+      RandomSample(T start, T finish) : start_(start), finish_(finish), rng_(std::random_device{}()), dist_(start_, finish_ < std::numeric_limits<T>::max() ? std::nextafter(finish_, std::numeric_limits<T>::max()) : finish_) {}
+      T next() noexcept {
+        return dist_(rng_);
+      }
+
+      T start_;
+      T finish_;
+      std::mt19937 rng_;
+      std::uniform_real_distribution<T> dist_;
+  };
+
   template<typename T>
   void operator()(const T&) const {
     using namespace boost;
     constexpr int m = 3;
     constexpr T pct_epsilon = math::tools::epsilon<T>() * 100;
+    constexpr std::size_t n_samples = 25;
 
     // airy.hpp
     {
@@ -1896,39 +1913,46 @@ struct boost_special_functions_test
       //BOOST_REQUIRE(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
     }
 
-    // acosh.hpp, asinh.hpp, atanh.hpp
+    // acosh.hpp
     {
-      // adapted from boost/math/test/test_inv_hyp.cpp
-      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(262145) / 262144L),
-                          math::acosh(static_cast<T>(262145) / 262144L),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(2)), math::acosh(static_cast<T>(2)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(40)), math::acosh(static_cast<T>(40)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(262145L)), math::acosh(static_cast<T>(262145L)), pct_epsilon);
+      RandomSample<T> sampler{1, std::numeric_limits<T>::max()};
+      for (auto _ : boost::irange(n_samples)) {
+        auto sample = sampler.next();
+        BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), pct_epsilon);
+      }
+    }
 
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(0)), math::asinh(static_cast<T>(0)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(1) / 262145L),
-                          math::asinh(static_cast<T>(1) / 262145L),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(0.25)), math::asinh(static_cast<T>(0.25)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(1)), math::asinh(static_cast<T>(1)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(10)), math::asinh(static_cast<T>(10)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(262145L)), math::asinh(static_cast<T>(262145L)), pct_epsilon);
+    // asinh.hpp
+    {
+      RandomSample<T> sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
+      for (auto _ : boost::irange(n_samples)) {
+        auto sample = sampler.next();
+        if (std::isfinite<T>(sample)) {
+          BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), pct_epsilon);
+        } else {
+          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
+        }
+      }
+    }
 
-      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(0)), math::atanh(static_cast<T>(0)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(1 / 262145L)),
-                          math::atanh(static_cast<T>(1 / 262145L)),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-1 / 262145L)),
-                          math::atanh(static_cast<T>(-1 / 262145L)),
-                          pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(0.5)), math::atanh(static_cast<T>(0.5)), pct_epsilon);
-      BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(-0.5)), math::atanh(static_cast<T>(-0.5)), pct_epsilon);
+    // atanh.hpp
+    {
+      RandomSample<T> sampler{-1, 1};
+      for (auto _ : boost::irange(n_samples)) {
+        auto sample = sampler.next();
+        if (abs(sample) == 1) {
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
+        } else if ((-1 >= sample && sample < -1+std::numeric_limits<T>::epsilon()) || (1 <= sample && sample > 1-std::numeric_limits<T>::epsilon())) {
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 2*pct_epsilon);
+        }
+      }
     }
 
     // bernoulli.hpp
     {
-      for (auto idx = 1; idx < 26; ++idx) {
+      for (auto idx : boost::irange(n_samples)) {
         BOOST_REQUIRE(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(idx))) == math::bernoulli_b2n<T>(idx));
         BOOST_REQUIRE(math::tangent_t2n<T>(iround(make_fvar<T, m>(idx))) == math::tangent_t2n<T>(idx));
       }
@@ -1936,10 +1960,19 @@ struct boost_special_functions_test
 
     // beta.hpp
     {
-      // Compiles, but compares 0.74868571757768376251 == 0.74868571757768354047 which is false.
-      BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T, m>(1.1), make_fvar<T, m>(1.2)),
-                          math::beta(static_cast<T>(1.1), static_cast<T>(1.2)),
-                          1.5 * pct_epsilon);
+      RandomSample<T> x_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
+      RandomSample<T> y_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
+      for (auto _ : boost::irange(n_samples)) {
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        if (x < 1 || y < 1) {
+          BOOST_REQUIRE_THROW(math::beta(make_fvar<T,m>(x), make_fvar<T,m>(y)), wrapexcept<std::domain_error>);
+        } else if (!std::isfinite(x) && !std::isfinite(y)) {
+          BOOST_REQUIRE(!std::isfinite(static_cast<T>(math::beta(make_fvar<T,m>(x), make_fvar<T,m>(y)))));
+        } else {
+          BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T,m>(x), make_fvar<T,m>(y)), math::beta(x, y), 2*pct_epsilon);
+        }
+      }
       // policy issue
       //BOOST_REQUIRE(math::ibeta(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.25)) == math::ibeta(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.25)));
       //BOOST_REQUIRE(math::ibetac(make_fvar<T,m>(0.5), make_fvar<T,m>(0.5), make_fvar<T,m>(0.825)) == math::ibetac(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.825)));

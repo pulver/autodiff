@@ -146,11 +146,11 @@ factorial and coefficient:
 
 \subsubsection{Calculate derivatives of $f(x)=x^4$ at $x=2$.}
 
-In this example, {\tt autodiff\_fvar<double,5>} is a data type that can hold a polynomial of up to degree 5, and
-the {\tt make\_fvar<double,5> x(2.0)} represents the polynomial $2+\varepsilon$.  Internally, this is modeled by
-a {\tt std::array<double,6>} whose elements {\tt \{2, 1, 0, 0, 0, 0\}} correspond to the 6 coefficients of the
-polynomial upon initialization. Its fourth power is a polynomial with coefficients {\tt y = \{16, 32, 24, 8, 1, 0\}}.
-The derivatives are obtained using the formula $f^{(n)}(2)=n!*{\tt y[n]}$.
+In this example, {\tt autodiff\_fvar<double,5>} is a data type that can hold a polynomial of up to degree 5,
+and the {\tt make\_fvar<double,5> x(2)} represents the polynomial $2+\varepsilon$.  Internally, this is modeled
+by a {\tt std::array<double,6>} whose elements {\tt \{2, 1, 0, 0, 0, 0\}} correspond to the 6 coefficients of
+the polynomial upon initialization. Its fourth power is a polynomial with coefficients {\tt y = \{16, 32, 24, 8,
+1, 0\}}.  The derivatives are obtained using the formula $f^{(n)}(2)=n!*{\tt y[n]}$.
 
 \begin{verbatim}
 #include <boost/math/differentiation/autodiff.hpp>
@@ -262,7 +262,7 @@ Output:
 mathematica   : 1976.3196007477977177798818752904187209081211892188
 autodiff      : 1976.3196007477977177798818752904187209081211892188
 relative error: 2.67e-50
-**/
+*/
 \end{verbatim}
 
 \section{Mathematics}

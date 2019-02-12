@@ -1985,9 +1985,14 @@ struct boost_special_functions_test
 
     // binomial.hpp
     {
-      for (auto r = 0; r <= 20; ++r) {
-        BOOST_REQUIRE(math::binomial_coefficient<T>(iround(make_fvar<T, m>(20)), iround(make_fvar<T, m>(r)))
-                          == math::binomial_coefficient<T>(20, r));
+      RandomSample<T> n_sampler{0, 100};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto n = static_cast<int>(n_sampler.next());
+        RandomSample<T> r_sampler{0, static_cast<T>(n)};
+        auto r = static_cast<int>(r_sampler.next());
+        BOOST_REQUIRE_CLOSE(math::binomial_coefficient<T>(iround(make_fvar<T, m>(n)), iround(make_fvar<T, m>(r))),
+                            math::binomial_coefficient<T>(n, r), pct_epsilon);
       }
     }
 

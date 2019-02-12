@@ -1506,7 +1506,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
             root_type d1powers = derivatives[1] * derivatives[1];
             const root_type x = derivatives[1] * expw;
             derivatives[2] = d1powers * (-1 - x);
-            std::array<root_type,order> coef { -1, -1 }; // as in derivatives[2].
+            std::array<root_type,order> coef {{ -1, -1 }}; // as in derivatives[2].
             for (size_t n=3 ; n<=order ; ++n)
             {
                 coef[n-1] = coef[n-2] * -static_cast<root_type>(2*n-3);

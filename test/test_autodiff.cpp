@@ -1888,6 +1888,7 @@ BOOST_AUTO_TEST_CASE(black_scholes)
     boost::fusion::for_each(bin_float_types, black_scholes_test());
 }
 
+/*
 // Compilation tests for boost special functions.
 struct boost_special_functions_test
 {
@@ -1959,5 +1960,6 @@ BOOST_AUTO_TEST_CASE(boost_special_functions)
     //boost::fusion::for_each(bin_float_types, boost_special_functions_test());
     //boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test());
 }
+*/
 
 BOOST_AUTO_TEST_SUITE_END()

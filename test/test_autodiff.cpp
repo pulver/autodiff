@@ -1804,7 +1804,8 @@ struct multiprecision_test
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    multiprecision_test()(boost::multiprecision::cpp_bin_float_50());
+    //multiprecision_test()(boost::multiprecision::cpp_bin_float_50());
+    boost::fusion::for_each(bin_float_types, mixed_partials_test());
 }
 
 struct black_scholes_test

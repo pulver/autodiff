@@ -9,6 +9,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/numeric.hpp>
 #include <random>
 
 #include <boost/math/differentiation/autodiff.hpp>
@@ -2073,6 +2074,7 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::asinh(sample), wrapexcept<std::overflow_error>);
         }
       }
     }
@@ -2085,9 +2087,11 @@ struct boost_special_functions_test {
         auto sample = sampler.next();
         if (abs(sample) > 1) {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::domain_error>);
         } else if ((sample >= -1 && sample < std::numeric_limits<T>::epsilon() - 1) ||
             (sample <= 1 && sample > 1 - std::numeric_limits<T>::epsilon())) {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::overflow_error>);
         } else {
           BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 2*pct_epsilon);
         }
@@ -2132,7 +2136,15 @@ struct boost_special_functions_test {
         auto n = static_cast<unsigned>(n_sampler.next());
         RandomSample<T> r_sampler{0, static_cast<T>(n)};
         auto r = static_cast<unsigned>(r_sampler.next());
-        try {
+        int log_sum = boost::accumulate(boost::irange<int>(1, std::min(n - r, r) + 1),
+                                        0,
+                                        [](auto &&lhs, auto &&rhs) { return lhs - static_cast<int>(std::log10(rhs)); });
+        log_sum = boost::accumulate(boost::irange<int>(std::max(n - r, r) + 1, n + 1),
+                                    log_sum,
+                                    [](auto &&lhs, auto &&rhs) { return lhs + static_cast<int>(std::log10(rhs)); });
+
+        const auto max_digits = std::log10(std::numeric_limits<T>::max());
+        if (log_sum <= max_digits) {
           auto fvar_value = math::binomial_coefficient<T>(static_cast<unsigned>(iround(make_fvar<T, m>(n))),
                                                           static_cast<unsigned>(iround(make_fvar<T, m>(r))));
           auto root_type_value = math::binomial_coefficient<T>(n, r);
@@ -2141,9 +2153,11 @@ struct boost_special_functions_test {
           } else {
             BOOST_REQUIRE(!std::isfinite(fvar_value) && !std::isfinite(root_type_value));
           }
-        } catch (const std::overflow_error &e) {
-          std::cout << e.what() << "\tn: " << n << "  r:" << r << std::endl;
-          continue;
+        } else {
+          BOOST_REQUIRE_THROW(math::binomial_coefficient<T>(static_cast<unsigned>(iround(make_fvar<T, m>(n))),
+                                                            static_cast<unsigned>(iround(make_fvar<T, m>(r)))),
+                              wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::binomial_coefficient<T>(n, r), wrapexcept<std::overflow_error>);
         }
       }
     }
@@ -2161,6 +2175,7 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T, m>(x)), math::cbrt(static_cast<T>(x)), 2*pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::cbrt(make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::cbrt(static_cast<T>(x)), wrapexcept<std::domain_error>);
         }
       }
     }

@@ -2023,7 +2023,7 @@ struct boost_special_functions_test {
   template<typename T>
   struct RandomSample {
     RandomSample(T start, T finish) : start_(start), finish_(finish), rng_(std::random_device{}()),
-                                      dist_(start_, std::nextafter(finish_, std::numeric_limits<T>::max())) {
+                                      dist_(start_, std::nextafter(finish_,std::numeric_limits<T>::max())) {
     }
 
     T next() noexcept {
@@ -2040,7 +2040,7 @@ struct boost_special_functions_test {
   void operator()(const T &) const {
     using namespace boost;
     constexpr int m = 3;
-    constexpr T pct_epsilon = math::tools::epsilon<T>()*100;
+    constexpr T pct_epsilon = std::numeric_limits<T>::epsilon()*100;
     constexpr std::size_t n_samples = 25;
 
     // airy.hpp
@@ -2060,18 +2060,18 @@ struct boost_special_functions_test {
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
-        BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(static_cast<T>(sample)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), pct_epsilon);
       }
     }
 
     // asinh.hpp
     {
-      RandomSample<T> sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
+      RandomSample<T> sampler{std::numeric_limits<T>::lowest(),std::numeric_limits<T>::max()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
         if (std::isfinite(sample)) {
-          BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(static_cast<T>(sample)), pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::asinh(static_cast<T>(sample)), wrapexcept<std::overflow_error>);
@@ -2085,15 +2085,15 @@ struct boost_special_functions_test {
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
-        if (abs(sample) > 1) {
+        if (abs(sample) > static_cast<T>(1)) {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
           BOOST_REQUIRE_THROW(math::atanh(static_cast<T>(sample)), wrapexcept<std::domain_error>);
-        } else if ((sample >= -1 && sample < std::numeric_limits<T>::epsilon() - 1) ||
-            (sample <= 1 && sample > 1 - std::numeric_limits<T>::epsilon())) {
+        } else if ((sample >= static_cast<T>(-1) && sample < std::numeric_limits<T>::epsilon() + static_cast<T>(-1)) ||
+            (sample <= static_cast<T>(1) && sample > static_cast<T>(1) - std::numeric_limits<T>::epsilon())) {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::atanh(static_cast<T>(sample)), wrapexcept<std::overflow_error>);
         } else {
-          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(static_cast<T>(sample)), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 2*pct_epsilon);
         }
       }
     }
@@ -2108,19 +2108,19 @@ struct boost_special_functions_test {
 
     // beta.hpp
     {
-      RandomSample<T> x_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
-      RandomSample<T> y_sampler{std::numeric_limits<T>::lowest(), std::numeric_limits<T>::max()};
+      RandomSample<T> x_sampler{std::numeric_limits<T>::lowest(),std::numeric_limits<T>::max()};
+      RandomSample<T> y_sampler{std::numeric_limits<T>::lowest(),std::numeric_limits<T>::max()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto x = x_sampler.next();
         auto y = y_sampler.next();
         if (x < 1 || y < 1) {
           BOOST_REQUIRE_THROW(math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::beta(static_cast<T>(x), static_cast<T>(y)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::beta(x, y), wrapexcept<std::domain_error>);
         } else if (!std::isfinite(x) && !std::isfinite(y)) {
           BOOST_REQUIRE(!std::isfinite(static_cast<T>(math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)))));
         } else {
-          BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), math::beta(static_cast<T>(x), static_cast<T>(y)), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), math::beta(x, y), 2*pct_epsilon);
         }
       }
       // policy issue
@@ -2146,7 +2146,7 @@ struct boost_special_functions_test {
           } else {
             BOOST_REQUIRE(!std::isfinite(fvar_value) && !std::isfinite(root_type_value));
           }
-        } catch (std::overflow_error) {
+        } catch (const std::overflow_error&) {
           continue;
         }
       }
@@ -2155,32 +2155,44 @@ struct boost_special_functions_test {
     // cbrt.hpp
     {
       // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
-      RandomSample<T> x_sampler{0, std::numeric_limits<T>::max()};
+      RandomSample<T> x_sampler{0,std::numeric_limits<T>::max()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto x = x_sampler.next();
         if (boost::math::isinf(x) || x==0) {
-          BOOST_REQUIRE_EQUAL(math::cbrt(make_fvar<T, m>(x)), static_cast<T>(x));
+          BOOST_REQUIRE_EQUAL(math::cbrt(make_fvar<T, m>(x)), x);
         } else if (std::isfinite(x)) {
-          BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T, m>(x)), math::cbrt(static_cast<T>(x)), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T, m>(x)), math::cbrt(x), 2*pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::cbrt(make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::cbrt(static_cast<T>(x)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::cbrt(x), wrapexcept<std::domain_error>);
         }
       }
     }
 
     // chebyshev.hpp
     {
-      BOOST_REQUIRE_EQUAL(math::chebyshev_next(make_fvar<T, m>(0.5), make_fvar<T, m>(0.5), make_fvar<T, m>(0.5)),
-                          math::chebyshev_next(static_cast<T>(0.5), static_cast<T>(0.5), static_cast<T>(0.5)));
-      // Requires acosh() (added)
+      {
+        RandomSample<T> x_sampler{0, 1};
+        T t_0 = 1;
+        T x = x_sampler.next();
+        T t_1 = x;
+        for (auto i : boost::irange(n_samples)) {
+          std::ignore = i;
+          std::swap(t_0, t_1);
+          auto tmp = math::chebyshev_next(x, t_0, t_1);
+          BOOST_REQUIRE_EQUAL(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
+                              tmp);
+          t_1 = tmp;
+        }
+      }
+      //TODO(kbhat): more tests for these
       BOOST_REQUIRE_EQUAL(math::chebyshev_t(0, make_fvar<T, m>(0.5)), math::chebyshev_t(0, static_cast<T>(0.5)));
       BOOST_REQUIRE_EQUAL(math::chebyshev_u(0, make_fvar<T, m>(0.5)), math::chebyshev_u(0, static_cast<T>(0.5)));
       BOOST_REQUIRE_EQUAL(math::chebyshev_t_prime(0, make_fvar<T, m>(0.5)),
                           math::chebyshev_t_prime(0, static_cast<T>(0.5)));
       {
-        std::array<double, 4> c{14.2, -13.7, 82.3, 96};
+        //std::array<double, 4> c{14.2, -13.7, 82.3, 96};
         // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error: cannot convert ‘boost::math::differentiation::autodiff_v1::detail::fvar<double, 3>’ to ‘double’ in return
         //BOOST_REQUIRE_EQUAL(math::chebyshev_clenshaw_recurrence(c.data(),c.size(),make_fvar<T,m>(0.5)) , math::chebyshev_clenshaw_recurrence(c.data(),c.size(),static_cast<T>(0.5)));
       }

@@ -2135,10 +2135,14 @@ struct boost_special_functions_test {
         try {
           auto fvar_value = math::binomial_coefficient<T>(static_cast<unsigned>(iround(make_fvar<T, m>(n))),
                                                           static_cast<unsigned>(iround(make_fvar<T, m>(r))));
-          auto t_value = math::binomial_coefficient<T>(n, r);
-          BOOST_REQUIRE_CLOSE(fvar_value, t_value, pct_epsilon);
+          auto root_type_value = math::binomial_coefficient<T>(n, r);
+          if (std::isfinite(fvar_value) && std::isfinite(root_type_value)) {
+            BOOST_REQUIRE_CLOSE(fvar_value, root_type_value, pct_epsilon);
+          } else {
+            BOOST_REQUIRE(!std::isfinite(fvar_value) && !std::isfinite(root_type_value));
+          }
         } catch (const std::overflow_error &e) {
-          std::cout << e.what() << std::endl;
+          std::cout << e.what() << "\tn: " << n << "  r:" << r << std::endl;
           continue;
         }
       }

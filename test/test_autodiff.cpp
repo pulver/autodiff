@@ -1935,44 +1935,48 @@ struct boost_special_functions_test {
 
     // acosh.hpp
     {
-      RandomSample<T> sampler{1, 2000};
+      RandomSample<T> sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
-        BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), 20*pct_epsilon);
+        try {
+          BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), 20*pct_epsilon);
+        } catch (const std::domain_error&) {
+          BOOST_REQUIRE_THROW(math::acosh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::acosh(sample), wrapexcept<std::domain_error>);
+        }
       }
     }
 
     // asinh.hpp
     {
-      RandomSample<T> sampler{-2000,2000};
+      RandomSample<T> sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
-        if (std::isfinite(sample)) {
+        try {
           BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), 20*pct_epsilon);
-        } else {
-          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::asinh(static_cast<T>(sample)), wrapexcept<std::overflow_error>);
+        } catch (const std::domain_error&) {
+          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::asinh(sample), wrapexcept<std::domain_error>);
         }
       }
     }
 
     // atanh.hpp
     {
-      RandomSample<T> sampler{-1, 1};
+      RandomSample<T> sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
-        if (abs(sample) > static_cast<T>(1)) {
-          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::atanh(static_cast<T>(sample)), wrapexcept<std::domain_error>);
-        } else if ((sample >= static_cast<T>(-1) && sample < math::tools::epsilon<T>() + static_cast<T>(-1)) ||
-            (sample <= static_cast<T>(1) && sample > static_cast<T>(1) - math::tools::epsilon<T>())) {
-          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::atanh(static_cast<T>(sample)), wrapexcept<std::overflow_error>);
-        } else {
+        try {
           BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 20*pct_epsilon);
+        } catch (const std::domain_error&) {
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::domain_error>);
+        } catch (const std::overflow_error&) {
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::overflow_error>);
         }
       }
     }

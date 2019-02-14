@@ -1970,7 +1970,7 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::atanh(static_cast<T>(sample)), wrapexcept<std::overflow_error>);
         } else {
-          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), 3*pct_epsilon);
         }
       }
     }
@@ -2101,17 +2101,21 @@ struct boost_special_functions_test {
 
     // digamma.hpp
     {
-      BOOST_REQUIRE_EQUAL(math::digamma(make_fvar<T, m>(std::ldexp(1.0, -100))),
-                          math::digamma(static_cast<T>(std::ldexp(1.0, -100))));
-      BOOST_REQUIRE_EQUAL(math::digamma(make_fvar<T, m>(-std::ldexp(1.0, -100))),
-                          math::digamma(static_cast<T>(-std::ldexp(1.0, -100))));
-      // -0.577215612 != -0.577215672
-      BOOST_REQUIRE_CLOSE(math::digamma(make_fvar<T, m>(1.0)), math::digamma(static_cast<T>(1.0)), 2*pct_epsilon);
-      BOOST_REQUIRE_EQUAL(math::digamma(make_fvar<T, m>(-1 + std::ldexp(1.0, -20))),
-                          math::digamma(static_cast<T>(-1 + std::ldexp(1.0, -20))));
-      // 1048576.4227818125 != 1048576.4227818127
-      BOOST_REQUIRE_CLOSE(math::digamma(make_fvar<T, m>(-1 - std::ldexp(1.0, -20))),
-                          math::digamma(static_cast<T>(-1 - std::ldexp(1.0, -20))), 2*pct_epsilon);
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> exp_sampler{0, std::log2(math::tools::max_value<T>())};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto exponent = exp_sampler.next();
+        std::cout << x << "\t" << exponent << std::endl;
+        if (std::isfinite(x)) {
+          BOOST_REQUIRE_EQUAL(math::digamma(make_fvar<T, m>(std::ldexp(x, exponent))),
+                              math::digamma(static_cast<T>(std::ldexp(x, exponent))));
+        } else {
+          BOOST_REQUIRE_THROW(math::digamma(make_fvar<T, m>(std::ldexp(x, exponent))), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::digamma(static_cast<T>(std::ldexp(x, exponent))), wrapexcept<std::overflow_error>);
+        }
+      }
       for (auto i = 0; i < 3; ++i) {
         BOOST_REQUIRE_THROW(math::digamma(make_fvar<T, m>(-1.0*i)), wrapexcept<std::domain_error>);
       }
@@ -2119,99 +2123,82 @@ struct boost_special_functions_test {
 
     // ellint_1.hpp
     {
-      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(1.01)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(-1.01)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(-1)), wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(1)), wrapexcept<std::overflow_error>);
-      for (auto i : {0.0, 0.125, 0.25, 0.29296875, 0.390625, -0.5, -0.75, 0.875, 0.9990234375}) {
-        // i=0.125 -> 1.576986771215812988 != 1.57698677121581321
-        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(i)), math::ellint_1(static_cast<T>(i)), 2*pct_epsilon);
-      }
-      for (auto p : std::initializer_list<std::tuple<T, T>>{{0.0, 0.0},
-                                                            {0.0, -10.0},
-                                                            {-1.0, -1.0},
-                                                            {0.875, -4.0},
-                                                            {-0.625, 8.0},
-                                                            {0.875, 1e-5},
-                                                            {100/1024.0, 1e5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))),
-                            math::ellint_1(std::get<0>(p), std::get<1>(p)), 2*pct_epsilon);
+      RandomSample<T> k_sampler{-1.5, 1.5};
+      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto k = k_sampler.next();
+        auto phi = phi_sampler.next();
+        if (abs(k) > static_cast<T>(1)) {
+          BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(k)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_1(k), wrapexcept<std::domain_error>);
+        } else if (abs(k) == static_cast<T>(1)) {
+          BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(k)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::ellint_1(k), wrapexcept<std::overflow_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k)), math::ellint_1(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
+                              math::ellint_1(k, phi), 4*pct_epsilon);
+        }
       }
     }
 
     // ellint_2.hpp
     {
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(1.01)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(-1.01)), wrapexcept<std::domain_error>);
-      for (auto i : {-1024.0, -900.0, -800.0, -600.0, -512.0, 0.0, 100.0, 200.0, 300.0, 400.0}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(i/1024)), math::ellint_2(static_cast<T>(i/1024)),
-                            1.5*pct_epsilon);
-      }
-      for (auto p : std::initializer_list<std::tuple<T, T>>{{0.0, 0.0},
-                                                            {0.0, -10.0},
-                                                            {-1.0, -1.0},
-                                                            {900/1024.0, -4.0},
-                                                            {-600/1024.0, 8.0},
-                                                            {800.0/1024, 1e-5},
-                                                            {100/1024.0, 1e5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))),
-                            math::ellint_2(std::get<0>(p), std::get<1>(p)), 1.5*pct_epsilon);
+      RandomSample<T> k_sampler{-1.5, 1.5};
+      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto k = k_sampler.next();
+        auto phi = phi_sampler.next();
+        if (abs(k) > static_cast<T>(1)) {
+          BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(k)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_2(k), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(k)), math::ellint_2(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
+                              math::ellint_2(k, phi), 3*pct_epsilon);
+        }
       }
     }
 
     // ellint_3.hpp
     {
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(1.0001), make_fvar<T, m>(-1), make_fvar<T, m>(0)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(0.5), make_fvar<T, m>(20), make_fvar<T, m>(1.5)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(1.0001), make_fvar<T, m>(-1)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(0.5), make_fvar<T, m>(1)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(0.5), make_fvar<T, m>(2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(0.5), make_fvar<T, m>(2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T, m>(2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T, m>(-2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(0.5), make_fvar<T, m>(2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T, m>(2)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(1), make_fvar<T, m>(-0.5), make_fvar<T, m>(-2)),
-                          wrapexcept<std::domain_error>);
-      for (auto p : std::initializer_list<std::tuple<T, T>>{{0.2, 0.0},
-                                                            {0.4, 0.0},
-                                                            {0.0, 0.0},
-                                                            {0.0, 0.5},
-                                                            {0.3, -4.0},
-                                                            {-0.5, -1e5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_3(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))),
-                            math::ellint_3(std::get<0>(p), std::get<1>(p)), 2*pct_epsilon);
+      RandomSample<T> k_sampler{-1.5, 1.5};
+      RandomSample<T> n_sampler{0, 1};
+      RandomSample<T> phi_sampler{1.25, math::constants::half_pi<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto k = k_sampler.next();
+        auto n = n_sampler.next();
+        auto phi = phi_sampler.next();
+        if (abs(k) > static_cast<T>(1)) {
+          BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_3(k, n), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)), math::ellint_3(k, n), 4*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n), make_fvar<T, m>(phi)),
+                              math::ellint_3(k, n, phi), 4*pct_epsilon);
+        }
       }
     }
+    
     // ellint_d.hpp
     {
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(1)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(-1)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(1.5)), wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(-1.5)), wrapexcept<std::domain_error>);
-      for (auto p : {0.5, 1.0/1024}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(p)), math::ellint_d(p), 2*pct_epsilon);
-      }
-      for (auto p : std::initializer_list<std::tuple<T, T>>{{0.5, 0.5},
-                                                            {0.5, 0},
-                                                            {0.5, 1},
-                                                            {1, 1},
-                                                            {1, -1},
-                                                            {0.5, -1},
-                                                            {0.5, -10},
-                                                            {-0.5, 10}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))),
-                            math::ellint_d(std::get<0>(p), std::get<1>(p)), 2*pct_epsilon);
+      RandomSample<T> k_sampler{-1.5, 1.5};
+      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto k = k_sampler.next();
+        auto phi = phi_sampler.next();
+        if (abs(k) >= static_cast<T>(1)) {
+          BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(k)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_d(k), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(k)), math::ellint_d(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
+                              math::ellint_d(k, phi), 4.5*pct_epsilon);
+        }
       }
     }
 

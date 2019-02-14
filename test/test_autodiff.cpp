@@ -2115,7 +2115,8 @@ struct boost_special_functions_test {
     // chebyshev.hpp
     {
       {
-        RandomSample<T> x_sampler{0, 1};
+        RandomSample<T> x_sampler{-1, 1};
+        RandomSample<unsigned> n_sampler{0, 100};
         T t_0 = 1;
         T x = x_sampler.next();
         T t_1 = x;
@@ -2134,10 +2135,21 @@ struct boost_special_functions_test {
             BOOST_REQUIRE_THROW(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)), wrapexcept<std::overflow_error>);
             BOOST_REQUIRE_THROW(math::chebyshev_next(x, t_0, t_1), wrapexcept<std::overflow_error>);
           }
+
+          auto n = n_sampler.next();
+          try {
+            BOOST_REQUIRE_CLOSE_FRACTION(math::chebyshev_t(n, make_fvar<T, m>(x)), math::chebyshev_t(n, static_cast<T>(x)), pct_epsilon);
+          } catch (const std::domain_error&) {
+            BOOST_REQUIRE_THROW(math::chebyshev_t(n, make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_t(n, x), wrapexcept<std::domain_error>);
+          } catch (const std::overflow_error&) {
+            std::cout << n << "\t" << x << std::endl;
+            BOOST_REQUIRE_THROW(math::chebyshev_t(n, make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_t(n, x), wrapexcept<std::overflow_error>);
+          }
         }
       }
       //TODO(kbhat): more tests for these
-      BOOST_REQUIRE_EQUAL(math::chebyshev_t(0, make_fvar<T, m>(0.20)), math::chebyshev_t(0, static_cast<T>(0.20)));
       BOOST_REQUIRE_EQUAL(math::chebyshev_u(0, make_fvar<T, m>(0.20)), math::chebyshev_u(0, static_cast<T>(0.20)));
       BOOST_REQUIRE_EQUAL(math::chebyshev_t_prime(0, make_fvar<T, m>(0.20)),
                           math::chebyshev_t_prime(0, static_cast<T>(0.20)));
@@ -2338,7 +2350,7 @@ struct boost_special_functions_test {
                                               make_fvar<T, m>(y),
                                               make_fvar<T, m>(z),
                                               make_fvar<T, m>(p)),
-                              math::ellint_rj(x, y, z, p), pct_epsilon);
+                              math::ellint_rj(x, y, z, p), 11*pct_epsilon);
         } catch (const std::domain_error& e) {
           BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z), make_fvar<T,m>(p)), wrapexcept<std::domain_error>);
           BOOST_REQUIRE_THROW(math::ellint_rj(x, y, z, p), wrapexcept<std::domain_error>);

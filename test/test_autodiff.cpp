@@ -11,6 +11,8 @@
 #include <boost/math/special_functions/round.hpp> // iround
 #include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/range/adaptors.hpp>
+#include <boost/range/algorithm.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/range/numeric.hpp>
 #include <random>
@@ -2043,7 +2045,6 @@ struct boost_special_functions_test {
         if (boost::math::isinf(x) || x==0) {
           BOOST_REQUIRE_EQUAL(math::cbrt(make_fvar<T, m>(x)), x);
         } else if (std::isfinite(x)) {
-          std::cout << x << "\t" << math::tools::max_value<T>() << std::endl;
           BOOST_REQUIRE_CLOSE(math::cbrt(make_fvar<T, m>(x)), math::cbrt(x), 2*pct_epsilon);
         } else {
           BOOST_REQUIRE_THROW(math::cbrt(make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
@@ -2107,7 +2108,6 @@ struct boost_special_functions_test {
         std::ignore = i;
         auto x = x_sampler.next();
         auto exponent = exp_sampler.next();
-        std::cout << x << "\t" << exponent << std::endl;
         if (std::isfinite(x)) {
           BOOST_REQUIRE_EQUAL(math::digamma(make_fvar<T, m>(std::ldexp(x, exponent))),
                               math::digamma(static_cast<T>(std::ldexp(x, exponent))));
@@ -2124,7 +2124,7 @@ struct boost_special_functions_test {
     // ellint_1.hpp
     {
       RandomSample<T> k_sampler{-1.5, 1.5};
-      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      RandomSample<T> phi_sampler{0, math::constants::half_pi<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto k = k_sampler.next();
@@ -2136,9 +2136,9 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(k)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_1(k), wrapexcept<std::overflow_error>);
         } else {
-          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k)), math::ellint_1(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k)), math::ellint_1(k), 5*pct_epsilon);
           BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                              math::ellint_1(k, phi), 4*pct_epsilon);
+                              math::ellint_1(k, phi), 5*pct_epsilon);
         }
       }
     }
@@ -2146,7 +2146,7 @@ struct boost_special_functions_test {
     // ellint_2.hpp
     {
       RandomSample<T> k_sampler{-1.5, 1.5};
-      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      RandomSample<T> phi_sampler{0, math::constants::half_pi<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto k = k_sampler.next();
@@ -2155,9 +2155,9 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(k)), wrapexcept<std::domain_error>);
           BOOST_REQUIRE_THROW(math::ellint_2(k), wrapexcept<std::domain_error>);
         } else {
-          BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(k)), math::ellint_2(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(k)), math::ellint_2(k), 5*pct_epsilon);
           BOOST_REQUIRE_CLOSE(math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                              math::ellint_2(k, phi), 3*pct_epsilon);
+                              math::ellint_2(k, phi), 5*pct_epsilon);
         }
       }
     }
@@ -2166,7 +2166,7 @@ struct boost_special_functions_test {
     {
       RandomSample<T> k_sampler{-1.5, 1.5};
       RandomSample<T> n_sampler{0, 1};
-      RandomSample<T> phi_sampler{1.25, math::constants::half_pi<T>()};
+      RandomSample<T> phi_sampler{0, math::constants::half_pi<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto k = k_sampler.next();
@@ -2186,7 +2186,7 @@ struct boost_special_functions_test {
     // ellint_d.hpp
     {
       RandomSample<T> k_sampler{-1.5, 1.5};
-      RandomSample<T> phi_sampler{0.5, math::constants::half_pi<T>()};
+      RandomSample<T> phi_sampler{0, math::constants::half_pi<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto k = k_sampler.next();
@@ -2195,32 +2195,32 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(k)), wrapexcept<std::domain_error>);
           BOOST_REQUIRE_THROW(math::ellint_d(k), wrapexcept<std::domain_error>);
         } else {
-          BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(k)), math::ellint_d(k), 2*pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(k)), math::ellint_d(k), 4.5*pct_epsilon);
           BOOST_REQUIRE_CLOSE(math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
                               math::ellint_d(k, phi), 4.5*pct_epsilon);
         }
       }
     }
 
-    BOOST_REQUIRE_EQUAL(math::log1p(make_fvar<T, m>(math::constants::pi<T>())), math::log1p(math::constants::pi<T>()));
-    BOOST_REQUIRE_EQUAL(math::expm1(make_fvar<T, m>(math::constants::pi<T>())), math::expm1(math::constants::pi<T>()));
-    BOOST_REQUIRE_EQUAL(math::sqrt1pm1(make_fvar<T, m>(math::constants::pi<T>())),
-                        math::sqrt1pm1(math::constants::pi<T>()));
-    // 9.95037044e-06 != 9.95037135e-06
-    BOOST_REQUIRE_CLOSE(math::powm1(make_fvar<T, m>(1.01), make_fvar<T, m>(0.001)),
-                        math::powm1(static_cast<T>(1.01), static_cast<T>(0.001)), pct_epsilon);
-    BOOST_REQUIRE_EQUAL(math::hypot(make_fvar<T, m>(3), make_fvar<T, m>(4)),
-                        math::hypot(static_cast<T>(3), static_cast<T>(4)));
-    BOOST_REQUIRE_EQUAL(math::pow<2>(make_fvar<T, m>(3)), math::pow<2>(static_cast<T>(3)));
-
     // ellint_rf.hpp
     {
-      for (auto p : std::initializer_list<std::tuple<T, T, T>>{{1, 2, 0},
-                                                               {0.5, 1, 0},
-                                                               {2, 3, 4}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_rf(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p)),
-                                            make_fvar<T, m>(std::get<2>(p))),
-                            math::ellint_rf(std::get<0>(p), std::get<1>(p), std::get<2>(p)), 2*pct_epsilon);
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> z_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        auto z = z_sampler.next();
+        std::array<T, 3> samples {x, y, z};
+        if (boost::size(samples | adaptors::filtered([](const T& sample) { return sample < static_cast<T>(0); })) > 0 ||
+            boost::size(samples | adaptors::filtered([](const T& sample) { return sample == static_cast<T>(0); })) > 1) {
+          BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rf(x, y, z), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_rf(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)),
+                              math::ellint_rf(x, y, z), pct_epsilon);
+        }
       }
     }
     // ellint_rc.hpp
@@ -2278,6 +2278,29 @@ struct boost_special_functions_test {
         }
       }
     }
+
+    // expm1.hpp
+    {
+      RandomSample<T> x_sampler{-math::log1p(math::tools::max_value<T>()), math::log1p(math::tools::max_value<T>())};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        BOOST_REQUIRE_EQUAL(math::expm1(make_fvar<T, m>(x)),
+                            math::expm1(x));
+      }
+    }
+
+    BOOST_REQUIRE_EQUAL(math::log1p(make_fvar<T, m>(math::constants::pi<T>())), math::log1p(math::constants::pi<T>()));
+    BOOST_REQUIRE_EQUAL(math::sqrt1pm1(make_fvar<T, m>(math::constants::pi<T>())),
+                        math::sqrt1pm1(math::constants::pi<T>()));
+    // 9.95037044e-06 != 9.95037135e-06
+    BOOST_REQUIRE_CLOSE(math::powm1(make_fvar<T, m>(1.01), make_fvar<T, m>(0.001)),
+                        math::powm1(static_cast<T>(1.01), static_cast<T>(0.001)), pct_epsilon);
+    BOOST_REQUIRE_EQUAL(math::hypot(make_fvar<T, m>(3), make_fvar<T, m>(4)),
+                        math::hypot(static_cast<T>(3), static_cast<T>(4)));
+    BOOST_REQUIRE_EQUAL(math::pow<2>(make_fvar<T, m>(3)), math::pow<2>(static_cast<T>(3)));
+
+
 
     // jacobi_zeta.hpp
     {

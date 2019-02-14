@@ -1943,7 +1943,7 @@ struct boost_special_functions_test {
 
     // asinh.hpp
     {
-      RandomSample<T> sampler{std::numeric_limits<T>::lowest(),math::tools::max_value<T>()};
+      RandomSample<T> sampler{-math::tools::max_value<T>(),math::tools::max_value<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto sample = sampler.next();
@@ -1989,8 +1989,8 @@ struct boost_special_functions_test {
 
     // beta.hpp
     {
-      RandomSample<T> x_sampler{std::numeric_limits<T>::lowest(),math::tools::max_value<T>()};
-      RandomSample<T> y_sampler{std::numeric_limits<T>::lowest(),math::tools::max_value<T>()};
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(),math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(),math::tools::max_value<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto x = x_sampler.next();
@@ -2036,7 +2036,7 @@ struct boost_special_functions_test {
     // cbrt.hpp
     {
       // Compiles, but compares 0.7937005259840996807 == 0.79370052598409979172 which is false.
-      RandomSample<T> x_sampler{0,math::tools::max_value<T>()};
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(),math::tools::max_value<T>()};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
         auto x = x_sampler.next();
@@ -2085,9 +2085,17 @@ struct boost_special_functions_test {
     // cos_pi.hpp
     {
       // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
-      for (auto idx = -10; idx < 11; ++idx) {
-        BOOST_REQUIRE_EQUAL(math::cos_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*idx*0.25))),
-                            math::cos_pi(math::iround(math::constants::pi<T>()*idx*0.25)));
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        if (std::isfinite(x)) {
+          BOOST_REQUIRE_EQUAL(math::cos_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))),
+                              math::cos_pi(math::iround(math::constants::pi<T>()*x)));
+        } else {
+          BOOST_REQUIRE_THROW(math::cos_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))), wrapexcept<math::rounding_error>);
+          BOOST_REQUIRE_THROW(math::cos_pi(math::iround(math::constants::pi<T>()*x)), wrapexcept<math::rounding_error>);
+        }
       }
     }
 
@@ -2334,9 +2342,17 @@ struct boost_special_functions_test {
     // sin_pi.hpp
     {
       // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
-      for (auto idx = -10; idx < 11; ++idx) {
-        BOOST_REQUIRE_EQUAL(math::sin_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*idx*0.25))),
-                            math::sin_pi(math::iround(math::constants::pi<T>()*idx*0.25)));
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        if (std::isfinite(x)) {
+          BOOST_REQUIRE_EQUAL(math::sin_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))),
+                              math::sin_pi(math::iround(math::constants::pi<T>()*x)));
+        } else {
+          BOOST_REQUIRE_THROW(math::sin_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))), wrapexcept<math::rounding_error>);
+          BOOST_REQUIRE_THROW(math::sin_pi(math::iround(math::constants::pi<T>()*x)), wrapexcept<math::rounding_error>);
+        }
       }
     }
   }

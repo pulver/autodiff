@@ -1948,55 +1948,63 @@ struct boost_special_functions_test {
 
     // acosh.hpp
     {
-      RandomSample<T> sampler{-2000, 2000};
+      RandomSample<T> x_sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
-        auto sample = sampler.next();
+        auto x = x_sampler.next();
         try {
-          BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(sample)), math::acosh(sample), pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::acosh(make_fvar<T, m>(x)), math::acosh(x), pct_epsilon);
         } catch (const std::domain_error&) {
-          BOOST_REQUIRE_THROW(math::acosh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::acosh(sample), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::acosh(make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::acosh(x), wrapexcept<std::domain_error>);
         } catch (const std::overflow_error&) {
-          BOOST_REQUIRE_THROW(math::acosh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::acosh(sample), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::acosh(make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::acosh(x), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
-
       }
     }
 
     // asinh.hpp
     {
-      RandomSample<T> sampler{-2000, 2000};
+      RandomSample<T> x_sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
-        auto sample = sampler.next();
+        auto x = x_sampler.next();
         try {
-          BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(sample)), math::asinh(sample), pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::asinh(make_fvar<T, m>(x)), math::asinh(x), pct_epsilon);
         } catch (const std::domain_error &) {
-          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept < std::domain_error > );
-          BOOST_REQUIRE_THROW(math::asinh(sample), wrapexcept < std::domain_error > );
+          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(x)), wrapexcept < std::domain_error > );
+          BOOST_REQUIRE_THROW(math::asinh(x), wrapexcept < std::domain_error > );
         } catch (const std::overflow_error &) {
-          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(sample)), wrapexcept < std::overflow_error > );
-          BOOST_REQUIRE_THROW(math::asinh(sample), wrapexcept < std::overflow_error > );
+          BOOST_REQUIRE_THROW(math::asinh(make_fvar<T, m>(x)), wrapexcept < std::overflow_error > );
+          BOOST_REQUIRE_THROW(math::asinh(x), wrapexcept < std::overflow_error > );
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
 
     // atanh.hpp
     {
-      RandomSample<T> sampler{-2000, 2000};
+      RandomSample<T> x_sampler{-2000, 2000};
       for (auto i : boost::irange(n_samples)) {
         std::ignore = i;
-        auto sample = sampler.next();
+        auto x = x_sampler.next();
         try {
-          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(sample)), math::atanh(sample), pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::atanh(make_fvar<T, m>(x)), math::atanh(x), pct_epsilon);
         } catch (const std::domain_error&) {
-          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::atanh(x), wrapexcept<std::domain_error>);
         } catch (const std::overflow_error&) {
-          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(sample)), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::atanh(sample), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::atanh(make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::atanh(x), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2016,6 +2024,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error& e) {
           BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(x), wrapexcept <std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
 
         try {
@@ -2026,6 +2037,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error& e) {
           BOOST_REQUIRE_THROW(math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::tangent_t2n<T>(x), wrapexcept <std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2052,6 +2066,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::beta(x, y), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
       // policy issue
@@ -2085,6 +2102,9 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::binomial_coefficient<T>(static_cast<unsigned>(iround(make_fvar<T, m>(n))),
                                                             static_cast<unsigned>(iround(make_fvar<T, m>(r)))), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::binomial_coefficient<T>(n, r), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Input: n: " << n << "  r: " << r << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2108,6 +2128,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::cbrt(make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::cbrt(x), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2115,8 +2138,7 @@ struct boost_special_functions_test {
     // chebyshev.hpp
     {
       {
-        RandomSample<T> x_sampler{-1, 1};
-        RandomSample<unsigned> n_sampler{0, 100};
+        RandomSample<T> x_sampler{-2, 2};
         T t_0 = 1;
         T x = x_sampler.next();
         T t_1 = x;
@@ -2128,31 +2150,68 @@ struct boost_special_functions_test {
             BOOST_REQUIRE_EQUAL(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
                                 tmp);
             t_1 = tmp;
-          } catch (const std::domain_error&) {
-            BOOST_REQUIRE_THROW(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)), wrapexcept<std::domain_error>);
+          } catch (const std::domain_error &) {
+            BOOST_REQUIRE_THROW(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
+                                wrapexcept<std::domain_error>);
             BOOST_REQUIRE_THROW(math::chebyshev_next(x, t_0, t_1), wrapexcept<std::domain_error>);
-          } catch (const std::overflow_error&) {
-            BOOST_REQUIRE_THROW(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)), wrapexcept<std::overflow_error>);
+          } catch (const std::overflow_error &) {
+            BOOST_REQUIRE_THROW(math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
+                                wrapexcept<std::overflow_error>);
             BOOST_REQUIRE_THROW(math::chebyshev_next(x, t_0, t_1), wrapexcept<std::overflow_error>);
+          }catch (...) {
+            std::cout <<  "Input: x: " << x << "  t_0: " << t_0 << "  t_1: " << t_1 << std::endl;
+            std::rethrow_exception(std::exception_ptr(std::current_exception()));
           }
-
+        }
+      }
+      {
+        RandomSample<unsigned> n_sampler{0, 100};
+        RandomSample<T> x_sampler{-2, 2};
+        for (auto i : boost::irange(n_samples)) {
+          std::ignore = i;
           auto n = n_sampler.next();
+          auto x = x_sampler.next();
           try {
-            BOOST_REQUIRE_CLOSE_FRACTION(math::chebyshev_t(n, make_fvar<T, m>(x)), math::chebyshev_t(n, static_cast<T>(x)), pct_epsilon);
+            BOOST_REQUIRE_CLOSE_FRACTION(math::chebyshev_t(n, make_fvar<T, m>(x)), math::chebyshev_t(n, x), 400*math::tools::epsilon<T>());
           } catch (const std::domain_error&) {
             BOOST_REQUIRE_THROW(math::chebyshev_t(n, make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
             BOOST_REQUIRE_THROW(math::chebyshev_t(n, x), wrapexcept<std::domain_error>);
           } catch (const std::overflow_error&) {
-            std::cout << n << "\t" << x << std::endl;
             BOOST_REQUIRE_THROW(math::chebyshev_t(n, make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
             BOOST_REQUIRE_THROW(math::chebyshev_t(n, x), wrapexcept<std::overflow_error>);
+          } catch (...) {
+            std::cout <<  "Inputs: n: " << n << "  x: " << x << std::endl;
+            std::rethrow_exception(std::exception_ptr(std::current_exception()));
+          }
+
+          try {
+            BOOST_REQUIRE_CLOSE_FRACTION(math::chebyshev_u(n, make_fvar<T, m>(x)), math::chebyshev_u(n, x), 4000*math::tools::epsilon<T>());
+          } catch (const std::domain_error&) {
+            BOOST_REQUIRE_THROW(math::chebyshev_u(n, make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_u(n, x), wrapexcept<std::domain_error>);
+          } catch (const std::overflow_error&) {
+            BOOST_REQUIRE_THROW(math::chebyshev_u(n, make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_u(n, x), wrapexcept<std::overflow_error>);
+          } catch (...) {
+            std::cout <<  "Inputs: n: " << n << "  x: " << x << std::endl;
+            std::rethrow_exception(std::exception_ptr(std::current_exception()));
+          }
+
+          try {
+            BOOST_REQUIRE_CLOSE_FRACTION(math::chebyshev_t_prime(n, make_fvar<T, m>(x)), math::chebyshev_t_prime(n, x), 1000*math::tools::epsilon<T>());
+          } catch (const std::domain_error&) {
+            BOOST_REQUIRE_THROW(math::chebyshev_t_prime(n, make_fvar<T, m>(x)), wrapexcept<std::domain_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_t_prime(n, x), wrapexcept<std::domain_error>);
+          } catch (const std::overflow_error&) {
+            BOOST_REQUIRE_THROW(math::chebyshev_t_prime(n, make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
+            BOOST_REQUIRE_THROW(math::chebyshev_t_prime(n, x), wrapexcept<std::overflow_error>);
+          } catch (...) {
+            std::cout << "Inputs: n: " << n << "  x: " << x << std::endl;
+            std::rethrow_exception(std::exception_ptr(std::current_exception()));
           }
         }
       }
-      //TODO(kbhat): more tests for these
-      BOOST_REQUIRE_EQUAL(math::chebyshev_u(0, make_fvar<T, m>(0.20)), math::chebyshev_u(0, static_cast<T>(0.20)));
-      BOOST_REQUIRE_EQUAL(math::chebyshev_t_prime(0, make_fvar<T, m>(0.20)),
-                          math::chebyshev_t_prime(0, static_cast<T>(0.20)));
+     
       {
         //std::array<double, 4> c{14.2, -13.7, 82.3, 96};
         // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error: cannot convert ‘boost::math::differentiation::autodiff_v1::detail::fvar<double, 3>’ to ‘double’ in return
@@ -2175,6 +2234,9 @@ struct boost_special_functions_test {
         } catch (const math::rounding_error&) {
           BOOST_REQUIRE_THROW(math::cos_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))), wrapexcept<math::rounding_error>);
           BOOST_REQUIRE_THROW(math::cos_pi(math::iround(math::constants::pi<T>()*x)), wrapexcept<math::rounding_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2194,6 +2256,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::digamma(make_fvar<T, m>(x)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::digamma(x), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2216,6 +2281,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_1(make_fvar<T, m>(k)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_1(k), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: k: " << k << "  phi: " << phi << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2238,6 +2306,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_2(make_fvar<T, m>(k)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_2(k), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: k: " << k << "  phi: " << phi << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2262,6 +2333,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_3(k, n), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Inputs: k: " << k << "  n: " << n << "  phi: " << phi << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2284,6 +2358,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_d(make_fvar<T, m>(k)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_d(k), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Inputs: k: " << k << "  phi: " << phi << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2307,6 +2384,8 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_rf(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_rf(x, y, z), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cerr <<  "Inputs: x: " << x << "  y: " << y << "  z: " << z << std::endl;
         }
       }
     }
@@ -2328,6 +2407,8 @@ struct boost_special_functions_test {
         }catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T,m>(x), make_fvar<T,m>(y)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_rc(x, y), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cerr <<  "Inputs: x: " << x << "  y: " << y << std::endl;
         }
       }
     }
@@ -2357,6 +2438,9 @@ struct boost_special_functions_test {
         }catch (const std::overflow_error& e) {
           BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z), make_fvar<T,m>(p)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_rj(x, y, z, p), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << "  z: " << z << "  p: " << p << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2381,6 +2465,9 @@ struct boost_special_functions_test {
         }  catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_rd(x, y, z), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << "  z: " << z << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2405,6 +2492,9 @@ struct boost_special_functions_test {
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(math::ellint_rg(x, y, z), wrapexcept<std::overflow_error>);
+        }catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << "  z: " << z << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
     }
@@ -2467,7 +2557,7 @@ struct boost_special_functions_test {
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_EQUAL(math::cyl_bessel_j_prime(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_j_prime(0,static_cast<T>(0.20)));
     //BOOST_REQUIRE_EQUAL(math::cyl_neumann_prime(0,make_fvar<T,m>(0.20)) , math::cyl_neumann_prime(0,static_cast<T>(0.20)));
-    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i_prime(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_i_prime(0,static_cast<T>(0.20)));
+    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i_prime(0,make_fvar<T,m>(0.20)) , ath::cyl_bessel_i_prime(0,static_cast<T>(0.20)));
     BOOST_REQUIRE_CLOSE(math::cyl_bessel_k_prime(0, make_fvar<T, m>(0.20)),
                         math::cyl_bessel_k_prime(0, static_cast<T>(0.20)), pct_epsilon);
     // Policy parameter prevents ADL.

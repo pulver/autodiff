@@ -2223,58 +2223,93 @@ struct boost_special_functions_test {
         }
       }
     }
+
     // ellint_rc.hpp
     {
-      for (auto p : std::initializer_list<std::tuple<T, T>>{{0, 0.25},
-                                                            {9.0/4, 2},
-                                                            {0.25, -2}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_rc(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p))),
-                            math::ellint_rc(std::get<0>(p), std::get<1>(p)), 2*pct_epsilon);
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        if (x <= static_cast<T>(0) || y == static_cast<T>(0)) {
+          BOOST_REQUIRE_THROW(math::ellint_rc(make_fvar<T,m>(x), make_fvar<T,m>(y)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rc(x, y), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_rc(make_fvar<T,m>(x), make_fvar<T,m>(y)),
+                              math::ellint_rc(x, y), pct_epsilon);
+        }
       }
     }
 
     // ellint_rj.hpp
     {
-      for (auto p : std::initializer_list<std::tuple<T, T, T, T>>{{0, 1, 2, 3},
-                                                                  {2, 3, 4, 5},
-                                                                  {2, 3, 4, -0.5},
-                                                                  {2, 3, 4, -5}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_rj(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p)),
-                                            make_fvar<T, m>(std::get<2>(p)), make_fvar<T, m>(std::get<3>(p))),
-                            math::ellint_rj(std::get<0>(p), std::get<1>(p), std::get<2>(p), std::get<3>(p)),
-                            3.5*pct_epsilon);
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> z_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> p_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        auto z = z_sampler.next();
+        auto p = p_sampler.next();
+        std::array<T, 4> samples {x, y, z, p};
+        if (p == 0 || boost::size(samples | adaptors::filtered([](const T& sample) { return sample < static_cast<T>(0); })) > 0 ||
+            boost::size(samples | adaptors::filtered([](const T& sample) { return sample == static_cast<T>(0); })) > 1) {
+          BOOST_REQUIRE_THROW(math::ellint_rj(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z), make_fvar<T,m>(p)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rj(x, y, z, p), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_rj(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z), make_fvar<T,m>(p)),
+                              math::ellint_rj(x, y, z, p), pct_epsilon);
+        }
       }
     }
 
     // ellint_rd.hpp
     {
-      for (auto p : std::initializer_list<std::tuple<T, T, T>>{{0, 2, 1},
-                                                               {2, 3, 4}}) {
-        BOOST_REQUIRE_CLOSE(math::ellint_rd(make_fvar<T, m>(std::get<0>(p)), make_fvar<T, m>(std::get<1>(p)),
-                                            make_fvar<T, m>(std::get<2>(p))),
-                            math::ellint_rd(std::get<0>(p), std::get<1>(p), std::get<2>(p)), 1.5*pct_epsilon);
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> z_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        auto z = z_sampler.next();
+        std::array<T, 3> samples {x, y, z};
+        if (z < 0 || boost::size(samples | adaptors::filtered([](const T& sample) { return sample < static_cast<T>(0); })) > 0 ||
+            boost::size(samples | adaptors::filtered([](const T& sample) { return sample == static_cast<T>(0); })) > 1) {
+          BOOST_REQUIRE_THROW(math::ellint_rd(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rd(x, y, z), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_rd(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)),
+                              math::ellint_rd(x, y, z), pct_epsilon);
+        }
       }
     }
 
     // ellint_rg.hpp
     {
-      BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(1.01), make_fvar<T, m>(-1.0), make_fvar<T, m>(0)),
-                          wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(-1.01), make_fvar<T, m>(1.0), make_fvar<T, m>(1.0)),
-                          wrapexcept<std::domain_error>);
-      for (auto x = -1; x < 5; ++x) {
-        for (auto y = -1; y < 5; ++y) {
-          for (auto z = -1; z < 5; ++z) {
-            if (x < 0 || y < 0 || z < 0) {
-              BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                                  wrapexcept<std::domain_error>);
-            } else {
-              static constexpr auto pi = math::constants::pi<T>();
-              BOOST_REQUIRE_CLOSE(
-                  math::ellint_rg(make_fvar<T, m>(pi*x), make_fvar<T, m>(pi*y), make_fvar<T, m>(pi*z)),
-                  math::ellint_rg(pi*x, pi*y, pi*z), 2*pct_epsilon);
-            }
-          }
+      RandomSample<T> x_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> y_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+      RandomSample<T> z_sampler{-math::tools::max_value<T>(), math::tools::max_value<T>()};
+
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        auto z = z_sampler.next();
+        std::array<T, 3> samples{x,y,z};
+        if (boost::size(samples | adaptors::filtered([](const T& sample) { return !std::isfinite(sample); }))) {
+          BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rg(x, y, z), wrapexcept<std::overflow_error>);
+        } else if (x <= static_cast<T>(0) || y <= static_cast<T>(0)) {
+          BOOST_REQUIRE_THROW(math::ellint_rg(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::ellint_rg(x, y, z), wrapexcept<std::domain_error>);
+        } else {
+          BOOST_REQUIRE_CLOSE(math::ellint_rg(make_fvar<T,m>(x), make_fvar<T,m>(y), make_fvar<T,m>(z)),
+                              math::ellint_rg(x, y, z), pct_epsilon);
         }
       }
     }

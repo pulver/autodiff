@@ -1928,7 +1928,7 @@ struct boost_special_functions_test {
     using namespace boost;
     constexpr int m = 3;
     constexpr T pct_epsilon = 20*math::tools::epsilon<T>()*100;
-    constexpr std::size_t n_samples = 100;
+    constexpr std::size_t n_samples = 25;
 
     // goofy heuristic to deal with functions yielding values very close to 0
     const auto is_small = [](const T& x, const T& y) -> bool {
@@ -2165,7 +2165,7 @@ struct boost_special_functions_test {
         }
       }
       {
-        RandomSample<unsigned> n_sampler{0, 100};
+        RandomSample<unsigned> n_sampler{0, 10};
         RandomSample<T> x_sampler{-2, 2};
         for (auto i : boost::irange(n_samples)) {
           std::ignore = i;

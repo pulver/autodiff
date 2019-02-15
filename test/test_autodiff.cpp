@@ -2278,7 +2278,7 @@ struct boost_special_functions_test {
         auto k = k_sampler.next();
         auto phi = phi_sampler.next();
         try {
-          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k)), math::ellint_1(k), pct_epsilon);
+          BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k)), math::ellint_1(k), 3*pct_epsilon);
           BOOST_REQUIRE_CLOSE(math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
                               math::ellint_1(k, phi), pct_epsilon);
         } catch (const std::domain_error&) {
@@ -2566,6 +2566,25 @@ struct boost_special_functions_test {
       }
     }
 
+    // log1p.hpp
+    {
+      RandomSample<T> x_sampler{-1,2000};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        try{
+          BOOST_REQUIRE_CLOSE_FRACTION(math::log1p(make_fvar<T, m>(x)),
+                              math::log1p(x), 2*math::tools::epsilon<T>());
+        } catch(const math::rounding_error&) {
+          BOOST_REQUIRE_THROW(math::log1p(make_fvar<T, m>(x)), wrapexcept<math::rounding_error>);
+          BOOST_REQUIRE_THROW(math::log1p(x), wrapexcept<math::rounding_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
+        }
+      }
+    }
+
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.20)), math::cyl_bessel_j(0,static_cast<T>(0.20)), 2*pct_epsilon);
     //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.20)), math::cyl_neumann(0,static_cast<T>(0.20)), 2*pct_epsilon);
@@ -2613,7 +2632,6 @@ struct boost_special_functions_test {
       }
     }
 
-    BOOST_REQUIRE_EQUAL(math::log1p(make_fvar<T, m>(math::constants::pi<T>())), math::log1p(math::constants::pi<T>()));
     BOOST_REQUIRE_EQUAL(math::sqrt1pm1(make_fvar<T, m>(math::constants::pi<T>())),
                         math::sqrt1pm1(math::constants::pi<T>()));
     // 9.920037044e-06 != 9.9200371320e-06

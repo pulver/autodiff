@@ -2594,6 +2594,27 @@ struct boost_special_functions_test {
       }
     }
 
+    // hypot.hpp
+    {
+      RandomSample<T> x_sampler{-2000,2000};
+      RandomSample<T> y_sampler{-2000,2000};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        try{
+          BOOST_REQUIRE_CLOSE(math::hypot(make_fvar<T, m>(x), make_fvar<T, m>(y)),
+                              math::hypot(x, y), 2*pct_epsilon);
+        } catch(const math::rounding_error&) {
+          BOOST_REQUIRE_THROW(math::hypot(make_fvar<T, m>(x), make_fvar<T, m>(y)), wrapexcept<math::rounding_error>);
+          BOOST_REQUIRE_THROW(math::hypot(x, y), wrapexcept<math::rounding_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
+        }
+      }
+    }
+
     // log1p.hpp
     {
       RandomSample<T> x_sampler{-1,2000};
@@ -2608,6 +2629,51 @@ struct boost_special_functions_test {
           BOOST_REQUIRE_THROW(math::log1p(x), wrapexcept<math::rounding_error>);
         } catch (...) {
           std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
+        }
+      }
+    }
+
+    // pow.hpp
+    {
+      for (auto i : boost::irange(10)) {
+        BOOST_REQUIRE_CLOSE(math::pow<0>(make_fvar<T, m>(i)), math::pow<0>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<1>(make_fvar<T, m>(i)), math::pow<1>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<2>(make_fvar<T, m>(i)), math::pow<2>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<3>(make_fvar<T, m>(i)), math::pow<3>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<4>(make_fvar<T, m>(i)), math::pow<4>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<5>(make_fvar<T, m>(i)), math::pow<5>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<6>(make_fvar<T, m>(i)), math::pow<6>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<7>(make_fvar<T, m>(i)), math::pow<7>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<8>(make_fvar<T, m>(i)), math::pow<8>(static_cast<T>(i)), pct_epsilon);
+        BOOST_REQUIRE_CLOSE(math::pow<9>(make_fvar<T, m>(i)), math::pow<9>(static_cast<T>(i)), pct_epsilon);
+      }
+    }
+
+    // powm1.hpp
+    {
+      RandomSample<T> x_sampler{0,20};
+      RandomSample<T> y_sampler{-200,200};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        auto y = y_sampler.next();
+        try{
+          auto autodiff_v = math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y));
+          auto anchor_v = math::powm1(x, y);
+          if (!std::isfinite(static_cast<T>(autodiff_v)) || !std::isfinite(anchor_v)) {
+            BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(anchor_v));
+          }else {
+            BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 25*pct_epsilon);
+          }
+        } catch(const std::domain_error&) {
+          BOOST_REQUIRE_THROW(math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y)), wrapexcept<std::domain_error>);
+          BOOST_REQUIRE_THROW(math::powm1(x, y), wrapexcept<std::domain_error>);
+        } catch(const std::overflow_error&) {
+          BOOST_REQUIRE_THROW(math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y)), wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(math::powm1(x, y), wrapexcept<std::overflow_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << "  y: " << y << std::endl;
           std::rethrow_exception(std::exception_ptr(std::current_exception()));
         }
       }
@@ -2651,15 +2717,6 @@ struct boost_special_functions_test {
         }
       }
     }
-
-    BOOST_REQUIRE_EQUAL(math::sqrt1pm1(make_fvar<T, m>(math::constants::pi<T>())),
-                        math::sqrt1pm1(math::constants::pi<T>()));
-    // 9.920037044e-06 != 9.9200371320e-06
-    BOOST_REQUIRE_CLOSE(math::powm1(make_fvar<T, m>(1.01), make_fvar<T, m>(0.001)),
-                        math::powm1(static_cast<T>(1.01), static_cast<T>(0.001)), pct_epsilon);
-    BOOST_REQUIRE_EQUAL(math::hypot(make_fvar<T, m>(3), make_fvar<T, m>(4)),
-                        math::hypot(static_cast<T>(3), static_cast<T>(4)));
-    BOOST_REQUIRE_EQUAL(math::pow<2>(make_fvar<T, m>(3)), math::pow<2>(static_cast<T>(3)));
   }
 };
 

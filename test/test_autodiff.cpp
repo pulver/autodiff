@@ -2044,6 +2044,34 @@ struct boost_special_functions_test {
       }
     }
 
+    // bessel.hpp, bessel_prime.hpp
+    // Policy parameter prevents ADL.
+    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.20)), math::cyl_bessel_j(0,static_cast<T>(0.20)), 2*pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.20)), math::cyl_neumann(0,static_cast<T>(0.20)), 2*pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j_zero(make_fvar<T,m>(0.20),0), math::cyl_bessel_j_zero(static_cast<T>(0.20),0), 2*pct_epsilon);
+    //BOOST_REQUIRE_CLOSE(math::cyl_neumann_zero(make_fvar<T,m>(0.20),0),  math::cyl_neumann_zero(static_cast<T>(0.20),0), 2*pct_epsilon);
+    // Required sinh() (added) but then has policy parameter ADL issue.
+    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_i(0,static_cast<T>(0.20)));
+    BOOST_REQUIRE_CLOSE(math::cyl_bessel_k(0, make_fvar<T, m>(0.20)), math::cyl_bessel_k(0, static_cast<T>(0.20)), pct_epsilon);
+    // Policy parameter prevents ADL.
+    //BOOST_REQUIRE_EQUAL(math::sph_bessel(0,make_fvar<T,m>(0.20)) , math::sph_bessel(0,static_cast<T>(0.20)));
+    // Required fmod() but then has policy parameter ADL issue.
+    //BOOST_REQUIRE_EQUAL(math::sph_neumann(0,make_fvar<T,m>(0.20)) , math::sph_neumann(0,static_cast<T>(0.20)));
+    // Policy parameter prevents ADL.
+    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_j_prime(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_j_prime(0,static_cast<T>(0.20)));
+    //BOOST_REQUIRE_EQUAL(math::cyl_neumann_prime(0,make_fvar<T,m>(0.20)) , math::cyl_neumann_prime(0,static_cast<T>(0.20)));
+    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i_prime(0,make_fvar<T,m>(0.20)) , ath::cyl_bessel_i_prime(0,static_cast<T>(0.20)));
+    BOOST_REQUIRE_CLOSE(math::cyl_bessel_k_prime(0, make_fvar<T, m>(0.20)),
+                        math::cyl_bessel_k_prime(0, static_cast<T>(0.20)), pct_epsilon);
+    // Policy parameter prevents ADL.
+    //BOOST_REQUIRE_EQUAL(math::sph_bessel_prime(0,make_fvar<T,m>(0.20)) , math::sph_bessel_prime(0,static_cast<T>(0.20)));
+    //BOOST_REQUIRE_EQUAL(math::sph_neumann_prime(0,make_fvar<T,m>(0.20)) , math::sph_neumann_prime(0,static_cast<T>(0.20)));
+    // Per docs: "the functions can only be instantiated on types float, double and long double."
+    //BOOST_REQUIRE_EQUAL(math::cyl_hankel_1(0,make_fvar<T,m>(0.20)).real() , math::cyl_hankel_1(0,static_cast<T>(0.20)).real());
+    //BOOST_REQUIRE_EQUAL(math::cyl_hankel_2(0,make_fvar<T,m>(0.20)).real() , math::cyl_hankel_2(0,static_cast<T>(0.20)).real());
+    //BOOST_REQUIRE_EQUAL(math::sph_hankel_1(0,make_fvar<T,m>(0.20)).real() , math::sph_hankel_1(0,static_cast<T>(0.20)).real());
+    //BOOST_REQUIRE_EQUAL(math::sph_hankel_2(0,make_fvar<T,m>(0.20)).real() , math::sph_hankel_2(0,static_cast<T>(0.20)).real());
+
     // beta.hpp
     {
       RandomSample<T> x_sampler{-2000, 2000};
@@ -2534,7 +2562,7 @@ struct boost_special_functions_test {
         auto phi = phi_sampler.next();
         try {
           BOOST_REQUIRE_CLOSE_FRACTION(math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                              math::jacobi_zeta(x, phi), 10*math::tools::epsilon<T>());
+                              math::jacobi_zeta(x, phi), 50*math::tools::epsilon<T>());
         } catch (const std::domain_error&) {
           BOOST_REQUIRE_THROW(math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)), wrapexcept<std::domain_error>);
           BOOST_REQUIRE_THROW(math::jacobi_zeta(x, phi), wrapexcept<std::domain_error>);
@@ -2585,33 +2613,6 @@ struct boost_special_functions_test {
       }
     }
 
-    // Policy parameter prevents ADL.
-    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j(0,make_fvar<T,m>(0.20)), math::cyl_bessel_j(0,static_cast<T>(0.20)), 2*pct_epsilon);
-    //BOOST_REQUIRE_CLOSE(math::cyl_neumann(0,make_fvar<T,m>(0.20)), math::cyl_neumann(0,static_cast<T>(0.20)), 2*pct_epsilon);
-    //BOOST_REQUIRE_CLOSE(math::cyl_bessel_j_zero(make_fvar<T,m>(0.20),0), math::cyl_bessel_j_zero(static_cast<T>(0.20),0), 2*pct_epsilon);
-    //BOOST_REQUIRE_CLOSE(math::cyl_neumann_zero(make_fvar<T,m>(0.20),0),  math::cyl_neumann_zero(static_cast<T>(0.20),0), 2*pct_epsilon);
-    // Required sinh() (added) but then has policy parameter ADL issue.
-    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_i(0,static_cast<T>(0.20)));
-    BOOST_REQUIRE_CLOSE(math::cyl_bessel_k(0, make_fvar<T, m>(0.20)), math::cyl_bessel_k(0, static_cast<T>(0.20)), pct_epsilon);
-    // Policy parameter prevents ADL.
-    //BOOST_REQUIRE_EQUAL(math::sph_bessel(0,make_fvar<T,m>(0.20)) , math::sph_bessel(0,static_cast<T>(0.20)));
-    // Required fmod() but then has policy parameter ADL issue.
-    //BOOST_REQUIRE_EQUAL(math::sph_neumann(0,make_fvar<T,m>(0.20)) , math::sph_neumann(0,static_cast<T>(0.20)));
-    // Policy parameter prevents ADL.
-    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_j_prime(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_j_prime(0,static_cast<T>(0.20)));
-    //BOOST_REQUIRE_EQUAL(math::cyl_neumann_prime(0,make_fvar<T,m>(0.20)) , math::cyl_neumann_prime(0,static_cast<T>(0.20)));
-    //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i_prime(0,make_fvar<T,m>(0.20)) , ath::cyl_bessel_i_prime(0,static_cast<T>(0.20)));
-    BOOST_REQUIRE_CLOSE(math::cyl_bessel_k_prime(0, make_fvar<T, m>(0.20)),
-                        math::cyl_bessel_k_prime(0, static_cast<T>(0.20)), pct_epsilon);
-    // Policy parameter prevents ADL.
-    //BOOST_REQUIRE_EQUAL(math::sph_bessel_prime(0,make_fvar<T,m>(0.20)) , math::sph_bessel_prime(0,static_cast<T>(0.20)));
-    //BOOST_REQUIRE_EQUAL(math::sph_neumann_prime(0,make_fvar<T,m>(0.20)) , math::sph_neumann_prime(0,static_cast<T>(0.20)));
-    // Per docs: "the functions can only be instantiated on types float, double and long double."
-    //BOOST_REQUIRE_EQUAL(math::cyl_hankel_1(0,make_fvar<T,m>(0.20)).real() , math::cyl_hankel_1(0,static_cast<T>(0.20)).real());
-    //BOOST_REQUIRE_EQUAL(math::cyl_hankel_2(0,make_fvar<T,m>(0.20)).real() , math::cyl_hankel_2(0,static_cast<T>(0.20)).real());
-    //BOOST_REQUIRE_EQUAL(math::sph_hankel_1(0,make_fvar<T,m>(0.20)).real() , math::sph_hankel_1(0,static_cast<T>(0.20)).real());
-    //BOOST_REQUIRE_EQUAL(math::sph_hankel_2(0,make_fvar<T,m>(0.20)).real() , math::sph_hankel_2(0,static_cast<T>(0.20)).real());
-
     // sin_pi.hpp
     {
       // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
@@ -2625,6 +2626,25 @@ struct boost_special_functions_test {
         } catch(const math::rounding_error&) {
           BOOST_REQUIRE_THROW(math::sin_pi(iround(make_fvar<T, m>(math::constants::pi<T>()*x))), wrapexcept<math::rounding_error>);
           BOOST_REQUIRE_THROW(math::sin_pi(math::iround(math::constants::pi<T>()*x)), wrapexcept<math::rounding_error>);
+        } catch (...) {
+          std::cout <<  "Input: x: " << x << std::endl;
+          std::rethrow_exception(std::exception_ptr(std::current_exception()));
+        }
+      }
+    }
+
+    // sqrt1pm1.hpp
+    {
+      RandomSample<T> x_sampler{-1,2000};
+      for (auto i : boost::irange(n_samples)) {
+        std::ignore = i;
+        auto x = x_sampler.next();
+        try{
+          BOOST_REQUIRE_CLOSE(math::sqrt1pm1(make_fvar<T, m>(x)),
+                              math::sqrt1pm1(x), pct_epsilon);
+        } catch(const math::rounding_error&) {
+          BOOST_REQUIRE_THROW(math::sqrt1pm1(make_fvar<T, m>(x)), wrapexcept<math::rounding_error>);
+          BOOST_REQUIRE_THROW(math::sqrt1pm1(x), wrapexcept<math::rounding_error>);
         } catch (...) {
           std::cout <<  "Input: x: " << x << std::endl;
           std::rethrow_exception(std::exception_ptr(std::current_exception()));

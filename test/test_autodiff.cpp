@@ -17,8 +17,10 @@
 #include <boost/range/numeric.hpp>
 #include <boost/utility/identity_type.hpp>
 
+#include <algorithm>
 #include <cfenv>
 #include <random>
+
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
@@ -1446,15 +1448,6 @@ struct RandomSample<T,
 };
 static_assert(std::is_same<typename RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
 static_assert(std::is_same<typename RandomSample<long>::dist_t, std::uniform_int_distribution<long>>::value, "");
-/**
- * goofy heuristic to deal with functions yielding values very close to 0
- */
-template<typename T, typename U>
-static constexpr bool is_small(const T &x, const U &y) noexcept {
-  using common_t = typename std::common_type<T,U>::type;
-  return std::log10(static_cast<common_t>(x)) < static_cast<common_t>(0) && std::log10(static_cast<common_t>(y)) < static_cast<common_t>(0)
-      && std::log10(std::abs(static_cast<common_t>(x) - static_cast<common_t>(y))) < std::max(std::log10(static_cast<common_t>(x)), std::log10(static_cast<common_t>(y)));
-}
 
 /**
  * Simple struct to hold constants that are used in each test
@@ -1599,7 +1592,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
     try {
       auto anchor_v = boost::math::beta(x, y);
       auto autodiff_v = boost::math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y));
-      if (detail::is_small(static_cast<T>(autodiff_v), anchor_v)) {
+      if (std::min<T>(static_cast<T>(log(autodiff_v)), static_cast<T>(std::log(anchor_v))) < boost::math::tools::epsilon<T>()) {
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*test_constants::pct_epsilon);
       } else {
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon);
@@ -2437,7 +2430,6 @@ struct boost_special_functions_test {
     using namespace boost;
     constexpr int m = 3;
     constexpr T pct_epsilon = 20*math::tools::epsilon<T>()*100;
-    constexpr std::size_t n_samples = 100;
 
     // airy.hpp
     {

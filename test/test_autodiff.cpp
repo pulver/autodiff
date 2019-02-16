@@ -1975,17 +1975,102 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::acosh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::acosh(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(asinh(make_fvar<T, m>(x)), boost::math::asinh(x), test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      std::feclearexcept(FE_ALL_EXCEPT);
+      BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      std::feclearexcept(FE_ALL_EXCEPT);
+      BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(atanh(make_fvar<T, m>(x)), boost::math::atanh(x), test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      std::feclearexcept(FE_ALL_EXCEPT);
+      BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      std::feclearexcept(FE_ALL_EXCEPT);
+      BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<int> x_sampler{0, 2000};
+
+  for (auto idx : boost::irange(test_constants::n_samples)) {
+    std::ignore = idx;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_EQUAL(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::math::bernoulli_b2n<T>(x));
+    } catch (const std::domain_error &e) {
+      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &e) {
+      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_EQUAL(boost::math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), boost::math::tangent_t2n<T>(x));
+    } catch (const std::domain_error &e) {
+      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &e) {
+      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
   }
 }
 
@@ -2002,12 +2087,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((erf(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::erf(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((erf(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::erf(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -2019,12 +2102,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((erfc(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::erfc(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((erfc(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE_THROW(boost::math::erfc(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -2052,41 +2133,6 @@ struct boost_special_functions_test {
       //BOOST_REQUIRE_EQUAL(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
       //BOOST_REQUIRE_EQUAL(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
       //BOOST_REQUIRE_EQUAL(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
-    }
-
-    // bernoulli.hpp
-    {
-      detail::RandomSample<int> x_sampler{0, 2000};
-
-      for (auto idx : boost::irange(n_samples)) {
-        std::ignore = idx;
-        auto x = x_sampler.next();
-        try {
-          BOOST_REQUIRE_EQUAL(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), math::bernoulli_b2n<T>(x));
-        } catch (const std::domain_error &e) {
-          BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(x), wrapexcept<std::domain_error>);
-        } catch (const std::overflow_error &e) {
-          BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::bernoulli_b2n<T>(x), wrapexcept<std::overflow_error>);
-        } catch (...) {
-          std::cout << "Input: x: " << x << std::endl;
-          std::rethrow_exception(std::exception_ptr(std::current_exception()));
-        }
-
-        try {
-          BOOST_REQUIRE_EQUAL(math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), math::tangent_t2n<T>(x));
-        } catch (const std::domain_error &e) {
-          BOOST_REQUIRE_THROW(math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::domain_error>);
-          BOOST_REQUIRE_THROW(math::tangent_t2n<T>(x), wrapexcept<std::domain_error>);
-        } catch (const std::overflow_error &e) {
-          BOOST_REQUIRE_THROW(math::tangent_t2n<T>(iround(make_fvar<T, m>(x))), wrapexcept<std::overflow_error>);
-          BOOST_REQUIRE_THROW(math::tangent_t2n<T>(x), wrapexcept<std::overflow_error>);
-        } catch (...) {
-          std::cout << "Input: x: " << x << std::endl;
-          std::rethrow_exception(std::exception_ptr(std::current_exception()));
-        }
-      }
     }
 
     // bessel.hpp, bessel_prime.hpp

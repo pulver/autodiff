@@ -1451,8 +1451,9 @@ static_assert(std::is_same<typename RandomSample<long>::dist_t, std::uniform_int
  */
 template<typename T, typename U>
 static constexpr bool is_small(const T &x, const U &y) noexcept {
-  return std::log10(x) < static_cast<T>(0) && std::log10(y) < static_cast<U>(0)
-      && std::log10(std::abs(x - y)) < std::max(std::log10(x), std::log10(y));
+  using common_t = typename std::common_type<T,U>::type;
+  return std::log10(static_cast<common_t>(x)) < static_cast<common_t>(0) && std::log10(static_cast<common_t>(y)) < static_cast<common_t>(0)
+      && std::log10(std::abs(static_cast<common_t>(x) - static_cast<common_t>(y))) < std::max(std::log10(static_cast<common_t>(x)), std::log10(static_cast<common_t>(y)));
 }
 
 /**

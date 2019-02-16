@@ -1552,7 +1552,7 @@ struct sinh_and_cosh_test
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 800*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
     using std::sinh;
     using std::cosh;
     constexpr int m = 5;

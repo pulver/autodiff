@@ -19,18 +19,18 @@ The essential idea of autodiff is the replacement of numbers with polynomials in
 the first-order polynomial *x₀+ε*, the resulting polynomial in *ε* contains the function's derivatives within the
 coefficients. Each coefficient is equal to a derivative of its respective order, divided by the factorial of the order.
 
-Assume one is interested in the first *N* derivatives of *f* at *x₀*. Then without any loss of precision to
-the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of *ε* greater than *N*
+Assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without any loss of precision
+to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of *ε* greater than *N*
 can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
 
 ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
 
 C++'s ability to overload operators and functions allows for the creation of a class `fvar` that represents
-polynomials in *ε*. Thus the same algorithm that calculates the numeric value of *y₀=f(x₀)* is also used
-to calculate the polynomial *Ʃₙyₙεⁿ=f(x₀+ε)*.  The derivatives are then found from the product of the
-respective factorial and coefficient:
+polynomials in *ε*. Thus the same algorithm that calculates the numeric value of *y₀=f(x₀)* is also used to
+calculate the polynomial *Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*.  The derivatives are then found from the
+product of the respective factorial and coefficient:
 
-![Polynomial transform](doc/quickbook/equations/derivative_formula.svg)
+![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
 
 
 ### Example 1: Single-Variable Differentiation
@@ -121,3 +121,7 @@ autodiff      : 1976.3196007477977177798818752904187209081211892188
 relative error: 2.67e-50
 */
 ```
+
+## Manual
+
+Additional details are in the [autodiff manual](doc/latex/autodiff.pdf).

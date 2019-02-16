@@ -5,23 +5,20 @@
 
 #include <boost/fusion/include/algorithm.hpp>
 #include <boost/fusion/include/vector.hpp>
+#include <boost/math/differentiation/autodiff.hpp>
 #include <boost/math/special_functions/factorials.hpp>
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
 #include <boost/math/special_functions/round.hpp> // iround
 #include <boost/math/special_functions/trunc.hpp> // itrunc
 #include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/cpp_dec_float.hpp>
-
-#include <boost/math/differentiation/autodiff.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
-#include <iostream>
+#include <sstream>
 
 //boost::fusion::vector<float,double,long double,boost::multiprecision::cpp_bin_float_50> bin_float_types;
-//boost::fusion::vector<float,double,long double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70
-boost::fusion::vector<double> bin_float_types; // Add cpp_bin_float_50 for boost 1.70 // TEST
+boost::fusion::vector<float,double,long double> bin_float_types; // cpp_bin_float_50 is fixed in boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 //boost::fusion::vector<boost::multiprecision::cpp_dec_float_50>
 boost::fusion::vector<> multiprecision_float_types;
@@ -120,8 +117,6 @@ struct constructors_test
                 BOOST_REQUIRE(y.derivative(i,j) == 1.0);
             else
                 BOOST_REQUIRE(y.derivative(i,j) == 0.0);
-    // Test ostream operator<<
-    std::cout << "x = " << x << std::endl;
   }
 };
 
@@ -197,6 +192,26 @@ BOOST_AUTO_TEST_CASE(assignment)
 {
     boost::fusion::for_each(bin_float_types, assignment_test());
     boost::fusion::for_each(multiprecision_float_types, assignment_test());
+}
+
+struct ostream_test
+{
+  template<typename T>
+  void operator()(const T&) const
+  {
+    constexpr int m = 3;
+    const T cx = 10;
+    const auto x = make_fvar<T,m>(cx);
+    std::ostringstream ss;
+    ss << "x = " << x;
+    BOOST_REQUIRE(ss.str() == "x = depth(1)(10,1,0,0)");
+  }
+};
+
+BOOST_AUTO_TEST_CASE(ostream)
+{
+    boost::fusion::for_each(bin_float_types, ostream_test());
+    boost::fusion::for_each(multiprecision_float_types, ostream_test());
 }
 
 struct addition_assignment_test
@@ -1222,19 +1237,19 @@ struct cos_and_sin_test
   {
     using std::cos;
     using std::sin;
-    const T eps = 100*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 200*std::numeric_limits<T>::epsilon(); // percent
     constexpr int m = 5;
     const T cx = boost::math::constants::third_pi<T>();
     const auto x = make_fvar<T,m>(cx);
     auto cos5 = cos(x);
-    BOOST_REQUIRE(cos5.derivative(0) == cos(cx));
+    BOOST_REQUIRE_CLOSE(cos5.derivative(0), cos(cx), eps);
     BOOST_REQUIRE_CLOSE(cos5.derivative(1), -sin(cx), eps);
     BOOST_REQUIRE_CLOSE(cos5.derivative(2), -cos(cx), eps);
     BOOST_REQUIRE_CLOSE(cos5.derivative(3), sin(cx), eps);
     BOOST_REQUIRE_CLOSE(cos5.derivative(4), cos(cx), eps);
     BOOST_REQUIRE_CLOSE(cos5.derivative(5), -sin(cx), eps);
     auto sin5 = sin(x);
-    BOOST_REQUIRE(sin5.derivative(0) == sin(cx));
+    BOOST_REQUIRE_CLOSE(sin5.derivative(0), sin(cx), eps);
     BOOST_REQUIRE_CLOSE(sin5.derivative(1), cos(cx), eps);
     BOOST_REQUIRE_CLOSE(sin5.derivative(2), -sin(cx), eps);
     BOOST_REQUIRE_CLOSE(sin5.derivative(3), -cos(cx), eps);
@@ -1242,9 +1257,9 @@ struct cos_and_sin_test
     BOOST_REQUIRE_CLOSE(sin5.derivative(5), cos(cx), eps);
     // Test Order = 0 for codecov
     auto cos0 = cos(make_fvar<T,0>(cx));
-    BOOST_REQUIRE(cos0.derivative(0) == cos(cx));
+    BOOST_REQUIRE_CLOSE(cos0.derivative(0), cos(cx), eps);
     auto sin0 = sin(make_fvar<T,0>(cx));
-    BOOST_REQUIRE(sin0.derivative(0) == sin(cx));
+    BOOST_REQUIRE_CLOSE(sin0.derivative(0), sin(cx), eps);
   }
 };
 
@@ -1266,7 +1281,7 @@ struct acos_test_test
     const T cx = 0.5;
     auto x = make_fvar<T,m>(cx);
     auto y = acos(x);
-    BOOST_REQUIRE(y.derivative(0) == acos(cx));
+    BOOST_REQUIRE_CLOSE(y.derivative(0), acos(cx), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(1), -1/sqrt(1-cx*cx), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(2), -cx/pow(1-cx*cx,1.5), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(3), -(2*cx*cx+1)/pow(1-cx*cx,2.5), eps);
@@ -1319,7 +1334,7 @@ struct asin_test_test
     const T cx = 0.5;
     auto x = make_fvar<T,m>(cx);
     auto y = asin(x);
-    BOOST_REQUIRE(y.derivative(0) == asin(cx));
+    BOOST_REQUIRE_CLOSE(y.derivative(0), asin(cx), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(1), 1/sqrt(1-cx*cx), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(2), cx/pow(1-cx*cx,1.5), eps);
     BOOST_REQUIRE_CLOSE(y.derivative(3), (2*cx*cx+1)/pow(1-cx*cx,2.5), eps);
@@ -1498,32 +1513,32 @@ struct sinc_test_test
   template<typename T>
   void operator()(const T&) const
   {
-    const T eps = 5000*std::numeric_limits<T>::epsilon(); // percent
+    const T eps = 20000*std::numeric_limits<T>::epsilon(); // percent
     using std::sin;
     using std::cos;
     constexpr int m = 5;
     const T cx = 1;
     auto x = make_fvar<T,m>(cx);
     auto y = sinc(x);
-    BOOST_REQUIRE_CLOSE(y.derivative(0), sin(1), eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(1), cos(1)-sin(1), eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(2), sin(1)-2*cos(1), eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(3), 5*cos(1)-3*sin(1), eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(4), 13*sin(1)-20*cos(1), eps);
-    BOOST_REQUIRE_CLOSE(y.derivative(5), 101*cos(1)-65*sin(1), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(0), sin(cx), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(1), cos(cx)-sin(cx), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(2), sin(cx)-2*cos(cx), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(3), 5*cos(cx)-3*sin(cx), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(4), 13*sin(cx)-20*cos(cx), eps);
+    BOOST_REQUIRE_CLOSE(y.derivative(5), 101*cos(cx)-65*sin(cx), eps);
     // Test at x = 0
     auto y2 = sinc(make_fvar<T,10>(0));
     BOOST_REQUIRE_CLOSE(y2.derivative(0), 1, eps);
     BOOST_REQUIRE_CLOSE(y2.derivative(1), 0, eps);
-    BOOST_REQUIRE_CLOSE(y2.derivative(2), -static_cast<T>(1)/3, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(2), -cx/3, eps);
     BOOST_REQUIRE_CLOSE(y2.derivative(3), 0, eps);
-    BOOST_REQUIRE_CLOSE(y2.derivative(4), static_cast<T>(1)/5, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(4), cx/5, eps);
     BOOST_REQUIRE_CLOSE(y2.derivative(5), 0, eps);
-    BOOST_REQUIRE_CLOSE(y2.derivative(6), -static_cast<T>(1)/7, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(6), -cx/7, eps);
     BOOST_REQUIRE_CLOSE(y2.derivative(7), 0, eps);
-    BOOST_REQUIRE_CLOSE(y2.derivative(8), static_cast<T>(1)/9, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(8), cx/9, eps);
     BOOST_REQUIRE_CLOSE(y2.derivative(9), 0, eps);
-    BOOST_REQUIRE_CLOSE(y2.derivative(10), -static_cast<T>(1)/11, eps);
+    BOOST_REQUIRE_CLOSE(y2.derivative(10), -cx/11, eps);
   }
 };
 
@@ -1539,13 +1554,14 @@ struct sinh_and_cosh_test
   {
     const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
     using std::sinh;
+    using std::cosh;
     constexpr int m = 5;
     const T cx = 1;
     auto x = make_fvar<T,m>(cx);
     auto s = sinh(x);
     auto c = cosh(x);
-    BOOST_REQUIRE(s.derivative(0) == sinh(static_cast<T>(x)));
-    BOOST_REQUIRE(c.derivative(0) == cosh(static_cast<T>(x)));
+    BOOST_REQUIRE_CLOSE(s.derivative(0), sinh(static_cast<T>(x)), eps);
+    BOOST_REQUIRE_CLOSE(c.derivative(0), cosh(static_cast<T>(x)), eps);
     for (size_t i=0 ; i<=m ; ++i)
     {
         BOOST_REQUIRE_CLOSE(s.derivative(i), static_cast<T>(i&1?c:s), eps);
@@ -1666,7 +1682,7 @@ struct lambert_w0_test_test
   {
     const T eps = 1000*std::numeric_limits<T>::epsilon(); // percent
     constexpr int m = 10;
-    constexpr T cx = 3;
+    const T cx = 3;
     // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]
     const char* const answers[m+1] {
         "1.049908894964039959988697070552897904589466943706341",
@@ -1709,16 +1725,16 @@ struct lround_llround_truncl_test
   {
     using std::lround;
     using std::llround;
-    using std::truncl; // truncl not supported by cpp_dec_float<>.
+    //using std::truncl; // truncl not supported by boost::multiprecision types.
     constexpr int m = 3;
-    constexpr float cx = 3.25;
+    const T cx = 3.25;
     auto x = make_fvar<T,m>(cx);
     long yl = lround(x);
     BOOST_REQUIRE(yl == lround(cx));
     long long yll = llround(x);
     BOOST_REQUIRE(yll == llround(cx));
-    long double yld = truncl(x);
-    BOOST_REQUIRE(yld == truncl(cx));
+    //long double yld = truncl(x);
+    //BOOST_REQUIRE(yld == truncl(cx));
   }
 };
 
@@ -1789,7 +1805,8 @@ struct multiprecision_test
 
 BOOST_AUTO_TEST_CASE(multiprecision)
 {
-    multiprecision_test()(boost::multiprecision::cpp_dec_float_50());
+    //multiprecision_test()(boost::multiprecision::cpp_bin_float_50());
+    boost::fusion::for_each(bin_float_types, mixed_partials_test());
 }
 
 struct black_scholes_test
@@ -1872,6 +1889,7 @@ BOOST_AUTO_TEST_CASE(black_scholes)
     boost::fusion::for_each(bin_float_types, black_scholes_test());
 }
 
+/*
 // Compilation tests for boost special functions.
 struct boost_special_functions_test
 {
@@ -1943,5 +1961,6 @@ BOOST_AUTO_TEST_CASE(boost_special_functions)
     //boost::fusion::for_each(bin_float_types, boost_special_functions_test());
     //boost::fusion::for_each(multiprecision_float_types, boost_special_functions_test());
 }
+*/
 
 BOOST_AUTO_TEST_SUITE_END()

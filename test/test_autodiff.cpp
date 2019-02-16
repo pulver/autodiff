@@ -2084,7 +2084,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
       auto anchor_v = boost::math::beta(x, y);
       auto autodiff_v = boost::math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y));
       if (detail::is_small(static_cast<T>(autodiff_v), anchor_v)) {
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000*test_constants::pct_epsilon);
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*test_constants::pct_epsilon);
       } else {
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon);
       }

@@ -121,3 +121,7 @@ autodiff      : 1976.3196007477977177798818752904187209081211892188
 relative error: 2.67e-50
 */
 ```
+
+## Manual
+
+Additional details are in the [autodiff manual](doc/latex/autodiff.pdf).

@@ -261,7 +261,7 @@ class fvar
     get_type_at<RealType, sizeof...(Orders)> at(size_t order, Orders... orders) const;
 
     template<typename... Orders>
-    get_type_at<RealType, sizeof...(Orders)-1> derivative(Orders... orders) const;
+    get_type_at<fvar, sizeof...(Orders)> derivative(Orders... orders) const;
 
     fvar inverse() const; // Multiplicative inverse.
 
@@ -992,7 +992,7 @@ get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, O
 // Can throw "std::out_of_range: array::at: __n (which is 7) >= _Nm (which is 7)"
 template<typename RealType, size_t Order>
 template<typename... Orders>
-get_type_at<RealType,sizeof...(Orders)-1> fvar<RealType,Order>::derivative(Orders... orders) const
+get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
     static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
     return at(orders...) * (... * boost::math::factorial<root_type>(orders));

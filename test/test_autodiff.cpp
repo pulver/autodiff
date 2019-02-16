@@ -15,26 +15,23 @@
 #include <boost/range/algorithm.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/range/numeric.hpp>
-#include <boost/utility/identity_type.hpp>
 
 #include <algorithm>
 #include <cfenv>
 #include <random>
-
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
 #include <sstream>
 
-using boost::mp11::mp_list;
-using boost::mp11::mp_append;
-
 //using bin_float_types = mp_list<float,double,long double,boost::multiprecision::cpp_bin_float_50>;
-using bin_float_types = mp_list<float,double,long double>; // cpp_bin_float_50 is fixed in boost 1.70
+using bin_float_types = boost::mp11::mp_list<float,double,long double>; // cpp_bin_float_50 is fixed in boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 //using multiprecision_float_types = mp_list<boost::multiprecision::cpp_dec_float_50>;
-using multiprecision_float_types = mp_list<>;
+using multiprecision_float_types = boost::mp11::mp_list<>;
+
+using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
 
 using namespace boost::math::differentiation;
 
@@ -86,7 +83,7 @@ T uncast_return(const T& x)
 
 BOOST_AUTO_TEST_SUITE(test_autodiff)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(constructors, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(constructors, T, all_float_types)
 {
   constexpr int m = 3;
   constexpr int n = 4;
@@ -130,7 +127,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructors, T, BOOST_IDENTITY_TYPE((mp_append<bi
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(implicit_constructors, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(implicit_constructors, T, all_float_types) {
   constexpr int m = 3;
   const autodiff_fvar<T,m> x = 3;
   const autodiff_fvar<T,m> one = uncast_return(x);
@@ -140,7 +137,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(implicit_constructors, T, BOOST_IDENTITY_TYPE((mp_
   BOOST_REQUIRE(static_cast<T>(two_and_a_half) == 2.5);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, all_float_types)
 
 {
   constexpr int m = 3;
@@ -178,7 +175,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_
               BOOST_REQUIRE(empty.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ostream, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(ostream, T, all_float_types)
 
 {
   constexpr int m = 3;
@@ -189,7 +186,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ostream, T, BOOST_IDENTITY_TYPE((mp_append<bin_flo
   BOOST_REQUIRE(ss.str() == "x = depth(1)(10,1,0,0)");
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 10.0;
@@ -217,7 +214,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, BOOST_IDENTITY_TYPE((mp_ap
               BOOST_REQUIRE(sum.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, all_float_types) {
 
   constexpr int m = 3;
   constexpr int n = 4;
@@ -246,7 +243,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, BOOST_IDENTITY_TYPE((mp
               BOOST_REQUIRE(sum.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiplication_assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiplication_assignment, T, all_float_types) {
 
 // Try explicit bracing based on feedback. Doesn't add very much except 26 extra lines.
   constexpr int m = 3;
@@ -315,7 +312,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiplication_assignment, T, BOOST_IDENTITY_TYPE(
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(division_assignment, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(division_assignment, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 16.0;
@@ -342,7 +339,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division_assignment, T, BOOST_IDENTITY_TYPE((mp_ap
               BOOST_REQUIRE(quotient.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 16.0;
@@ -370,7 +367,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, BOOST_IDENTITY_TYPE((mp_append<bin
 }
 
 // TODO 3 tests for 3 operator+() definitions.
-BOOST_AUTO_TEST_CASE_TEMPLATE(cast_double, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(cast_double, T, all_float_types) {
 
   constexpr float ca = 13.0;
   constexpr int i = 12;
@@ -380,7 +377,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cast_double, T, BOOST_IDENTITY_TYPE((mp_append<bin
   BOOST_REQUIRE(i*x == i*ca);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(int_double_casting, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(int_double_casting, T, all_float_types) {
   constexpr float ca = 3.0;
   const auto x0 = make_fvar<T,0>(ca);
   BOOST_REQUIRE(static_cast<T>(x0) == ca);
@@ -391,7 +388,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(int_double_casting, T, BOOST_IDENTITY_TYPE((mp_app
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(scalar_addition, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(scalar_addition, T, all_float_types)
 {
   constexpr float ca = 3.0;
   constexpr float cb = 4.0;
@@ -404,7 +401,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(scalar_addition, T, BOOST_IDENTITY_TYPE((mp_append
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, all_float_types) {
 
   constexpr int n = 8;
   constexpr float ca = 3.0;
@@ -423,7 +420,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, BOOST_IDENTITY_TYPE((mp_append<bin_floa
       BOOST_REQUIRE(x.derivative(i) == power_factorial/boost::math::factorial<T>(n-i)*std::pow(ca,n-i));
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(dim1_multiplication, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(dim1_multiplication, T, all_float_types) {
   constexpr int m = 2;
   constexpr int n = 3;
   constexpr float cy = 4.0;
@@ -441,7 +438,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(dim1_multiplication, T, BOOST_IDENTITY_TYPE((mp_ap
   BOOST_REQUIRE(y.derivative(3) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(dim1and2_multiplication, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(dim1and2_multiplication, T, all_float_types) {
 
 constexpr int m = 2;
   constexpr int n = 3;
@@ -462,7 +459,7 @@ constexpr int m = 2;
               BOOST_REQUIRE(y.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_addition, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_addition, T, all_float_types) {
 constexpr int m = 2;
   constexpr int n = 3;
   constexpr float cx = 3.0;
@@ -491,7 +488,7 @@ constexpr int m = 2;
   BOOST_REQUIRE(z.derivative(1).derivative(1) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 6.0;
@@ -521,7 +518,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication, T, BOOST_IDENTITY_TYPE((mp_ap
   BOOST_REQUIRE(z.derivative(3,4) == 0.0); // 0 * 0
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication_and_subtraction, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication_and_subtraction, T, all_float_types) {
 
   constexpr int m = 3;
   constexpr int n = 4;
@@ -542,7 +539,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication_and_subtraction, T, BOOST_IDEN
           BOOST_REQUIRE(z.derivative(i,j) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, all_float_types) {
   constexpr int m = 3;
   constexpr float cx = 4.0;
   const auto x = make_fvar<T,m>(cx);
@@ -557,7 +554,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, BOOST_IDENTITY_TYPE((mp_append<bin_flo
       BOOST_REQUIRE(inf.derivative(i) == (i&1?-1:1)*std::numeric_limits<T>::infinity());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 16.0;
@@ -615,7 +612,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 10.0;
@@ -629,7 +626,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
   BOOST_REQUIRE((y == cx));
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(inequality, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(inequality, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 10.0;
@@ -643,7 +640,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(inequality, T, BOOST_IDENTITY_TYPE((mp_append<bin_
   BOOST_REQUIRE((y != cx));
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(less_than_or_equal_to, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(less_than_or_equal_to, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 10.0;
@@ -661,7 +658,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(less_than_or_equal_to, T, BOOST_IDENTITY_TYPE((mp_
   BOOST_REQUIRE((cx < y));
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(greater_than_or_equal_to, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(greater_than_or_equal_to, T, all_float_types) {
   constexpr int m = 3;
   constexpr int n = 4;
   constexpr float cx = 11.0;
@@ -679,7 +676,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(greater_than_or_equal_to, T, BOOST_IDENTITY_TYPE((
   BOOST_REQUIRE((cx > y));
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, all_float_types) {
   constexpr int m = 3;
   constexpr float cx = 11.0;
   const auto x = make_fvar<T,m>(cx);
@@ -705,7 +702,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
       BOOST_REQUIRE(a.derivative(i) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ceil_and_floor, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ceil_and_floor, T, all_float_types) {
   constexpr int m = 3;
   float tests[] { -1.5, 0.0, 1.5 };
   for (unsigned t=0 ; t<sizeof(tests)/sizeof(*tests) ; ++t)
@@ -723,7 +720,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ceil_and_floor, T, BOOST_IDENTITY_TYPE((mp_append<
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(one_over_one_plus_x_squared, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(one_over_one_plus_x_squared, T, all_float_types) {
   constexpr int m = 4;
   constexpr float cx = 1.0;
   auto f = make_fvar<T,m>(cx);
@@ -736,7 +733,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(one_over_one_plus_x_squared, T, BOOST_IDENTITY_TYP
   BOOST_REQUIRE(f.derivative(4) == -3.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, all_float_types) {
 using std::exp;
   constexpr int m = 4;
   const T cx = 2.0;
@@ -750,7 +747,7 @@ using std::exp;
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
 const T eps = 201*std::numeric_limits<T>::epsilon(); // percent
   using std::exp;
   using std::log;
@@ -787,7 +784,7 @@ const T eps = 201*std::numeric_limits<T>::epsilon(); // percent
   BOOST_REQUIRE_CLOSE(z2.derivative(2,4), pow(cx,cy-2)*pow(log(cx),2)*(4*(2*cy-1)*log(cx)+(4-1)*4+(cy-1)*cy*pow(log(cx),2)), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, all_float_types) {
   using std::sqrt;
   using std::pow;
   constexpr int m = 5;
@@ -808,7 +805,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
       BOOST_REQUIRE(y.derivative(i) == (i&1?1:-1)*std::numeric_limits<T>::infinity());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, all_float_types) {
   using std::log;
   using std::pow;
   constexpr int m = 5;
@@ -829,7 +826,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
   using std::log;
   using std::pow;
   const T eps = 100*std::numeric_limits<T>::epsilon(); // percent
@@ -859,7 +856,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, BOOST_IDENTITY_TYPE((mp_append<bin_float
       pow(cx,cy-2)*pow(log(cx),2)*(4*(2*cy-1)*log(cx)+(4-1)*4+(cy-1)*cy*pow(log(cx),2)), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(frexp_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(frexp_test, T, all_float_types) {
   using std::frexp;
   using std::exp2;
   constexpr int m = 3;
@@ -875,7 +872,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(frexp_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ldexp_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ldexp_test, T, all_float_types) {
   using std::ldexp;
   using std::exp2;
   constexpr int m = 3;
@@ -889,7 +886,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ldexp_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_
   BOOST_REQUIRE(y.derivative(3) == 0.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(cos_and_sin, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(cos_and_sin, T, bin_float_types) {
 
   using std::cos;
   using std::sin;
@@ -919,7 +916,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cos_and_sin, T, BOOST_IDENTITY_TYPE((mp_append<bin
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::acos;
@@ -938,7 +935,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::acosh;
@@ -955,7 +952,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_
   BOOST_REQUIRE_CLOSE(y.derivative(5), 227/(27*boost::math::constants::root_three<T>()), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::asin;
@@ -973,7 +970,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
   BOOST_REQUIRE_CLOSE(y.derivative(5), (24*(cx*cx+3)*cx*cx+9)/pow(1-cx*cx,4.5), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(asin_infinity, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(asin_infinity, T, all_float_types) {
 
   const T eps = 100*std::numeric_limits<T>::epsilon(); // percent
   constexpr int m = 5;
@@ -985,7 +982,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_infinity, T, BOOST_IDENTITY_TYPE((mp_append<b
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(asin_derivative, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(asin_derivative, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::pow;
@@ -1013,7 +1010,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_derivative, T, BOOST_IDENTITY_TYPE((mp_append
   BOOST_REQUIRE_CLOSE(y.derivative(4), (24*(cx*cx+3)*cx*cx+9)/pow(1-cx*cx,4.5), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, bin_float_types) {
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::asinh;
   constexpr int m = 5;
@@ -1028,7 +1025,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_
   BOOST_REQUIRE_CLOSE(y.derivative(5), -39/(16*boost::math::constants::root_two<T>()), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/ >))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::atanh;
@@ -1045,7 +1042,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_
   BOOST_REQUIRE_CLOSE(y.derivative(5), static_cast<T>(31232)/81, eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
 
   constexpr int m = 5;
   constexpr float cx = 1.0;
@@ -1059,7 +1056,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
   BOOST_REQUIRE(y.derivative(5) == -3.0);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types, multiprecision_float_types>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::erf;
   using namespace boost;
@@ -1075,7 +1072,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
   BOOST_REQUIRE_CLOSE(y.derivative(5), -40/(math::constants::e<T>()*math::constants::root_pi<T>()), eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
 
   const T eps = 20000*std::numeric_limits<T>::epsilon(); // percent
   using std::sin;
@@ -1105,7 +1102,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
   BOOST_REQUIRE_CLOSE(y2.derivative(10), -cx/11, eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types /*, multiprecision_float_types*/>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
 
   const T eps = 300*std::numeric_limits<T>::epsilon(); // percent
   using std::sinh;
@@ -1124,7 +1121,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, BOOST_IDENTITY_TYPE((mp_append<b
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types/*, multiprecision_float_types*/>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
 
   const T eps = 800*std::numeric_limits<T>::epsilon(); // percent
   using std::sqrt;
@@ -1141,7 +1138,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_fl
   BOOST_REQUIRE_CLOSE(y.derivative(5), 5824.0, eps);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types,multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, bin_float_types)
 {
   constexpr int m = 3;
   constexpr float cx = 3.25;
@@ -1155,7 +1152,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, BOOST_IDENTITY_TYPE((mp_append<bin_f
 }
 
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(round_and_trunc, T, BOOST_IDENTITY_TYPE((mp_append<bin_float_types,multiprecision_float_types>)))
+BOOST_AUTO_TEST_CASE_TEMPLATE(round_and_trunc, T, all_float_types)
 {
   using std::round;
   using std::trunc;
@@ -1468,7 +1465,7 @@ struct test_constants_t<T, std::integral_constant<Order, val>> {
 template<typename T, int m = 3>
 using test_constants_t = detail::test_constants_t<T, boost::mp11::mp_int<m>>;
 
-using testing_types = mp_list<double>;
+using testing_types = boost::mp11::mp_list<double>;
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

@@ -5,6 +5,7 @@
 
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/math/special_functions/factorials.hpp>
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
 #include <boost/range/irange.hpp>
@@ -1784,7 +1785,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<unsigned> n_sampler{0u, 10000u};
+  detail::RandomSample<unsigned> n_sampler{0u, 1000u};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
@@ -2297,7 +2298,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> x_sampler{-2000, 2000};
+  detail::RandomSample<T> x_sampler{1, 500};
   for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
     auto x = x_sampler.next();
     try {
@@ -2315,17 +2316,26 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x)), boost::math::expint(x), 200*test_constants::pct_epsilon);
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::expint(x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::expint(x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    for (auto y : {-1, 1}) {
+      try {
+        auto anchor_v = boost::math::expint(x*y);
+        auto autodiff_v = boost::math::expint(make_fvar<T, m>(x*y));
+        if (std::max(static_cast<T>(log(autodiff_v)), static_cast<T>(std::log(anchor_v))) < boost::math::tools::epsilon<T>()) {
+          BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
+        } else {
+          BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x*y)),
+                              boost::math::expint(x*y), 200*test_constants::pct_epsilon);
+        }
+      } catch (const std::domain_error &) {
+        BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x*y)), boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(boost::math::expint(x*y), boost::wrapexcept<std::domain_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x*y)), boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::expint(x*y), boost::wrapexcept<std::overflow_error>);
+      } catch (...) {
+        std::cout << "Input: x: " << x << " y: " << y << std::endl;
+        std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      }
     }
   }
 }
@@ -2349,6 +2359,69 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, testing_types) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{0, 1000};
+  for (auto i : boost::irange<unsigned>(test_constants::n_samples)) {
+    try {
+      auto fact_i = boost::math::factorial<T>(i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: i: " << i << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto fact_i = boost::math::unchecked_factorial<T>(i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: i: " << i << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto fact_i = boost::math::unchecked_factorial<T>(i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: i: " << i << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto fact_i = boost::math::double_factorial<T>(i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: i: " << i << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    auto x = x_sampler.next();
+    try {
+      auto fact_i = boost::math::rising_factorial<T>(x, i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: x: " << x << " i: " << i << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto fact_i = boost::math::falling_factorial<T>(x, test_constants::n_samples-i);
+      auto autodiff_v = make_fvar<T, m>(fact_i);
+      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+    } catch (...) {
+      std::cout << "Input: x: " << x << " i: " << (test_constants::n_samples-i) << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
@@ -2570,7 +2643,7 @@ struct boost_special_functions_test {
     //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i(0,make_fvar<T,m>(0.20)) , math::cyl_bessel_i(0,static_cast<T>(0.20)));
     BOOST_REQUIRE_CLOSE(math::cyl_bessel_k(0, make_fvar<T, m>(0.20)),
                         math::cyl_bessel_k(0, static_cast<T>(0.20)),
-                        pct_epsilon);
+                        50*pct_epsilon);
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_EQUAL(math::sph_bessel(0,make_fvar<T,m>(0.20)) , math::sph_bessel(0,static_cast<T>(0.20)));
     // Required fmod() but then has policy parameter ADL issue.
@@ -2580,7 +2653,7 @@ struct boost_special_functions_test {
     //BOOST_REQUIRE_EQUAL(math::cyl_neumann_prime(0,make_fvar<T,m>(0.20)) , math::cyl_neumann_prime(0,static_cast<T>(0.20)));
     //BOOST_REQUIRE_EQUAL(math::cyl_bessel_i_prime(0,make_fvar<T,m>(0.20)) , ath::cyl_bessel_i_prime(0,static_cast<T>(0.20)));
     BOOST_REQUIRE_CLOSE(math::cyl_bessel_k_prime(0, make_fvar<T, m>(0.20)),
-                        math::cyl_bessel_k_prime(0, static_cast<T>(0.20)), pct_epsilon);
+                        math::cyl_bessel_k_prime(0, static_cast<T>(0.20)), 50*pct_epsilon);
     // Policy parameter prevents ADL.
     //BOOST_REQUIRE_EQUAL(math::sph_bessel_prime(0,make_fvar<T,m>(0.20)) , math::sph_bessel_prime(0,static_cast<T>(0.20)));
     //BOOST_REQUIRE_EQUAL(math::sph_neumann_prime(0,make_fvar<T,m>(0.20)) , math::sph_neumann_prime(0,static_cast<T>(0.20)));

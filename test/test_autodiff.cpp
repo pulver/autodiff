@@ -2152,7 +2152,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
     auto x = x_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::log1p(make_fvar<T, m>(x)),
-                                   boost::math::log1p(x), 2*boost::math::tools::epsilon<T>());
+                                   boost::math::log1p(x), 10*boost::math::tools::epsilon<T>());
     } catch (const boost::math::rounding_error &) {
       BOOST_REQUIRE_THROW(boost::math::log1p(make_fvar<T, m>(x)), boost::wrapexcept<boost::math::rounding_error>);
       BOOST_REQUIRE_THROW(boost::math::log1p(x), boost::wrapexcept<boost::math::rounding_error>);

@@ -11,10 +11,7 @@
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
-#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
 #include <boost/range/irange.hpp>
-#include <boost/range/numeric.hpp>
 
 #include <algorithm>
 #include <cfenv>
@@ -1259,6 +1256,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(mixed_partials, T, all_float_types)
               }
 }
 
+// Not called in original code
+/*
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, bin_float_types)
 {
   const T eps = 600*std::numeric_limits<T>::epsilon(); // percent
@@ -1278,6 +1277,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, bin_float_types)
   const double relative_error = static_cast<double>(fabs(v.derivative(Nw,Nx,Ny,Nz)/answer-1));
   BOOST_REQUIRE(100*relative_error < eps);
 }
+*/
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(black_scholes, T, bin_float_types) {
   //const T eps = 2725*std::numeric_limits<T>::epsilon(); // percent

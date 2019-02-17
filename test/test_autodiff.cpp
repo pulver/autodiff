@@ -11,6 +11,8 @@
 #include <boost/range/irange.hpp>
 
 #include <cfenv>
+#include <cstring>
+#include <cerrno>
 #include <random>
 
 #define BOOST_TEST_MODULE test_autodiff
@@ -1583,11 +1585,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(black_scholes, T, bin_float_types) {
   BOOST_REQUIRE_CLOSE(  put_price.derivative(0,3,0,0), formula_ultima, eps);
 }
 
-/**
+/*********************************************************************************************************************
  * special functions tests
- */
-namespace detail {
+ *********************************************************************************************************************/
 
+namespace detail {
 /**
  * struct to emit pseudo-random values from a given interval.
  * Endpoints are closed or open depending on whether or not they're infinite).
@@ -1637,6 +1639,77 @@ template<typename T, int m = 3>
 using test_constants_t = detail::test_constants_t<T, boost::mp11::mp_int<m>>;
 
 using testing_types = boost::mp11::mp_list<double>;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
+      auto anchor_v = boost::math::airy_ai(static_cast<T>(x));
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
+      auto anchor_v = boost::math::airy_ai_prime(static_cast<T>(x));
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x));
+      auto anchor_v = boost::math::airy_bi(static_cast<T>(x));
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_bi(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_bi(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x));
+      auto anchor_v = boost::math::airy_bi_prime(static_cast<T>(x));
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -2622,16 +2695,7 @@ struct boost_special_functions_test {
     constexpr int m = 3;
     constexpr T pct_epsilon = 20*math::tools::epsilon<T>()*100;
 
-    // airy.hpp
-    {
-      // Policy parameter prevents proper ADL for autodiff_fvar objects. E.g. iround(v,pol) instead of iround(v).
-      // In cyl_bessel_j_imp() call is made to iround(v, pol) with v of type autodiff_fvar. It it were just iround(v)
-      // then autodiff's iround would properly be called via ADL.
-      //BOOST_REQUIRE_EQUAL(math::airy_ai(make_fvar<T,m>(1)), math::airy_ai(static_cast<T>(1)));
-      //BOOST_REQUIRE_EQUAL(math::airy_bi(make_fvar<T,m>(1)), math::airy_bi(static_cast<T>(1)));
-      //BOOST_REQUIRE_EQUAL(math::airy_ai_prime(make_fvar<T,m>(1)), math::airy_ai_prime(static_cast<T>(1)));
-      //BOOST_REQUIRE_EQUAL(math::airy_bi_prime(make_fvar<T,m>(1)), math::airy_bi_prime(static_cast<T>(1)));
-    }
+
 
     // bessel.hpp, bessel_prime.hpp
     // Policy parameter prevents ADL.

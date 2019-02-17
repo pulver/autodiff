@@ -7,6 +7,7 @@
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
 #include <boost/config.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
@@ -100,6 +101,8 @@ class fvar
 
     template<typename RealType2>
     fvar(const RealType2& ca); // Supports any RealType2 for which static_cast<root_type>(ca) compiles.
+
+    explicit fvar(const char* ca); // Converts a const char* string to RealType by boost::lexical_cast
 
     // r = cr | RealType& | Assignment operator.
     fvar& operator=(const fvar&) = default;
@@ -270,6 +273,8 @@ class fvar
     static constexpr size_t order_sum = get_order_sum<fvar>::value;
 
     explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+
+    explicit operator int() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
     fvar& set_root(const root_type&);
 
@@ -555,6 +560,12 @@ template<typename RealType, size_t Order>
 template<typename RealType2>
 fvar<RealType,Order>::fvar(const RealType2& ca)
 :    v{{static_cast<RealType>(ca)}} // Can cause compiler error if RealType2 cannot be cast to root_type.
+{
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>::fvar(const char* ca_str)
+:    v{{boost::lexical_cast<RealType>(ca_str)}}
 {
 }
 
@@ -1098,6 +1109,12 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order>::operator root_type() const
 {
     return static_cast<root_type>(v.front());
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>::operator int() const
+{
+    return static_cast<int>(v.front());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR

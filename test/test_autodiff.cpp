@@ -2320,7 +2320,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
       try {
         auto anchor_v = boost::math::expint(x*y);
         auto autodiff_v = boost::math::expint(make_fvar<T, m>(x*y));
-        if (std::max(static_cast<T>(log(autodiff_v)), static_cast<T>(std::log(anchor_v))) < boost::math::tools::epsilon<T>()) {
+        if (fabs(log(autodiff_v)) < boost::math::tools::epsilon<T>() && std::fabs(std::log(anchor_v)) < boost::math::tools::epsilon<T>()) {
           BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
         } else {
           BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x*y)),

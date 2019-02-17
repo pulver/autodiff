@@ -1651,7 +1651,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     try {
       auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai(static_cast<T>(x));
-      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 100000*test_constants::pct_epsilon);
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1666,7 +1666,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     try {
       auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai_prime(static_cast<T>(x));
-      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 100000*test_constants::pct_epsilon);
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1681,7 +1681,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     try {
       auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_bi(static_cast<T>(x));
-      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 100000*test_constants::pct_epsilon);
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1696,7 +1696,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     try {
       auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_bi_prime(static_cast<T>(x));
-      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v,anchor_v, 100000*test_constants::pct_epsilon);
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);

@@ -2294,6 +2294,42 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::expint(n, make_fvar<T, m>(x)),
+                          boost::math::expint(n, x),
+                          200*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::expint(n, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::expint(n, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::expint(n, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::expint(n, x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x)), boost::math::expint(x), 200*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::expint(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::expint(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

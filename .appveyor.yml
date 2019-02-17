@@ -39,7 +39,7 @@ install:
   - ls
 
 build_script:
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
+  - cl.exe /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff.cpp
 
 test_script:
   - test_autodiff

@@ -1659,8 +1659,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     auto x = x_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_ai(make_fvar<T, m>(x))),
-                          detail::normalize(boost::math::airy_ai(static_cast<T>(x))),
-                          50000*boost::math::tools::epsilon<T>());
+                                   detail::normalize(boost::math::airy_ai(static_cast<T>(x))),
+                                   50000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1803,7 +1803,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
     std::ignore = idx;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_EQUAL(detail::normalize(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x)))), detail::normalize(boost::math::bernoulli_b2n<T>(x)));
+      BOOST_REQUIRE_EQUAL(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::math::bernoulli_b2n<T>(x));
     } catch (const std::domain_error &e) {
       BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(x), boost::wrapexcept<std::domain_error>);
@@ -1833,35 +1833,78 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> x_sampler{-2000, 2000};
-  detail::RandomSample<T> y_sampler{-2000, 2000};
+  detail::RandomSample<T> a_sampler{-2000, 2000};
+  detail::RandomSample<T> b_sampler{-2000, 2000};
+  detail::RandomSample<T> z_sampler{0, 1};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
-    auto y = y_sampler.next();
+    auto a = a_sampler.next();
+    auto b = b_sampler.next();
     try {
-      auto anchor_v = boost::math::beta(x, y);
-      auto autodiff_v = boost::math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y));
-      if (std::min<T>(static_cast<T>(log(autodiff_v)), static_cast<T>(std::log(anchor_v))) < boost::math::tools::epsilon<T>()) {
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*test_constants::pct_epsilon);
-      } else {
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon);
-      }
+      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::beta(make_fvar<T, m>(a), make_fvar<T, m>(b))),
+                          detail::normalize(boost::math::beta(a, b)), test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::beta(x, y), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(a), make_fvar<T, m>(b)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::beta(a, b), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(x), make_fvar<T, m>(y)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::beta(x, y), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(a), make_fvar<T, m>(b)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::beta(a, b), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      std::cout << "Input: x: " << x << "  y: " << y << std::endl;
+      std::cout << "Input: a: " << a << "  b: " << b << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+    
+    auto z = z_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::betac(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z))),
+                          detail::normalize(boost::math::betac(a, b, z)), test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::betac(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::betac(a, b, z), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::betac(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::betac(a, b, z), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: a: " << a << "  b: " << b << "  z: " << z << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::ibeta(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z)))),
+                          detail::normalize(boost::math::ibeta(abs(a), abs(b), abs(z))), test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::ibeta(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z))),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ibeta(abs(a), abs(b), abs(z)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::ibeta(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z))),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::ibeta(abs(a), abs(b), abs(z)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: a: " << abs(a) << "  b: " << abs(b) << "  z: " << abs(z) << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::ibetac(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z)))),
+                          detail::normalize(boost::math::ibetac(abs(a), abs(b), abs(z))), test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::ibetac(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z))),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::ibetac(abs(a), abs(b), abs(z)), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::ibetac(make_fvar<T, m>(abs(a)), make_fvar<T, m>(abs(b)), make_fvar<T, m>(abs(z))),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::ibetac(abs(a), abs(b), abs(z)), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: a: " << abs(a) << "  b: " << abs(b) << "  z: " << abs(z) << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
-// policy issue
-//BOOST_REQUIRE_EQUAL(math::ibeta(make_fvar<T,m>(0.20), make_fvar<T,m>(0.20), make_fvar<T,m>(0.220)) , math::ibeta(static_cast<T>(0.20), static_cast<T>(0.20), static_cast<T>(0.220)));
-//BOOST_REQUIRE_EQUAL(math::ibetac(make_fvar<T,m>(0.20), make_fvar<T,m>(0.20), make_fvar<T,m>(0.8220)) , math::ibetac(static_cast<T>(0.20), static_cast<T>(0.20), static_cast<T>(0.8220)));
-//BOOST_REQUIRE_EQUAL(math::betac(make_fvar<T,m>(12), make_fvar<T,m>(120), make_fvar<T,m>(0.220)),math::betac(static_cast<T>(12), static_cast<T>(120), static_cast<T>(0.20)));
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, testing_types) {

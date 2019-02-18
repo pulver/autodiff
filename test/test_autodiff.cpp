@@ -1639,10 +1639,7 @@ struct test_constants_t<T, std::integral_constant<Order, val>> {
 
 template<typename T>
 static constexpr T normalize(T&& x) noexcept {
-  BOOST_MATH_STD_USING
-  return (std::forward<T>(x) < static_cast<T>(0) ? -1 : 1) *
-         (abs(std::forward<T>(x)) > BOOST_MATH_SMALL_CONSTANT(std::forward<T>(x))
-           ? abs(std::forward<T>(x)) : BOOST_MATH_SMALL_CONSTANT(std::forward<T>(x)));
+  return std::fetestexcept(FE_UNDERFLOW) ? BOOST_MATH_SMALL_CONSTANT(std::forward<T>(x)) : std::forward<T>(x);
 }
 
 } // namespace detail
@@ -1661,9 +1658,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::airy_ai(make_fvar<T, m>(x))),
+      BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_ai(make_fvar<T, m>(x))),
                           detail::normalize(boost::math::airy_ai(static_cast<T>(x))),
-                          50000*test_constants::pct_epsilon);
+                          50000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1676,9 +1673,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     }
 
     try {
-      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::airy_ai_prime(make_fvar<T, m>(x))),
-                          detail::normalize(boost::math::airy_ai_prime(static_cast<T>(x))),
-                          50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_ai_prime(make_fvar<T, m>(x))),
+                                   detail::normalize(boost::math::airy_ai_prime(static_cast<T>(x))),
+                                   50000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1691,9 +1688,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     }
 
     try {
-      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::airy_bi(make_fvar<T, m>(x))),
-                          detail::normalize(boost::math::airy_bi(static_cast<T>(x))),
-                          50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_bi(make_fvar<T, m>(x))),
+                                   detail::normalize(boost::math::airy_bi(static_cast<T>(x))),
+                                   50000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1706,9 +1703,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
     }
 
     try {
-      BOOST_REQUIRE_CLOSE(detail::normalize(boost::math::airy_bi_prime(make_fvar<T, m>(x))),
-                          detail::normalize(boost::math::airy_bi_prime(static_cast<T>(x))),
-                          50000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_bi_prime(make_fvar<T, m>(x))),
+                                   detail::normalize(boost::math::airy_bi_prime(static_cast<T>(x))),
+                                   50000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error&) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(static_cast<T>(x)), boost::wrapexcept<std::domain_error>);
@@ -1731,7 +1728,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(acosh(make_fvar<T, m>(x)), boost::math::acosh(x), test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(detail::normalize(acosh(make_fvar<T, m>(x))), detail::normalize(boost::math::acosh(x)), test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
@@ -1756,7 +1753,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, testing_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(asinh(make_fvar<T, m>(x)), boost::math::asinh(x), test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(detail::normalize(asinh(make_fvar<T, m>(x))), detail::normalize(boost::math::asinh(x)), test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
@@ -1781,7 +1778,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, testing_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(atanh(make_fvar<T, m>(x)), boost::math::atanh(x), test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(detail::normalize(atanh(make_fvar<T, m>(x))), detail::normalize(boost::math::atanh(x)), test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
@@ -1806,7 +1803,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
     std::ignore = idx;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_EQUAL(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::math::bernoulli_b2n<T>(x));
+      BOOST_REQUIRE_EQUAL(detail::normalize(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x)))), detail::normalize(boost::math::bernoulli_b2n<T>(x)));
     } catch (const std::domain_error &e) {
       BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(iround(make_fvar<T, m>(x))), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(x), boost::wrapexcept<std::domain_error>);

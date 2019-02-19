@@ -2770,31 +2770,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
   detail::RandomSample<T> x_sampler{-1000, 1000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(x)), boost::math::fpclassify(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(x)), boost::math::fpclassify(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isfinite(make_fvar<T, m>(x)), boost::math::isfinite(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isinf(make_fvar<T, m>(x)), boost::math::isinf(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isnan(make_fvar<T, m>(x)), boost::math::isnan(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isnormal(make_fvar<T, m>(x)), boost::math::isnormal(static_cast<T>(x)));
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(1/x)), boost::math::fpclassify(static_cast<T>(1/x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isfinite(make_fvar<T, m>(1/x)), boost::math::isfinite(static_cast<T>(1/x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isinf(make_fvar<T, m>(1/x)), boost::math::isinf(static_cast<T>(1/x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isnan(make_fvar<T, m>(1/x)), boost::math::isnan(static_cast<T>(1/x)));
-    BOOST_REQUIRE_EQUAL(boost::math::isnormal(make_fvar<T, m>(1/x)), boost::math::isnormal(static_cast<T>(1/x)));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(0)), static_cast<T>(FP_ZERO));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(10)), static_cast<T>(FP_NORMAL));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::infinity())),
+                        static_cast<T>(FP_INFINITE));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())),
+                        static_cast<T>(FP_NAN));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())),
+                        static_cast<T>(FP_SUBNORMAL));
+
+    BOOST_REQUIRE(boost::math::isfinite(make_fvar<T, m>(0)));
+    BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
+    BOOST_REQUIRE(!boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
+    BOOST_REQUIRE(boost::math::isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
+    BOOST_REQUIRE(boost::math::isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
   }
-
-  BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(0)), static_cast<T>(FP_ZERO));
-  BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(10)), static_cast<T>(FP_NORMAL));
-  BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::infinity())), static_cast<T>(FP_INFINITE));
-  BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())), static_cast<T>(FP_NAN));
-  BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())), static_cast<T>(FP_SUBNORMAL));
-
-  BOOST_REQUIRE(boost::math::isfinite(make_fvar<T, m>(0)));
-  BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
-  BOOST_REQUIRE(!boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
-  BOOST_REQUIRE(boost::math::isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
-  BOOST_REQUIRE(boost::math::isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
@@ -2850,30 +2840,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
-  using test_constants = test_constants_t<T>;
-  static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> x_sampler{-2, 2};
-  detail::RandomSample<T> phi_sampler{-2000, 2000};
-  for (auto i : boost::irange(test_constants::n_samples)) {
-    std::ignore = i;
-    auto x = x_sampler.next();
-    auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                                   boost::math::jacobi_zeta(x, phi), 50*boost::math::tools::epsilon<T>());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(x, phi), boost::wrapexcept<std::domain_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << "  " << "phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-  }
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   detail::RandomSample<T> x_sampler{-1.01, 1.01};
@@ -2891,6 +2858,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda, T, testing_types) {
       BOOST_REQUIRE_THROW(boost::math::heuman_lambda(x, phi), boost::wrapexcept<std::domain_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << "  " << "phi: " << phi << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange<unsigned>(test_constants::n_samples)) {
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::hermite(i, make_fvar<T, m>(x)),
+                          boost::math::hermite(i, x), 10000*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
@@ -2918,6 +2909,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hypot_hpp, T, testing_types) {
     }
   }
 }
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{-2, 2};
+  detail::RandomSample<T> phi_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    auto phi = phi_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
+                                   boost::math::jacobi_zeta(x, phi), 50*boost::math::tools::epsilon<T>());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(x, phi), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << "  " << "phi: " << phi << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;

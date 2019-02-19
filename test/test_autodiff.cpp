@@ -3,6 +3,10 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
+#if defined(_MSC_VER)
+#define NOMINMAX
+#endif
+
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/math/special_functions/factorials.hpp>
@@ -1589,10 +1593,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(black_scholes, T, bin_float_types) {
  * special functions tests
  *********************************************************************************************************************/
 
-#ifndef NOMINMAX
-#define NOMINMAX 1
-#endif
-
 namespace detail {
 /**
  * struct to emit pseudo-random values from a given interval.
@@ -2756,13 +2756,35 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
   BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())), static_cast<T>(FP_SUBNORMAL));
 
   BOOST_REQUIRE(boost::math::isfinite(make_fvar<T, m>(0)));
-  BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::min())));
+  BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
   BOOST_REQUIRE(!boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
   BOOST_REQUIRE(boost::math::isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
   BOOST_REQUIRE(boost::math::isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
+using test_constants = test_constants_t<T>;
+static constexpr auto m = test_constants::order;
+detail::RandomSample<T> x_sampler{0, 1000};
+for (auto i : boost::irange(test_constants::n_samples)) {
+std::ignore = i;
+auto x = x_sampler.next();
+try {
+BOOST_REQUIRE_CLOSE(boost::math::tgamma(make_fvar<T, m>(x)), boost::math::tgamma(x), 50*test_constants::pct_epsilon);
+} catch (const std::domain_error &) {
+BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::domain_error>);
+}  catch (const std::overflow_error &) {
+BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::overflow_error>);
+}
 
+catch (...) {
+std::cout << "Input: x: " << x << std::endl;
+std::rethrow_exception(std::exception_ptr(std::current_exception()));
+}
+}
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;

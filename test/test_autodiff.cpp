@@ -1655,7 +1655,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
 
   detail::RandomSample<T> x_sampler{-1000, 1000};
   for (auto i : boost::irange(test_constants::n_samples)) {
-    std::ignore = i;
     auto x = x_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(detail::normalize(boost::math::airy_ai(make_fvar<T, m>(x))),
@@ -1716,6 +1715,37 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
       std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i)))),
+                                     detail::normalize(boost::math::airy_ai_zero<T>(i)),
+                                     50000*boost::math::tools::epsilon<T>());
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i)))),
+                                     detail::normalize(boost::math::airy_bi_zero<T>(i)),
+                                     50000*boost::math::tools::epsilon<T>());
+    } catch (const std::domain_error&) {
+      BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error&) {
+      BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
   }
 }
 
@@ -2763,27 +2793,56 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
-using test_constants = test_constants_t<T>;
-static constexpr auto m = test_constants::order;
-detail::RandomSample<T> x_sampler{0, 1000};
-for (auto i : boost::irange(test_constants::n_samples)) {
-std::ignore = i;
-auto x = x_sampler.next();
-try {
-BOOST_REQUIRE_CLOSE(boost::math::tgamma(make_fvar<T, m>(x)), boost::math::tgamma(x), 50*test_constants::pct_epsilon);
-} catch (const std::domain_error &) {
-BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::domain_error>);
-}  catch (const std::overflow_error &) {
-BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::overflow_error>);
-}
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{0, 1000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::tgamma(make_fvar<T, m>(x)), boost::math::tgamma(x), 50*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::domain_error>);
+    }  catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::tgamma(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
 
-catch (...) {
-std::cout << "Input: x: " << x << std::endl;
-std::rethrow_exception(std::exception_ptr(std::current_exception()));
-}
-}
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::tgamma1pm1(make_fvar<T, m>(x)), boost::math::tgamma1pm1(x), 50*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::tgamma1pm1(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::tgamma1pm1(x), boost::wrapexcept<std::domain_error>);
+    }  catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::tgamma1pm1(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::tgamma1pm1(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    int s1 = 0;
+    int s2 = 0;
+
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::lgamma(make_fvar<T, m>(x), std::addressof(s1)),
+                          boost::math::lgamma(x, std::addressof(s2)), 50*test_constants::pct_epsilon);
+      BOOST_REQUIRE((std::addressof(s1) == nullptr && std::addressof(s2) == nullptr) || (s1 == s2));
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::lgamma(x), boost::wrapexcept<std::domain_error>);
+    }  catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lgamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::lgamma(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
@@ -2976,6 +3035,28 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt1pm1_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(trigamma, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{0, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::trigamma(make_fvar<T, m>(x)),
+                          boost::math::trigamma(x), (x < static_cast<T>(0) ? 220 : 20)*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::trigamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::trigamma(x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::trigamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::trigamma(x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
 // Compilation tests for boost special functions.
 struct boost_special_functions_test {
 

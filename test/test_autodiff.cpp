@@ -2866,17 +2866,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> x_sampler{-2000, 2000};
-  for (auto i : boost::irange<unsigned>(test_constants::n_samples)) {
+  detail::RandomSample<T> x_sampler{-200, 200};
+  for (auto i : boost::irange(test_constants::n_samples)) {
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(boost::math::hermite(i, make_fvar<T, m>(x)),
-                          boost::math::hermite(i, x), 10000*test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::hermite(i, make_fvar<T, m>(x)),
+                                   boost::math::hermite(i, x), 10000*boost::math::tools::epsilon<T>());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)),
                           boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
+      std::cout << "i: " << i << "\tx: " << x << std::endl;
       BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)),
                           boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);

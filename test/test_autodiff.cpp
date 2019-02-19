@@ -2982,6 +2982,28 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(boost::math::polygamma(i, make_fvar<T, m>(x)),
+                          boost::math::polygamma(i, x), 20*test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::polygamma(i, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::polygamma(i, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::polygamma(i, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::polygamma(i, x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: i: " << i << "\tx: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -3078,6 +3100,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(trigamma, T, testing_types) {
     }
   }
 }
+
 // Compilation tests for boost special functions.
 struct boost_special_functions_test {
 

@@ -1716,36 +1716,41 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
-    try {
-      BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i)))),
+    if (i > 0) {
+      try {
+        BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i)))),
                                      detail::normalize(boost::math::airy_ai_zero<T>(i)),
                                      50000*boost::math::tools::epsilon<T>());
-    } catch (const std::domain_error&) {
-      BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error&) {
-      BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+      } catch (const std::domain_error &) {
+        BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i))),
+                            boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::domain_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i))),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::airy_ai_zero<T>(i), boost::wrapexcept<std::overflow_error>);
+      } catch (...) {
+        std::cout << "Input: x: " << x << std::endl;
+        std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      }
 
-    try {
-      BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i)))),
+      try {
+        BOOST_REQUIRE_CLOSE_FRACTION(((detail::normalize(boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i)))),
                                      detail::normalize(boost::math::airy_bi_zero<T>(i)),
                                      50000*boost::math::tools::epsilon<T>());
-    } catch (const std::domain_error&) {
-      BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error&) {
-      BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T,m>>(i))), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      } catch (const std::domain_error &) {
+        BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i))),
+                            boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::domain_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i))),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::airy_bi_zero<T>(i), boost::wrapexcept<std::overflow_error>);
+      } catch (...) {
+        std::cout << "Input: x: " << x << std::endl;
+        std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      }
     }
-
   }
 }
 

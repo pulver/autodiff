@@ -1633,7 +1633,7 @@ struct test_constants_t;
 template<typename T, typename Order, Order val>
 struct test_constants_t<T, std::integral_constant<Order, val>> {
   static constexpr T pct_epsilon = 50*std::numeric_limits<T>::epsilon()*100;
-  static constexpr int n_samples = 100;
+  static constexpr int n_samples = 25;
   static constexpr Order order = val;
 };
 
@@ -3235,7 +3235,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
   }
 }
 
-
 BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -3251,6 +3250,36 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
       BOOST_REQUIRE_THROW(boost::math::log1p(x), boost::wrapexcept<boost::math::rounding_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> h_sampler{-2000, 2000};
+  detail::RandomSample<T> a_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto h = h_sampler.next();
+    auto a = a_sampler.next();
+    try {
+      auto autodiff_v = boost::math::owens_t(make_fvar<T,m>(h), make_fvar<T, m>(a));
+      auto anchor_v   = boost::math::owens_t(h, a);
+      if (detail::check_if_small(autodiff_v, anchor_v)) {
+        BOOST_REQUIRE_SMALL(static_cast<T>(autodiff_v - anchor_v), std::numeric_limits<T>::epsilon());
+      } else {
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 200000*std::numeric_limits<T>::epsilon());
+      }
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::owens_t(make_fvar<T, m>(h), make_fvar<T, m>(a)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::owens_t(h, a), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::owens_t(make_fvar<T, m>(h), make_fvar<T, m>(a)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::owens_t(h, a), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: h: " << h << "\ta: " << a << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }

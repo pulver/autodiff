@@ -2381,18 +2381,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  // iround needed due to cos_pi using all integral arithmetic before calculation of cos(pi*x)
   detail::RandomSample<T> x_sampler{-2000, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_EQUAL(boost::math::cos_pi(iround(make_fvar<T, m>(boost::math::constants::pi<T>()*x))),
-                          boost::math::cos_pi(boost::math::iround(boost::math::constants::pi<T>()*x)));
+      BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)),
+                          boost::math::cos_pi(x), test_constants::pct_epsilon);
     } catch (const boost::math::rounding_error &) {
-      BOOST_REQUIRE_THROW(boost::math::cos_pi(iround(make_fvar<T, m>(boost::math::constants::pi<T>()*x))),
+      BOOST_REQUIRE_THROW(boost::math::cos_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
-      BOOST_REQUIRE_THROW(boost::math::cos_pi(boost::math::iround(boost::math::constants::pi<T>()*x)),
+      BOOST_REQUIRE_THROW(boost::math::cos_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -3223,7 +3222,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
     auto phi = phi_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                                   boost::math::jacobi_zeta(x, phi), 50*std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_zeta(x, phi), 100*std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);
@@ -3372,19 +3371,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  // iround needed due to sin_pi using all integral arithmetic before calculation of sin(pi*x)
   detail::RandomSample<T> x_sampler{-2000, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(boost::math::sin_pi(iround(make_fvar<T, m>(boost::math::constants::pi<T>()*x))),
-                          boost::math::sin_pi(boost::math::iround(boost::math::constants::pi<T>()*x)),
+      BOOST_REQUIRE_CLOSE(boost::math::sin_pi(make_fvar<T, m>(x)),
+                          boost::math::sin_pi(x),
                           test_constants::pct_epsilon);
     } catch (const boost::math::rounding_error &) {
-      BOOST_REQUIRE_THROW(boost::math::sin_pi(iround(make_fvar<T, m>(boost::math::constants::pi<T>()*x))),
+      BOOST_REQUIRE_THROW(boost::math::sin_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
-      BOOST_REQUIRE_THROW(boost::math::sin_pi(boost::math::iround(boost::math::constants::pi<T>()*x)),
+      BOOST_REQUIRE_THROW(boost::math::sin_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;

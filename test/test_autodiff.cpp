@@ -2389,7 +2389,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, testing_types) {
       BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)),
                           boost::math::cos_pi(x), test_constants::pct_epsilon);
     } catch (const boost::math::rounding_error &) {
-      BOOST_REQUIRE_THROW(boost::math::cos_pi(x),
+      BOOST_REQUIRE_THROW(boost::math::cos_pi(make_fvar<T, m>(x)),
                           boost::wrapexcept<boost::math::rounding_error>);
       BOOST_REQUIRE_THROW(boost::math::cos_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
@@ -3380,9 +3380,36 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, testing_types) {
                           boost::math::sin_pi(x),
                           test_constants::pct_epsilon);
     } catch (const boost::math::rounding_error &) {
-      BOOST_REQUIRE_THROW(boost::math::sin_pi(x),
+      BOOST_REQUIRE_THROW(boost::math::sin_pi(make_fvar<T,m>(x)),
                           boost::wrapexcept<boost::math::rounding_error>);
       BOOST_REQUIRE_THROW(boost::math::sin_pi(x),
+                          boost::wrapexcept<boost::math::rounding_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{-2000, 2000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
+      auto anchor_v = boost::math::sinhc_pi(x);
+      if (!std::isfinite(static_cast<T>(autodiff_v)) || !std::isfinite(anchor_v)) {
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(anchor_v));
+      } else {
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon);
+      }
+    } catch (const boost::math::rounding_error &) {
+      BOOST_REQUIRE_THROW(boost::math::sinhc_pi(make_fvar<T,m>(x)),
+                          boost::wrapexcept<boost::math::rounding_error>);
+      BOOST_REQUIRE_THROW(boost::math::sinhc_pi(x),
                           boost::wrapexcept<boost::math::rounding_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;

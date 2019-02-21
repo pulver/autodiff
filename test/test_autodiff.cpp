@@ -3497,8 +3497,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
     auto x = x_sampler.next();
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::math::laguerre(n, x),
-                                   100 * std::numeric_limits<T>::epsilon());
+      auto autodiff_v = boost::math::laguerre(n, make_fvar<T, m>(x));
+      auto anchor_v = boost::math::laguerre(n, x);
+      if (!std::isfinite(static_cast<T>(autodiff_v)) || !std::isfinite(anchor_v)) {
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(anchor_v));
+      } else {
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100 * std::numeric_limits<T>::epsilon());
+      }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::domain_error>);

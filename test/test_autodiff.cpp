@@ -1864,7 +1864,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> v_sampler{-700, 700};
+  detail::RandomSample<T> v_sampler{-100, 100};
   detail::RandomSample<T> x_sampler{-boost::math::tools::log_max_value<T>() + 1,
                                     boost::math::tools::log_max_value<T>() - 1};
   for (auto i : boost::irange(test_constants::n_samples)) {

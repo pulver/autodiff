@@ -3485,9 +3485,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<unsigned> n_sampler{0, 1000};
-  detail::RandomSample<unsigned> r_sampler{0, 1000};
-  detail::RandomSample<T> x_sampler{-1000, 1000};
+  detail::RandomSample<unsigned> n_sampler{0, 50};
+  detail::RandomSample<unsigned> r_sampler{0, 50};
+  detail::RandomSample<T> x_sampler{-50, 50};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;

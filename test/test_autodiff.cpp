@@ -1870,6 +1870,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     auto v = v_sampler.next();
     auto x = x_sampler.next();
+    if (v == 0) {
+      continue;
+    }
 
     try {
       auto x_i = x < 0 ? boost::math::itrunc(x) : x;
@@ -1897,7 +1900,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
     }
 
     try {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       auto autodiff_v = boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
       auto anchor_v = boost::math::cyl_bessel_j(v, x_j);
       if (detail::check_if_small(autodiff_v, anchor_v)) {
@@ -1906,17 +1909,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 200000 * std::numeric_limits<T>::epsilon());
       }
     } catch (const std::domain_error &) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j)),
                           boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j(v, x_j), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j)),
                           boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j(v, x_j), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       std::cout << "Input: v: " << v << " x_j: " << x_j << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
@@ -2081,7 +2084,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
     }
 
     try {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
       auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
       if (detail::check_if_small(autodiff_v, anchor_v)) {
@@ -2090,17 +2093,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 200000 * std::numeric_limits<T>::epsilon());
       }
     } catch (const std::domain_error &) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j)),
                           boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j_prime(v, x_j), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j)),
                           boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j_prime(v, x_j), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      auto x_j = abs(x);
+      auto x_j = abs(x)+1;
       std::cout << "Input: v: " << v << " x_j: " << x_j << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }

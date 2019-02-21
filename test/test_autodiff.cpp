@@ -1864,7 +1864,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  detail::RandomSample<T> v_sampler{-1000, 1000};
+  detail::RandomSample<T> v_sampler{-700, 700};
   detail::RandomSample<T> x_sampler{-boost::math::tools::log_max_value<T>() + 1,
                                     boost::math::tools::log_max_value<T>() - 1};
   for (auto i : boost::irange(test_constants::n_samples)) {
@@ -3499,6 +3499,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: n: " << n << " x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -3510,6 +3513,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::laguerre(n, r, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::laguerre(n, r, x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: n: " << n << " r: " << r << " x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));

@@ -3479,6 +3479,97 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<unsigned> n_sampler{0, 1000};
+  detail::RandomSample<unsigned> r_sampler{0, 1000};
+  detail::RandomSample<T> x_sampler{-1000, 1000};
+
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto n = n_sampler.next();
+    n_sampler.dist_.param(typename detail::RandomSample<unsigned>::dist_t::param_type(0, m));
+    auto r = r_sampler.next();
+    auto x = x_sampler.next();
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::math::laguerre(n, x),
+                                   100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::math::laguerre(n, r, x),
+                                   100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::laguerre(n, r, x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " r: " << r << " x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  detail::RandomSample<T> x_sampler{static_cast<T>(-1 / std::exp(-1)), std::numeric_limits<T>::max()};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::lambert_w0(make_fvar<T, m>(x)), boost::math::lambert_w0(x),
+                                   100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lambert_w0(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::lambert_w0(x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::lambert_wm1(make_fvar<T, m>(x)), boost::math::lambert_wm1(x),
+                                   100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lambert_wm1(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::lambert_wm1(x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::lambert_w0_prime(make_fvar<T, m>(x)), boost::math::lambert_w0_prime(x),
+                                   100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lambert_w0_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::lambert_w0_prime(x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::lambert_wm1_prime(make_fvar<T, m>(x)),
+                                   boost::math::lambert_wm1_prime(x), 100 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::lambert_wm1_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::lambert_wm1_prime(x), boost::wrapexcept<std::domain_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

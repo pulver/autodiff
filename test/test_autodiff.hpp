@@ -24,9 +24,9 @@
 using bin_float_types = boost::mp11::mp_list<float, double, long double>;  // cpp_bin_float_50 is
                                                                            // fixed in boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-using multiprecision_float_types =
-    boost::mp11::mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;
-// using multiprecision_float_types = boost::mp11::mp_list<>;
+/*using multiprecision_float_types =
+    boost::mp11::mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;*/
+using multiprecision_float_types = boost::mp11::mp_list<>;
 
 using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
 

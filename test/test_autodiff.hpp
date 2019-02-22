@@ -14,6 +14,7 @@
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
@@ -23,9 +24,8 @@
 using bin_float_types = boost::mp11::mp_list<float, double, long double>;  // cpp_bin_float_50 is
                                                                            // fixed in boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-// using multiprecision_float_types =
-// mp_list<boost::multiprecision::cpp_dec_float_50>;
-using multiprecision_float_types = boost::mp11::mp_list<>;
+using multiprecision_float_types = boost::mp11::mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;
+//using multiprecision_float_types = boost::mp11::mp_list<>;
 
 using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
 

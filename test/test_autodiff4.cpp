@@ -5,25 +5,37 @@
 
 #include "test_autodiff.hpp"
 
+#include <boost/mp11/function.hpp>
+
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
   using std::llround;
   using std::lround;
-  // using std::truncl; // truncl not supported by boost::multiprecision types.
+  using std::truncl;
+
   constexpr int m = 3;
   const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
   long yl = lround(x);
-  BOOST_REQUIRE(yl == lround(cx));
+  BOOST_REQUIRE_EQUAL(yl, lround(cx));
   long long yll = llround(x);
-  BOOST_REQUIRE(yll == llround(cx));
-  // long double yld = truncl(x);
-  // BOOST_REQUIRE(yld == truncl(cx));
+  BOOST_REQUIRE_EQUAL(yll, llround(cx));
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+  static constexpr bool is_not_mp_number_t =
+      !boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>::value;
+#define IS_NOT_MP_NUMBER_TYPE is_not_mp_number_t
+#if IS_NOT_MP_NUMBER_TYPE
+  auto yld = truncl(x);
+  BOOST_REQUIRE_EQUAL(yld, truncl(cx));
+#endif
+#pragma GCC diagnostic pop
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, bin_float_types) {
-  const T eps = 25 * std::numeric_limits<T>::epsilon();
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, all_float_types) {
+  const T eps = 30 * std::numeric_limits<T>::epsilon();
   constexpr int Nw = 3;
   constexpr int Nx = 2;
   constexpr int Ny = 4;
@@ -39,8 +51,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, bin_float_types) {
       "5499076582535951111845769110560421820940516423255314");
   // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
   using std::fabs;
-  const double relative_error = static_cast<double>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
-  BOOST_REQUIRE(relative_error < eps);
+  const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
+  BOOST_REQUIRE_LT(relative_error, eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

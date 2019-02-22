@@ -24,12 +24,18 @@
 using bin_float_types = boost::mp11::mp_list<float, double, long double>;  // cpp_bin_float_50 is
                                                                            // fixed in boost 1.70
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-using multiprecision_float_types = boost::mp11::mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;
-//using multiprecision_float_types = boost::mp11::mp_list<>;
+using multiprecision_float_types =
+    boost::mp11::mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;
+// using multiprecision_float_types = boost::mp11::mp_list<>;
 
 using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
 
 using namespace boost::math::differentiation;
+
+template <typename T>
+using mp_epsilon_multiplier = boost::mp11::mp_if<
+    boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>,
+    boost::mp11::mp_int<1>, boost::mp11::mp_int<0>>;
 
 template <typename W, typename X, typename Y, typename Z>
 promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z) {
@@ -73,4 +79,4 @@ T uncast_return(const T& x) {
   return x == 0 ? 0 : 1;
 }
 
-#endif // BOOST_MATH_TEST_AUTODIFF_HPP
+#endif  // BOOST_MATH_TEST_AUTODIFF_HPP

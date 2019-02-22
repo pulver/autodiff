@@ -30,7 +30,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, all_float_types) {
     // std::cout.precision(100);
     // std::cout << "y.derivative("<<i<<") = " << y.derivative(i) << ",
     // std::exp(cx) = " << std::exp(cx) << std::endl;
-    BOOST_REQUIRE(y.derivative(i) == exp(cx));
+    BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(i), exp(cx),
+                                 mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
   }
 }
 
@@ -81,12 +82,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, all_float_types) {
   constexpr float cx = 4.0;
   auto x = make_fvar<T, m>(cx);
   auto y = sqrt(x);
-  BOOST_REQUIRE(y.derivative(0) == sqrt(cx));
-  BOOST_REQUIRE(y.derivative(1) == 0.5 * pow(cx, -0.5));
-  BOOST_REQUIRE(y.derivative(2) == -0.5 * 0.5 * pow(cx, -1.5));
-  BOOST_REQUIRE(y.derivative(3) == 0.5 * 0.5 * 1.5 * pow(cx, -2.5));
-  BOOST_REQUIRE(y.derivative(4) == -0.5 * 0.5 * 1.5 * 2.5 * pow(cx, -3.5));
-  BOOST_REQUIRE(y.derivative(5) == 0.5 * 0.5 * 1.5 * 2.5 * 3.5 * pow(cx, -4.5));
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), sqrt(cx),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 0.5 * pow(cx, -0.5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -0.5 * 0.5 * pow(cx, -1.5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 0.5 * 0.5 * 1.5 * pow(cx, -2.5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), -0.5 * 0.5 * 1.5 * 2.5 * pow(cx, -3.5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), 0.5 * 0.5 * 1.5 * 2.5 * 3.5 * pow(cx, -4.5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
   x = make_fvar<T, m>(0);
   y = sqrt(x);
   // std::cout << "sqrt(0) = " << y << std::endl; // (0,inf,-inf,inf,-inf,inf)
@@ -101,12 +108,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, all_float_types) {
   const T cx = 2.0;
   auto x = make_fvar<T, m>(cx);
   auto y = log(x);
-  BOOST_REQUIRE(y.derivative(0) == log(cx));
-  BOOST_REQUIRE(y.derivative(1) == 1 / cx);
-  BOOST_REQUIRE(y.derivative(2) == -1 / pow(cx, 2));
-  BOOST_REQUIRE(y.derivative(3) == 2 / pow(cx, 3));
-  BOOST_REQUIRE(y.derivative(4) == -6 / pow(cx, 4));
-  BOOST_REQUIRE(y.derivative(5) == 24 / pow(cx, 5));
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), log(cx),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 1 / cx,
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -1 / pow(cx, 2),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 2 / pow(cx, 3),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), -6 / pow(cx, 4),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), 24 / pow(cx, 5),
+                               mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon());
   x = make_fvar<T, m>(0);
   y = log(x);
   // std::cout << "log(0) = " << y << std::endl; // log(0) =

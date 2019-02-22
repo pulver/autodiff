@@ -28,12 +28,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
   constexpr float cx = 1.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
-  BOOST_REQUIRE(y.derivative(0) == boost::math::constants::pi<T>() / 4);
-  BOOST_REQUIRE(y.derivative(1) == 0.5);
-  BOOST_REQUIRE(y.derivative(2) == -0.5);
-  BOOST_REQUIRE(y.derivative(3) == 0.5);
-  BOOST_REQUIRE(y.derivative(4) == 0.0);
-  BOOST_REQUIRE(y.derivative(5) == -3.0);
+  const auto eps = mp_epsilon_multiplier<T>::value * std::numeric_limits<T>::epsilon();
+  BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::pi<T>() / 4, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(1), 0.5, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(2), -0.5, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(3), 0.5, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4), 0.0, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5), -3.0, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {

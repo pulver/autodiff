@@ -24,8 +24,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-  static constexpr bool is_not_mp_number_t =
-      !boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>::value;
+  static constexpr bool is_not_mp_number_t = mp_epsilon_multiplier<T>::value == 0;
 #define IS_NOT_MP_NUMBER_TYPE is_not_mp_number_t
 #if IS_NOT_MP_NUMBER_TYPE
   auto yld = truncl(x);

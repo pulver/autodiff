@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
   long long yll = llround(x);
   BOOST_REQUIRE_EQUAL(yll, llround(cx));
 
-#ifdef BOOST_MSVC
+#if defined(_MSC_VER) || defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable : 4101)
 #else
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
   auto yld = truncl(x);
   BOOST_REQUIRE_EQUAL(yld, truncl(cx));
 #endif
-#ifdef BOOST_MSVC
+#if defined(_MSC_VER) || defined(BOOST_MSVC)
 #pragma warning(pop)
 #else
 #pragma GCC diagnostic pop

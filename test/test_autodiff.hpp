@@ -6,7 +6,7 @@
 #ifndef BOOST_MATH_TEST_AUTODIFF_HPP
 #define BOOST_MATH_TEST_AUTODIFF_HPP
 
-#if defined(BOOST_MSVC)
+#if defined(_MSC_VER) || defined(BOOST_MSVC)
 #define NOMINMAX
 #endif
 

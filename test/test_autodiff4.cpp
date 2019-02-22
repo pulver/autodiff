@@ -22,15 +22,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
   long long yll = llround(x);
   BOOST_REQUIRE_EQUAL(yll, llround(cx));
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable : 4101)
+#else
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
   static constexpr bool is_not_mp_number_t = mp_epsilon_multiplier<T>::value == 0;
 #define IS_NOT_MP_NUMBER_TYPE is_not_mp_number_t
 #if IS_NOT_MP_NUMBER_TYPE
   auto yld = truncl(x);
   BOOST_REQUIRE_EQUAL(yld, truncl(cx));
 #endif
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#else
 #pragma GCC diagnostic pop
+#endif
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, all_float_types) {

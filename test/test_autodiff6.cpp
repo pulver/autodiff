@@ -531,6 +531,70 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  test_detail::RandomSample<T> theta_sampler{0, boost::math::constants::pi<T>()};
+  test_detail::RandomSample<T> phi_sampler{0, boost::math::constants::two_pi<T>()};
+  test_detail::RandomSample<int> r_sampler{0, test_constants::n_samples};
+  for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
+    auto theta = theta_sampler.next();
+    auto phi = phi_sampler.next();
+    auto r = (std::min<unsigned>)(n - 1, r_sampler.next());
+    try {
+      auto autodiff_v = boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
+      auto anchor_v = boost::math::spherical_harmonic(n, r, theta, phi);
+      BOOST_REQUIRE_CLOSE(autodiff_v.real(), anchor_v.real(), 5 * test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v.imag(), anchor_v.imag(), 5 * test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, theta, phi), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, theta, phi), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " r: " << r << " theta: " << theta << " phi: " << phi << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
+      auto anchor_v = boost::math::spherical_harmonic_r(n, r, theta, phi);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5 * test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, theta, phi), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, theta, phi), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " r: " << r << " theta: " << theta << " phi: " << phi << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
+      auto anchor_v = boost::math::spherical_harmonic_i(n, r, theta, phi);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5 * test_constants::pct_epsilon);
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, theta, phi), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, theta, phi), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: n: " << n << " r: " << r << " theta: " << theta << " phi: " << phi << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt1pm1_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

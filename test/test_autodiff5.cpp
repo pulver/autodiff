@@ -1798,6 +1798,105 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
   }
 }
 
+// Requires pow(complex<autodiff_fvar<T,m>>, T)
+/*BOOST_AUTO_TEST_CASE_TEMPLATE(hankel_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  test_detail::RandomSample<T> v_sampler{-200, 200};
+  test_detail::RandomSample<T> x_sampler{-200, 200};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto v = v_sampler.next();
+    auto x = x_sampler.next();
+
+    try {
+      auto autodiff_v = boost::math::cyl_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x));
+      auto anchor_v = boost::math::cyl_hankel_1(v, x);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v.real(), anchor_v.real(),
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v.imag(), anchor_v.imag(),
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::cyl_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::domain_error>); BOOST_REQUIRE_THROW(boost::math::cyl_hankel_1(v, x),
+boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::cyl_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::overflow_error>); BOOST_REQUIRE_THROW(boost::math::cyl_hankel_1(v, x),
+boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::cyl_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x));
+      auto anchor_v = boost::math::cyl_hankel_2(v, x);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v.real(), anchor_v.real(),
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v.imag(), anchor_v.imag(),
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::cyl_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::domain_error>); BOOST_REQUIRE_THROW(boost::math::cyl_hankel_2(v, x),
+boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::cyl_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::overflow_error>); BOOST_REQUIRE_THROW(boost::math::cyl_hankel_2(v, x),
+boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::sph_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x));
+      auto anchor_v = boost::math::sph_hankel_1(v, x);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v,
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::sph_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::domain_error>); BOOST_REQUIRE_THROW(boost::math::sph_hankel_1(v, x),
+boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::sph_hankel_1(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::overflow_error>); BOOST_REQUIRE_THROW(boost::math::sph_hankel_1(v, x),
+boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+
+    try {
+      auto autodiff_v = boost::math::sph_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x));
+      auto anchor_v = boost::math::sph_hankel_2(v, x);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v,
+                                   test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::sph_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::domain_error>); BOOST_REQUIRE_THROW(boost::math::sph_hankel_2(v, x),
+boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::sph_hankel_2(make_fvar<T,m>(v), make_fvar<T,m>(x)),
+boost::wrapexcept<std::overflow_error>); BOOST_REQUIRE_THROW(boost::math::sph_hankel_2(v, x),
+boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+} */
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  test_detail::RandomSample<T> x_sampler{-200, 200};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::hermite(i, make_fvar<T, m>(x)), boost::math::hermite(i, x),
+                                   10000 * std::numeric_limits<T>::epsilon());
+    } catch (const std::domain_error &) {
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::domain_error>);
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -1817,28 +1916,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
     } catch (...) {
       std::cout << "Input: x: " << x << "  "
                 << "phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-  }
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
-  using test_constants = test_constants_t<T>;
-  static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-200, 200};
-  for (auto i : boost::irange(test_constants::n_samples)) {
-    auto x = x_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::hermite(i, make_fvar<T, m>(x)), boost::math::hermite(i, x),
-                                   10000 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }

@@ -369,6 +369,70 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_next(make_fvar<T, m>(i)),
+                                 boost::math::float_next(static_cast<T>(i)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_prior(make_fvar<T, m>(i)),
+                                 boost::math::float_prior(static_cast<T>(i)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(1)),
+                                 boost::math::nextafter(static_cast<T>(i), static_cast<T>(1)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i + 2)),
+                                 boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(i + 2)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i + 1)),
+                                 boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(i + 2)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1)),
+                                 boost::math::nextafter(static_cast<T>(i), static_cast<T>(-1)),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1 * (i + 2))),
+                                 boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(-1 * (i + 2))),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1 * (i + 1))),
+                                 boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(-1 * (i + 2))),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i)), ((make_fvar<T, m>(i))),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), 1),
+                                 boost::math::float_advance(static_cast<T>(i), 1),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), i + 2),
+                                 boost::math::float_advance(make_fvar<T, m>(i), i + 2),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), i + 1),
+                                 boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(i), i + 2), -1),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), -1),
+                                 boost::math::float_advance(static_cast<T>(i), -1),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), -i - 2),
+                                 boost::math::float_advance(static_cast<T>(i), -i - 2),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), -i - 1),
+                                 boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(i), -i - 2), 1),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_advance(make_fvar<T, m>(i), 0), ((make_fvar<T, m>(i))),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+
+    BOOST_REQUIRE_CLOSE_FRACTION(boost::math::float_distance(make_fvar<T, m>(i), static_cast<T>(i)), static_cast<T>(0),
+                                 test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(
+        boost::math::float_distance(boost::math::float_next(make_fvar<T, m>(i)), make_fvar<T, m>(i)),
+        ((make_fvar<T, m>(-1))), test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(
+        boost::math::float_distance(boost::math::float_prior(make_fvar<T, m>(i)), make_fvar<T, m>(i)),
+        ((make_fvar<T, m>(1))), test_constants::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

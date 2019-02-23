@@ -607,8 +607,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v.real(), anchor_v.real(), 5 * test_constants::pct_epsilon);
-      BOOST_REQUIRE_CLOSE(autodiff_v.imag(), anchor_v.imag(), 5 * test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v.real(), anchor_v.real(), 50 * test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v.imag(), anchor_v.imag(), 50 * test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);
@@ -625,7 +625,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic_r(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5 * test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);
@@ -642,7 +642,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic_i(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5 * test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);

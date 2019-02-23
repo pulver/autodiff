@@ -5,214 +5,214 @@ BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-100, 100};
-  test_detail::RandomSample<T> u_sampler{0, 100};
+  test_detail::RandomSample<T> k_sampler{0, 1};
+  test_detail::RandomSample<T> theta_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
-    auto u = u_sampler.next();
+    auto theta = theta_sampler.next();
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cd(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_cd(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cd(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cn(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_cn(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cn(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cs(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_cs(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_cs(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_dc(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_dc(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dc(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_dn(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_dn(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_dn(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_ds(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_ds(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ds(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_nc(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_nc(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nc(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_nd(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_nd(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_nd(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_ns(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_ns(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_ns(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sc(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_sc(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sc(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sd(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_sd(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sd(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sn(k, u), 100000 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
+                                   boost::math::jacobi_sn(k, theta), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(k, u), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(k, theta), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(theta)),
                           boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(k, u), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::jacobi_sn(k, theta), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: k: " << k << "  "
-                << "u: " << u << std::endl;
+                << "theta: " << theta << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }

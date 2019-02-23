@@ -10,6 +10,7 @@
 #define NOMINMAX
 #endif
 
+#include <boost/lexical_cast.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
@@ -113,8 +114,6 @@ constexpr bool check_if_small(const T& lhs, const U& rhs) noexcept {
 
 template <typename T, int m = 3>
 using test_constants_t = test_detail::test_constants_t<T, boost::mp11::mp_int<m>>;
-
-using testing_types = mp_list<double>;
 
 template <typename W, typename X, typename Y, typename Z>
 promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z) {

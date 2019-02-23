@@ -13,7 +13,7 @@ using namespace boost::math::differentiation;
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<int> x_sampler{0, 2000};
@@ -270,7 +270,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> v_sampler{-100, 100};
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> a_sampler{-2000, 2000};
@@ -857,7 +857,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<unsigned> n_sampler{0u, 100};
@@ -891,7 +891,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -917,7 +917,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   {
@@ -1017,7 +1017,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1036,7 +1036,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1064,7 +1064,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
@@ -1091,7 +1091,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
@@ -1118,7 +1118,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
@@ -1149,7 +1149,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.20, 1.20};
@@ -1176,7 +1176,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1205,7 +1205,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1231,7 +1231,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1266,7 +1266,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1295,7 +1295,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1325,7 +1325,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -1364,7 +1364,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{1, 500};
@@ -1402,10 +1402,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-boost::math::log1p(2000), boost::math::log1p(2000)};
+  test_detail::RandomSample<T> x_sampler{-boost::math::log1p<T>(2000), boost::math::log1p<T>(2000)};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -1421,7 +1421,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 1000};
@@ -1483,7 +1483,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1000, 1000};
@@ -1506,7 +1506,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 1000};
@@ -1799,7 +1799,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
 }
 
 // Requires pow(complex<autodiff_fvar<T,m>>, T)
-/*BOOST_AUTO_TEST_CASE_TEMPLATE(hankel_hpp, T, testing_types) {
+/*BOOST_AUTO_TEST_CASE_TEMPLATE(hankel_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> v_sampler{-200, 200};
@@ -1875,7 +1875,7 @@ boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout << "Input: x:
   }
 } */
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-200, 200};
@@ -1897,7 +1897,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1.01, 1.01};
@@ -1921,7 +1921,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(hypot_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(hypot_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};

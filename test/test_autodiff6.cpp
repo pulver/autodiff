@@ -2,7 +2,7 @@
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-500, 500};
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2, 2};
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<unsigned> n_sampler{0, 50};
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{static_cast<T>(-1 / std::exp(-1)), std::numeric_limits<T>::max()};
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1, 2000};
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(test_constants::n_samples)) {
@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> h_sampler{-2000, 2000};
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(10)) {
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 2000};
@@ -519,7 +519,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 20};
@@ -551,7 +551,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};
@@ -595,13 +595,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> theta_sampler{0, boost::math::constants::pi<T>()};
   test_detail::RandomSample<T> phi_sampler{0, boost::math::constants::two_pi<T>()};
   test_detail::RandomSample<int> r_sampler{0, test_constants::n_samples};
-  for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
+  for (auto n : boost::irange(test_constants::n_samples)) {
     auto theta = theta_sampler.next();
     auto phi = phi_sampler.next();
     auto r = (std::min<unsigned>)(n - 1, r_sampler.next());
@@ -659,7 +659,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt1pm1_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt1pm1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1, 2000};
@@ -679,7 +679,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt1pm1_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(trigamma_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(trigamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 2000};
@@ -702,7 +702,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(trigamma_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(zeta_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(zeta_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};

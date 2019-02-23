@@ -10,7 +10,6 @@
 #define NOMINMAX
 #endif
 
-#include <boost/lexical_cast.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
@@ -28,21 +27,19 @@
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
-namespace {
-using boost::mp11::mp_append;
-using boost::mp11::mp_list;
-}  // namespace
 
 // using bin_float_types = mp_list<float,double,long
 // double,boost::multiprecision::cpp_bin_float_50>;
-using bin_float_types = mp_list<float, double, long double>;  // cpp_bin_float_50 is
-                                                              // fixed in boost 1.70
+using bin_float_types = boost::mp11::mp_list<double, long double>;
+//  cpp_bin_float_50 is fixed in boost 1.70
+// float blows up in unchecked_factorial
+
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 /*using multiprecision_float_types =
     mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;*/
-using multiprecision_float_types = mp_list<>;
+using multiprecision_float_types = boost::mp11::mp_list<>;
 
-using all_float_types = mp_append<bin_float_types, multiprecision_float_types>;
+using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
 
 using namespace boost::math::differentiation;
 
@@ -65,7 +62,7 @@ struct RandomSample<
       : start_(static_cast<T>(start)),
         finish_(static_cast<T>(finish)),
         rng_(std::random_device{}()),
-        dist_(start_, std::nextafter(finish_, boost::math::tools::max_value<T>())) {}
+        dist_(start_, std::nextafter(finish_, std::numeric_limits<T>::max())) {}
 
   T next() noexcept { return dist_(rng_); }
 
@@ -76,12 +73,6 @@ struct RandomSample<
 };
 static_assert(std::is_same<typename RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
 static_assert(std::is_same<typename RandomSample<long>::dist_t, std::uniform_int_distribution<long>>::value, "");
-
-inline namespace {
-using boost::mp11::mp_if;
-using boost::mp11::mp_int;
-using boost::mp11::mp_or;
-}  // namespace
 
 /**
  * Simple struct to hold constants that are used in each test
@@ -94,9 +85,9 @@ template <typename T, typename Order, Order val>
 struct test_constants_t<T, std::integral_constant<Order, val>> {
   static constexpr int n_samples = 25;
   static constexpr Order order = val;
-  static constexpr T mp_epsilon_multiplier =
-      mp_if<mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>, mp_int<1>,
-            mp_int<0>>::value;
+  static constexpr T mp_epsilon_multiplier = boost::mp11::mp_if<
+      boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>,
+      boost::mp11::mp_int<1>, boost::mp11::mp_int<0>>::value;
   static constexpr T pct_epsilon = 50 * std::numeric_limits<T>::epsilon() * 100;
 };
 
@@ -104,8 +95,7 @@ template <typename T, typename U>
 constexpr bool check_if_small(const T& lhs, const U& rhs) noexcept {
   using boost::math::differentiation::detail::get_root_type;
   using boost::math::differentiation::detail::is_fvar;
-  using real_type = typename std::common_type<mp_if<is_fvar<T>, typename get_root_type<T>::type, T>,
-                                              mp_if<is_fvar<U>, typename get_root_type<U>::type, U>>::type;
+  using real_type = promote<T, U>;
 
   return std::numeric_limits<real_type>::epsilon() >
          fabs((std::max)(static_cast<real_type>(lhs), static_cast<real_type>(rhs)) -

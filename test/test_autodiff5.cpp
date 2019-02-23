@@ -866,8 +866,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
-    r_sampler.dist_.param(typename test_detail::RandomSample<unsigned>::dist_t::param_type(0, n));
-    auto r = r_sampler.next();
+    auto r = (std::min)(r_sampler.next(), n - 1);
     try {
       auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
       auto anchor_v = boost::math::binomial_coefficient<T>(n, r);

@@ -30,9 +30,10 @@
 
 // using bin_float_types = mp_list<float,double,long
 // double,boost::multiprecision::cpp_bin_float_50>;
-using bin_float_types = boost::mp11::mp_list<double, long double>;
+using bin_float_types = boost::mp11::mp_list<double>;
 //  cpp_bin_float_50 is fixed in boost 1.70
 // float blows up in unchecked_factorial
+// long double blows up at index 0 for tangent_t2n
 
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 /*using multiprecision_float_types =

@@ -1494,7 +1494,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  test_detail::RandomSample<T> x_sampler{-1000, 1000};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(0)), static_cast<T>(FP_ZERO));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(10)), static_cast<T>(FP_NORMAL));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::infinity())),
+                        static_cast<T>(FP_INFINITE));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())),
+                        static_cast<T>(FP_NAN));
+    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())),
+                        static_cast<T>(FP_SUBNORMAL));
+
+    BOOST_REQUIRE(boost::math::isfinite(make_fvar<T, m>(0)));
+    BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
+    BOOST_REQUIRE(!boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
+    BOOST_REQUIRE(boost::math::isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
+    BOOST_REQUIRE(boost::math::isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
+  }
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 1000};

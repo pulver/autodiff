@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::bernoulli_b2n<T>(i);
       if (!std::isfinite(static_cast<T>(autodiff_v)) || !std::isfinite(anchor_v)) {
-        BOOST_REQUIRE(!std::isfinite(autodiff_v) && !std::isfinite(anchor_v));
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(anchor_v));
       } else {
         BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
       }
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::tangent_t2n<T>(i);
       if (!std::isfinite(static_cast<T>(autodiff_v)) || !std::isfinite(anchor_v)) {
-        BOOST_REQUIRE(!std::isfinite(autodiff_v) && !std::isfinite(anchor_v));
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(anchor_v));
       } else {
         BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
       }

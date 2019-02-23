@@ -120,7 +120,7 @@ script:
   - $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff3
   - $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff4
   - $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff5
-  - $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff6
+  - $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff6
   - ./test_autodiff1
   - ./test_autodiff2
   - ./test_autodiff3

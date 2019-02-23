@@ -60,9 +60,10 @@ struct RandomSample<
     T, typename std::enable_if<std::is_floating_point<T>::value || std::numeric_limits<T>::is_integer>::type> {
   using dist_t = typename boost::conditional<std::is_floating_point<T>::value, std::uniform_real_distribution<T>,
                                              std::uniform_int_distribution<T>>::type;
-  RandomSample(T start, T finish)
-      : start_(start),
-        finish_(finish),
+  template <typename U, typename V>
+  RandomSample(U start, V finish)
+      : start_(static_cast<T>(start)),
+        finish_(static_cast<T>(finish)),
         rng_(std::random_device{}()),
         dist_(start_, std::nextafter(finish_, boost::math::tools::max_value<T>())) {}
 

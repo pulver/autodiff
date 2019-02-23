@@ -5,8 +5,8 @@ BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-500, 500};
-  test_detail::RandomSample<T> u_sampler{0, 500};
+  test_detail::RandomSample<T> k_sampler{-100, 100};
+  test_detail::RandomSample<T> u_sampler{0, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cd(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_cd(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_cd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cn(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_cn(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_cn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_cs(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_cs(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_cs(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_dc(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_dc(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_dc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_dn(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_dn(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_dn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_ds(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_ds(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_ds(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_nc(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_nc(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_nc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_nd(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_nd(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_nd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_ns(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_ns(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_ns(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sc(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_sc(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_sc(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sd(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_sd(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_sd(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_elliptic_hpp, T, all_float_types) {
 
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
-                                   boost::math::jacobi_sn(k, u), 50000 * std::numeric_limits<T>::epsilon());
+                                   boost::math::jacobi_sn(k, u), 100000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::jacobi_sn(make_fvar<T, m>(k), make_fvar<T, m>(u)),
                           boost::wrapexcept<std::domain_error>);

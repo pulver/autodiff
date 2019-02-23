@@ -1494,7 +1494,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1000, 1000};
@@ -1517,7 +1517,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, testing_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, testing_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 1000};

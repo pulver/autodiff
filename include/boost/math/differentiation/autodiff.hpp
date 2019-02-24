@@ -1664,6 +1664,11 @@ struct promote_args_2<RealType0,differentiation::detail::fvar<RealType1,Order1>>
     using type = differentiation::detail::fvar<typename promote_args_2<RealType0,RealType1>::type,Order1>;
 };
 
+template<typename RealType,std::size_t Order>
+inline int fpclassify(const differentiation::autodiff_fvar<RealType,Order>& x) {
+  return (fpclassify)(static_cast<RealType>(x));
+}
+
 } } } // namespace boost::math::tools
 
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR

@@ -577,7 +577,7 @@ fvar<RealType,Order>::fvar(const RealType2& ca)
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const char* ca_str)
-:    v{{boost::lexical_cast<RealType>(ca_str)}}
+:    v{{static_cast<RealType>(boost::lexical_cast<promote<RealType, double>>(ca_str))}}
 {
 }
 

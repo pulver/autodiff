@@ -238,7 +238,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<int> x_sampler{0, 2000};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     try {

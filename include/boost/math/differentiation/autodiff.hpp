@@ -7,10 +7,14 @@
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
 #include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
+#include <boost/math/tools/config.hpp>
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
+
+#include <boost/lexical_cast.hpp>
+#include <boost/mp11/function.hpp>
 
 #include <algorithm>
 #include <array>
@@ -68,7 +72,7 @@ struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
-    typename std::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
+    typename boost::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -1664,9 +1668,10 @@ struct promote_args_2<RealType0,differentiation::detail::fvar<RealType1,Order1>>
     using type = differentiation::detail::fvar<typename promote_args_2<RealType0,RealType1>::type,Order1>;
 };
 
-template<typename RealType,std::size_t Order>
-inline int fpclassify(const differentiation::autodiff_fvar<RealType,Order>& x) {
-  return (fpclassify)(static_cast<RealType>(x));
+template<typename ToType, typename RealType, std::size_t Order>
+inline ToType real_cast(const differentiation::detail::fvar<RealType, Order>& from_v)
+{
+  return static_cast<ToType>(static_cast<RealType>(from_v));
 }
 
 } } } // namespace boost::math::tools

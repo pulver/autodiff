@@ -399,7 +399,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::hermite(i, make_fvar<T, m>(x)), boost::math::hermite(i, x),
+      auto autodiff_v = boost::math::hermite(i, make_fvar<T, m>(x));
+      auto anchor_v = boost::math::hermite(i, x);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v,
                                    10000 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
@@ -408,7 +410,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
       BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
+      std::cout << "Input i: " << i << " x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
@@ -1061,7 +1063,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   for (auto n : boost::irange(test_constants::n_samples)) {
     auto theta = theta_sampler.next();
     auto phi = phi_sampler.next();
-    auto r = (std::min<unsigned>)(n - 1, r_sampler.next());
+    auto r = (std::min)(n - 1, r_sampler.next());
     try {
       auto autodiff_v = boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic(n, r, theta, phi);

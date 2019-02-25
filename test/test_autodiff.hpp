@@ -6,10 +6,7 @@
 #ifndef BOOST_MATH_TEST_AUTODIFF_HPP
 #define BOOST_MATH_TEST_AUTODIFF_HPP
 
-#if defined(_MSC_VER) || defined(BOOST_MSVC)
-#define NOMINMAX
-#endif
-
+#include <boost/config.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/mp11.hpp>
 #include <boost/mp11/mpl.hpp>
@@ -27,10 +24,13 @@
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
+#if defined(_MSC_VER) || defined(BOOST_MSVC)
+#define NOMINMAX
+#endif
 
 // using bin_float_types = mp_list<float,double,long
 // double,boost::multiprecision::cpp_bin_float_50>;
-using bin_float_types = boost::mp11::mp_list<double, long double>;
+using bin_float_types = boost::mp11::mp_list<float, double, long double>;
 //  cpp_bin_float_50 is fixed in boost 1.70
 // float blows up in unchecked_factorial
 
@@ -61,18 +61,20 @@ struct RandomSample<
   RandomSample(U start, V finish)
       : start_(static_cast<T>(start)),
         finish_(static_cast<T>(finish)),
-        rng_(std::random_device{}()),
+        random_device_{},
+        rng_(random_device_()),
         dist_(start_, std::nextafter(finish_, std::numeric_limits<T>::max())) {}
 
   T next() noexcept { return dist_(rng_); }
 
   T start_;
   T finish_;
+  std::random_device random_device_;
   std::mt19937 rng_;
   dist_t dist_;
 };
 static_assert(std::is_same<typename RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
-static_assert(std::is_same<typename RandomSample<long>::dist_t, std::uniform_int_distribution<long>>::value, "");
+static_assert(std::is_same<typename RandomSample<int64_t>::dist_t, std::uniform_int_distribution<int64_t>>::value, "");
 
 /**
  * Simple struct to hold constants that are used in each test
@@ -137,9 +139,9 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp, double K, con
   static_assert(std::is_same<decltype(S * Phi(d1) - exp(-r * tau) * K * Phi(d2)),
                              decltype(exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1))>::value,
                 "decltype(call) != decltype(put)");
-  if (cp == call)
+  if (cp == call) {
     return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
-  else
+  } else
     return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
 }
 

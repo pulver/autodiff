@@ -172,8 +172,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
 
-    auto x_normalized = x / (x_sampler.dist_.max() - x_sampler.dist_.min());
-    auto x2_normalized = x2 / (x_sampler.dist_.max() - x_sampler.dist_.min());
+    auto x_normalized = x / (((x_sampler.dist_.max))() - ((x_sampler.dist_.min))());
+    auto x2_normalized = x2 / (((x_sampler.dist_.max))() - ((x_sampler.dist_.min))());
     try {
       auto autodiff_v = boost::math::gamma_p_inv(make_fvar<T, m>(x_normalized), make_fvar<T, m>(x2_normalized));
       auto anchor_v = boost::math::gamma_p_inv(x_normalized, x2_normalized);
@@ -758,7 +758,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{static_cast<T>(-1 / std::exp(-1)), std::numeric_limits<T>::max()};
+  test_detail::RandomSample<T> x_sampler{static_cast<T>(-1 / std::exp(-1)), ((std::numeric_limits<T>::max))()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();

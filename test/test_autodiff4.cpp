@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, all_float_types) {
   const T answer = boost::lexical_cast<T>(
       "1976.3196007477977177798818752904187209081211892187"
       "5499076582535951111845769110560421820940516423255314");
-  // BOOST_REQUIRE_CLOSE_FRACTION(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
+  // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
   using std::fabs;
   const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
   BOOST_REQUIRE_LT(relative_error, eps);

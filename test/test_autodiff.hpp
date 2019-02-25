@@ -63,7 +63,7 @@ struct RandomSample<
         finish_(static_cast<T>(finish)),
         random_device_{},
         rng_(random_device_()),
-        dist_(start_, std::nextafter(finish_, std::numeric_limits<T>::max())) {}
+        dist_(start_, ((std::nextafter))(finish_, ((std::numeric_limits<T>::max())))) {}
 
   T next() noexcept { return dist_(rng_); }
 

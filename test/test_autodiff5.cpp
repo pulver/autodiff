@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai(x);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::overflow_error &) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai_prime(x);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::overflow_error &) {
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_ai_prime(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_bi(x);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::overflow_error &) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_bi_prime(x);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::overflow_error &) {
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::airy_bi_prime(static_cast<T>(x)), boost::wrapexcept<std::overflow_error>);
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i);
         auto anchor_v = boost::math::airy_ai_zero<T>(i);
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } catch (const std::overflow_error &) {
         BOOST_REQUIRE_THROW(((boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i))),
                             boost::wrapexcept<std::overflow_error>);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i);
         auto anchor_v = boost::math::airy_bi_zero<T>(i);
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } catch (const std::overflow_error &) {
         BOOST_REQUIRE_THROW(((boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i))),
                             boost::wrapexcept<std::overflow_error>);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::acosh(make_fvar<T, m>(x));
       auto anchor_v = boost::math::acosh(x);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
@@ -106,14 +106,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto autodiff_v = boost::math::asinh(make_fvar<T, m>(x));
     auto anchor_v = boost::math::asinh(x);
     if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     }
   }
 }
@@ -122,14 +122,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
       auto autodiff_v = boost::math::atanh(make_fvar<T, m>(x));
       auto anchor_v = boost::math::atanh(x);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       std::feclearexcept(FE_ALL_EXCEPT);
       BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
@@ -175,9 +175,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_i(make_fvar<T, m>(v), make_fvar<T, m>(x_i));
       auto anchor_v = boost::math::cyl_bessel_i(v, x_i);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_i = x < 0 ? boost::math::itrunc(x) : x;
@@ -191,9 +191,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
       auto anchor_v = boost::math::cyl_bessel_j(v, x_j);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_j = abs(x) + 1;
@@ -206,9 +206,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_j_zero(make_fvar<T, m>(v), i + 1);
       auto anchor_v = boost::math::cyl_bessel_j_zero(v, i + 1);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::cyl_bessel_j_zero(make_fvar<T, m>(v), i + 1),
@@ -221,9 +221,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_k(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
       auto anchor_v = boost::math::cyl_bessel_k(v, x_k);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_k = abs(x) + 1;
@@ -237,9 +237,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_neumann(make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
       auto anchor_v = boost::math::cyl_neumann(v, x_neumann);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_neumann = abs(x);
@@ -252,9 +252,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_neumann_zero(make_fvar<T, m>(v), i + 1);
       auto anchor_v = boost::math::cyl_neumann_zero(v, i + 1);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::cyl_neumann_zero(make_fvar<T, m>(v), i + 1),
@@ -266,9 +266,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::sph_bessel<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v));
       auto anchor_v = boost::math::sph_bessel<T>(i, v);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::sph_bessel<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v)))),
@@ -280,9 +280,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v));
       auto anchor_v = boost::math::sph_neumann<T>(i, v);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v)))),
@@ -295,9 +295,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_i_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_i));
       auto anchor_v = boost::math::cyl_bessel_i_prime(v, x_i);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_i = x < 0 ? boost::math::itrunc(x) : x;
@@ -311,9 +311,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
       auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_j = abs(x) + 1;
@@ -327,9 +327,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_bessel_k_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
       auto anchor_v = boost::math::cyl_bessel_k_prime(v, x_k);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_k = abs(x) + 1;
@@ -343,9 +343,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::cyl_neumann_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
       auto anchor_v = boost::math::cyl_neumann_prime(v, x_neumann);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       auto x_neumann = abs(x);
@@ -358,9 +358,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v));
       auto anchor_v = boost::math::sph_bessel_prime<T>(i, v);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v)))),
@@ -372,9 +372,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v));
       auto anchor_v = boost::math::sph_neumann_prime<T>(i, v);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v)))),
@@ -387,8 +387,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> a_sampler{-500, 500};
-  test_detail::RandomSample<T> b_sampler{-500, 500};
+  test_detail::RandomSample<T> a_sampler{-100, 100};
+  test_detail::RandomSample<T> b_sampler{-100, 100};
   test_detail::RandomSample<T> z_sampler{0, 1};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -397,7 +397,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::beta(fabs(make_fvar<T, m>(a)), fabs(make_fvar<T, m>(b)));
       auto anchor_v = boost::math::beta(fabs(a), fabs(b));
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::beta(fabs(make_fvar<T, m>(a)), fabs(make_fvar<T, m>(b))),
                           boost::wrapexcept<std::domain_error>);
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::beta(fabs(make_fvar<T, m>(a)), fabs(make_fvar<T, m>(b)));
       auto anchor_v = boost::math::beta(fabs(a), fabs(b));
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(
           boost::math::betac(fabs(make_fvar<T, m>(a)), fabs(make_fvar<T, m>(b)), fabs(make_fvar<T, m>(z))),
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibeta(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibeta(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::beta(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::beta(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibetac(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -438,7 +438,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibeta_derivative(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibeta_derivative(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -448,7 +448,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibeta_inv(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibeta_inv<T>(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibeta_inv(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -458,7 +458,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibetac_inv(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibetac_inv<T>(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibetac_inv(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibeta_inva(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibeta_inva(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibetac_inva(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibetac_inva(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibetac_inva(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -488,7 +488,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibeta_invb(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibeta_invb(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibeta_invb(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -498,7 +498,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::ibetac_invb(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibetac_invb(a, b, z);
-      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ibetac_invb(make_fvar<T, m>(a), make_fvar<T, m>(b), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
       auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+      BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(((boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r))),
                           boost::wrapexcept<std::domain_error>);
@@ -532,14 +532,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     if (boost::math::isinf(x) || x == 0) {
       BOOST_REQUIRE_EQUAL(boost::math::cbrt(make_fvar<T, m>(x)), x);
     } else {
-      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), 3000 *  test_constants::eps);
+      BOOST_REQUIRE_CLOSE_FRACTION(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), 50000 *  test_constants::eps);
     }
   }
 }
@@ -569,13 +569,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       auto n = n_sampler.next();
       auto x = x_sampler.next();
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::math::chebyshev_t(n, x),
-                                   3000 *  test_constants::eps);
+                                   50000 *  test_constants::eps);
 
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::math::chebyshev_u(n, x),
-                                   3000 *  test_constants::eps);
+                                   50000 *  test_constants::eps);
 
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)),
-                                   boost::math::chebyshev_t_prime(n, x), 3000 *  test_constants::eps);
+                                   boost::math::chebyshev_t_prime(n, x), 50000 *  test_constants::eps);
 
       // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error:
       // cannot convert
@@ -599,7 +599,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -619,9 +619,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
       auto anchor_v = boost::math::digamma(x);
       if (test_detail::check_if_small(autodiff_v, anchor_v)) {
-        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 3000 *  test_constants::eps);
+        BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), 50000 *  test_constants::eps);
       } else {
-        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 3000 *  test_constants::eps);
+        BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 50000 *  test_constants::eps);
       }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::digamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
@@ -634,16 +634,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
-  test_detail::RandomSample<T> phi_sampler{-500, 500};
+  test_detail::RandomSample<T> phi_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_1(make_fvar<T, m>(k)), boost::math::ellint_1(k),
-                                   3000 *  test_constants::eps);
+                                   50000 *  test_constants::eps);
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                                   boost::math::ellint_1(k, phi), 3000 *  test_constants::eps);
+                                   boost::math::ellint_1(k, phi), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_1(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::ellint_1(k), boost::wrapexcept<std::domain_error>);
@@ -655,16 +655,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
-  test_detail::RandomSample<T> phi_sampler{-500, 500};
+  test_detail::RandomSample<T> phi_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_2(make_fvar<T, m>(k)), boost::math::ellint_2(k),
-                                   3000 *  test_constants::eps);
+                                   50000 *  test_constants::eps);
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                                   boost::math::ellint_2(k, phi), 3000 *  test_constants::eps);
+                                   boost::math::ellint_2(k, phi), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_2(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::ellint_2(k), boost::wrapexcept<std::domain_error>);
@@ -676,8 +676,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
-  test_detail::RandomSample<T> n_sampler{-500, 500};
-  test_detail::RandomSample<T> phi_sampler{-500, 500};
+  test_detail::RandomSample<T> n_sampler{-100, 100};
+  test_detail::RandomSample<T> phi_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
@@ -685,9 +685,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
     auto phi = phi_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)),
-                                   boost::math::ellint_3(k, n), 3000 *  test_constants::eps);
+                                   boost::math::ellint_3(k, n), 50000 *  test_constants::eps);
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n), make_fvar<T, m>(phi)),
-                                   boost::math::ellint_3(k, n, phi), 3000 *  test_constants::eps);
+                                   boost::math::ellint_3(k, n, phi), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)),
                           boost::wrapexcept<std::domain_error>);
@@ -700,16 +700,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.20, 1.20};
-  test_detail::RandomSample<T> phi_sampler{-500, 500};
+  test_detail::RandomSample<T> phi_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_d(make_fvar<T, m>(k)), boost::math::ellint_d(k),
-                                   3000 *  test_constants::eps);
+                                   50000 *  test_constants::eps);
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                                   boost::math::ellint_d(k, phi), 3000 *  test_constants::eps);
+                                   boost::math::ellint_d(k, phi), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::ellint_d(k), boost::wrapexcept<std::domain_error>);
@@ -720,9 +720,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
-  test_detail::RandomSample<T> y_sampler{-500, 500};
-  test_detail::RandomSample<T> z_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
+  test_detail::RandomSample<T> y_sampler{-100, 100};
+  test_detail::RandomSample<T> z_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -730,7 +730,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
     auto z = z_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                                   boost::math::ellint_rf(x, y, z), 3000 *  test_constants::eps);
+                                   boost::math::ellint_rf(x, y, z), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -742,15 +742,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
-  test_detail::RandomSample<T> y_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
+  test_detail::RandomSample<T> y_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)),
-                                   boost::math::ellint_rc(x, y), 3000 *  test_constants::eps);
+                                   boost::math::ellint_rc(x, y), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)),
                           boost::wrapexcept<std::domain_error>);
@@ -762,10 +762,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
-  test_detail::RandomSample<T> y_sampler{-500, 500};
-  test_detail::RandomSample<T> z_sampler{-500, 500};
-  test_detail::RandomSample<T> p_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
+  test_detail::RandomSample<T> y_sampler{-100, 100};
+  test_detail::RandomSample<T> z_sampler{-100, 100};
+  test_detail::RandomSample<T> p_sampler{-100, 100};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -776,7 +776,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(
           boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
-          boost::math::ellint_rj(x, y, z, p), 3000 *  test_constants::eps);
+          boost::math::ellint_rj(x, y, z, p), 50000 *  test_constants::eps);
     } catch (const std::domain_error &e) {
       BOOST_REQUIRE_THROW(
           boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
@@ -789,9 +789,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
-  test_detail::RandomSample<T> y_sampler{-500, 500};
-  test_detail::RandomSample<T> z_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
+  test_detail::RandomSample<T> y_sampler{-100, 100};
+  test_detail::RandomSample<T> z_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
@@ -799,7 +799,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
     auto z = z_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                                   boost::math::ellint_rd(x, y, z), 3000 *  test_constants::eps);
+                                   boost::math::ellint_rd(x, y, z), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -811,9 +811,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
-  test_detail::RandomSample<T> y_sampler{-500, 500};
-  test_detail::RandomSample<T> z_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
+  test_detail::RandomSample<T> y_sampler{-100, 100};
+  test_detail::RandomSample<T> z_sampler{-100, 100};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -822,7 +822,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
     auto z = z_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE_FRACTION(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                                   boost::math::ellint_rg(x, y, z), 3000 *  test_constants::eps);
+                                   boost::math::ellint_rg(x, y, z), 50000 *  test_constants::eps);
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                           boost::wrapexcept<std::domain_error>);
@@ -834,28 +834,28 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-500, 500};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    BOOST_REQUIRE_CLOSE_FRACTION(erf(make_fvar<T, m>(x)), boost::math::erf(x), 3000 *  test_constants::eps);
-    BOOST_REQUIRE_CLOSE_FRACTION(erfc(make_fvar<T, m>(x)), boost::math::erfc(x), 3000 *  test_constants::eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(erf(make_fvar<T, m>(x)), boost::math::erf(x), 50000 *  test_constants::eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(erfc(make_fvar<T, m>(x)), boost::math::erfc(x), 50000 *  test_constants::eps);
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{1, 500};
+  test_detail::RandomSample<T> x_sampler{1, 100};
   for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
     auto x = x_sampler.next();
     BOOST_REQUIRE_CLOSE_FRACTION(boost::math::expint(n, make_fvar<T, m>(x)), boost::math::expint(n, x),
-                                 3000 *  test_constants::eps);
+                                 50000 *  test_constants::eps);
 
     for (auto y : {-1, 1}) {
       try {
         BOOST_REQUIRE_CLOSE_FRACTION(boost::math::expint(make_fvar<T, m>(x * y)), boost::math::expint(x * y),
-                                     3000 *  test_constants::eps);
+                                     50000 *  test_constants::eps);
       } catch (const std::overflow_error &) {
         BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x * y)), boost::wrapexcept<std::overflow_error>);
         BOOST_REQUIRE_THROW(boost::math::expint(x * y), boost::wrapexcept<std::overflow_error>);

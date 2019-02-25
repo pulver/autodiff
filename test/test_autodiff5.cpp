@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> v_sampler{-100, 100};
+  test_detail::RandomSample<T> v_sampler{-20, 20};
   test_detail::RandomSample<T> x_sampler{-boost::math::tools::log_max_value<T>() + 1,
                                          boost::math::tools::log_max_value<T>() - 1};
   for (auto i : boost::irange(test_constants::n_samples)) {
@@ -871,8 +871,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<unsigned> n_sampler{0u, 100};
-  test_detail::RandomSample<unsigned> r_sampler{0u, 100};
+  test_detail::RandomSample<unsigned> n_sampler{0u, 30};
+  test_detail::RandomSample<unsigned> r_sampler{0u, 30};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -1420,7 +1420,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(boost::math::expm1(make_fvar<T, m>(x)), boost::math::expm1(x), test_constants::pct_epsilon);
+      BOOST_REQUIRE_CLOSE(boost::math::expm1(make_fvar<T, m>(x)), boost::math::expm1(x),
+                          10 * test_constants::pct_epsilon);
     } catch (const std::overflow_error &) {
       BOOST_REQUIRE_THROW(boost::math::expm1(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(boost::math::expm1(x), boost::wrapexcept<std::overflow_error>);
@@ -1434,12 +1435,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{0, 1000};
+  test_detail::RandomSample<T> x_sampler{0, 100};
   for (auto i : boost::irange<unsigned>(test_constants::n_samples)) {
     try {
       auto fact_i = boost::math::factorial<T>(i);
-      auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      auto autodiff_v = boost::math::factorial<autodiff_fvar<T, m>>(i);
+      BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
     } catch (...) {
       std::cout << "Input: i: " << i << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -1447,8 +1448,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 
     try {
       auto fact_i = boost::math::unchecked_factorial<T>(i);
-      auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      auto autodiff_v = boost::math::unchecked_factorial<autodiff_fvar<T, m>>(i);
+      BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
     } catch (...) {
       std::cout << "Input: i: " << i << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -1456,8 +1457,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 
     try {
       auto fact_i = boost::math::unchecked_factorial<T>(i);
-      auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      auto autodiff_v = boost::math::unchecked_factorial<autodiff_fvar<T, m>>(i);
+      BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
     } catch (...) {
       std::cout << "Input: i: " << i << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -1465,8 +1466,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 
     try {
       auto fact_i = boost::math::double_factorial<T>(i);
-      auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      auto autodiff_v = boost::math::double_factorial<autodiff_fvar<T, m>>(i);
+      if (std::isfinite(static_cast<T>(autodiff_v)) && std::isfinite(fact_i)) {
+        BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
+      } else {
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(fact_i));
+      }
     } catch (...) {
       std::cout << "Input: i: " << i << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -1476,7 +1481,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
     try {
       auto fact_i = boost::math::rising_factorial<T>(x, i);
       auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      if (std::isfinite(static_cast<T>(autodiff_v)) && std::isfinite(fact_i)) {
+        BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
+      } else {
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(fact_i));
+      }
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::rising_factorial<autodiff_fvar<T, m>>))(x, i),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::rising_factorial<T>(x, i), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << " i: " << i << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -1485,13 +1498,22 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
     try {
       auto fact_i = boost::math::falling_factorial<T>(x, test_constants::n_samples - i);
       auto autodiff_v = make_fvar<T, m>(fact_i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, fact_i);
+      if (std::isfinite(static_cast<T>(autodiff_v)) && std::isfinite(fact_i)) {
+        BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 10 * test_constants::pct_epsilon);
+      } else {
+        BOOST_REQUIRE(!std::isfinite(static_cast<T>(autodiff_v)) && !std::isfinite(fact_i));
+      }
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::falling_factorial<autodiff_fvar<T, m>>))(x, test_constants::n_samples - i),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(boost::math::falling_factorial<T>(x, test_constants::n_samples - i),
+                          boost::wrapexcept<std::overflow_error>);
+
     } catch (...) {
       std::cout << "Input: x: " << x << " i: " << (test_constants::n_samples - i) << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -433,7 +433,7 @@ fvar<RealType,Order> tan(const fvar<RealType,Order>&);
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>&);
 
-// atan2(cr1) | RealType
+// atan2(cr1,cr2) | RealType
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>, fvar<RealType2,Order2>>
     atan2(const fvar<RealType1,Order1>&, const fvar<RealType2,Order2>&);
@@ -1350,8 +1350,10 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>, fvar<RealType2,Order2>> atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
+  //TODO(kbhat): Reimplement taking derivatives
+  // Called by owens_t; see atan2_function test
   using std::atan2;
-  return atan2(static_cast<RealType1>(cr2), static_cast<RealType2>(cr1));
+  return atan2(static_cast<RealType1>(cr1), static_cast<RealType2>(cr2));
 }
 
 

@@ -90,7 +90,7 @@ struct test_constants_t<T, std::integral_constant<Order, val>> {
   static constexpr T mp_epsilon_multiplier = boost::mp11::mp_if<
       boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>,
       boost::mp11::mp_int<1>, boost::mp11::mp_int<0>>::value;
-  static constexpr T pct_epsilon = 50 * std::numeric_limits<T>::epsilon() * 100;
+  static constexpr T eps = std::numeric_limits<T>::epsilon();
 };
 
 template <typename T, typename U>

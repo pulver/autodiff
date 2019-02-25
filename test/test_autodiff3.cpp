@@ -16,11 +16,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, bin_float_types) {
   auto y = atanh(x);
   // BOOST_REQUIRE(y.derivative(0) == atanh(cx)); // fails due to overload
   BOOST_REQUIRE(y.derivative(0) == atanh(static_cast<T>(x)));
-  BOOST_REQUIRE_CLOSE(y.derivative(1), static_cast<T>(4) / 3, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), static_cast<T>(16) / 9, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), static_cast<T>(224) / 27, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), static_cast<T>(1280) / 27, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), static_cast<T>(31232) / 81, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), static_cast<T>(4) / 3, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), static_cast<T>(16) / 9, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), static_cast<T>(224) / 27, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), static_cast<T>(1280) / 27, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), static_cast<T>(31232) / 81, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
@@ -29,12 +29,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
   const auto eps = test_constants_t<T>::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon();
-  BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::pi<T>() / 4, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 0.5, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -0.5, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 0.5, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 0.0, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), -3.0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), boost::math::constants::pi<T>() / 4, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 0.5, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -0.5, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 0.5, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 0.0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), -3.0, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
@@ -46,11 +46,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   const auto x = make_fvar<T, m>(cx);
   auto y = erf(x);
   BOOST_REQUIRE(y.derivative(0) == erf(static_cast<T>(x)));
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 2 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 8 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), -40 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 2 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 8 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), -40 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
@@ -61,25 +61,25 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
   const T cx = 1;
   auto x = make_fvar<T, m>(cx);
   auto y = sinc(x);
-  BOOST_REQUIRE_CLOSE(y.derivative(0), sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), cos(cx) - sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), sin(cx) - 2 * cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 5 * cos(cx) - 3 * sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 13 * sin(cx) - 20 * cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), 101 * cos(cx) - 65 * sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), cos(cx) - sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), sin(cx) - 2 * cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 5 * cos(cx) - 3 * sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 13 * sin(cx) - 20 * cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), 101 * cos(cx) - 65 * sin(cx), eps);
   // Test at x = 0
   auto y2 = sinc(make_fvar<T, 10>(0));
-  BOOST_REQUIRE_CLOSE(y2.derivative(0), 1, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(1), 0, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(2), -cx / 3, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(3), 0, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(4), cx / 5, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(5), 0, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(6), -cx / 7, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(7), 0, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(8), cx / 9, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(9), 0, eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(10), -cx / 11, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(0), 1, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(1), 0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(2), -cx / 3, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(3), 0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(4), cx / 5, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(5), 0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(6), -cx / 7, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(7), 0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(8), cx / 9, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(9), 0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y2.derivative(10), -cx / 11, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
@@ -91,11 +91,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
   auto x = make_fvar<T, m>(cx);
   auto s = sinh(x);
   auto c = cosh(x);
-  BOOST_REQUIRE_CLOSE(s.derivative(0), sinh(static_cast<T>(x)), eps);
-  BOOST_REQUIRE_CLOSE(c.derivative(0), cosh(static_cast<T>(x)), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(s.derivative(0), sinh(static_cast<T>(x)), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(c.derivative(0), cosh(static_cast<T>(x)), eps);
   for (size_t i = 0; i <= m; ++i) {
-    BOOST_REQUIRE_CLOSE(s.derivative(i), static_cast<T>(i & 1 ? c : s), eps);
-    BOOST_REQUIRE_CLOSE(c.derivative(i), static_cast<T>(i & 1 ? s : c), eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(s.derivative(i), static_cast<T>(i & 1 ? c : s), eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(c.derivative(i), static_cast<T>(i & 1 ? s : c), eps);
   }
 }
 
@@ -107,12 +107,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
   const T root_three = boost::math::constants::root_three<T>();
   const auto x = make_fvar<T, m>(cx);
   auto y = tan(x);
-  BOOST_REQUIRE_CLOSE(y.derivative(0), root_three, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 4.0, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), 8 * root_three, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 80.0, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 352 * root_three, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), 5824.0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), root_three, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 4.0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), 8 * root_three, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 80.0, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 352 * root_three, eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), 5824.0, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, bin_float_types) {
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w0_test, T, all_float_types) {
   auto y = lambert_w0(x);
   for (int i = 0; i <= m; ++i) {
     const T answer = boost::lexical_cast<T>(answers[i]);
-    BOOST_REQUIRE_CLOSE(y.derivative(i), answer, eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(i), answer, eps);
   }
   // const T cx0 = -1 / boost::math::constants::e<T>();
   // auto edge = lambert_w0(make_fvar<T,m>(cx0));

@@ -54,22 +54,22 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
   BOOST_REQUIRE(z0.derivative(4) == 0.0);
   BOOST_REQUIRE(z0.derivative(5) == 0.0);
   auto z1 = pow(cx, y);
-  BOOST_REQUIRE_CLOSE(z1.derivative(0, 0), pow(cx, cy), eps);
-  for (int j = 1; j <= n; ++j) BOOST_REQUIRE_CLOSE(z1.derivative(0, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(z1.derivative(0, 0), pow(cx, cy), eps);
+  for (int j = 1; j <= n; ++j) BOOST_REQUIRE_CLOSE_FRACTION(z1.derivative(0, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
   for (int i = 1; i <= m; ++i)
     for (int j = 0; j <= n; ++j) BOOST_REQUIRE(z1.derivative(i, j) == 0.0);
   auto z2 = pow(x, y);
-  for (int j = 0; j <= n; ++j) BOOST_REQUIRE_CLOSE(z2.derivative(0, j), pow(cx, cy) * pow(log(cx), j), eps);
+  for (int j = 0; j <= n; ++j) BOOST_REQUIRE_CLOSE_FRACTION(z2.derivative(0, j), pow(cx, cy) * pow(log(cx), j), eps);
   for (int j = 0; j <= n; ++j)
-    BOOST_REQUIRE_CLOSE(z2.derivative(1, j), pow(cx, cy - 1) * pow(log(cx), j - 1) * (cy * log(cx) + j), eps);
-  BOOST_REQUIRE_CLOSE(z2.derivative(2, 0), pow(cx, cy - 2) * cy * (cy - 1), eps);
-  BOOST_REQUIRE_CLOSE(z2.derivative(2, 1), pow(cx, cy - 2) * (cy * (cy - 1) * log(cx) + 2 * cy - 1), eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(z2.derivative(1, j), pow(cx, cy - 1) * pow(log(cx), j - 1) * (cy * log(cx) + j), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(z2.derivative(2, 0), pow(cx, cy - 2) * cy * (cy - 1), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(z2.derivative(2, 1), pow(cx, cy - 2) * (cy * (cy - 1) * log(cx) + 2 * cy - 1), eps);
   for (int j = 2; j <= n; ++j)
-    BOOST_REQUIRE_CLOSE(z2.derivative(2, j),
+    BOOST_REQUIRE_CLOSE_FRACTION(z2.derivative(2, j),
                         pow(cx, cy - 2) * pow(log(cx), j - 2) *
                             (j * (2 * cy - 1) * log(cx) + (j - 1) * j + (cy - 1) * cy * pow(log(cx), 2)),
                         eps);
-  BOOST_REQUIRE_CLOSE(
+  BOOST_REQUIRE_CLOSE_FRACTION(
       z2.derivative(2, 4),
       pow(cx, cy - 2) * pow(log(cx), 2) * (4 * (2 * cy - 1) * log(cx) + (4 - 1) * 4 + (cy - 1) * cy * pow(log(cx), 2)),
       eps);
@@ -144,15 +144,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
   BOOST_REQUIRE(z.derivative(0, 3) == 0.0);
   BOOST_REQUIRE(z.derivative(0, 4) == 0.0);
   for (size_t i = 1; i <= m; ++i)
-    BOOST_REQUIRE_CLOSE(z.derivative(i, 0), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) * cy / pow(cx, i), eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(z.derivative(i, 0), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) * cy / pow(cx, i), eps);
   for (size_t i = 1; i <= m; ++i)
-    BOOST_REQUIRE_CLOSE(z.derivative(i, 1), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) / pow(cx, i), eps);
+    BOOST_REQUIRE_CLOSE_FRACTION(z.derivative(i, 1), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) / pow(cx, i), eps);
   for (size_t i = 1; i <= m; ++i)
     for (size_t j = 2; j <= n; ++j) BOOST_REQUIRE(z.derivative(i, j) == 0.0);
   auto z1 = exp(z);
   // RHS is confirmed by
   // https://www.wolframalpha.com/input/?i=D%5Bx%5Ey,%7Bx,2%7D,%7By,4%7D%5D+%2F.+%7Bx-%3E2.0,+y-%3E3.0%7D
-  BOOST_REQUIRE_CLOSE(
+  BOOST_REQUIRE_CLOSE_FRACTION(
       z1.derivative(2, 4),
       pow(cx, cy - 2) * pow(log(cx), 2) * (4 * (2 * cy - 1) * log(cx) + (4 - 1) * 4 + (cy - 1) * cy * pow(log(cx), 2)),
       eps);
@@ -195,24 +195,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cos_and_sin, T, bin_float_types) {
   const T cx = boost::math::constants::third_pi<T>();
   const auto x = make_fvar<T, m>(cx);
   auto cos5 = cos(x);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(0), cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(1), -sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(2), -cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(3), sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(4), cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(cos5.derivative(5), -sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(0), cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(1), -sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(2), -cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(3), sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(4), cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos5.derivative(5), -sin(cx), eps);
   auto sin5 = sin(x);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(0), sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(1), cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(2), -sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(3), -cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(4), sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(sin5.derivative(5), cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(0), sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(1), cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(2), -sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(3), -cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(4), sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin5.derivative(5), cos(cx), eps);
   // Test Order = 0 for codecov
   auto cos0 = cos(make_fvar<T, 0>(cx));
-  BOOST_REQUIRE_CLOSE(cos0.derivative(0), cos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(cos0.derivative(0), cos(cx), eps);
   auto sin0 = sin(make_fvar<T, 0>(cx));
-  BOOST_REQUIRE_CLOSE(sin0.derivative(0), sin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(sin0.derivative(0), sin(cx), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, bin_float_types) {
@@ -224,12 +224,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, bin_float_types) {
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = acos(x);
-  BOOST_REQUIRE_CLOSE(y.derivative(0), acos(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), -1 / sqrt(1 - cx * cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -cx / pow(1 - cx * cx, 1.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), -(2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), -3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), -(24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), acos(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), -1 / sqrt(1 - cx * cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -cx / pow(1 - cx * cx, 1.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), -(2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), -3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), -(24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
@@ -242,11 +242,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
   // BOOST_REQUIRE(y.derivative(0) == acosh(cx)); // FAILS! acosh(2) is
   // overloaded for integral types
   BOOST_REQUIRE(y.derivative(0) == acosh(static_cast<T>(x)));
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 1 / boost::math::constants::root_three<T>(), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -2 / (3 * boost::math::constants::root_three<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 1 / boost::math::constants::root_three<T>(), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), -22 / (9 * boost::math::constants::root_three<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), 227 / (27 * boost::math::constants::root_three<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 1 / boost::math::constants::root_three<T>(), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -2 / (3 * boost::math::constants::root_three<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 1 / boost::math::constants::root_three<T>(), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), -22 / (9 * boost::math::constants::root_three<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), 227 / (27 * boost::math::constants::root_three<T>()), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, bin_float_types) {
@@ -258,12 +258,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, bin_float_types) {
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = asin(x);
-  BOOST_REQUIRE_CLOSE(y.derivative(0), asin(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 1 / sqrt(1 - cx * cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), cx / pow(1 - cx * cx, 1.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), (2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), (24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), asin(cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 1 / sqrt(1 - cx * cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), cx / pow(1 - cx * cx, 1.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), (2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), (24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asin_infinity, T, all_float_types) {
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_infinity, T, all_float_types) {
   auto y = asin(x);
   // std::cout << "asin(1) = " << y << std::endl; //
   // depth(1)(1.5707963267949,inf,inf,-nan,-nan,-nan)
-  BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::half_pi<T>(),
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), boost::math::constants::half_pi<T>(),
                       eps);  // MacOS is not exact
   BOOST_REQUIRE(y.derivative(1) == std::numeric_limits<T>::infinity());
 }
@@ -293,16 +293,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_derivative, T, bin_float_types) {
   BOOST_REQUIRE(y.derivative(4) == 0);
   y = sqrt(y);
   BOOST_REQUIRE(y.derivative(0) == sqrt(1 - cx * cx));
-  BOOST_REQUIRE_CLOSE(y.derivative(1), -cx / sqrt(1 - cx * cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -1 / pow(1 - cx * cx, 1.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), -3 * cx / pow(1 - cx * cx, 2.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), -(12 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), -cx / sqrt(1 - cx * cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -1 / pow(1 - cx * cx, 1.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), -3 * cx / pow(1 - cx * cx, 2.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), -(12 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
   y = y.inverse();  // asin'(x) = 1 / sqrt(1-x*x).
-  BOOST_REQUIRE_CLOSE(y.derivative(0), 1 / sqrt(1 - cx * cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1), cx / pow(1 - cx * cx, 1.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), (2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), (24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(0), 1 / sqrt(1 - cx * cx), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), cx / pow(1 - cx * cx, 1.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), (2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 3 * cx * (2 * cx * cx + 3) / pow(1 - cx * cx, 3.5), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), (24 * (cx * cx + 3) * cx * cx + 9) / pow(1 - cx * cx, 4.5), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, bin_float_types) {
@@ -313,11 +313,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, bin_float_types) {
   auto x = make_fvar<T, m>(cx);
   auto y = asinh(x);
   BOOST_REQUIRE(y.derivative(0) == asinh(cx));
-  BOOST_REQUIRE_CLOSE(y.derivative(1), 1 / boost::math::constants::root_two<T>(), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2), -1 / (2 * boost::math::constants::root_two<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3), 1 / (4 * boost::math::constants::root_two<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4), 3 / (8 * boost::math::constants::root_two<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5), -39 / (16 * boost::math::constants::root_two<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(1), 1 / boost::math::constants::root_two<T>(), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(2), -1 / (2 * boost::math::constants::root_two<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(3), 1 / (4 * boost::math::constants::root_two<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(4), 3 / (8 * boost::math::constants::root_two<T>()), eps);
+  BOOST_REQUIRE_CLOSE_FRACTION(y.derivative(5), -39 / (16 * boost::math::constants::root_two<T>()), eps);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

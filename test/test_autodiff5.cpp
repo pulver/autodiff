@@ -613,7 +613,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(boost::math::chebyshev_clenshaw_recurrence(c0.data(),
       c0.size(), make_fvar<T,m>(x)),
                                      boost::math::chebyshev_clenshaw_recurrence(c0.data(),
-      c0.size(), x), 10*test_constants::eps); } catch (...) {
+      c0.size(), x), 10*std::numeric_limits<T>::epsilon()); } catch (...) {
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }*/
     }
@@ -628,7 +628,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     BOOST_REQUIRE_CLOSE_FRACTION(boost::math::cos_pi(make_fvar<T, m>(x)), boost::math::cos_pi(x),
-                                 test_constants::eps);
+                                 std::numeric_limits<T>::epsilon());
   }
 }
 

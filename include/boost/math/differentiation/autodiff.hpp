@@ -1264,7 +1264,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
     // argument to std::exp2 must be casted to RealType, otherwise std::exp2 returns double (always)
-    return cr * std::exp2(static_cast<RealType>(exp));
+    return cr * std::exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
 
 template<typename RealType, size_t Order>

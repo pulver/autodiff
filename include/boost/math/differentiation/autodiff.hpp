@@ -1074,7 +1074,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 {
-    return operator root_type() == 0 ? inverse_apply() : 1 / *this;
+    return static_cast<root_type>(*this) == 0 ? inverse_apply() : 1 / *this;
 }
 
 // This gives log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)

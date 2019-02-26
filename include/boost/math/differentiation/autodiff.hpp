@@ -499,6 +499,9 @@ template<typename RealType, size_t Order>
 long long llround(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
+long long lltrunc(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
 
 // Compile-time test for fvar<> type.
@@ -1607,6 +1610,13 @@ long long llround(const fvar<RealType,Order>& cr)
 {
     using std::llround;
     return llround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
+}
+
+template<typename RealType, size_t Order>
+long long lltrunc(const fvar<RealType,Order>& cr)
+{
+  using boost::math::lltrunc;
+  return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType, size_t Order>

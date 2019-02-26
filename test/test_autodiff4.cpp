@@ -9,10 +9,11 @@
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types) {
   using std::llround;
   using std::lround;
   using std::truncl;
+  using boost::math::lltrunc;
 
   constexpr int m = 3;
   const T cx = 3.25;
@@ -21,7 +22,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_truncl, T, all_float_types) {
   BOOST_REQUIRE_EQUAL(yl, lround(cx));
   long long yll = llround(x);
   BOOST_REQUIRE_EQUAL(yll, llround(cx));
+  BOOST_REQUIRE_EQUAL(lltrunc(cx), lltrunc(x));
 
+  //TODO(kbhat): Replace with a struct
 #if defined(_MSC_VER) || defined(BOOST_MSVC)
 #pragma warning(push)
 #pragma warning(disable : 4101)

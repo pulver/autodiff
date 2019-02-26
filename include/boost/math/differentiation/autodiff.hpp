@@ -1254,17 +1254,19 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
 {
+    using std::exp2;
     using std::frexp;
     using root_type = typename fvar<RealType,Order>::root_type;
     frexp(static_cast<root_type>(cr), exp);
-    return cr * std::exp2(-*exp);
+    return cr * exp2(-*exp);
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
     // argument to std::exp2 must be casted to RealType, otherwise std::exp2 returns double (always)
-    return cr * std::exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
+    using std::exp2;
+    return cr * exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
 
 template<typename RealType, size_t Order>

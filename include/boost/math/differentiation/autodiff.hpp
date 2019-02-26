@@ -276,9 +276,8 @@ class fvar
 
     static constexpr size_t order_sum = get_order_sum<fvar>::value;
 
-    explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
-
-    explicit operator int() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+    template<typename T>
+    explicit operator T() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
     fvar& set_root(const root_type&);
 
@@ -498,9 +497,6 @@ long lround(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long long llround(const fvar<RealType,Order>&);
-
-template<typename RealType, size_t Order>
-long long lltrunc(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
@@ -1117,16 +1113,12 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 }
 #endif
 
-template<typename RealType, size_t Order>
-fvar<RealType,Order>::operator root_type() const
-{
-    return static_cast<root_type>(v.front());
-}
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>::operator int() const
+template<typename T>
+fvar<RealType,Order>::operator T() const
 {
-    return static_cast<int>(v.front());
+  return static_cast<T>(v.front());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1618,13 +1610,6 @@ long long llround(const fvar<RealType,Order>& cr)
 }
 
 template<typename RealType, size_t Order>
-long long lltrunc(const fvar<RealType,Order>& cr)
-{
-  using boost::math::lltrunc;
-  return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
-}
-
-template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>& cr)
 {
     using std::truncl;
@@ -1674,11 +1659,6 @@ template <typename RealType, std::size_t Order>
 struct promote_args<differentiation::detail::fvar<RealType, Order>> {
   using type = differentiation::detail::fvar<typename promote_args<RealType>::type, Order>;
 };
-
-template <typename ToType, typename RealType, std::size_t Order>
-inline ToType real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) {
-  return static_cast<ToType>(static_cast<RealType>(from_v));
-}
 
 }  // namespace tools
 

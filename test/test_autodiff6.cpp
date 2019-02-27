@@ -2,7 +2,7 @@
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 
-/*BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-boost::math::log1p<T>(2000), boost::math::log1p<T>(2000)};
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(test_autodiff_6)
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
-}*/
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;

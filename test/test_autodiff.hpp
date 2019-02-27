@@ -12,17 +12,14 @@
 #include <boost/mp11/mpl.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/random/independent_bits.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/random_device.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+#include <boost/multiprecision/cpp_int/literals.hpp>
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <cfenv>
 #include <cmath>
 #include <cstdlib>
+#include <random>
 #include <type_traits>
 
 #define BOOST_TEST_MODULE test_autodiff
@@ -35,12 +32,12 @@
 // using bin_float_types = mp_list<float,double,long
 // double,boost::multiprecision::cpp_bin_float_50>;
 using bin_float_types = boost::mp11::mp_list<float, double, long double>;
+
 //  cpp_bin_float_50 is fixed in boost 1.70
 // float blows up in unchecked_factorial
 
 // cpp_dec_float_50 cannot be used with close_at_tolerance
-/*using multiprecision_float_types =
-    mp_list<boost::multiprecision::cpp_dec_float_50, boost::multiprecision::cpp_bin_float_50>;*/
+//using multiprecision_float_types = boost::mp11::mp_list<boost::multiprecision::cpp_bin_float_50>;
 using multiprecision_float_types = boost::mp11::mp_list<>;
 
 using all_float_types = boost::mp11::mp_append<bin_float_types, multiprecision_float_types>;
@@ -56,32 +53,20 @@ namespace test_detail {
 
 template <typename T>
 struct RandomSample {
-  using dist_t = typename boost::conditional<std::is_integral<T>::value, boost::random::uniform_int_distribution<T>,
-                                             boost::random::uniform_real_distribution<T>>::type;
+  using is_mp_type = boost::mp11::mp_bool<boost::multiprecision::is_number<T>::value ||
+                                          boost::multiprecision::is_number_expression<T>::value>;
+  using dist_t = typename boost::conditional<std::is_integral<T>::value, std::uniform_int_distribution<T>,
+                                             std::uniform_real_distribution<T>>::type;
   template <typename U, typename V>
   RandomSample(U start, V finish)
-      : start_(static_cast<T>(start)),
-        finish_(static_cast<T>(finish)),
-        dist_(start_, ((boost::math::nextafter))(finish_, ((std::numeric_limits<T>::max))())) {}
+      : dist_(int64_t(std::forward<U>(start)),
+          ((std::nextafter))(int64_t(std::forward<V>(finish)), ((boost::math::tools::max_value<int64_t>))())) {}
 
-  T next() noexcept { return dist_(gen_); }
+  T next() noexcept { return T(dist_(engine_)); }
 
-  T start_;
-  T finish_;
-  boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<T>::digits, uint64_t> gen_;
   dist_t dist_;
+  std::independent_bits_engine<std::mt19937, 64, uint64_t> engine_;
 };
-
-static_assert(std::is_same<typename RandomSample<boost::multiprecision::cpp_bin_float_50>::dist_t,
-                           boost::random::uniform_real_distribution<boost::multiprecision::cpp_bin_float_50>>::value,
-              "");
-static_assert(std::is_same<typename RandomSample<boost::multiprecision::cpp_dec_float_50>::dist_t,
-                           boost::random::uniform_real_distribution<boost::multiprecision::cpp_dec_float_50>>::value,
-              "");
-static_assert(
-    std::is_same<typename RandomSample<float>::dist_t, boost::random::uniform_real_distribution<float>>::value, "");
-static_assert(std::is_same<typename RandomSample<int>::dist_t, boost::random::uniform_int_distribution<int>>::value,
-              "");
 
 /**
  * Simple struct to hold constants that are used in each test
@@ -94,7 +79,7 @@ template <typename T, typename Order, Order val>
 struct test_constants_t<T, std::integral_constant<Order, val>> {
   static constexpr int n_samples = 25;
   static constexpr Order order = val;
-  static constexpr T mp_epsilon_multiplier = boost::mp11::mp_if<
+  static constexpr int mp_epsilon_multiplier = boost::mp11::mp_if<
       boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>,
       boost::mp11::mp_int<1>, boost::mp11::mp_int<0>>::value;
   static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }

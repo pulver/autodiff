@@ -24,24 +24,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
   BOOST_REQUIRE_EQUAL(yll, llround(cx));
   BOOST_REQUIRE_EQUAL(lltrunc(cx), lltrunc(x));
 
-  //TODO(kbhat): Replace with a struct
-#if defined(_MSC_VER) || defined(BOOST_MSVC)
-#pragma warning(push)
-#pragma warning(disable : 4101)
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-#endif
-  static constexpr bool is_not_mp_number_t = test_constants_t<T>::mp_epsilon_multiplier == 0;
-#define IS_NOT_MP_NUMBER_TYPE is_not_mp_number_t
-#if IS_NOT_MP_NUMBER_TYPE
-  auto yld = truncl(x);
-  BOOST_REQUIRE_EQUAL(yld, truncl(cx));
-#endif
-#if defined(_MSC_VER) || defined(BOOST_MSVC)
-#pragma warning(pop)
-#else
-#pragma GCC diagnostic pop
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+  if constexpr (!boost::multiprecision::is_number<T>::value && !boost::multiprecision::is_number_expression<T>::value) {
+    BOOST_REQUIRE_EQUAL(truncl(x), truncl(cx));
+  }
 #endif
 }
 

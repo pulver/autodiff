@@ -7,8 +7,8 @@
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, bin_float_types) {
-  const T eps = 300 * std::numeric_limits<T>::epsilon();  // percent
+BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
+  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::atanh;
   constexpr int m = 5;
   const T cx = 0.5;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
   constexpr float cx = 1.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
-  const auto eps = test_constants_t<T>::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon();
+  const auto eps = test_constants_t<T>::mp_epsilon_multiplier * boost::math::tools::epsilon<T>();
   BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::pi<T>() / 4, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1), 0.5, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2), -0.5, eps);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
-  const T eps = 300 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::erf;
   using namespace boost;
   constexpr int m = 5;
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
-  const T eps = 20000 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 20000 * boost::math::tools::epsilon<T>();  // percent
   using std::cos;
   using std::sin;
   constexpr int m = 5;
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
-  const T eps = 300 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::cosh;
   using std::sinh;
   constexpr int m = 5;
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
-  const T eps = 800 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 800 * boost::math::tools::epsilon<T>();  // percent
   using std::sqrt;
   constexpr int m = 5;
   const T cx = boost::math::constants::third_pi<T>();
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(iround_and_itrunc, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w0_test, T, all_float_types) {
-  const T eps = 1000 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 1000 * boost::math::tools::epsilon<T>();  // percent
   constexpr int m = 10;
   const T cx = 3;
   // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]

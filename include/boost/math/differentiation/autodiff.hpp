@@ -276,8 +276,9 @@ class fvar
 
     static constexpr size_t order_sum = get_order_sum<fvar>::value;
 
-    template<typename T>
-    explicit operator T() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+    explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+
+    explicit operator int() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
     fvar& set_root(const root_type&);
 
@@ -1118,10 +1119,15 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 
 
 template<typename RealType, size_t Order>
-template<typename T>
-fvar<RealType,Order>::operator T() const
+fvar<RealType,Order>::operator root_type() const
 {
-  return static_cast<T>(v.front());
+  return static_cast<root_type>(v.front());
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>::operator int() const
+{
+  return static_cast<int>(v.front());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR

@@ -12,13 +12,17 @@
 #include <boost/mp11/mpl.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/random/independent_bits.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/random_device.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <cfenv>
 #include <cmath>
 #include <cstdlib>
-#include <random>
 #include <type_traits>
 
 #define BOOST_TEST_MODULE test_autodiff
@@ -49,32 +53,35 @@ namespace test_detail {
  * struct to emit pseudo-random values from a given interval.
  * Endpoints are closed or open depending on whether or not they're infinite).
  */
-template <typename T, typename = void>
-struct RandomSample;
 
 template <typename T>
-struct RandomSample<
-    T, typename std::enable_if<std::is_floating_point<T>::value || std::numeric_limits<T>::is_integer>::type> {
-  using dist_t = typename boost::conditional<std::is_floating_point<T>::value, std::uniform_real_distribution<T>,
-                                             std::uniform_int_distribution<T>>::type;
+struct RandomSample {
+  using dist_t = typename boost::conditional<std::is_integral<T>::value, boost::random::uniform_int_distribution<T>,
+                                             boost::random::uniform_real_distribution<T>>::type;
   template <typename U, typename V>
   RandomSample(U start, V finish)
       : start_(static_cast<T>(start)),
         finish_(static_cast<T>(finish)),
-        random_device_{},
-        rng_(random_device_()),
-        dist_(start_, ((std::nextafter))(finish_, ((std::numeric_limits<T>::max))())) {}
+        dist_(start_, ((boost::math::nextafter))(finish_, ((std::numeric_limits<T>::max))())) {}
 
-  T next() noexcept { return dist_(rng_); }
+  T next() noexcept { return dist_(gen_); }
 
   T start_;
   T finish_;
-  std::random_device random_device_;
-  std::mt19937 rng_;
+  boost::random::independent_bits_engine<boost::random::mt19937, std::numeric_limits<T>::digits, uint64_t> gen_;
   dist_t dist_;
 };
-static_assert(std::is_same<typename RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
-static_assert(std::is_same<typename RandomSample<int64_t>::dist_t, std::uniform_int_distribution<int64_t>>::value, "");
+
+static_assert(std::is_same<typename RandomSample<boost::multiprecision::cpp_bin_float_50>::dist_t,
+                           boost::random::uniform_real_distribution<boost::multiprecision::cpp_bin_float_50>>::value,
+              "");
+static_assert(std::is_same<typename RandomSample<boost::multiprecision::cpp_dec_float_50>::dist_t,
+                           boost::random::uniform_real_distribution<boost::multiprecision::cpp_dec_float_50>>::value,
+              "");
+static_assert(
+    std::is_same<typename RandomSample<float>::dist_t, boost::random::uniform_real_distribution<float>>::value, "");
+static_assert(std::is_same<typename RandomSample<int>::dist_t, boost::random::uniform_int_distribution<int>>::value,
+              "");
 
 /**
  * Simple struct to hold constants that are used in each test
@@ -90,7 +97,7 @@ struct test_constants_t<T, std::integral_constant<Order, val>> {
   static constexpr T mp_epsilon_multiplier = boost::mp11::mp_if<
       boost::mp11::mp_or<boost::multiprecision::is_number<T>, boost::multiprecision::is_number_expression<T>>,
       boost::mp11::mp_int<1>, boost::mp11::mp_int<0>>::value;
-  static constexpr T pct_epsilon = 50 * std::numeric_limits<T>::epsilon() * 100;
+  static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
 };
 
 template <typename T, typename U>

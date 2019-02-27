@@ -577,7 +577,7 @@ fvar<RealType,Order>::fvar(const RealType2& ca)
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const char* ca_str)
-:    v{{static_cast<RealType>(boost::lexical_cast<promote<RealType, double>>(ca_str))}}
+:    v{{static_cast<RealType>(boost::lexical_cast<promote<typename fvar<RealType, Order>::root_type, double>>(ca_str))}}
 {
 }
 
@@ -1117,17 +1117,16 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 }
 #endif
 
-
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::operator root_type() const
 {
-  return static_cast<root_type>(v.front());
+    return static_cast<root_type>(v.front());
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::operator int() const
 {
-  return static_cast<int>(v.front());
+    return static_cast<int>(v.front());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1645,40 +1644,39 @@ class numeric_limits<boost::math::differentiation::detail::fvar<RealType,Order>>
     : public numeric_limits<typename boost::math::differentiation::detail::fvar<RealType,Order>::root_type>
 { };
 
-}  // namespace std
+} // namespace std
 
 namespace boost {
 namespace math {
 namespace tools {
 
 // See boost/math/tools/promotion.hpp
-template <typename RealType0, size_t Order0, typename RealType1, size_t Order1>
+template<typename RealType0, size_t Order0, typename RealType1, size_t Order1>
 struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
                       differentiation::detail::fvar<RealType1, Order1>> {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
-#ifndef BOOST_NO_CXX14_CONSTEXPR
-                                             std::max(Order0, Order1)>;
+                                             #ifndef BOOST_NO_CXX14_CONSTEXPR
+                                                 std::max(Order0,Order1)>;
 #else
-        Order0<Order1 ? Order1 : Order0>;
+          Order0 < Order1 ? Order1 : Order0>;
 #endif
 };
 
-template <typename RealType0, size_t Order0, typename RealType1>
+template<typename RealType0, size_t Order0, typename RealType1>
 struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1> {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
 };
 
-template <typename RealType0, typename RealType1, size_t Order1>
+template<typename RealType0, typename RealType1, size_t Order1>
 struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>> {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template <typename RealType, std::size_t Order>
-struct promote_args<differentiation::detail::fvar<RealType, Order>> {
-  using type = differentiation::detail::fvar<typename promote_args<RealType>::type, Order>;
-};
-
-}  // namespace tools
+template<typename ToType, typename RealType, std::size_t Order>
+inline ToType real_cast(const differentiation::detail::fvar<RealType, Order> &from_v) {
+  return static_cast<ToType>(static_cast<RealType>(from_v));
+}
+} // namespace tools
 
 namespace policies {
 

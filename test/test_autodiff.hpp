@@ -52,7 +52,8 @@ namespace test_detail {
  */
 
 template <typename T> struct RandomSample {
-  RandomSample(const T& start, const T& finish)
+  template<typename U, typename V>
+  RandomSample(const U& start, const V& finish)
       : dist_(static_cast<long double>(start), static_cast<long double>(finish)) {}
   T next() noexcept { return T(dist_(engine_)); }
 

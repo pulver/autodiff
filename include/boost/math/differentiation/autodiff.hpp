@@ -7,9 +7,14 @@
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
 #include <boost/config.hpp>
+#include <boost/math/tools/config.hpp>
+
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
+
+#include <boost/lexical_cast.hpp>
+#include <boost/mp11/function.hpp>
 
 #include <algorithm>
 #include <array>
@@ -67,7 +72,7 @@ struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
-    typename std::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
+    typename boost::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -100,6 +105,8 @@ class fvar
 
     template<typename RealType2>
     fvar(const RealType2& ca); // Supports any RealType2 for which static_cast<root_type>(ca) compiles.
+
+    explicit fvar(const char* ca); // Converts a const char* string to RealType by boost::lexical_cast
 
     // r = cr | RealType& | Assignment operator.
     fvar& operator=(const fvar&) = default;
@@ -271,6 +278,8 @@ class fvar
 
     explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
+    explicit operator int() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+
     fvar& set_root(const root_type&);
 
     // Use when function returns derivatives.
@@ -424,6 +433,11 @@ fvar<RealType,Order> tan(const fvar<RealType,Order>&);
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>&);
 
+// atan2(cr1,cr2) | RealType
+template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
+promote<fvar<RealType1,Order1>, fvar<RealType2,Order2>>
+    atan2(const fvar<RealType1,Order1>&, const fvar<RealType2,Order2>&);
+
 // fmod(cr1,cr2) | RealType
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
@@ -484,6 +498,9 @@ long lround(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long long llround(const fvar<RealType,Order>&);
+
+template<typename RealType, size_t Order>
+long long lltrunc(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
@@ -555,6 +572,12 @@ template<typename RealType, size_t Order>
 template<typename RealType2>
 fvar<RealType,Order>::fvar(const RealType2& ca)
 :    v{{static_cast<RealType>(ca)}} // Can cause compiler error if RealType2 cannot be cast to root_type.
+{
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>::fvar(const char* ca_str)
+:    v{{static_cast<RealType>(boost::lexical_cast<promote<typename fvar<RealType, Order>::root_type, double>>(ca_str))}}
 {
 }
 
@@ -1055,7 +1078,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 {
-    return operator root_type() == 0 ? inverse_apply() : 1 / *this;
+    return static_cast<root_type>(*this) == 0 ? inverse_apply() : 1 / *this;
 }
 
 // This gives log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
@@ -1098,6 +1121,12 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order>::operator root_type() const
 {
     return static_cast<root_type>(v.front());
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>::operator int() const
+{
+    return static_cast<int>(v.front());
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1230,16 +1259,19 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
 {
+    using std::exp2;
     using std::frexp;
     using root_type = typename fvar<RealType,Order>::root_type;
     frexp(static_cast<root_type>(cr), exp);
-    return cr * std::exp2(-*exp);
+    return cr * exp2(-*exp);
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
-    return cr * std::exp2(exp);
+    // argument to std::exp2 must be casted to RealType, otherwise std::exp2 returns double (always)
+    using std::exp2;
+    return cr * exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
 
 template<typename RealType, size_t Order>
@@ -1316,6 +1348,16 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
         return cr.apply_with_horner_factorials([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
+
+template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
+promote<fvar<RealType1,Order1>, fvar<RealType2,Order2>> atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
+{
+  //TODO(kbhat): Reimplement taking derivatives
+  // Called by owens_t; see atan2_function test
+  using std::atan2;
+  return atan2(static_cast<RealType1>(cr1), static_cast<RealType2>(cr2));
+}
+
 
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
@@ -1578,6 +1620,13 @@ long long llround(const fvar<RealType,Order>& cr)
 }
 
 template<typename RealType, size_t Order>
+long long lltrunc(const fvar<RealType,Order>& cr)
+{
+  using boost::math::lltrunc;
+  return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
+}
+
+template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>& cr)
 {
     using std::truncl;
@@ -1597,33 +1646,55 @@ class numeric_limits<boost::math::differentiation::detail::fvar<RealType,Order>>
 
 } // namespace std
 
-namespace boost { namespace math { namespace tools {
+namespace boost {
+namespace math {
+namespace tools {
 
 // See boost/math/tools/promotion.hpp
-template <typename RealType0, size_t Order0, typename RealType1, size_t Order1>
-struct promote_args_2<differentiation::detail::fvar<RealType0,Order0>,differentiation::detail::fvar<RealType1,Order1>>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0,RealType1>::type,
-#ifndef BOOST_NO_CXX14_CONSTEXPR
-        std::max(Order0,Order1)>;
+template<typename RealType0, size_t Order0, typename RealType1, size_t Order1>
+struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
+                      differentiation::detail::fvar<RealType1, Order1>> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
+                                             #ifndef BOOST_NO_CXX14_CONSTEXPR
+                                                 std::max(Order0,Order1)>;
 #else
-        Order0 < Order1 ? Order1 : Order0>;
+          Order0 < Order1 ? Order1 : Order0>;
 #endif
 };
 
-template <typename RealType0, size_t Order0, typename RealType1>
-struct promote_args_2<differentiation::detail::fvar<RealType0,Order0>,RealType1>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0,RealType1>::type,Order0>;
+template<typename RealType0, size_t Order0, typename RealType1>
+struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
 };
 
-template <typename RealType0, typename RealType1, size_t Order1>
-struct promote_args_2<RealType0,differentiation::detail::fvar<RealType1,Order1>>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0,RealType1>::type,Order1>;
+template<typename RealType0, typename RealType1, size_t Order1>
+struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-} } } // namespace boost::math::tools
+template<typename ToType, typename RealType, std::size_t Order>
+inline ToType real_cast(const differentiation::detail::fvar<RealType, Order> &from_v) {
+  return static_cast<ToType>(static_cast<RealType>(from_v));
+}
+} // namespace tools
+
+namespace policies {
+
+template <class Policy, std::size_t Order>
+using fvar_t = differentiation::detail::fvar<Policy, Order>;
+template <class Policy, std::size_t Order>
+struct evaluation<fvar_t<float, Order>, Policy> {
+  using type = fvar_t<typename boost::conditional<Policy::promote_float_type::value, double, float>::type, Order>;
+};
+
+template <class Policy, std::size_t Order>
+struct evaluation<fvar_t<double, Order>, Policy> {
+  using type =
+      fvar_t<typename boost::conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
+};
+}  // namespace policies
+}  // namespace math
+}  // namespace boost
 
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR
 #include "autodiff_cpp11.hpp"

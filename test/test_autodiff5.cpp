@@ -14,10 +14,14 @@ using namespace boost::math::differentiation;
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::multiprecision::min;
+  using std::min;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler(-100, 26);
+  test_detail::RandomSample<T> x_sampler(-100, 100);
   for (auto i : boost::irange(test_constants::n_samples)) {
     const auto &x = x_sampler.next();
     {
@@ -33,14 +37,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     }
 
     {
-      auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::airy_bi(x);
+      auto x_ = ((min))(x, T(26));
+      auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x_));
+      auto anchor_v = boost::math::airy_bi(x_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
     }
 
     {
-      auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::airy_bi_prime(x);
+      auto x_ = ((min))(x, T(26));
+      auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x_));
+      auto anchor_v = boost::math::airy_bi_prime(x_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
     }
 
@@ -134,23 +140,22 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto y = y_sampler.next();
-    try {
-      auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
-      auto anchor_v = atan2(x, y);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
-    } catch (...) {
-      std::cout << "Input: x: " << x << " y: " << y << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+
+    auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
+    auto anchor_v = atan2(x, y);
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::multiprecision::min;
+  using std::min;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
   for (auto i : boost::irange(test_constants::n_samples)) {
-    try {
+    {
       auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::bernoulli_b2n<T>(i);
       if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
@@ -158,35 +163,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
       } else {
         BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
       }
-    } catch (const std::domain_error &e) {
-      BOOST_REQUIRE_THROW(((boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(i), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &e) {
-      BOOST_REQUIRE_THROW(((boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i))),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::bernoulli_b2n<T>(i), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: i: " << i << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
-
-    try {
-      auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i);
-      auto anchor_v = boost::math::tangent_t2n<T>(i);
+    {
+      auto i_ = ((min))(19, i);
+      auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
+      auto anchor_v = boost::math::tangent_t2n<T>(i_);
       if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
         BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
       } else {
         BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
       }
-    } catch (const std::domain_error &e) {
-      BOOST_REQUIRE_THROW(((boost::math::tangent_t2n<autodiff_fvar<T, m>>(i))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(i), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &e) {
-      BOOST_REQUIRE_THROW(((boost::math::tangent_t2n<autodiff_fvar<T, m>>(i))), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::tangent_t2n<T>(i), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: i: " << i << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
 }

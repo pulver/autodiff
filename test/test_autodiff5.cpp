@@ -680,7 +680,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 
     {
       auto a_ = abs(a) + 1;
-      auto b_ = abs(b) / (b_sampler.dist_.max() - b_sampler.dist_.min());
+      auto b_ = abs(b) / (((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
       try {
         auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::ibeta_inva(a_, b_, z);

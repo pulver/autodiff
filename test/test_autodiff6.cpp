@@ -1060,7 +1060,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
       x = boost::math::nextafter(static_cast<T>(0), ((std::numeric_limits<T>::max))());
     }
 
-    auto y = x < sqrt(2) ? log(((std::numeric_limits<T>::max))()) / (log(x) * log(x)) : 1.0 / x;
+    auto y = x < cbrt(2) ? log(((std::numeric_limits<T>::max))()) / (log(x) * log(x)) : 1.0 / exp(1+x);
     try {
       auto autodiff_v = boost::math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y));
       auto anchor_v = boost::math::powm1(x, y);

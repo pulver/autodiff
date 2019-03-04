@@ -309,13 +309,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, all_float_types) {
   for (int i = 0; i <= n; ++i)
     BOOST_REQUIRE_CLOSE(static_cast<T>(x.derivative(i)),
                         static_cast<T>(power_factorial / boost::math::factorial<T>(n - i) * pow(ca, n - i)),
-                        test_constants_t<T>::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+                        std::numeric_limits<T>::epsilon());
   x = make_fvar<T, n>(ca);
   // Test operator*()
   x = x * x * x * x * x * x * x * x;
   for (int i = 0; i <= n; ++i)
     BOOST_REQUIRE_CLOSE(x.derivative(i), power_factorial / boost::math::factorial<T>(n - i) * pow(ca, n - i),
-                        test_constants_t<T>::mp_epsilon_multiplier * std::numeric_limits<T>::epsilon());
+                        std::numeric_limits<T>::epsilon());
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(dim1_multiplication, T, all_float_types) {

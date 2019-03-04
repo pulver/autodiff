@@ -5,6 +5,8 @@
 
 #include "test_autodiff.hpp"
 
+#include <boost/utility/identity_type.hpp>
+
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types) {
@@ -29,7 +31,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, BOOST_IDENTITY_TYPE(((boost::mp11::mp_list<boost::multiprecision::cpp_bin_float_50>)))) {
   const T eps = 30 * std::numeric_limits<T>::epsilon();
   constexpr int Nw = 3;
   constexpr int Nx = 2;

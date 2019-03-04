@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
   constexpr float cx = 1.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
-  const auto eps = test_constants_t<T>::mp_epsilon_multiplier * boost::math::tools::epsilon<T>();
+  const auto eps = boost::math::tools::epsilon<T>();
   BOOST_REQUIRE_CLOSE(y.derivative(0), boost::math::constants::pi<T>() / 4, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1), 0.5, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2), -0.5, eps);

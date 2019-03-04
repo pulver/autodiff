@@ -159,13 +159,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      }
       BOOST_REQUIRE_THROW(boost::math::acosh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      BOOST_REQUIRE_THROW(boost::math::acosh(x), boost::wrapexcept<std::overflow_error>);
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      }
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -190,12 +197,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      }
       BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      }
       BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -221,12 +236,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+      }
       BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
+        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+      } else {
+        std::feclearexcept(FE_ALL_EXCEPT);
+        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+      }
       BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -304,7 +327,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, all_float_types) {
+// TODO(kbhat): Something in here is very slow with boost::multiprecision
+BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> v_sampler{-20, 20};
@@ -1101,7 +1125,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
-  test_detail::RandomSample<T> phi_sampler{-2000, 2000};
+  test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
@@ -1128,7 +1152,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
-  test_detail::RandomSample<T> phi_sampler{-2000, 2000};
+  test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
@@ -1156,7 +1180,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
   test_detail::RandomSample<T> n_sampler{-2000, 2000};
-  test_detail::RandomSample<T> phi_sampler{-2000, 2000};
+  test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
@@ -1186,7 +1210,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> k_sampler{-1.20, 1.20};
-  test_detail::RandomSample<T> phi_sampler{-2000, 2000};
+  test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();

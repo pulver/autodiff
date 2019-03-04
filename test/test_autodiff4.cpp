@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, boost::mp11::mp_list<boost::multiprecision::cpp_bin_float_50>) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   const T eps = 30 * std::numeric_limits<T>::epsilon();
   constexpr int Nw = 3;
   constexpr int Nx = 2;

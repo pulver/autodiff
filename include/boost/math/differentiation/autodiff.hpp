@@ -1608,7 +1608,8 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> tanh(const fvar<RealType,Order>& cr)
 {
     fvar<RealType,Order> retval = exp(cr*2);
-    (retval -= 1.0) /= (retval + 1.0);
+    const fvar<RealType,Order> denom = retval + 1;
+    (retval -= 1) /= denom;
     return retval;
 }
 

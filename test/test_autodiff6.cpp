@@ -1052,15 +1052,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{0, log(std::numeric_limits<T>::max())};
+  test_detail::RandomSample<T> x_sampler{0, log(((std::numeric_limits<T>::max))())};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    if (x < boost::math::nextafter(static_cast<T>(0), std::numeric_limits<T>::max())) {
-      x = boost::math::nextafter(static_cast<T>(0), std::numeric_limits<T>::max());
+    if (x < boost::math::nextafter(static_cast<T>(0), ((std::numeric_limits<T>::max))())) {
+      x = boost::math::nextafter(static_cast<T>(0), ((std::numeric_limits<T>::max))());
     }
 
-    auto y = x < sqrt(2) ? log(std::numeric_limits<T>::max()) / (log(x) * log(x)) : 1.0 / x;
+    auto y = x < sqrt(2) ? log(((std::numeric_limits<T>::max))()) / (log(x) * log(x)) : 1.0 / x;
     try {
       auto autodiff_v = boost::math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y));
       auto anchor_v = boost::math::powm1(x, y);

@@ -29,7 +29,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types_only) {
+  BOOST_MATH_STD_USING
+
   const T eps = 30 * std::numeric_limits<T>::epsilon();
   constexpr int Nw = 3;
   constexpr int Nx = 2;
@@ -45,7 +47,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
       "1976.3196007477977177798818752904187209081211892187"
       "5499076582535951111845769110560421820940516423255314");
   // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
-  using std::fabs;
   const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
   BOOST_REQUIRE_LT(relative_error, eps);
 }

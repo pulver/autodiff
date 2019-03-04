@@ -13,7 +13,7 @@ using namespace boost::math::differentiation;
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, multiprecision_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 

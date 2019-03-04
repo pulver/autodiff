@@ -42,10 +42,10 @@ product of the respective factorial and coefficient:
 #include <iostream>
 
 template<typename T>
-T fourth_power(T x)
+T fourth_power(const T& x)
 {
-    x *= x;
-    return x *= x;
+    const T second_power = x * x;
+    return second_power * second_power;
 }
 
 int main()

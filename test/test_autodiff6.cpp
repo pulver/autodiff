@@ -1066,7 +1066,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
       auto anchor_v = boost::math::powm1(x, y);
 
       T tolerance_adjustment = std::is_same<T, float>::value ? 500 : 10;
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, tolerance_adjustment * 100 * std::numeric_limits<T>::epsilon());
+      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
+        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
+      } else {
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, tolerance_adjustment*100*std::numeric_limits<T>::epsilon());
+      }
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y)),
                           boost::wrapexcept<std::domain_error>);

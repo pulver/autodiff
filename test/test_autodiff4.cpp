@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types_only) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   BOOST_MATH_STD_USING
 
   const T eps = 30 * std::numeric_limits<T>::epsilon();

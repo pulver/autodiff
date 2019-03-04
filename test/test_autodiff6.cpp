@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::gamma_q(a, z), boost::wrapexcept<boost::math::evaluation_error>);
       } catch (...) {
-      std::cout << std::setprecision(20) << "Input: a: " << a << " z: " << z << std::endl;
+        std::cout << std::setprecision(20) << "Input: a: " << a << " z: " << z << std::endl;
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }
     }
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::gamma_p(a, z), boost::wrapexcept<boost::math::evaluation_error>);
       } catch (...) {
-      std::cout << std::setprecision(20) << "Input: a: " << a << " z: " << z << std::endl;
+        std::cout << std::setprecision(20) << "Input: a: " << a << " z: " << z << std::endl;
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }
     }
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
         BOOST_REQUIRE_THROW(boost::math::gamma_p_derivative(a_normalized, z_normalized),
                             boost::wrapexcept<std::overflow_error>);
       } catch (const boost::math::evaluation_error &) {
-          std::cout << "Overflow a: " << a_normalized << " z: " << z_normalized << std::endl;
+        std::cout << "Overflow a: " << a_normalized << " z: " << z_normalized << std::endl;
         BOOST_REQUIRE_THROW(
             boost::math::gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
             boost::wrapexcept<boost::math::evaluation_error>);
@@ -983,7 +983,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::owens_t(make_fvar<T, m>(h), make_fvar<T, m>(a));
       auto anchor_v = boost::math::owens_t(h, a);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5 * 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 20 * 100 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::owens_t(make_fvar<T, m>(h), make_fvar<T, m>(a)),
                           boost::wrapexcept<std::domain_error>);
@@ -1246,7 +1246,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(zeta_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE(boost::math::zeta(make_fvar<T, m>(x)), boost::math::zeta(x),
-                          50 * 100 * std::numeric_limits<T>::epsilon());
+                          100 * 100 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::zeta(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       BOOST_REQUIRE_THROW(boost::math::zeta(x), boost::wrapexcept<std::domain_error>);

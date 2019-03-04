@@ -146,32 +146,34 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = T(x_sampler.next());
     try {
-      auto autodiff_v = boost::math::acosh(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::acosh(x);
-      if (test_detail::check_if_small(autodiff_v, anchor_v)) {
+      auto autodiff_v = acosh(make_fvar<T, m>(x));
+      auto anchor_v = acosh(x);
+      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
+        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
+      } else if (test_detail::check_if_small(autodiff_v, anchor_v)) {
         BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), boost::math::tools::epsilon<T>());
       } else {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
-        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+        BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
       }
-      BOOST_REQUIRE_THROW(boost::math::acosh(x), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(acosh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
-        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
+        BOOST_REQUIRE((acosh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
       }
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
@@ -184,34 +186,36 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      auto autodiff_v = boost::math::asinh(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::asinh(x);
-      if (test_detail::check_if_small(autodiff_v, anchor_v)) {
+      auto autodiff_v = asinh(make_fvar<T, m>(x));
+      auto anchor_v = asinh(x);
+      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
+        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
+      } else if (test_detail::check_if_small(autodiff_v, anchor_v)) {
         BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), boost::math::tools::epsilon<T>());
       } else {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(asinh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
         BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
       }
-      BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(asinh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(asinh(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
-        BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
+        BOOST_REQUIRE((asinh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
       }
-      BOOST_REQUIRE_THROW(boost::math::asinh(x), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(asinh(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));
@@ -223,34 +227,36 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{-100, 100};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      auto autodiff_v = boost::math::atanh(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::atanh(x);
-      if (test_detail::check_if_small(autodiff_v, anchor_v)) {
+      auto autodiff_v = atanh(make_fvar<T, m>(x));
+      auto anchor_v = atanh(x);
+      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
+        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
+      } else if (test_detail::check_if_small(autodiff_v, anchor_v)) {
         BOOST_REQUIRE_SMALL(static_cast<T>(fabs(autodiff_v - anchor_v)), boost::math::tools::epsilon<T>());
       } else {
         BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100000 * boost::math::tools::epsilon<T>());
       }
     } catch (const std::domain_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
         BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
       }
-      BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::domain_error>);
+      BOOST_REQUIRE_THROW(atanh(x), boost::wrapexcept<std::domain_error>);
     } catch (const std::overflow_error &) {
       if (bmp::is_number<T>::value || bmp::is_number_expression<T>::value) {
-        BOOST_REQUIRE_THROW(boost::math::acosh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
+        BOOST_REQUIRE_THROW(atanh(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
       } else {
         std::feclearexcept(FE_ALL_EXCEPT);
         BOOST_REQUIRE((atanh(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
       }
-      BOOST_REQUIRE_THROW(boost::math::atanh(x), boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(atanh(x), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
       std::cout << "Input: x: " << x << std::endl;
       std::rethrow_exception(std::exception_ptr(std::current_exception()));

@@ -390,11 +390,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
     auto r = n == 0 ? 0 : (std::min)(r_sampler.next(), n - 1);
     auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
     auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-    if (isfinite(static_cast<T>(autodiff_v)) && isfinite(anchor_v)) {
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
-    } else {
-      BOOST_REQUIRE(!(isfinite(static_cast<T>(autodiff_v)) || isfinite(anchor_v)));
-    }
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
   }
 }
 
@@ -474,12 +470,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using std::nextafter;
+  using boost::math::nextafter;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{-1, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
+    auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
     auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
     auto anchor_v = boost::math::digamma(x);
     BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * std::numeric_limits<T>::epsilon());

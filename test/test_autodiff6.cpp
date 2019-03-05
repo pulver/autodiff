@@ -539,18 +539,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                          boost::math::jacobi_zeta(x, phi), 5 * 100 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::jacobi_zeta(x, phi), boost::wrapexcept<std::domain_error>);
-    } catch (...) {
-      std::cout << std::setprecision(20) << "Input: x: " << x << "  "
-                << "phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::jacobi_zeta(make_fvar<T, m>(x), make_fvar<T, m>(phi)),
+                        boost::math::jacobi_zeta(x, phi), 5 * 100 * std::numeric_limits<T>::epsilon());
   }
 }
 
@@ -567,34 +557,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
     auto r = (std::min)(n - 1, r_sampler.next());
     auto x = x_sampler.next();
 
-    try {
+    {
       auto autodiff_v = boost::math::laguerre(n, make_fvar<T, m>(x));
       auto anchor_v = boost::math::laguerre(n, x);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 100 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, make_fvar<T, m>(x)))), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::laguerre(n, x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << std::setprecision(20) << "Input: n: " << n << " x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
-
-    try {
+    {
       auto autodiff_v = boost::math::laguerre(n, r, make_fvar<T, m>(x));
       auto anchor_v = boost::math::laguerre(n, r, x);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 100 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::laguerre(n, r, x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::laguerre(n, r, make_fvar<T, m>(x)))), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::laguerre(n, r, x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << std::setprecision(20) << "Input: n: " << n << " r: " << r << " x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
     }
   }
 }

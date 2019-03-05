@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::tgamma(make_fvar<T, m>(z));
         auto anchor_v = boost::math::tgamma(z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::tgamma(make_fvar<T, m>(z)), boost::wrapexcept<std::domain_error>);
         BOOST_REQUIRE_THROW(boost::math::tgamma(z), boost::wrapexcept<std::domain_error>);
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::tgamma1pm1(make_fvar<T, m>(z));
         auto anchor_v = boost::math::tgamma1pm1(z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
 
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::tgamma1pm1(make_fvar<T, m>(z)), boost::wrapexcept<std::domain_error>);
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       int s2 = 0;
       try {
         BOOST_REQUIRE_CLOSE(boost::math::lgamma(make_fvar<T, m>(z), std::addressof(s1)),
-                            boost::math::lgamma(z, std::addressof(s2)), 500 * 100 * std::numeric_limits<T>::epsilon());
+                            boost::math::lgamma(z, std::addressof(s2)), 5000 * 100 * std::numeric_limits<T>::epsilon());
         BOOST_REQUIRE((std::addressof(s1) == nullptr && std::addressof(s2) == nullptr) || (s1 == s2));
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::lgamma(make_fvar<T, m>(z)), boost::wrapexcept<std::domain_error>);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::tgamma_lower(make_fvar<T, m>(a), make_fvar<T, m>(z));
         auto anchor_v = boost::math::tgamma_lower(a, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
 
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::tgamma_lower(make_fvar<T, m>(a), make_fvar<T, m>(z)),
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_q(make_fvar<T, m>(a), make_fvar<T, m>(z));
         auto anchor_v = boost::math::gamma_q(a, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
 
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_q(make_fvar<T, m>(a), make_fvar<T, m>(z)),
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_p(make_fvar<T, m>(a), make_fvar<T, m>(z));
         auto anchor_v = boost::math::gamma_p(a, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
 
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_p(make_fvar<T, m>(a), make_fvar<T, m>(z)),
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_p_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
         auto anchor_v = boost::math::gamma_p_inv(a_normalized, z_normalized);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
 
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_p_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_q_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
         auto anchor_v = boost::math::gamma_q_inv(a_normalized, z_normalized);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_q_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
                             boost::wrapexcept<std::domain_error>);
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_p_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
         auto anchor_v = boost::math::gamma_p_inva(a_normalized, z_normalized);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_p_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
                             boost::wrapexcept<std::domain_error>);
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_q_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
         auto anchor_v = boost::math::gamma_q_inva(a_normalized, z_normalized);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(boost::math::gamma_q_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
                             boost::wrapexcept<std::domain_error>);
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       try {
         auto autodiff_v = boost::math::gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
         auto anchor_v = boost::math::gamma_p_derivative(a_normalized, z_normalized);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
       } catch (const std::domain_error &) {
         BOOST_REQUIRE_THROW(
             boost::math::gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized)),
@@ -1095,8 +1095,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v.real(), anchor_v.real(), 50 * 100 * std::numeric_limits<T>::epsilon());
-      BOOST_REQUIRE_CLOSE(autodiff_v.imag(), anchor_v.imag(), 50 * 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(autodiff_v.real(), anchor_v.real(), 500 * 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(autodiff_v.imag(), anchor_v.imag(), 500 * 100 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);
@@ -1114,7 +1114,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic_r(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_r(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);
@@ -1132,7 +1132,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
     try {
       auto autodiff_v = boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic_i(n, r, theta, phi);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 500 * 100 * std::numeric_limits<T>::epsilon());
     } catch (const std::domain_error &) {
       BOOST_REQUIRE_THROW(boost::math::spherical_harmonic_i(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi)),
                           boost::wrapexcept<std::domain_error>);

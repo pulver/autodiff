@@ -66,15 +66,21 @@ template <typename T> struct RandomSample {
       mp11::mp_if<is_multiprecision_t,
                   mp11::mp_if<is_integer_t, mp11::mp_if_c<numeric_limits_t::is_signed, int64_t, uint64_t>, long double>,
                   T>;
+  static_assert(std::numeric_limits<T>::is_integer || !std::numeric_limits<distribution_param_t>::is_integer,
+                "T and distribution_param_t must either both be integral or both be not integral");
+
   using dist_t = mp11::mp_if<is_integer_t, std::uniform_int_distribution<distribution_param_t>,
                              std::uniform_real_distribution<distribution_param_t>>;
+
   template <typename U, typename V>
   RandomSample(U start, V finish)
       : random_device_{},
         rng_(random_device_()),
         dist_(static_cast<distribution_param_t>(start),
-              ((std::nextafter))(static_cast<distribution_param_t>(finish),
-                                 ((std::numeric_limits<distribution_param_t>::max))())) {}
+              (std::numeric_limits<T>::is_integer
+                   ? static_cast<distribution_param_t>(finish)
+                   : ((std::nextafter))(static_cast<distribution_param_t>(finish),
+                                        ((std::numeric_limits<distribution_param_t>::max))()))) {}
 
   T next() noexcept { return T(dist_(rng_)); }
 

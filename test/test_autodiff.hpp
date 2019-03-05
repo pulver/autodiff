@@ -17,6 +17,7 @@
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
 
+#include <algorithm>
 #include <cfenv>
 #include <cstdlib>
 #include <random>

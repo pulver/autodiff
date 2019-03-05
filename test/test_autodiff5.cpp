@@ -5,9 +5,6 @@
 
 #include "test_autodiff.hpp"
 
-#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
-
 using namespace boost::math::differentiation;
 
 /*********************************************************************************************************************
@@ -26,7 +23,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
 
   test_detail::RandomSample<T> x_sampler(-100, 100);
   for (auto i : boost::irange(test_constants::n_samples)) {
-    const auto &x = x_sampler.next();
+    const auto& x = x_sampler.next();
     {
       auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai(x);
@@ -252,7 +249,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_));
       auto anchor_v = boost::math::sph_neumann<T>(i, v_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
-    } catch (const std::overflow_error &) {
+    } catch (const std::overflow_error&) {
       BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_)))),
                           boost::wrapexcept<std::overflow_error>);
       BOOST_REQUIRE_THROW(((boost::math::sph_neumann<T>(i, v_))), boost::wrapexcept<std::overflow_error>);
@@ -599,8 +596,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
     auto y = y_sampler.next();
     auto z = z_sampler.next();
 
-    if (1 < (boost::size(std::initializer_list<T>{x, y, z} |
-                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+    std::array<T, 3> params{x, y, z};
+    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
       x += 1;
       y += 1;
       z += 1;
@@ -650,8 +647,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
     auto y = y_sampler.next();
     auto z = z_sampler.next();
     auto p = (max)(p_sampler.next(), nextafter(T(0), ((std::numeric_limits<T>::max))()));
-    if (1 < (boost::size(std::initializer_list<T>{x, y, z} |
-                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+    std::array<T, 3> params{x, y, z};
+    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
       x += 1;
       y += 1;
       z += 1;
@@ -673,8 +670,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     auto z = z_sampler.next();
-    if (1 < (boost::size(std::initializer_list<T>{x, y} |
-                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+    std::array<T, 2> params{x, y};
+    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
       x += 1;
       y += 1;
     }

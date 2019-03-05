@@ -78,11 +78,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     auto autodiff_v = acosh(make_fvar<T, m>(x));
     auto anchor_v = acosh(x);
-    if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
-      BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
-    } else {
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
-    }
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
   }
 }
 
@@ -99,16 +95,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
 
     auto autodiff_v = asinh(make_fvar<T, m>(x));
     auto anchor_v = asinh(x);
-    if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
-      BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
-    } else {
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
-    }
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   BOOST_MATH_STD_USING;
+  using boost::math::nextafter;
+  using std::nextafter;
+
   using boost::math::atanh;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -116,15 +111,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   test_detail::RandomSample<T> x_sampler{-1, 1};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
+    auto x = nextafter(x_sampler.next(), T(0));
 
     auto autodiff_v = atanh(make_fvar<T, m>(x));
     auto anchor_v = atanh(x);
-    if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
-      BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
-    } else {
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
-    }
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1000 * 100 * boost::math::tools::epsilon<T>());
   }
 }
 
@@ -644,15 +635,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = y_sampler.next();
-    auto z = z_sampler.next();
+    auto y = (x == 0 ? 1 : 0) + y_sampler.next();
+    auto z = ((x == 0 || y == 0) ? 1 : 0) + z_sampler.next();
     auto p = (max)(p_sampler.next(), nextafter(T(0), ((std::numeric_limits<T>::max))()));
-    std::array<T, 3> params{x, y, z};
-    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
-      x += 1;
-      y += 1;
-      z += 1;
-    }
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
         boost::math::ellint_rj(x, y, z, p), 50 * test_constants::pct_epsilon());
@@ -668,13 +653,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = y_sampler.next();
+    auto y = (x == 0 ? 1 : 0) + y_sampler.next();
     auto z = z_sampler.next();
-    std::array<T, 2> params{x, y};
-    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
-      x += 1;
-      y += 1;
-    }
     BOOST_REQUIRE_CLOSE(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                         boost::math::ellint_rd(x, y, z), 50 * test_constants::pct_epsilon());
   }
@@ -696,12 +676,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
     auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
     auto y = nextafter(y_sampler.next(), ((std::numeric_limits<T>::max))());
     auto z = z_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::math::ellint_rg(x, y, z), 50 * test_constants::pct_epsilon());
-    } catch (...) {
-      std::cout << x << " " << y << " " << z << std::endl;
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
+                        boost::math::ellint_rg(x, y, z), 50 * test_constants::pct_epsilon());
   }
 }
 

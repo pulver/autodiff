@@ -149,21 +149,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
     {
       auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::bernoulli_b2n<T>(i);
-      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
-        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
-      } else {
-        BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
-      }
+      BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
     }
     {
       auto i_ = ((min))(19, i);
       auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
       auto anchor_v = boost::math::tangent_t2n<T>(i_);
-      if (!isfinite(static_cast<T>(autodiff_v)) || !isfinite(anchor_v)) {
-        BOOST_REQUIRE(!isfinite(static_cast<T>(autodiff_v)) && !isfinite(anchor_v));
-      } else {
-        BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
-      }
+      BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
     }
   }
 }
@@ -413,11 +405,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    if (boost::math::isinf(x) || x == 0) {
-      BOOST_REQUIRE_EQUAL(boost::math::cbrt(make_fvar<T, m>(x)), x);
-    } else {
-      BOOST_REQUIRE_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), test_constants::pct_epsilon());
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), test_constants::pct_epsilon());
   }
 }
 
@@ -575,6 +563,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
   using boost::math::tools::max;
   using std::max;
 
+  using boost::math::nextafter;
+  using std::nextafter;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -583,16 +574,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
   test_detail::RandomSample<T> z_sampler{0, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
-    auto y = y_sampler.next();
-    auto z = z_sampler.next();
+    auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
+    auto y = nextafter(y_sampler.next(), ((std::numeric_limits<T>::max))());
+    auto z = nextafter(z_sampler.next(), ((std::numeric_limits<T>::max))());
 
-    std::array<T, 3> params{x, y, z};
-    if (1 < std::count_if(params.cbegin(), params.cend(), [](const T& element) { return element == T(0); })) {
-      x += 1;
-      y += 1;
-      z += 1;
-    }
     BOOST_REQUIRE_CLOSE(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                         boost::math::ellint_rf(x, y, z), 50 * test_constants::pct_epsilon());
   }

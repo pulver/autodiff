@@ -180,9 +180,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 // TODO(kbhat): Something in here is very slow with boost::multiprecision
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   BOOST_MATH_STD_USING
+  using boost::math::nextafter;
   using boost::math::tools::max;
   using std::max;
-  using boost::math::nextafter;
   using std::nextafter;
 
   using test_constants = test_constants_t<T>;
@@ -237,68 +237,65 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
     }
 
-    {
-      {
-        auto v_ = abs(v);
-        auto autodiff_v = boost::math::sph_bessel<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_));
-        auto anchor_v = boost::math::sph_bessel<T>(i, v_);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
-      }
+    {{auto v_ = abs(v);
+    auto autodiff_v = boost::math::sph_bessel<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_));
+    auto anchor_v = boost::math::sph_bessel<T>(i, v_);
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+  }
 
-      {
-        auto v_ = (max)(abs(v), nextafter(abs(v), 2*(std::numeric_limits<T>::min)()));
-        try {
-          auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_));
-          auto anchor_v = boost::math::sph_neumann<T>(i, v_);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
-        } catch (const std::overflow_error &) {
-          BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_)))),
-                              boost::wrapexcept <std::overflow_error>);
-          BOOST_REQUIRE_THROW(((boost::math::sph_neumann<T>(i, v_))), boost::wrapexcept <std::overflow_error>);
-        }
-      }
-    }
-
-    {
-      auto autodiff_v = boost::math::cyl_bessel_i_prime(make_fvar<T, m>(v), make_fvar<T, m>(x));
-      auto anchor_v = boost::math::cyl_bessel_i_prime(v, x);
+  {
+    auto v_ = (max)(abs(v), nextafter(abs(v), 2 * (std::numeric_limits<T>::min)()));
+    try {
+      auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_));
+      auto anchor_v = boost::math::sph_neumann<T>(i, v_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
-    }
-
-    {
-      auto x_j = abs(x) + 1;
-      auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
-      auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
-    }
-
-    {
-      auto x_k = abs(x) + 1;
-      auto autodiff_v = boost::math::cyl_bessel_k_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
-      auto anchor_v = boost::math::cyl_bessel_k_prime(v, x_k);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
-
-    }
-
-    {
-      auto x_neumann = abs(x);
-      auto autodiff_v = boost::math::cyl_neumann_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
-      auto anchor_v = boost::math::cyl_neumann_prime(v, x_neumann);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
-    }
-
-    {
-      auto autodiff_v = boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(abs(v) + 1));
-      auto anchor_v = boost::math::sph_bessel_prime<T>(i, abs(v) + 1);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
-    }
-
-    {
-      auto autodiff_v = boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(abs(v) + 1));
-      auto anchor_v = boost::math::sph_neumann_prime<T>(i, abs(v) + 1);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+    } catch (const std::overflow_error &) {
+      BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(i, make_fvar<T, m>(v_)))),
+                          boost::wrapexcept<std::overflow_error>);
+      BOOST_REQUIRE_THROW(((boost::math::sph_neumann<T>(i, v_))), boost::wrapexcept<std::overflow_error>);
     }
   }
+}
+
+{
+  auto autodiff_v = boost::math::cyl_bessel_i_prime(make_fvar<T, m>(v), make_fvar<T, m>(x));
+  auto anchor_v = boost::math::cyl_bessel_i_prime(v, x);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+
+{
+  auto x_j = abs(x) + 1;
+  auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
+  auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+
+{
+  auto x_k = abs(x) + 1;
+  auto autodiff_v = boost::math::cyl_bessel_k_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
+  auto anchor_v = boost::math::cyl_bessel_k_prime(v, x_k);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+
+{
+  auto x_neumann = abs(x);
+  auto autodiff_v = boost::math::cyl_neumann_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
+  auto anchor_v = boost::math::cyl_neumann_prime(v, x_neumann);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+
+{
+  auto autodiff_v = boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(abs(v) + 1));
+  auto anchor_v = boost::math::sph_bessel_prime<T>(i, abs(v) + 1);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+
+{
+  auto autodiff_v = boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(i, make_fvar<T, m>(abs(v) + 1));
+  auto anchor_v = boost::math::sph_neumann_prime<T>(i, abs(v) + 1);
+  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+}
+}
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
@@ -318,13 +315,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       {
         auto autodiff_v = boost::math::beta(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::beta(a_, b_, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto autodiff_v = boost::math::betac(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::betac(a_, b_, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
@@ -333,13 +330,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         {
           auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
           auto autodiff_v = boost::math::ibetac(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
       }
 
@@ -348,7 +345,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         auto b_ = abs(b);
         auto autodiff_v = boost::math::ibeta_derivative(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::ibeta_derivative(a_, b_, z);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
@@ -357,41 +354,41 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         {
           auto autodiff_v = boost::math::ibeta_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
           auto autodiff_v = boost::math::ibetac_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
       }
 
       {
         auto a_ = abs(a) + 1;
-        auto b_ = abs(b)/(((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
+        auto b_ = abs(b) / (((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
         {
           auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inva(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
           auto autodiff_v = boost::math::ibetac_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_inva(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
           auto autodiff_v = boost::math::ibeta_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_invb(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
           auto autodiff_v = boost::math::ibetac_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_invb(a_, b_, z);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000*100*boost::math::tools::epsilon<T>());
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * boost::math::tools::epsilon<T>());
         }
       }
     }
@@ -407,26 +404,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
-    auto r = (std::min)(r_sampler.next(), n - 1);
-    try {
-      auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
-      auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-      if (isfinite(static_cast<T>(autodiff_v)) && isfinite(anchor_v)) {
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
-      } else {
-        BOOST_REQUIRE(!(isfinite(static_cast<T>(autodiff_v)) || isfinite(anchor_v)));
-      }
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r))),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::binomial_coefficient<T>(n, r), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(((boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r))),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::binomial_coefficient<T>(n, r), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: n: " << n << "  r: " << r << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    auto r = n == 0 ? 0 : (std::min)(r_sampler.next(), n - 1);
+    auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
+    auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
+    if (isfinite(static_cast<T>(autodiff_v)) && isfinite(anchor_v)) {
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
+    } else {
+      BOOST_REQUIRE(!(isfinite(static_cast<T>(autodiff_v)) || isfinite(anchor_v)));
     }
   }
 }
@@ -438,21 +422,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    try {
-      if (boost::math::isinf(x) || x == 0) {
-        BOOST_REQUIRE_EQUAL(boost::math::cbrt(make_fvar<T, m>(x)), x);
-      } else {
-        BOOST_REQUIRE_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), test_constants::pct_epsilon());
-      }
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::cbrt(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::cbrt(x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::cbrt(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::cbrt(x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    if (boost::math::isinf(x) || x == 0) {
+      BOOST_REQUIRE_EQUAL(boost::math::cbrt(make_fvar<T, m>(x)), x);
+    } else {
+      BOOST_REQUIRE_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)), boost::math::cbrt(x), test_constants::pct_epsilon());
     }
   }
 }
@@ -467,24 +440,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
     T t_1 = x;
     for (auto i : boost::irange(test_constants::n_samples)) {
       std::ignore = i;
-      try {
-        std::swap(t_0, t_1);
-        auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
-        BOOST_REQUIRE_EQUAL(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            tmp);
-        t_1 = tmp;
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Input: x: " << x << "  t_0: " << t_0 << "  t_1: " << t_1 << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
+      std::swap(t_0, t_1);
+      auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
+      BOOST_REQUIRE_EQUAL(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
+                          tmp);
+      t_1 = tmp;
     }
   }
   {
@@ -494,49 +454,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       std::ignore = i;
       auto n = n_sampler.next();
       auto x = x_sampler.next();
-      try {
-        BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::math::chebyshev_t(n, x),
-                            4000*boost::math::tools::epsilon<T>());
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t(n, x), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t(n, x), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Inputs: n: " << n << "  x: " << x << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
+      BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::math::chebyshev_t(n, x),
+                          4000*boost::math::tools::epsilon<T>());
 
-      try {
-        BOOST_REQUIRE_CLOSE(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::math::chebyshev_u(n, x),
-                            4000*boost::math::tools::epsilon<T>());
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_u(n, x), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_u(n, x), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Inputs: n: " << n << "  x: " << x << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
+      BOOST_REQUIRE_CLOSE(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::math::chebyshev_u(n, x),
+                          4000*boost::math::tools::epsilon<T>());
 
-      try {
-        BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)), boost::math::chebyshev_t_prime(n, x),
-                            4000*boost::math::tools::epsilon<T>());
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)),
-                            boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t_prime(n, x), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)),
-                            boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_t_prime(n, x), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Inputs: n: " << n << "  x: " << x << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
+      BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)), boost::math::chebyshev_t_prime(n, x),
+                          4000*boost::math::tools::epsilon<T>());
 
       // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error:
       // cannot convert
@@ -566,7 +491,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-      BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)), boost::math::cos_pi(x), 100 * std::numeric_limits<T>::epsilon());
+      BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)), boost::math::cos_pi(x),
+          100 * std::numeric_limits<T>::epsilon());
     } catch (const boost::math::rounding_error &) {
       BOOST_REQUIRE_THROW(boost::math::cos_pi(make_fvar<T, m>(x)), boost::wrapexcept<boost::math::rounding_error>);
       BOOST_REQUIRE_THROW(boost::math::cos_pi(x), boost::wrapexcept<boost::math::rounding_error>);
@@ -584,20 +510,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    try {
-      auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::digamma(x);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::digamma(make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::digamma(x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::digamma(make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::digamma(x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
+    auto anchor_v = boost::math::digamma(x);
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * std::numeric_limits<T>::epsilon());
   }
 }
 

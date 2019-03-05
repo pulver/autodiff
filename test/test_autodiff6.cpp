@@ -458,22 +458,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-200, 200};
-  for (auto i : boost::irange(test_constants::n_samples)) {
+  for (auto i : boost::irange(14)) {
     auto x = x_sampler.next();
-    try {
-      auto autodiff_v = boost::math::hermite(i, make_fvar<T, m>(x));
-      auto anchor_v = boost::math::hermite(i, x);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 100 * std::numeric_limits<T>::epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::hermite(i, x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << std::setprecision(20) << "Input i: " << i << " x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    auto autodiff_v = boost::math::hermite(i, make_fvar<T, m>(x));
+    auto anchor_v = boost::math::hermite(i, x);
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 100 * std::numeric_limits<T>::epsilon());
   }
 }
 

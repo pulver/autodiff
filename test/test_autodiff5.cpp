@@ -5,6 +5,9 @@
 
 #include "test_autodiff.hpp"
 
+#include <boost/range/adaptors.hpp>
+#include <boost/range/algorithm.hpp>
+
 using namespace boost::math::differentiation;
 
 /*********************************************************************************************************************
@@ -455,13 +458,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       auto n = n_sampler.next();
       auto x = x_sampler.next();
       BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t(n, make_fvar<T, m>(x)), boost::math::chebyshev_t(n, x),
-                          4000*boost::math::tools::epsilon<T>());
+                          4000 * boost::math::tools::epsilon<T>());
 
       BOOST_REQUIRE_CLOSE(boost::math::chebyshev_u(n, make_fvar<T, m>(x)), boost::math::chebyshev_u(n, x),
-                          4000*boost::math::tools::epsilon<T>());
+                          4000 * boost::math::tools::epsilon<T>());
 
       BOOST_REQUIRE_CLOSE(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)), boost::math::chebyshev_t_prime(n, x),
-                          4000*boost::math::tools::epsilon<T>());
+                          4000 * boost::math::tools::epsilon<T>());
 
       // /usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error:
       // cannot convert
@@ -478,7 +481,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       c0.size(), x), 10*boost::math::tools::epsilon<T>()); } catch (...) {
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }*/
-
     }
   }
 }
@@ -490,16 +492,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)), boost::math::cos_pi(x),
-          100 * std::numeric_limits<T>::epsilon());
-    } catch (const boost::math::rounding_error &) {
-      BOOST_REQUIRE_THROW(boost::math::cos_pi(make_fvar<T, m>(x)), boost::wrapexcept<boost::math::rounding_error>);
-      BOOST_REQUIRE_THROW(boost::math::cos_pi(x), boost::wrapexcept<boost::math::rounding_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)), boost::math::cos_pi(x),
+                        100 * std::numeric_limits<T>::epsilon());
   }
 }
 
@@ -519,176 +513,135 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
+  test_detail::RandomSample<T> k_sampler{-1, 1};
   test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_1(make_fvar<T, m>(k)), boost::math::ellint_1(k),
-                          50 * test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                          boost::math::ellint_1(k, phi), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_1(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_1(k), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_1(make_fvar<T, m>(k)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_1(k), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: k: " << k << "  phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_1(make_fvar<T, m>(k)), boost::math::ellint_1(k),
+                        50 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)), boost::math::ellint_1(k, phi),
+                        50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
+  test_detail::RandomSample<T> k_sampler{-1, 1};
   test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_2(make_fvar<T, m>(k)), boost::math::ellint_2(k),
-                          50 * test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                          boost::math::ellint_2(k, phi), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_2(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_2(k), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_2(make_fvar<T, m>(k)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_2(k), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: k: " << k << "  phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_2(make_fvar<T, m>(k)), boost::math::ellint_2(k),
+                        50 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)), boost::math::ellint_2(k, phi),
+                        50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+
+  using boost::math::nextafter;
+  using std::nextafter;
+
+  using boost::multiprecision::min;
+  using std::min;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-1.2, 1.2};
+  test_detail::RandomSample<T> k_sampler{-1, 1};
   test_detail::RandomSample<T> n_sampler{-2000, 2000};
   test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
-    auto n = n_sampler.next();
     auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)), boost::math::ellint_3(k, n),
-                          50 * test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n), make_fvar<T, m>(phi)),
-                          boost::math::ellint_3(k, n, phi), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(k, n), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n)),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_3(k, n), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Inputs: k: " << k << "  n: " << n << "  phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    auto n = ((min))(((min))(n_sampler.next(), 1 / (sin(phi) * sin(phi))), nextafter(T(1), T(0)));
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n), make_fvar<T, m>(phi)),
+                        boost::math::ellint_3(k, n, phi), 50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-1.20, 1.20};
+  test_detail::RandomSample<T> k_sampler{-1, 1};
   test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_d(make_fvar<T, m>(k)), boost::math::ellint_d(k),
-                          50 * test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-                          boost::math::ellint_d(k, phi), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(k)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(k), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(make_fvar<T, m>(k)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_d(k), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Inputs: k: " << k << "  phi: " << phi << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_d(make_fvar<T, m>(k)), boost::math::ellint_d(k),
+                        50 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)), boost::math::ellint_d(k, phi),
+                        50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::math::tools::max;
+  using std::max;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
-  test_detail::RandomSample<T> z_sampler{-2000, 2000};
+
+  test_detail::RandomSample<T> x_sampler{0, 2000};
+  test_detail::RandomSample<T> y_sampler{0, 2000};
+  test_detail::RandomSample<T> z_sampler{0, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     auto z = z_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::math::ellint_rf(x, y, z), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rf(x, y, z), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rf(x, y, z), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cerr << "Inputs: x: " << x << "  y: " << y << "  z: " << z << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+
+    if (1 < (boost::size(std::initializer_list<T>{x, y, z} |
+                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+      x += 1;
+      y += 1;
+      z += 1;
     }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
+                        boost::math::ellint_rf(x, y, z), 50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::math::nextafter;
+  using boost::math::tools::max;
+  using std::max;
+  using std::nextafter;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{0, 2000};
+  test_detail::RandomSample<T> y_sampler{0, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = y_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)), boost::math::ellint_rc(x, y),
-                          50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rc(x, y), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rc(x, y), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cerr << "Inputs: x: " << x << "  y: " << y << std::endl;
-    }
+    auto y = (max)(y_sampler.next(), nextafter(T(0), ((std::numeric_limits<T>::max))()));
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)), boost::math::ellint_rc(x, y),
+                        50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::math::nextafter;
+  using boost::math::tools::max;
+  using std::max;
+  using std::nextafter;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
-  test_detail::RandomSample<T> z_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{0, 2000};
+  test_detail::RandomSample<T> y_sampler{0, 2000};
+  test_detail::RandomSample<T> z_sampler{0, 2000};
   test_detail::RandomSample<T> p_sampler{-2000, 2000};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
@@ -696,83 +649,61 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     auto z = z_sampler.next();
-    auto p = p_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(
-          boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
-          boost::math::ellint_rj(x, y, z, p), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &e) {
-      BOOST_REQUIRE_THROW(
-          boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
-          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rj(x, y, z, p), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &e) {
-      BOOST_REQUIRE_THROW(
-          boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
-          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rj(x, y, z, p), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << "  y: " << y << "  z: " << z << "  p: " << p << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    auto p = (max)(p_sampler.next(), nextafter(T(0), ((std::numeric_limits<T>::max))()));
+    if (1 < (boost::size(std::initializer_list<T>{x, y, z} |
+                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+      x += 1;
+      y += 1;
+      z += 1;
     }
+    BOOST_REQUIRE_CLOSE(
+        boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z), make_fvar<T, m>(p)),
+        boost::math::ellint_rj(x, y, z, p), 50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
-  test_detail::RandomSample<T> z_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{0, 2000};
+  test_detail::RandomSample<T> y_sampler{0, 2000};
+  test_detail::RandomSample<T> z_sampler{0, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     auto z = z_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::math::ellint_rd(x, y, z), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rd(x, y, z), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rd(x, y, z), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << "  y: " << y << "  z: " << z << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    if (1 < (boost::size(std::initializer_list<T>{x, y} |
+                         boost::adaptors::filtered([](const T &var) { return var == T(0); })))) {
+      x += 1;
+      y += 1;
     }
+    BOOST_REQUIRE_CLOSE(boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
+                        boost::math::ellint_rd(x, y, z), 50 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::math::nextafter;
+  using std::nextafter;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
-  test_detail::RandomSample<T> z_sampler{-2000, 2000};
+  test_detail::RandomSample<T> x_sampler{0, 2000};
+  test_detail::RandomSample<T> y_sampler{0, 2000};
+  test_detail::RandomSample<T> z_sampler{0, 2000};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
-    auto x = x_sampler.next();
-    auto y = y_sampler.next();
+    auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
+    auto y = nextafter(y_sampler.next(), ((std::numeric_limits<T>::max))());
     auto z = z_sampler.next();
     try {
       BOOST_REQUIRE_CLOSE(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
                           boost::math::ellint_rg(x, y, z), 50 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rg(x, y, z), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y), make_fvar<T, m>(z)),
-                          boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::ellint_rg(x, y, z), boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      std::cout << "Input: x: " << x << "  y: " << y << "  z: " << z << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      std::cout << x << " " << y << " " << z << std::endl;
     }
   }
 }
@@ -784,72 +715,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(erf(make_fvar<T, m>(x)), boost::math::erf(x), 200 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((erf(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
-      BOOST_REQUIRE_THROW(boost::math::erf(x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((erf(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      BOOST_REQUIRE_THROW(boost::math::erf(x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
 
-    try {
-      BOOST_REQUIRE_CLOSE(erfc(make_fvar<T, m>(x)), boost::math::erfc(x), 200 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((erfc(make_fvar<T, m>(x)), std::fetestexcept(FE_INVALID)));
-      BOOST_REQUIRE_THROW(boost::math::erfc(x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      std::feclearexcept(FE_ALL_EXCEPT);
-      BOOST_REQUIRE((erfc(make_fvar<T, m>(x)), std::fetestexcept(FE_OVERFLOW)));
-      BOOST_REQUIRE_THROW(boost::math::erfc(x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(erf(make_fvar<T, m>(x)), boost::math::erf(x), 200 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(erfc(make_fvar<T, m>(x)), boost::math::erfc(x), 200 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{1, 500};
-  for (auto n : boost::irange<unsigned>(test_constants::n_samples)) {
+  test_detail::RandomSample<T> x_sampler{1, 83};
+  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples)) {
     auto x = x_sampler.next();
-    try {
-      BOOST_REQUIRE_CLOSE(boost::math::expint(n, make_fvar<T, m>(x)), boost::math::expint(n, x),
-                          200 * test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_REQUIRE_THROW(boost::math::expint(n, make_fvar<T, m>(x)), boost::wrapexcept<std::domain_error>);
-      BOOST_REQUIRE_THROW(boost::math::expint(n, x), boost::wrapexcept<std::domain_error>);
-    } catch (const std::overflow_error &) {
-      BOOST_REQUIRE_THROW(boost::math::expint(n, make_fvar<T, m>(x)), boost::wrapexcept<std::overflow_error>);
-      BOOST_REQUIRE_THROW(boost::math::expint(n, x), boost::wrapexcept<std::overflow_error>);
-    } catch (...) {
-      std::cout << "Input: n: " << n << " x: " << x << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::expint(n, make_fvar<T, m>(x)), boost::math::expint(n, x),
+                        200 * test_constants::pct_epsilon());
 
     for (auto y : {-1, 1}) {
-      try {
-        BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x * y)), boost::math::expint(x * y),
-                            200 * test_constants::pct_epsilon());
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x * y)), boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::expint(x * y), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::expint(make_fvar<T, m>(x * y)), boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::expint(x * y), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Input: x: " << x << " y: " << y << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
+      BOOST_REQUIRE_CLOSE(boost::math::expint(make_fvar<T, m>(x * y)), boost::math::expint(x * y),
+                          200 * test_constants::pct_epsilon());
     }
   }
 }

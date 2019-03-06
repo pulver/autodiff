@@ -487,7 +487,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, all_float_types) {
     auto a = a_sampler.next();
     auto autodiff_v = boost::math::owens_t(make_fvar<T, m>(h), make_fvar<T, m>(a));
     auto anchor_v = boost::math::owens_t(h, a);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 20 * 100 * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * std::numeric_limits<T>::epsilon());
   }
 }
 

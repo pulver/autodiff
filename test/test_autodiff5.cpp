@@ -471,8 +471,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
   BOOST_MATH_STD_USING
-  using std::nextafter;
   using boost::math::nextafter;
+  using std::nextafter;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

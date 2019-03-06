@@ -8,10 +8,10 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types) {
+  using boost::math::lltrunc;
   using std::llround;
   using std::lround;
   using std::truncl;
-  using boost::math::lltrunc;
 
   constexpr int m = 3;
   const T cx = 3.25;

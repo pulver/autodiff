@@ -545,16 +545,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::multiprecision::min;
+  using std::min;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<unsigned> n_sampler{0, 50};
+  test_detail::RandomSample<unsigned> n_sampler{1, 50};
   test_detail::RandomSample<unsigned> r_sampler{0, 50};
-  test_detail::RandomSample<T> x_sampler{-50, 50};
+  test_detail::RandomSample<T> x_sampler{0, 50};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
-    auto r = (std::min)(n - 1, r_sampler.next());
+    auto r = ((min))(n - 1, r_sampler.next());
     auto x = x_sampler.next();
 
     {

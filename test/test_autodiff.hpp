@@ -145,9 +145,6 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp, double K, con
                                                             const Tau& tau, const Rate& r) {
   const auto d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   const auto d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
-  static_assert(std::is_same<decltype(S * Phi(d1) - exp(-r * tau) * K * Phi(d2)),
-                             decltype(exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1))>::value,
-                "decltype(call) != decltype(put)");
   if (cp == CP::call) {
     return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
   }

@@ -54,20 +54,29 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
   BOOST_REQUIRE(z0.derivative(5) == 0.0);
   auto z1 = pow(cx, y);
   BOOST_REQUIRE_CLOSE(z1.derivative(0, 0), pow(cx, cy), eps);
-  for (int j = 1; j <= n; ++j) BOOST_REQUIRE_CLOSE(z1.derivative(0, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
-  for (int i = 1; i <= m; ++i)
-    for (int j = 0; j <= n; ++j) BOOST_REQUIRE(z1.derivative(i, j) == 0.0);
+  for (int j = 1; j <= n; ++j) {
+    BOOST_REQUIRE_CLOSE(z1.derivative(0, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
+  }
+  for (int i = 1; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      BOOST_REQUIRE(z1.derivative(i, j) == 0.0);
+    }
+  }
   auto z2 = pow(x, y);
-  for (int j = 0; j <= n; ++j) BOOST_REQUIRE_CLOSE(z2.derivative(0, j), pow(cx, cy) * pow(log(cx), j), eps);
-  for (int j = 0; j <= n; ++j)
+  for (int j = 0; j <= n; ++j) {
+    BOOST_REQUIRE_CLOSE(z2.derivative(0, j), pow(cx, cy) * pow(log(cx), j), eps);
+  }
+  for (int j = 0; j <= n; ++j) {
     BOOST_REQUIRE_CLOSE(z2.derivative(1, j), pow(cx, cy - 1) * pow(log(cx), j - 1) * (cy * log(cx) + j), eps);
+  }
   BOOST_REQUIRE_CLOSE(z2.derivative(2, 0), pow(cx, cy - 2) * cy * (cy - 1), eps);
   BOOST_REQUIRE_CLOSE(z2.derivative(2, 1), pow(cx, cy - 2) * (cy * (cy - 1) * log(cx) + 2 * cy - 1), eps);
-  for (int j = 2; j <= n; ++j)
+  for (int j = 2; j <= n; ++j) {
     BOOST_REQUIRE_CLOSE(z2.derivative(2, j),
                         pow(cx, cy - 2) * pow(log(cx), j - 2) *
                             (j * (2 * cy - 1) * log(cx) + (j - 1) * j + (cy - 1) * cy * pow(log(cx), 2)),
                         eps);
+  }
   BOOST_REQUIRE_CLOSE(
       z2.derivative(2, 4),
       pow(cx, cy - 2) * pow(log(cx), 2) * (4 * (2 * cy - 1) * log(cx) + (4 - 1) * 4 + (cy - 1) * cy * pow(log(cx), 2)),
@@ -93,7 +102,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, all_float_types) {
   y = sqrt(x);
   // std::cout << "sqrt(0) = " << y << std::endl; // (0,inf,-inf,inf,-inf,inf)
   BOOST_REQUIRE(y.derivative(0) == 0.0);
-  for (int i = 1; i <= m; ++i) BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
+  for (int i = 1; i <= m; ++i) {
+    BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, all_float_types) {
@@ -113,7 +124,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, all_float_types) {
   y = log(x);
   // std::cout << "log(0) = " << y << std::endl; // log(0) =
   // depth(1)(-inf,inf,-inf,inf,-inf,inf)
-  for (int i = 0; i <= m; ++i) BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
+  for (int i = 0; i <= m; ++i) {
+    BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
@@ -132,12 +145,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
   BOOST_REQUIRE(z.derivative(0, 2) == 0.0);
   BOOST_REQUIRE(z.derivative(0, 3) == 0.0);
   BOOST_REQUIRE(z.derivative(0, 4) == 0.0);
-  for (size_t i = 1; i <= m; ++i)
+  for (auto i : boost::irange<unsigned>(1, m+1)) {
     BOOST_REQUIRE_CLOSE(z.derivative(i, 0), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) * cy / pow(cx, i), eps);
-  for (size_t i = 1; i <= m; ++i)
     BOOST_REQUIRE_CLOSE(z.derivative(i, 1), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) / pow(cx, i), eps);
-  for (size_t i = 1; i <= m; ++i)
-    for (size_t j = 2; j <= n; ++j) BOOST_REQUIRE(z.derivative(i, j) == 0.0);
+    for (size_t j = 2; j <= n; ++j) {
+      BOOST_REQUIRE(z.derivative(i, j) == 0.0);
+    }
+  }
   auto z1 = exp(z);
   // RHS is confirmed by
   // https://www.wolframalpha.com/input/?i=D%5Bx%5Ey,%7Bx,2%7D,%7By,4%7D%5D+%2F.+%7Bx-%3E2.0,+y-%3E3.0%7D

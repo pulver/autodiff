@@ -12,39 +12,53 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructors, T, all_float_types) {
   constexpr int n = 4;
   // Verify value-initialized instance has all 0 entries.
   const autodiff_fvar<T, m> empty1 = autodiff_fvar<T, m>();
-  for (int i = 0; i <= m; ++i) BOOST_REQUIRE(empty1.derivative(i) == 0.0);
+  for (int i = 0; i <= m; ++i) {
+    {
+    BOOST_REQUIRE(empty1.derivative(i)==0.0);
+    }
+  }
   const auto empty2 = autodiff_fvar<T, m, n>();
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j) BOOST_REQUIRE(empty2.derivative(i, j) == 0.0);
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      BOOST_REQUIRE(empty2.derivative(i, j) == 0.0);
+    }
+  }
   // Single variable
   constexpr float cx = 10.0;
   const auto x = make_fvar<T, m>(cx);
-  for (int i = 0; i <= m; ++i)
-    if (i == 0)
+  for (int i = 0; i <= m; ++i) {
+    if (i == 0) {
       BOOST_REQUIRE(x.derivative(i) == cx);
-    else if (i == 1)
+    } else if (i == 1) {
       BOOST_REQUIRE(x.derivative(i) == 1.0);
-    else
+    } else {
       BOOST_REQUIRE(x.derivative(i) == 0.0);
+    }
+  }
   const autodiff_fvar<T, n> xn = x;
-  for (int i = 0; i <= n; ++i)
-    if (i == 0)
+  for (int i = 0; i <= n; ++i) {
+    if (i == 0) {
       BOOST_REQUIRE(xn.derivative(i) == cx);
-    else if (i == 1)
+    } else if (i == 1) {
       BOOST_REQUIRE(xn.derivative(i) == 1.0);
-    else
+    } else {
       BOOST_REQUIRE(xn.derivative(i) == 0.0);
+    }
+  }
   // Second independent variable
   constexpr float cy = 100.0;
   const auto y = make_fvar<T, m, n>(cy);
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(y.derivative(i, j) == cy);
-      else if (i == 0 && j == 1)
+      } else if (i == 0 && j == 1) {
         BOOST_REQUIRE(y.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(y.derivative(i, j) == 0.0);
+      }
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(implicit_constructors, T, all_float_types) {
@@ -68,31 +82,40 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, all_float_types)
   // Single variable
   auto x = make_fvar<T, m>(cx);
   empty = static_cast<decltype(empty)>(x);  // Test static_cast of single-variable to double-variable type.
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(empty.derivative(i, j) == cx);
-      else if (i == 1 && j == 0)
+      } else if (i == 1 && j == 0) {
         BOOST_REQUIRE(empty.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(empty.derivative(i, j) == 0.0);
+      }
+    }
+  }
   auto y = make_fvar<T, m, n>(cy);
   empty = y;  // default assignment operator
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(empty.derivative(i, j) == cy);
-      else if (i == 0 && j == 1)
+      } else if (i == 0 && j == 1) {
         BOOST_REQUIRE(empty.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(empty.derivative(i, j) == 0.0);
+      }
+    }
+    }
   empty = cx;  // set a constant
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(empty.derivative(i, j) == cx);
-      else
+      } else {
         BOOST_REQUIRE(empty.derivative(i, j) == 0.0);
+      }
+    }
+    }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ostream, T, all_float_types)
@@ -114,24 +137,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, all_float_types) {
   // Single variable
   const auto x = make_fvar<T, m>(cx);
   sum += x;
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == cx);
-      else if (i == 1 && j == 0)
+      } else if (i == 1 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(sum.derivative(i, j) == 0.0);
+      }
+    }
+    }
   // Arithmetic constant
   constexpr float cy = 11.0;
   sum = 0;
   sum += cy;
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == cy);
-      else
+      } else {
         BOOST_REQUIRE(sum.derivative(i, j) == 0.0);
+      }
+    }
+    }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, all_float_types) {
@@ -142,24 +171,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, all_float_types) {
   // Single variable
   const auto x = make_fvar<T, m>(cx);
   sum -= x;
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == -cx);
-      else if (i == 1 && j == 0)
+      } else if (i == 1 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == -1.0);
-      else
+      } else {
         BOOST_REQUIRE(sum.derivative(i, j) == 0.0);
+      }
+    }
+    }
   // Arithmetic constant
   constexpr float cy = 11.0;
   sum = 0;
   sum -= cy;
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(sum.derivative(i, j) == -cy);
-      else
+      } else {
         BOOST_REQUIRE(sum.derivative(i, j) == 0.0);
+      }
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiplication_assignment, T, all_float_types) {
@@ -225,18 +260,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division_assignment, T, all_float_types) {
   BOOST_REQUIRE(quotient.derivative(1, 0) == -1 / std::pow(cx, 2));
   BOOST_REQUIRE(quotient.derivative(2, 0) == 2 / std::pow(cx, 3));
   BOOST_REQUIRE(quotient.derivative(3, 0) == -6 / std::pow(cx, 4));
-  for (int i = 0; i <= m; ++i)
-    for (int j = 1; j <= n; ++j) BOOST_REQUIRE(quotient.derivative(i, j) == 0.0);
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 1; j <= n; ++j) {
+      BOOST_REQUIRE(quotient.derivative(i, j) == 0.0);
+    }
+  }
   // Arithmetic constant
   constexpr float cy = 32.0;
   quotient = 1;
   quotient /= cy;
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(quotient.derivative(i, j) == 1 / cy);
-      else
+      } else {
         BOOST_REQUIRE(quotient.derivative(i, j) == 0.0);
+      }
+    }
+    }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, all_float_types) {
@@ -247,23 +288,29 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, all_float_types) {
   // Single variable
   const auto x = make_fvar<T, m>(cx);
   lhs = static_cast<decltype(lhs)>(-x);
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(lhs.derivative(i, j) == -cx);
-      else if (i == 1 && j == 0)
+      } else if (i == 1 && j == 0) {
         BOOST_REQUIRE(lhs.derivative(i, j) == -1.0);
-      else
+      } else {
         BOOST_REQUIRE(lhs.derivative(i, j) == 0.0);
+      }
+    }
+  }
   lhs = static_cast<decltype(lhs)>(+x);
-  for (int i = 0; i <= m; ++i)
-    for (int j = 0; j <= n; ++j)
-      if (i == 0 && j == 0)
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      if (i == 0 && j == 0) {
         BOOST_REQUIRE(lhs.derivative(i, j) == cx);
-      else if (i == 1 && j == 0)
+      } else if (i == 1 && j == 0) {
         BOOST_REQUIRE(lhs.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(lhs.derivative(i, j) == 0.0);
+      }
+    }
+  }
 }
 
 // TODO 3 tests for 3 operator+() definitions.
@@ -298,7 +345,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(scalar_addition, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, all_float_types) {
-  constexpr int n = 8;
+  constexpr unsigned n = 8u;
   constexpr float ca = 3.0;
   auto x = make_fvar<T, n>(ca);
   // Test operator*=()
@@ -306,16 +353,18 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(power8, T, all_float_types) {
   x *= x;
   x *= x;
   const T power_factorial = boost::math::factorial<T>(n);
-  for (int i = 0; i <= n; ++i)
+  for (auto i : boost::irange<unsigned>(n + 1)) {
     BOOST_REQUIRE_CLOSE(static_cast<T>(x.derivative(i)),
                         static_cast<T>(power_factorial / boost::math::factorial<T>(n - i) * pow(ca, n - i)),
                         std::numeric_limits<T>::epsilon());
+  }
   x = make_fvar<T, n>(ca);
   // Test operator*()
   x = x * x * x * x * x * x * x * x;
-  for (int i = 0; i <= n; ++i)
+  for (auto i : boost::irange<unsigned>(n + 1)) {
     BOOST_REQUIRE_CLOSE(x.derivative(i), power_factorial / boost::math::factorial<T>(n - i) * pow(ca, n - i),
                         std::numeric_limits<T>::epsilon());
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(dim1_multiplication, T, all_float_types) {
@@ -348,12 +397,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(dim1and2_multiplication, T, all_float_types) {
   BOOST_REQUIRE(y.derivative(0, 1) == cx);
   BOOST_REQUIRE(y.derivative(1, 0) == cy);
   BOOST_REQUIRE(y.derivative(1, 1) == 1.0);
-  for (int i = 1; i < m; ++i)
-    for (int j = 1; j < n; ++j)
-      if (i == 1 && j == 1)
+  for (int i = 1; i < m; ++i) {
+    for (int j = 1; j < n; ++j) {
+      if (i == 1 && j == 1) {
         BOOST_REQUIRE(y.derivative(i, j) == 1.0);
-      else
+      } else {
         BOOST_REQUIRE(y.derivative(i, j) == 0.0);
+      }
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_addition, T, all_float_types) {
@@ -430,8 +482,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(dim2_multiplication_and_subtraction, T, all_float_
   BOOST_REQUIRE(z.derivative(0, 4) == 0.0);
   BOOST_REQUIRE(z.derivative(1, 0) == 2 * cx);
   BOOST_REQUIRE(z.derivative(2, 0) == 2.0);
-  for (int i = 1; i <= m; ++i)
-    for (int j = 1; j <= n; ++j) BOOST_REQUIRE(z.derivative(i, j) == 0.0);
+  for (int i = 1; i <= m; ++i) {
+    for (int j = 1; j <= n; ++j) {
+      BOOST_REQUIRE(z.derivative(i, j) == 0.0);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, all_float_types) {
@@ -445,8 +500,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, all_float_types) {
   BOOST_REQUIRE(xinv.derivative(3) == -6 / std::pow(cx, 4));
   const auto zero = make_fvar<T, m>(0);
   const auto inf = zero.inverse();
-  for (int i = 0; i <= m; ++i)
+  for (int i = 0; i <= m; ++i) {
     BOOST_REQUIRE(inf.derivative(i) == (i & 1 ? -1 : 1) * std::numeric_limits<T>::infinity());
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
@@ -472,7 +528,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
   BOOST_REQUIRE(z.derivative(2, 2) == 2 * (6) * std::pow(cy, -4));
   BOOST_REQUIRE(z.derivative(2, 3) == 2 * (-24) * std::pow(cy, -5));
   BOOST_REQUIRE(z.derivative(2, 4) == 2 * (120) * std::pow(cy, -6));
-  for (int j = 0; j <= n; ++j) BOOST_REQUIRE(z.derivative(3, j) == 0.0);
+  for (int j = 0; j <= n; ++j) {
+    BOOST_REQUIRE(z.derivative(3, j) == 0.0);
+  }
 
   auto x1 = make_fvar<T, m>(cx);
   auto z1 = x1 / cy;
@@ -487,8 +545,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
   BOOST_REQUIRE(z2.derivative(0, 2) == 2 * cx / std::pow(cy, 3));
   BOOST_REQUIRE(z2.derivative(0, 3) == -6 * cx / std::pow(cy, 4));
   BOOST_REQUIRE(z2.derivative(0, 4) == 24 * cx / std::pow(cy, 5));
-  for (int i = 1; i <= m; ++i)
-    for (int j = 0; j <= n; ++j) BOOST_REQUIRE(z2.derivative(i, j) == 0.0);
+  for (int i = 1; i <= m; ++i) {
+    for (int j = 0; j <= n; ++j) {
+      BOOST_REQUIRE(z2.derivative(i, j) == 0.0);
+    }
+  }
 
   const auto z3 = y / x;
   BOOST_REQUIRE(z3.derivative(0, 0) == cy / cx);
@@ -499,8 +560,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
   BOOST_REQUIRE(z3.derivative(2, 1) == 2 / std::pow(cx, 3));
   BOOST_REQUIRE(z3.derivative(3, 0) == -6 * cy / std::pow(cx, 4));
   BOOST_REQUIRE(z3.derivative(3, 1) == -6 / std::pow(cx, 4));
-  for (int i = 0; i <= m; ++i)
-    for (int j = 2; j <= n; ++j) BOOST_REQUIRE(z3.derivative(i, j) == 0.0);
+  for (int i = 0; i <= m; ++i) {
+    for (int j = 2; j <= n; ++j) {
+      BOOST_REQUIRE(z3.derivative(i, j) == 0.0);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
@@ -589,18 +653,20 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, all_float_types) {
   BOOST_REQUIRE(a.derivative(3) == 0.0);
   const auto zero = make_fvar<T, m>(0);
   a = abs(zero);
-  for (int i = 0; i <= m; ++i) BOOST_REQUIRE(a.derivative(i) == 0.0);
+  for (int i = 0; i <= m; ++i) {
+    BOOST_REQUIRE(a.derivative(i) == 0.0);
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ceil_and_floor, T, all_float_types) {
   constexpr int m = 3;
   float tests[]{-1.5, 0.0, 1.5};
-  for (unsigned t = 0; t < sizeof(tests) / sizeof(*tests); ++t) {
-    const auto x = make_fvar<T, m>(tests[t]);
+  for (float &test : tests) {
+    const auto x = make_fvar<T, m>(test);
     auto c = ceil(x);
     auto f = floor(x);
-    BOOST_REQUIRE(c.derivative(0) == std::ceil(tests[t]));
-    BOOST_REQUIRE(f.derivative(0) == std::floor(tests[t]));
+    BOOST_REQUIRE(c.derivative(0) == std::ceil(test));
+    BOOST_REQUIRE(f.derivative(0) == std::floor(test));
     for (int i = 1; i <= m; ++i) {
       BOOST_REQUIRE(c.derivative(i) == 0.0);
       BOOST_REQUIRE(f.derivative(i) == 0.0);

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 
     auto x = x_sampler.next();
     {
-      auto fact_i = boost::math::rising_factorial<T>(x, i);
+      auto fact_i = boost::math::rising_factorial<T>(x, static_cast<int>(i));
       auto autodiff_v = make_fvar<T, m>(fact_i);
       BOOST_REQUIRE_CLOSE(autodiff_v, fact_i, 100 * std::numeric_limits<T>::epsilon());
     }
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-200, 200};
-  for (auto i : boost::irange(14)) {
+  for (auto i : boost::irange<unsigned>(14)) {
     auto x = x_sampler.next();
     auto autodiff_v = boost::math::hermite(i, make_fvar<T, m>(x));
     auto anchor_v = boost::math::hermite(i, x);
@@ -588,10 +588,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   test_detail::RandomSample<T> theta_sampler{0, boost::math::constants::pi<T>()};
   test_detail::RandomSample<T> phi_sampler{0, boost::math::constants::two_pi<T>()};
   test_detail::RandomSample<int> r_sampler{0, test_constants::n_samples};
-  for (auto n : boost::irange(test_constants::n_samples)) {
+  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples+1)) {
     auto theta = theta_sampler.next();
     auto phi = phi_sampler.next();
-    auto r = (std::min)(n - 1, r_sampler.next());
+    auto r = (std::min)(static_cast<int>(n) - 1, r_sampler.next());
     {
       auto autodiff_v = boost::math::spherical_harmonic(n, r, make_fvar<T, m>(theta), make_fvar<T, m>(phi));
       auto anchor_v = boost::math::spherical_harmonic(n, r, theta, phi);

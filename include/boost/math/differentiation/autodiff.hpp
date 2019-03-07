@@ -26,8 +26,10 @@
 #include <type_traits>
 
 // Automatic Differentiation v1
-namespace boost { namespace math { namespace differentiation { inline namespace autodiff_v1 {
-
+namespace boost {
+namespace math {
+namespace differentiation {
+inline namespace autodiff_v1 {
 namespace detail {
 
 template<typename RealType, typename... RealTypes>
@@ -37,7 +39,7 @@ struct promote_args_n { using type = typename boost::math::tools::promote_args_2
 template<typename RealType>
 struct promote_args_n<RealType> { using type = typename boost::math::tools::promote_arg<RealType>::type; };
 
-} // namespace detail
+}  // namespace detail
 
 template<typename RealType, typename... RealTypes>
 using promote = typename detail::promote_args_n<RealType,RealTypes...>::type;
@@ -72,7 +74,7 @@ struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
-    typename boost::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
+    typename boost::mp11::mp_if_c<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>; };
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -1641,73 +1643,72 @@ long double truncl(const fvar<RealType,Order>& cr)
     return truncl(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
-} } } } } // namespace boost::math::differentiation::autodiff_v1::detail
+}
+}  // namespace autodiff_v1
+}  // namespace differentiation
+}  // namespace math
+}  // namespace boost
 
 namespace std {
 
 /// boost::math::tools::digits<RealType>() is handled by this std::numeric_limits<> specialization,
 /// and similarly for max_value, min_value, log_max_value, log_min_value, and epsilon.
 template <typename RealType, size_t Order>
-class numeric_limits<boost::math::differentiation::detail::fvar<RealType,Order>>
-    : public numeric_limits<typename boost::math::differentiation::detail::fvar<RealType,Order>::root_type>
-{ };
+class numeric_limits<boost::math::differentiation::detail::fvar<RealType, Order>>
+    : public numeric_limits<typename boost::math::differentiation::detail::fvar<RealType, Order>::root_type> {};
 
-} // namespace std
+}  // namespace std
 
-namespace boost { namespace math { namespace tools {
+namespace boost {
+namespace math {
+namespace tools {
 
 // See boost/math/tools/promotion.hpp
-template<typename RealType0, size_t Order0, typename RealType1, size_t Order1>
+template <typename RealType0, size_t Order0, typename RealType1, size_t Order1>
 struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
-                      differentiation::detail::fvar<RealType1, Order1>>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
+                      differentiation::detail::fvar<RealType1, Order1>> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
-          std::max(Order0,Order1)>;
+                                             std::max(Order0, Order1)>;
 #else
-          Order0 < Order1 ? Order1 : Order0>;
+        Order0<Order1 ? Order1 : Order0>;
 #endif
 };
 
-template<typename RealType0, size_t Order0, typename RealType1>
-struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
+template <typename RealType0, size_t Order0, typename RealType1>
+struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
 };
 
-template<typename RealType0, typename RealType1, size_t Order1>
-struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>>
-{
-    using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
+template <typename RealType0, typename RealType1, size_t Order1>
+struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>> {
+  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template<typename ToType, typename RealType, std::size_t Order>
-inline ToType real_cast(const differentiation::detail::fvar<RealType, Order> &from_v)
-{
-    return static_cast<ToType>(static_cast<RealType>(from_v));
+template <typename ToType, typename RealType, std::size_t Order>
+inline ToType real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) {
+  return static_cast<ToType>(static_cast<RealType>(from_v));
 }
 
-} // namespace tools
+}  // namespace tools
 
 namespace policies {
 
-template <class Policy, std::size_t Order>
-using fvar_t = differentiation::detail::fvar<Policy, Order>;
-template <class Policy, std::size_t Order>
-struct evaluation<fvar_t<float, Order>, Policy> {
-    using type = fvar_t<typename boost::conditional<Policy::promote_float_type::value, double, float>::type, Order>;
+template <class Policy, std::size_t Order> using fvar_t = differentiation::detail::fvar<Policy, Order>;
+template <class Policy, std::size_t Order> struct evaluation<fvar_t<float, Order>, Policy> {
+  using type = fvar_t<boost::mp11::mp_if_c<Policy::promote_float_type::value, double, float>, Order>;
 };
 
-template <class Policy, std::size_t Order>
-struct evaluation<fvar_t<double, Order>, Policy> {
-    using type =
-        fvar_t<typename boost::conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
+template <class Policy, std::size_t Order> struct evaluation<fvar_t<double, Order>, Policy> {
+  using type = fvar_t<boost::mp11::mp_if_c<Policy::promote_double_type::value, long double, double>, Order>;
 };
 
-} } } // namespace boost::math::policies
+}  // namespace policies
+}  // namespace math
+}  // namespace boost
 
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR
 #include "autodiff_cpp11.hpp"
 #endif
 
-#endif // BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
+#endif  // BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP

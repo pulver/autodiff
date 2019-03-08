@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff)
 [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master)
 [![codecov](https://codecov.io/gh/pulver/autodiff/branch/master/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/17839/badge.svg)(https://scan.coverity.com/projects/kedarbhat-autodiff)
 
 ## Description
 

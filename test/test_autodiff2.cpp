@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
   auto y = acosh(x);
   // BOOST_REQUIRE_EQUAL(y.derivative(0) == acosh(cx)); // FAILS! acosh(2) is
   // overloaded for integral types
-  BOOST_REQUIRE_EQUAL(y.derivative(0) == acosh(static_cast<T>(x)));
+  BOOST_REQUIRE_EQUAL(y.derivative(0), acosh(static_cast<T>(x)));
   BOOST_REQUIRE_CLOSE(y.derivative(1), 1 / boost::math::constants::root_three<T>(), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2), -2 / (3 * boost::math::constants::root_three<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3), 1 / boost::math::constants::root_three<T>(), eps);

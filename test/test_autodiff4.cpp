@@ -13,12 +13,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
   using std::lround;
   using std::truncl;
 
-  constexpr int m = 3;
+  constexpr std::size_t m = 3;
   const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
-  long yl = lround(x);
+  auto yl = lround(x);
   BOOST_REQUIRE_EQUAL(yl, lround(cx));
-  long long yll = llround(x);
+  auto yll = llround(x);
   BOOST_REQUIRE_EQUAL(yll, llround(cx));
   BOOST_REQUIRE_EQUAL(lltrunc(cx), lltrunc(x));
 
@@ -33,10 +33,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   BOOST_MATH_STD_USING
 
   const T eps = 30 * std::numeric_limits<T>::epsilon();
-  constexpr int Nw = 3;
-  constexpr int Nx = 2;
-  constexpr int Ny = 4;
-  constexpr int Nz = 3;
+  constexpr std::size_t Nw = 3;
+  constexpr std::size_t Nx = 2;
+  constexpr std::size_t Ny = 4;
+  constexpr std::size_t Nz = 3;
   const auto w = make_fvar<T, Nw>(11);
   const auto x = make_fvar<T, 0, Nx>(12);
   const auto y = make_fvar<T, 0, 0, Ny>(13);

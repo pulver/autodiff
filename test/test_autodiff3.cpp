@@ -10,7 +10,7 @@ BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
   const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::atanh;
-  constexpr int m = 5;
+  constexpr std::size_t m = 5;
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = atanh(x);
@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
-  constexpr int m = 5;
-  constexpr float cx = 1.0;
+  constexpr std::size_t m = 5;
+  const T cx = 1.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
   const auto eps = boost::math::tools::epsilon<T>();
@@ -41,8 +41,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::erf;
   using namespace boost;
-  constexpr int m = 5;
-  constexpr float cx = 1.0;
+  constexpr std::size_t m = 5;
+  const T cx = 1.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = erf(x);
   BOOST_REQUIRE(y.derivative(0) == erf(static_cast<T>(x)));
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
   const T eps = 20000 * boost::math::tools::epsilon<T>();  // percent
   using std::cos;
   using std::sin;
-  constexpr int m = 5;
+  constexpr std::size_t m = 5;
   const T cx = 1;
   auto x = make_fvar<T, m>(cx);
   auto y = sinc(x);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
   const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   using std::cosh;
   using std::sinh;
-  constexpr int m = 5;
+  constexpr std::size_t m = 5;
   const T cx = 1;
   auto x = make_fvar<T, m>(cx);
   auto s = sinh(x);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
   const T eps = 800 * boost::math::tools::epsilon<T>();  // percent
   using std::sqrt;
-  constexpr int m = 5;
+  constexpr std::size_t m = 5;
   const T cx = boost::math::constants::third_pi<T>();
   const T root_three = boost::math::constants::root_three<T>();
   const auto x = make_fvar<T, m>(cx);
@@ -116,8 +116,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, bin_float_types) {
-  constexpr int m = 3;
-  constexpr float cx = 3.25;
+  constexpr std::size_t m = 3;
+  const T cx = 3.25;
   const T cy = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = fmod(x, autodiff_fvar<T, m>(cy));
@@ -130,8 +130,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, bin_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(round_and_trunc, T, all_float_types) {
   using std::round;
   using std::trunc;
-  constexpr int m = 3;
-  constexpr float cx = 3.25;
+  constexpr std::size_t m = 3;
+  const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
   auto y = round(x);
   BOOST_REQUIRE(y.derivative(0) == round(cx));
@@ -147,8 +147,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(round_and_trunc, T, all_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(iround_and_itrunc, T, all_float_types) {
   using namespace boost::math;
-  constexpr int m = 3;
-  constexpr float cx = 3.25;
+  constexpr std::size_t m = 3;
+  const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
   int y = iround(x);
   BOOST_REQUIRE(y == iround(cx));
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(iround_and_itrunc, T, all_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w0_test, T, all_float_types) {
   const T eps = 1000 * boost::math::tools::epsilon<T>();  // percent
-  constexpr int m = 10;
+  constexpr std::size_t m = 10;
   const T cx = 3;
   // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]
   const char *const answers[m + 1]{"1.049908894964039959988697070552897904589466943706341",

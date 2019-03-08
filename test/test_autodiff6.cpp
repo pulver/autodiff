@@ -588,7 +588,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   test_detail::RandomSample<T> theta_sampler{0, boost::math::constants::pi<T>()};
   test_detail::RandomSample<T> phi_sampler{0, boost::math::constants::two_pi<T>()};
   test_detail::RandomSample<int> r_sampler{0, test_constants::n_samples};
-  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples+1)) {
+  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples + 1)) {
     auto theta = theta_sampler.next();
     auto phi = phi_sampler.next();
     auto r = (std::min)(static_cast<int>(n) - 1, r_sampler.next());

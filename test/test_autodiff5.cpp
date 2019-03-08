@@ -226,15 +226,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         auto v_ = abs(v);
         auto autodiff_v = boost::math::sph_bessel<autodiff_fvar<T, m>>(i_, make_fvar<T, m>(v_));
         auto anchor_v = boost::math::sph_bessel<T>(i_, v_);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
       {
-        auto v_ = (max)(abs(v), nextafter(abs(v), 2*(std::numeric_limits<T>::min)()));
+        auto v_ = (max)(abs(v), nextafter(abs(v), 2 * (std::numeric_limits<T>::min)()));
         try {
           auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(i_, make_fvar<T, m>(v_));
           auto anchor_v = boost::math::sph_neumann<T>(i_, v_);
-          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
-        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
+        } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(i_, make_fvar<T, m>(v_)))),
                               boost::wrapexcept<std::overflow_error>);
           BOOST_REQUIRE_THROW(((boost::math::sph_neumann<T>(i_, v_))), boost::wrapexcept<std::overflow_error>);
@@ -244,40 +244,40 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       {
         auto autodiff_v = boost::math::cyl_bessel_i_prime(make_fvar<T, m>(v), make_fvar<T, m>(x));
         auto anchor_v = boost::math::cyl_bessel_i_prime(v, x);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto x_j = abs(x) + 1;
         auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
         auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto x_k = abs(x) + 1;
         auto autodiff_v = boost::math::cyl_bessel_k_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
         auto anchor_v = boost::math::cyl_bessel_k_prime(v, x_k);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto x_neumann = abs(x);
         auto autodiff_v = boost::math::cyl_neumann_prime(make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
         auto anchor_v = boost::math::cyl_neumann_prime(v, x_neumann);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto autodiff_v = boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(i_, make_fvar<T, m>(abs(v) + 1));
         auto anchor_v = boost::math::sph_bessel_prime<T>(i_, abs(v) + 1);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
         auto autodiff_v = boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(i_, make_fvar<T, m>(abs(v) + 1));
         auto anchor_v = boost::math::sph_neumann_prime<T>(i_, abs(v) + 1);
-        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000*100*boost::math::tools::epsilon<T>());
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2000 * 100 * boost::math::tools::epsilon<T>());
       }
     }
   }

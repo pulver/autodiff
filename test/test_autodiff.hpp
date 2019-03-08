@@ -48,8 +48,6 @@ using all_float_types = mp11::mp_append<bin_float_types, multiprecision_float_ty
 
 using namespace boost::math::differentiation;
 
-template <typename... Ts> struct print_vals;
-
 namespace test_detail {
 
 /**
@@ -75,8 +73,8 @@ template <typename T> struct RandomSample {
 
   template <typename U, typename V>
   RandomSample(U start, V finish)
-      : random_device_{},
-        rng_(random_device_()),
+  :
+        rng_(std::random_device{}()),
         dist_(static_cast<distribution_param_t>(start),
               (std::numeric_limits<T>::is_integer
                    ? static_cast<distribution_param_t>(finish)
@@ -85,7 +83,6 @@ template <typename T> struct RandomSample {
 
   T next() noexcept { return T(dist_(rng_)); }
 
-  std::random_device random_device_;
   std::mt19937 rng_;
   dist_t dist_;
 };
@@ -110,15 +107,6 @@ template <typename T, typename Order, Order val> struct test_constants_t<T, std:
   static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
 };
 
-template <typename T, typename U> constexpr bool check_if_small(const T& lhs, const U& rhs) noexcept {
-  using boost::math::differentiation::detail::get_root_type;
-  using boost::math::differentiation::detail::is_fvar;
-  using real_type = promote<T, U>;
-
-  return std::numeric_limits<real_type>::epsilon() >
-         fabs((std::max)(static_cast<real_type>(lhs), static_cast<real_type>(rhs)) -
-              (std::min)(static_cast<real_type>(lhs), static_cast<real_type>(rhs)));
-}
 }  // namespace test_detail
 
 template <typename T, int m = 3> using test_constants_t = test_detail::test_constants_t<T, mp11::mp_int<m>>;

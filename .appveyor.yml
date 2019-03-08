@@ -39,12 +39,12 @@ install:
   - ls
 
 build_script:
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff1.cpp
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff2.cpp
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff3.cpp
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff4.cpp
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff5.cpp
-  - cl.exe /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff6.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff1.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff2.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff3.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff4.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff5.cpp
+  - cl.exe /W4 /permissive- /bigobj /EHsc /Iboost_1_69_0 /Iinclude test/test_autodiff6.cpp
 
 test_script:
   - test_autodiff1

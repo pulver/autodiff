@@ -4,29 +4,29 @@
 #           https://www.boost.org/LICENSE_1_0.txt)
 
 language: cpp
-
-cache:
-  directories:
-    - $HOME/cache3
-    - $HOME/.sonar/cache
+env:
+  global:
+    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+    #   via the "travis encrypt" command using the project repo's public key
+    - secure: "LIUpAUiiEH2CUllB+wBdtUHwYMnO6YhxJMK9H/CwM3TCaKHfSFajudeU4+GSWXB1h3qQjhawaNBmhAh6vq39BrJUXADKk9tlvzmdR3lyHAFx7jPnjrE5ca1ENSCGCWDZb3VAO50caChrb7HZ6Wb26aoYnMZnUDt6jQ5TzhMaqQJm/Fh1PEH4AiaoBTnXZper+zlI4GvZYtinfDSRbVOkCEiQ625Ir0Xqy8vYaVna4IESGB4Pft/8SpKWhofdk8rHIGXUIGqRM8oK2LvFzwDNf5u7RSoJraEqZ8W2zcWHh8ijn7N7Sj/Sh37bYeBbWu0asev0OjoZhsQVjpDGdyudSFbAuqGnCIgy/gP3+cWe8IRgTTOUDoYlyFjCSZr7Tfum7Ow1hBN6+EQ3Q4CwX04NyvOEysJ6FyyVX8pfMzqA7dm8W+JKeiIMD696Un8Xdj3578HqAiqDOeqeKJ7pNkGVIVr92DbwodKl8CMDV0Mqame6kJmaRmKftrP7a5xciiBvzzE9ay6Oc0Xc2JvdIbbwFwvAGXfF9/4qVcwwN66zYM6YBKaPP7C/Ule0//erg+YsHxu4YftOF2KRHg0odSZ7TKpdApbbbhOmVV4NRq3I4NgWVfPY0ecmUfRG1hmhHi1opaSfBzBVAFmz4tcQHQqr7NOaJ6XxO1l4aFlcv0Nkq24="
 
 anchors:
   clang-38: &clang-38 { apt: { packages: [ "clang-3.8",
                                            "libstdc++-6-dev" ], sources: [ "llvm-toolchain-trusty-3.8",
-                                                                           "ubuntu-toolchain-r-test"   ] } }
+                                                                           "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
   clang-4:  &clang-4  { apt: { packages: [ "clang-4.0",
                                            "libstdc++-6-dev" ], sources: [ "llvm-toolchain-trusty-4.0",
-                                                                           "ubuntu-toolchain-r-test"   ] } }
+                                                                           "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
   clang-5:  &clang-5  { apt: { packages: [ "clang-5.0",
                                            "libstdc++-7-dev" ], sources: [ "llvm-toolchain-trusty-5.0",
-                                                                           "ubuntu-toolchain-r-test"   ] } }
+                                                                           "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
   clang-6:  &clang-6  { apt: { packages: [ "clang-6.0",
                                            "libc++-dev",
                                            "libstdc++-8-dev" ], sources: [ "llvm-toolchain-trusty-6.0",
-                                                                           "ubuntu-toolchain-r-test"   ] } }
-  gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
-  gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
-  gcc-8:    &gcc-8    { apt: { packages: [ "g++-8"           ], sources: [ "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
+                                                                           "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
+  gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
+  gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github } }
+  gcc-8:    &gcc-8    { apt: { packages: [ "g++-8"           ], sources: [ "ubuntu-toolchain-r-test"   ] }, sonarcloud: { organization: kedarbhat-github }, coverity_scan: { project: { name: "kedarbhat/autodiff", description: "Boost.Autodiff" }, notification_email: "$COVERITY_SCAN_NOTIFICATION_EMAIL", branch_pattern: develop }}
 
 jobs:
   allow_failures:
@@ -72,10 +72,11 @@ jobs:
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++14 && CODE_ANALYSIS=1"  ], addons: *gcc-8 }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++17 && CODE_ANALYSIS=1"  ], addons: *gcc-8 }
     - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++2a && CODE_ANALYSIS=1"  ], addons: *gcc-8 }
-
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++11 && TOOLSET=gcc-8 && COMMENT='Coverity Scan'"], addons: *gcc-8 }
 before_install:
   - if [ \! -d $HOME/cache3/boost_1_69_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz | tar xz -C $HOME/cache3 -f -; fi
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then brew update && brew install gcc; fi
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
   - eval "${MATRIX_EVAL}"
 
 script:
@@ -110,3 +111,5 @@ after_success:
   - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff5; fi; fi
   - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff6; fi; fi
   - if $(env | grep -q ^CODE_ANALYSIS=); then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
+
+

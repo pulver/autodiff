@@ -13,11 +13,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(one_over_one_plus_x_squared, T, all_float_types) {
   auto f = make_fvar<T, m>(cx);
   // f = 1 / ((f *= f) += 1);
   f = ((f *= f) += 1).inverse();
-  BOOST_REQUIRE(f.derivative(0) == T(0.5));
-  BOOST_REQUIRE(f.derivative(1) == T(-0.5));
-  BOOST_REQUIRE(f.derivative(2) == T(0.5));
-  BOOST_REQUIRE(f.derivative(3) == T(0));
-  BOOST_REQUIRE(f.derivative(4) == T(-3));
+  BOOST_REQUIRE_EQUAL(f.derivative(0), 0.5);
+  BOOST_REQUIRE_EQUAL(f.derivative(1), -0.5);
+  BOOST_REQUIRE_EQUAL(f.derivative(2), 0.5);
+  BOOST_REQUIRE_EQUAL(f.derivative(3), 0);
+  BOOST_REQUIRE_EQUAL(f.derivative(4), -3);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, all_float_types) {
@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, all_float_types) {
   const T cx = 2.0;
   const auto x = make_fvar<T, m>(cx);
   auto y = exp(x);
-  for (int i = 0; i <= m; ++i) {
+  for (auto i : boost::irange(unsigned(m) + 1)) {
     // std::cout.precision(100);
     // std::cout << "y.derivative("<<i<<") = " << y.derivative(i) << ",
     // std::exp(cx) = " << std::exp(cx) << std::endl;
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
   BOOST_REQUIRE(z0.derivative(5) == T(0));
   auto z1 = pow(cx, y);
   BOOST_REQUIRE_CLOSE(z1.derivative(0, 0), pow(cx, cy), eps);
-  for (int j = 1; j <= n; ++j) {
+  for (auto j : boost::irange(1u, unsigned(n) + 1)) {
     BOOST_REQUIRE_CLOSE(z1.derivative(0, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
   }
   for (int i = 1; i <= m; ++i) {
@@ -63,15 +63,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
     }
   }
   auto z2 = pow(x, y);
-  for (int j = 0; j <= n; ++j) {
+  for (auto j : boost::irange(unsigned(n) + 1)) {
     BOOST_REQUIRE_CLOSE(z2.derivative(0, j), pow(cx, cy) * pow(log(cx), j), eps);
   }
-  for (int j = 0; j <= n; ++j) {
-    BOOST_REQUIRE_CLOSE(z2.derivative(1, j), pow(cx, cy - 1) * pow(log(cx), j - 1) * (cy * log(cx) + j), eps);
+  for (auto j : boost::irange(unsigned(n) + 1)) {
+    BOOST_REQUIRE_CLOSE(z2.derivative(1, j),
+                        pow(cx, cy - 1) * pow(log(cx), static_cast<int>(j) - 1) * (cy * log(cx) + j), eps);
   }
   BOOST_REQUIRE_CLOSE(z2.derivative(2, 0), pow(cx, cy - 2) * cy * (cy - 1), eps);
   BOOST_REQUIRE_CLOSE(z2.derivative(2, 1), pow(cx, cy - 2) * (cy * (cy - 1) * log(cx) + 2 * cy - 1), eps);
-  for (int j = 2; j <= n; ++j) {
+  for (auto j : boost::irange(2u, unsigned(n) + 1)) {
     BOOST_REQUIRE_CLOSE(z2.derivative(2, j),
                         pow(cx, cy - 2) * pow(log(cx), j - 2) *
                             (j * (2 * cy - 1) * log(cx) + (j - 1) * j + (cy - 1) * cy * pow(log(cx), 2)),
@@ -102,7 +103,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, all_float_types) {
   y = sqrt(x);
   // std::cout << "sqrt(0) = " << y << std::endl; // (0,inf,-inf,inf,-inf,inf)
   BOOST_REQUIRE(y.derivative(0) == T(0));
-  for (int i = 1; i <= m; ++i) {
+  for (auto i : boost::irange(1u, unsigned(m) + 1)) {
     BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
   }
 }
@@ -124,7 +125,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(log_test, T, all_float_types) {
   y = log(x);
   // std::cout << "log(0) = " << y << std::endl; // log(0) =
   // depth(1)(-inf,inf,-inf,inf,-inf,inf)
-  for (int i = 0; i <= m; ++i) {
+  for (auto i : boost::irange(unsigned(m) + 1)) {
     BOOST_REQUIRE(y.derivative(i) == (i & 1 ? 1 : -1) * std::numeric_limits<T>::infinity());
   }
 }
@@ -145,10 +146,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
   BOOST_REQUIRE(z.derivative(0, 2) == T(0));
   BOOST_REQUIRE(z.derivative(0, 3) == T(0));
   BOOST_REQUIRE(z.derivative(0, 4) == T(0));
-  for (auto i : boost::irange<unsigned>(1, m + 1)) {
+  for (auto i : boost::irange(1u, unsigned(m) + 1)) {
     BOOST_REQUIRE_CLOSE(z.derivative(i, 0), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) * cy / pow(cx, i), eps);
     BOOST_REQUIRE_CLOSE(z.derivative(i, 1), pow(-1, i - 1) * boost::math::factorial<T>(i - 1) / pow(cx, i), eps);
-    for (size_t j = 2; j <= n; ++j) {
+    for (auto j : boost::irange(2u, unsigned(n) + 1)) {
       BOOST_REQUIRE(z.derivative(i, j) == T(0));
     }
   }

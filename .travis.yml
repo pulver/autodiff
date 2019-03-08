@@ -81,12 +81,32 @@ before_install:
 script:
   - ls
   - $COMPILER --version
-  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
-  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
-  - ./test_autodiff
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if [ -z "${CODE_ANALYSIS}" ]; then $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff1
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff2
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff3
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff4
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff5
+  - if $(env | grep -q ^CODE_ANALYSIS=); then build-wrapper-linux-x86-64 --out-dir bw-outputs $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -o test_autodiff ; fi
+  - ./test_autodiff6
   - if $(env | grep -q ^CODE_ANALYSIS=); then sonar-scanner; fi
 
 after_success:
   - if $(env | grep -q ^CODE_ANALYSIS=); then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
-  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
+  - if $(env | grep -q ^CODE_ANALYSIS=); then if $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache3/boost_1_69_0 -Iinclude -Wall -O0 --coverage -o test_autodiff; then ./test_autodiff; fi; fi
   - if $(env | grep -q ^CODE_ANALYSIS=); then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi

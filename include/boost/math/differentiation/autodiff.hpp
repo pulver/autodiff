@@ -15,6 +15,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/mp11/function.hpp>
+#include <boost/range/irange.hpp>
 
 #include <algorithm>
 #include <array>
@@ -759,14 +760,15 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
     fvar<RealType,Order>::operator*(const fvar<RealType2,Order2>& cr) const
 {
+    using ssize_t = typename std::make_signed<std::size_t>::type;
     const promote<RealType,RealType2> zero(0);
     promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
     if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (size_t i=0, j=Order, k=Order2 ; i<=Order2 ; ++i, j&&--j, --k)
-            retval.v[i] = std::inner_product(v.cbegin(), v.cend()-j, cr.v.crbegin()+k, zero);
+            retval.v[i] = std::inner_product(v.cbegin(), v.cend()-ssize_t(j), cr.v.crbegin()+ssize_t(k), zero);
     else
         for (size_t i=0, j=Order2, k=Order ; i<=Order ; ++i, j&&--j, --k)
-            retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-j, v.crbegin()+k, zero);
+            retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-ssize_t(j), v.crbegin()+ssize_t(k), zero);
     return retval;
 }
 
@@ -794,17 +796,17 @@ promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
     retval.v.front() = v.front() / cr.v.front();
     if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     {
-        for (size_t i=1, j=Order2-1 ; i<=Order ; ++i, --j)
+        for (size_t i=1, j=Order2-1u ; i<=Order ; ++i, --j)
             retval.v[i] = (v[i] -
-                std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)) / cr.v.front();
-        for (size_t i=Order+1, j=Order2-Order-1 ; i<=Order2 ; ++i, --j)
+                std::inner_product(cr.v.cbegin()+ssize_t(1), cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(j+1), zero)) / cr.v.front();
+        for (size_t i=Order+1u, j=Order2-Order-ssize_t(1) ; i<=Order2 ; ++i, --j)
             retval.v[i] =
-                -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero) / cr.v.front();
+                -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(j+1), zero) / cr.v.front();
     }
     else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
         for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
             retval.v[i] =
-                (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero)) / cr.v.front();
+                (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(k), zero)) / cr.v.front();
     else
         for (size_t i=1 ; i<=Order ; ++i)
             retval.v[i] = v[i] / cr.v.front();
@@ -957,7 +959,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply(const std::function<root_type(s
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
     fvar<RealType,Order> accumulator = fvar<RealType,Order>(f(0));
-    for (size_t i=1 ; i<=order_sum ; ++i)
+    for (auto i=1u ; i<=order_sum ; ++i)
     {    // accumulator += (epsilon_i *= epsilon) * (f(i) / boost::math::factorial<root_type>(i));
         epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
         accumulator += epsilon_i.epsilon_multiply(i, 0, f(i) / boost::math::factorial<root_type>(i));
@@ -987,10 +989,11 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::apply_with_horner(const std::function<root_type(size_t)>& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(order_sum)));
-    for (size_t i=order_sum ; i-- ;)
-        (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
-    return accumulator;
+    fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(static_cast<unsigned>(order_sum))));
+  for (size_t i=order_sum ; i-- ;) {
+      (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
+    }
+  return accumulator;
 }
 
 // f : order -> derivative(order)/factorial(order)

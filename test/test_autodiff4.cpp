@@ -14,7 +14,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
   using std::truncl;
 
   constexpr std::size_t m = 3;
-  const T cx = 3.25;
+  const T& cx = static_cast<T>(3.25);
   auto x = make_fvar<T, m>(cx);
   auto yl = lround(x);
   BOOST_REQUIRE_EQUAL(yl, lround(cx));

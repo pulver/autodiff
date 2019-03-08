@@ -310,32 +310,26 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       }
 
       {
-        auto a_ = abs(a);
-        auto b_ = abs(b);
         {
-          auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibeta(a_, b_, z);
+          auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a_-1), make_fvar<T, m>(b_-1), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta(a_-1, b_-1, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
-          auto autodiff_v = boost::math::ibetac(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibetac(a_, b_, z);
+          auto autodiff_v = boost::math::ibetac(make_fvar<T, m>(a_-1), make_fvar<T, m>(b_-1), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac(a_-1, b_-1, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
       }
 
       {
-        auto a_ = abs(a);
-        auto b_ = abs(b);
-        auto autodiff_v = boost::math::ibeta_derivative(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-        auto anchor_v = boost::math::ibeta_derivative(a_, b_, z);
+        auto autodiff_v = boost::math::ibeta_derivative(make_fvar<T, m>(a_-1), make_fvar<T, m>(b_-1), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::ibeta_derivative(a_-1, b_-1, z);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
       }
 
       {
-        auto a_ = abs(a) + 1;
-        auto b_ = abs(b) + 1;
         {
           auto autodiff_v = boost::math::ibeta_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
@@ -350,29 +344,28 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       }
 
       {
-        auto a_ = abs(a) + 1;
-        auto b_ = abs(b) / (((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
+        auto b_norm = abs(b) / (((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
         {
-          auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibeta_inva(a_, b_, z);
+          auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta_inva(a_, b_norm, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
-          auto autodiff_v = boost::math::ibetac_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibetac_inva(a_, b_, z);
+          auto autodiff_v = boost::math::ibetac_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac_inva(a_, b_norm, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
-          auto autodiff_v = boost::math::ibeta_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibeta_invb(a_, b_, z);
+          auto autodiff_v = boost::math::ibeta_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta_invb(a_, b_norm, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
 
         {
-          auto autodiff_v = boost::math::ibetac_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-          auto anchor_v = boost::math::ibetac_invb(a_, b_, z);
+          auto autodiff_v = boost::math::ibetac_invb(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac_invb(a_, b_norm, z);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 10000 * 100 * boost::math::tools::epsilon<T>());
         }
       }
@@ -383,8 +376,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<unsigned> n_sampler{0u, 30};
-  test_detail::RandomSample<unsigned> r_sampler{0u, 30};
+  test_detail::RandomSample<unsigned> n_sampler{0u, 30u};
+  test_detail::RandomSample<unsigned> r_sampler{0u, 30u};
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -425,7 +418,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
     }
   }
   {
-    test_detail::RandomSample<unsigned> n_sampler{0, 10};
+    test_detail::RandomSample<unsigned> n_sampler{0u, 10u};
     test_detail::RandomSample<T> x_sampler{-2, 2};
     for (auto i : boost::irange(test_constants::n_samples)) {
       std::ignore = i;
@@ -491,7 +484,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> k_sampler{-1, 1};
+  test_detail::RandomSample<T> k_sampler{T{-1}, T{1}};
   test_detail::RandomSample<T> phi_sampler{-boost::math::constants::two_pi<T>(), boost::math::constants::two_pi<T>()};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
@@ -685,7 +678,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{1, 83};
-  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples)) {
+  for (auto n : boost::irange(1u, static_cast<unsigned>(test_constants::n_samples))) {
     auto x = x_sampler.next();
     BOOST_REQUIRE_CLOSE(boost::math::expint(n, make_fvar<T, m>(x)), boost::math::expint(n, x),
                         200 * test_constants::pct_epsilon());

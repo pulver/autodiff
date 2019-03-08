@@ -47,7 +47,7 @@ void fvar<RealType, Order>::fvar_cpp11(std::false_type, const RootType& ca, cons
 template <typename RealType, size_t Order>
 template <typename... Orders>
 get_type_at<RealType, sizeof...(Orders)> fvar<RealType, Order>::at_cpp11(std::true_type, size_t order,
-                                                                         Orders... orders) const {
+                                                                         Orders... /*unused*/) const {
   return v.at(order);
 }
 
@@ -65,7 +65,7 @@ get_type_at<RealType, sizeof...(Orders)> fvar<RealType, Order>::at(size_t order,
   return at_cpp11(std::integral_constant<bool, sizeof...(orders) == 0>{}, order, orders...);
 }
 
-template <typename T, typename... Ts> constexpr T product(Ts... factors) { return 1; }
+template <typename T, typename... Ts> constexpr T product(Ts... /*unused*/) { return 1; }
 
 template <typename T, typename... Ts> constexpr T product(T factor, Ts... factors) {
   return factor * product<T>(factors...);

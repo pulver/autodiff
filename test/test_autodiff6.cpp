@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 28};
-  for (auto i : boost::irange<unsigned>(test_constants::n_samples)) {
+  for (auto i : boost::irange(static_cast<unsigned>(test_constants::n_samples))) {
     {
       auto fact_i = boost::math::factorial<T>(i);
       auto autodiff_v = boost::math::factorial<autodiff_fvar<T, m>>(i);
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(hermite_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-200, 200};
-  for (auto i : boost::irange<unsigned>(14)) {
+  for (auto i : boost::irange(14u)) {
     auto x = x_sampler.next();
     auto autodiff_v = boost::math::hermite(i, make_fvar<T, m>(x));
     auto anchor_v = boost::math::hermite(i, x);
@@ -384,8 +384,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     {
-      auto x_ = static_cast<T>(((min))(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x)),
-                                       promoted_t((std::numeric_limits<double>::max)())));
+      auto x_ =
+          ((min<T>))(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x)), ((std::numeric_limits<double>::max))());
 
       BOOST_REQUIRE_CLOSE(boost::math::lambert_w0(make_fvar<T, m>(x_)), boost::math::lambert_w0(x_),
                           100 * std::numeric_limits<T>::epsilon());
@@ -588,7 +588,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   test_detail::RandomSample<T> theta_sampler{0, boost::math::constants::pi<T>()};
   test_detail::RandomSample<T> phi_sampler{0, boost::math::constants::two_pi<T>()};
   test_detail::RandomSample<int> r_sampler{0, test_constants::n_samples};
-  for (auto n : boost::irange<unsigned>(1, test_constants::n_samples + 1)) {
+  for (auto n : boost::irange(1u, static_cast<unsigned>(test_constants::n_samples) + 1u)) {
     auto theta = theta_sampler.next();
     auto phi = phi_sampler.next();
     auto r = (std::min)(static_cast<int>(n) - 1, r_sampler.next());

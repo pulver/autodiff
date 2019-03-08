@@ -791,6 +791,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
     fvar<RealType,Order>::operator/(const fvar<RealType2,Order2>& cr) const
 {
+    using ssize_t = typename std::make_signed<std::size_t>::type;
     const promote<RealType,RealType2> zero(0);
     promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
     retval.v.front() = v.front() / cr.v.front();

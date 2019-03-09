@@ -311,8 +311,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(unary_signs, T, all_float_types) {
 
 // TODO 3 tests for 3 operator+() definitions.
 BOOST_AUTO_TEST_CASE_TEMPLATE(cast_double, T, all_float_types) {
-  const T ca = 13.0;
-  constexpr unsigned i = 12;
+  const T ca(13);
+  const T i(12);
   constexpr unsigned m = 3;
   const auto x = make_fvar<T, m>(ca);
   BOOST_REQUIRE_LT(i, x);

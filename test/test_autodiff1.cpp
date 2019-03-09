@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(constructors, T, all_float_types) {
   // Second independent variable
   const T cy = 100.0;
   const auto y = make_fvar<T, m, n>(cy);
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(y.derivative(i, j), cy);
       } else if (i == 0 && j == 1) {
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, all_float_types)
   // Single variable
   auto x = make_fvar<T, m>(cx);
   empty = static_cast<decltype(empty)>(x);  // Test static_cast of single-variable to double-variable type.
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(empty.derivative(i, j), cx);
       } else if (i == 1 && j == 0) {
@@ -93,8 +93,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, all_float_types)
   }
   auto y = make_fvar<T, m, n>(cy);
   empty = y;  // default assignment operator
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(empty.derivative(i, j), cy);
       } else if (i == 0 && j == 1) {
@@ -105,8 +105,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(assignment, T, all_float_types)
     }
   }
   empty = cx;  // set a constant
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(empty.derivative(i, j), cx);
       } else {
@@ -133,8 +133,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, all_float_types) {
   // Single variable
   const auto x = make_fvar<T, m>(cx);
   sum += x;
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(sum.derivative(i, j), cx);
       } else if (i == 1 && j == 0) {
@@ -148,8 +148,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, all_float_types) {
   const T cy = 11.0;
   sum = 0;
   sum += cy;
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(sum.derivative(i, j), cy);
       } else {
@@ -167,8 +167,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, all_float_types) {
   // Single variable
   const auto x = make_fvar<T, m>(cx);
   sum -= x;
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(sum.derivative(i, j), -cx);
       } else if (i == 1 && j == 0) {
@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(subtraction_assignment, T, all_float_types) {
   const T cy = 11.0;
   sum = 0;
   sum -= cy;
-  for (auto i : boost::irange(m+1)) {
-    for (auto j : boost::irange(n+1)) {
+  for (auto i : boost::irange(m + 1)) {
+    for (auto j : boost::irange(n + 1)) {
       if (i == 0 && j == 0) {
         BOOST_REQUIRE_EQUAL(sum.derivative(i, j), -cy);
       } else {

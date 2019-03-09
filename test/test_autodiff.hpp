@@ -65,23 +65,32 @@ template <typename T> struct RandomSample {
                   mp11::mp_if<is_integer_t, mp11::mp_if_c<numeric_limits_t::is_signed, int64_t, uint64_t>, long double>,
                   T>;
   static_assert((std::numeric_limits<T>::is_integer && std::numeric_limits<distribution_param_t>::is_integer) ||
-                (!std::numeric_limits<T>::is_integer && !std::numeric_limits<distribution_param_t>::is_integer),
+                    (!std::numeric_limits<T>::is_integer && !std::numeric_limits<distribution_param_t>::is_integer),
                 "T and distribution_param_t must either both be integral or both be not integral");
 
   using dist_t = mp11::mp_if<is_integer_t, std::uniform_int_distribution<distribution_param_t>,
                              std::uniform_real_distribution<distribution_param_t>>;
 
+  template <bool> struct get_endpoint_t_ {
+    template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
+      return static_cast<distribution_param_t>(finish);
+    }
+  };
+
+  template <> struct get_endpoint_t_<false> {
+    template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
+      return ((std::nextafter))(static_cast<distribution_param_t>(finish),
+                                ((std::numeric_limits<distribution_param_t>::max))());
+    }
+  };
+
+  using get_endpoint_t = get_endpoint_t_<is_integer_t::value>;
+
   template <typename U, typename V>
   RandomSample(U start, V finish)
-  :
-        rng_(std::random_device{}()),
-        dist_(static_cast<distribution_param_t>(start),
-              (std::numeric_limits<T>::is_integer
-                   ? static_cast<distribution_param_t>(finish)
-                   : ((std::nextafter))(static_cast<distribution_param_t>(finish),
-                                        ((std::numeric_limits<distribution_param_t>::max))()))) {}
+      : rng_(std::random_device{}()), dist_(static_cast<distribution_param_t>(start), get_endpoint_t{}(finish)) {}
 
-  T next() noexcept { return T(dist_(rng_)); }
+  T next() noexcept { return static_cast<T>(dist_(rng_)); }
 
   std::mt19937 rng_;
   dist_t dist_;

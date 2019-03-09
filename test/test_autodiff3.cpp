@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w0_test, T, all_float_types) {
                                                     "-0.5905839053125614593682763387470654123192290838719517"}};
   auto x = make_fvar<T, m>(cx);
   auto y = lambert_w0(x);
-  for (auto i : boost::irange(m+1)) {
+  for (auto i : boost::irange(m + 1)) {
     const T answer = boost::lexical_cast<T>(answers[i]);
     BOOST_REQUIRE_CLOSE(y.derivative(i), answer, eps);
   }

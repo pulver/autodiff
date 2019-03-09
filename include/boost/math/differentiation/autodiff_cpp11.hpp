@@ -76,7 +76,8 @@ template <typename RealType, size_t Order>
 template <typename... Orders>
 get_type_at<fvar<RealType, Order>, sizeof...(Orders)> fvar<RealType, Order>::derivative(Orders... orders) const {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
+  return at(static_cast<unsigned>(orders)...) *
+         product(boost::math::factorial<root_type>(static_cast<unsigned>(orders))...);
 }
 
 template <typename RealType, size_t Order>

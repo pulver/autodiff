@@ -423,54 +423,54 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(test_constants::n_samples)) {
-    BOOST_REQUIRE_CLOSE(boost::math::float_next(make_fvar<T, m>(i)), boost::math::float_next(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::float_next(make_fvar<T, m>(static_cast<T>(i))), boost::math::float_next(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_prior(make_fvar<T, m>(i)), boost::math::float_prior(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::float_prior(make_fvar<T, m>(static_cast<T>(i))), boost::math::float_prior(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
 
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(1)),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(1)),
                         boost::math::nextafter(static_cast<T>(i), static_cast<T>(1)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i + 2)),
-                        boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(i + 2)),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(i + 2)),
+                        boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(i + 2)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i + 1)),
-                        boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(i + 2)),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(i + 1)),
+                        boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(i + 2)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1)),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(-1)),
                         boost::math::nextafter(static_cast<T>(i), static_cast<T>(-1)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1 * (i + 2))),
-                        boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(-1 * (i + 2))),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(-1 * (i + 2))),
+                        boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(-1 * (i + 2))),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(-1 * (i + 1))),
-                        boost::math::nextafter(make_fvar<T, m>(i), static_cast<T>(-1 * (i + 2))),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(-1 * (i + 1))),
+                        boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(-1 * (i + 2))),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(i), make_fvar<T, m>(i)), ((make_fvar<T, m>(i))),
+    BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(static_cast<T>(i))), ((make_fvar<T, m>(static_cast<T>(i)))),
                         100 * std::numeric_limits<T>::epsilon());
 
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), 1),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 1),
                         boost::math::float_advance(static_cast<T>(i), 1), 100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), i + 2),
-                        boost::math::float_advance(make_fvar<T, m>(i), i + 2), 100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), i + 1),
-                        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(i), i + 2), -1),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2),
+                        boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2), 100 * std::numeric_limits<T>::epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 1),
+                        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2), -1),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), -1),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -1),
                         boost::math::float_advance(static_cast<T>(i), -1), 100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), -i - 2),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2),
                         boost::math::float_advance(static_cast<T>(i), -i - 2), 100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), -i - 1),
-                        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(i), -i - 2), 1),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 1),
+                        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2), 1),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(i), 0), ((make_fvar<T, m>(i))),
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 0), ((make_fvar<T, m>(static_cast<T>(i)))),
                         100 * std::numeric_limits<T>::epsilon());
 
-    BOOST_REQUIRE_CLOSE(boost::math::float_distance(make_fvar<T, m>(i), static_cast<T>(i)), static_cast<T>(0),
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(i)), static_cast<T>(0),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_next(make_fvar<T, m>(i)), make_fvar<T, m>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_next(make_fvar<T, m>(static_cast<T>(i))), make_fvar<T, m>(static_cast<T>(i))),
                         ((make_fvar<T, m>(-1))), 100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_prior(make_fvar<T, m>(i)), make_fvar<T, m>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_prior(make_fvar<T, m>(static_cast<T>(i))), make_fvar<T, m>(static_cast<T>(i))),
                         ((make_fvar<T, m>(1))), 100 * std::numeric_limits<T>::epsilon());
   }
 }
@@ -495,25 +495,25 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(10)) {
-    BOOST_REQUIRE_CLOSE(boost::math::pow<0>(make_fvar<T, m>(i)), boost::math::pow<0>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<0>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<0>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<1>(make_fvar<T, m>(i)), boost::math::pow<1>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<1>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<1>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<2>(make_fvar<T, m>(i)), boost::math::pow<2>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<2>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<2>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<3>(make_fvar<T, m>(i)), boost::math::pow<3>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<3>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<3>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<4>(make_fvar<T, m>(i)), boost::math::pow<4>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<4>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<4>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<5>(make_fvar<T, m>(i)), boost::math::pow<5>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<5>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<5>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<6>(make_fvar<T, m>(i)), boost::math::pow<6>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<6>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<6>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<7>(make_fvar<T, m>(i)), boost::math::pow<7>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<7>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<7>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<8>(make_fvar<T, m>(i)), boost::math::pow<8>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<8>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<8>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::pow<9>(make_fvar<T, m>(i)), boost::math::pow<9>(static_cast<T>(i)),
+    BOOST_REQUIRE_CLOSE(boost::math::pow<9>(make_fvar<T, m>(static_cast<T>(i))), boost::math::pow<9>(static_cast<T>(i)),
                         100 * std::numeric_limits<T>::epsilon());
   }
 }

@@ -8,14 +8,16 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using namespace boost;
+
   const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
-  using std::atanh;
-  constexpr std::size_t m = 5;
+  constexpr unsigned m = 5;
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = atanh(x);
-  // BOOST_REQUIRE(y.derivative(0) == atanh(cx)); // fails due to overload
-  BOOST_REQUIRE(y.derivative(0) == atanh(static_cast<T>(x)));
+  // BOOST_REQUIRE_EQUAL(y.derivative(0) , atanh(cx)); // fails due to overload
+  BOOST_REQUIRE_EQUAL(y.derivative(0), atanh(static_cast<T>(x)));
   BOOST_REQUIRE_CLOSE(y.derivative(1), static_cast<T>(4) / 3, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2), static_cast<T>(16) / 9, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3), static_cast<T>(224) / 27, eps);
@@ -24,8 +26,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
-  constexpr std::size_t m = 5;
+  BOOST_MATH_STD_USING
+  using namespace boost;
+
   const T cx = 1.0;
+  constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);
   auto y = atan(x);
   const auto eps = boost::math::tools::epsilon<T>();
@@ -38,14 +43,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
-  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
-  using std::erf;
+  BOOST_MATH_STD_USING
   using namespace boost;
-  constexpr std::size_t m = 5;
+
+  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
   const T cx = 1.0;
+  constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);
   auto y = erf(x);
-  BOOST_REQUIRE(y.derivative(0) == erf(static_cast<T>(x)));
+  BOOST_REQUIRE_EQUAL(y.derivative(0), erf(static_cast<T>(x)));
   BOOST_REQUIRE_CLOSE(y.derivative(1), 2 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2), -4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3), 4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
@@ -54,11 +60,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
+  BOOST_MATH_STD_USING
   const T eps = 20000 * boost::math::tools::epsilon<T>();  // percent
-  using std::cos;
-  using std::sin;
-  constexpr std::size_t m = 5;
   const T cx = 1;
+  constexpr unsigned m = 5;
   auto x = make_fvar<T, m>(cx);
   auto y = sinc(x);
   BOOST_REQUIRE_CLOSE(y.derivative(0), sin(cx), eps);
@@ -83,28 +88,27 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
+  BOOST_MATH_STD_USING
   const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
-  using std::cosh;
-  using std::sinh;
-  constexpr std::size_t m = 5;
   const T cx = 1;
+  constexpr unsigned m = 5;
   auto x = make_fvar<T, m>(cx);
   auto s = sinh(x);
   auto c = cosh(x);
   BOOST_REQUIRE_CLOSE(s.derivative(0), sinh(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(c.derivative(0), cosh(static_cast<T>(x)), eps);
-  for (size_t i = 0; i <= m; ++i) {
-    BOOST_REQUIRE_CLOSE(s.derivative(i), static_cast<T>(i & 1 ? c : s), eps);
-    BOOST_REQUIRE_CLOSE(c.derivative(i), static_cast<T>(i & 1 ? s : c), eps);
+  for (auto i : boost::irange(m + 1)) {
+    BOOST_REQUIRE_CLOSE(s.derivative(i), static_cast<T>(i % 2 == 1 ? c : s), eps);
+    BOOST_REQUIRE_CLOSE(c.derivative(i), static_cast<T>(i % 2 == 1 ? s : c), eps);
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
+  BOOST_MATH_STD_USING
   const T eps = 800 * boost::math::tools::epsilon<T>();  // percent
-  using std::sqrt;
-  constexpr std::size_t m = 5;
   const T cx = boost::math::constants::third_pi<T>();
   const T root_three = boost::math::constants::root_three<T>();
+  constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);
   auto y = tan(x);
   BOOST_REQUIRE_CLOSE(y.derivative(0), root_three, eps);
@@ -116,65 +120,66 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(fmod_test, T, bin_float_types) {
-  constexpr std::size_t m = 3;
+  BOOST_MATH_STD_USING
+  constexpr unsigned m = 3;
   const T cx = 3.25;
   const T cy = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = fmod(x, autodiff_fvar<T, m>(cy));
-  BOOST_REQUIRE(y.derivative(0) == 0.25);
-  BOOST_REQUIRE(y.derivative(1) == 1.0);
-  BOOST_REQUIRE(y.derivative(2) == 0.0);
-  BOOST_REQUIRE(y.derivative(3) == 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(0), 0.25);
+  BOOST_REQUIRE_EQUAL(y.derivative(1), 1.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(2), 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(3), 0.0);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(round_and_trunc, T, all_float_types) {
-  using std::round;
-  using std::trunc;
-  constexpr std::size_t m = 3;
+  BOOST_MATH_STD_USING
+  constexpr unsigned m = 3;
   const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
   auto y = round(x);
-  BOOST_REQUIRE(y.derivative(0) == round(cx));
-  BOOST_REQUIRE(y.derivative(1) == 0.0);
-  BOOST_REQUIRE(y.derivative(2) == 0.0);
-  BOOST_REQUIRE(y.derivative(3) == 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(0), round(cx));
+  BOOST_REQUIRE_EQUAL(y.derivative(1), 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(2), 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(3), 0.0);
   y = trunc(x);
-  BOOST_REQUIRE(y.derivative(0) == trunc(cx));
-  BOOST_REQUIRE(y.derivative(1) == 0.0);
-  BOOST_REQUIRE(y.derivative(2) == 0.0);
-  BOOST_REQUIRE(y.derivative(3) == 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(0), trunc(cx));
+  BOOST_REQUIRE_EQUAL(y.derivative(1), 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(2), 0.0);
+  BOOST_REQUIRE_EQUAL(y.derivative(3), 0.0);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(iround_and_itrunc, T, all_float_types) {
+  BOOST_MATH_STD_USING
   using namespace boost::math;
-  constexpr std::size_t m = 3;
+  constexpr unsigned m = 3;
   const T cx = 3.25;
   auto x = make_fvar<T, m>(cx);
   int y = iround(x);
-  BOOST_REQUIRE(y == iround(cx));
+  BOOST_REQUIRE_EQUAL(y, iround(cx));
   y = itrunc(x);
-  BOOST_REQUIRE(y == itrunc(cx));
+  BOOST_REQUIRE_EQUAL(y, itrunc(cx));
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w0_test, T, all_float_types) {
   const T eps = 1000 * boost::math::tools::epsilon<T>();  // percent
-  constexpr std::size_t m = 10;
+  constexpr unsigned m = 10;
   const T cx = 3;
   // Mathematica: N[Table[D[ProductLog[x], {x, n}], {n, 0, 10}] /. x -> 3, 52]
-  const char *const answers[m + 1]{"1.049908894964039959988697070552897904589466943706341",
-                                   "0.1707244807388472968312949774415522047470762509741737",
-                                   "-0.04336545501146252734105411312976167858858970875797718",
-                                   "0.02321456264324789334313200360870492961288748451791104",
-                                   "-0.01909049778427783072663170526188353869136655225133878",
-                                   "0.02122935002563637629500975949987796094687564718834156",
-                                   "-0.02979093848448877259041971538394953658978044986784643",
-                                   "0.05051290266216717699803334605370337985567016837482099",
-                                   "-0.1004503154972645060971099914384090562800544486549660",
-                                   "0.2292464437392250211967939182075930820454464472006425",
-                                   "-0.5905839053125614593682763387470654123192290838719517"};
+  constexpr std::array<const char*, m + 1> answers{{"1.049908894964039959988697070552897904589466943706341",
+                                                    "0.1707244807388472968312949774415522047470762509741737",
+                                                    "-0.04336545501146252734105411312976167858858970875797718",
+                                                    "0.02321456264324789334313200360870492961288748451791104",
+                                                    "-0.01909049778427783072663170526188353869136655225133878",
+                                                    "0.02122935002563637629500975949987796094687564718834156",
+                                                    "-0.02979093848448877259041971538394953658978044986784643",
+                                                    "0.05051290266216717699803334605370337985567016837482099",
+                                                    "-0.1004503154972645060971099914384090562800544486549660",
+                                                    "0.2292464437392250211967939182075930820454464472006425",
+                                                    "-0.5905839053125614593682763387470654123192290838719517"}};
   auto x = make_fvar<T, m>(cx);
   auto y = lambert_w0(x);
-  for (int i = 0; i <= m; ++i) {
+  for (auto i : boost::irange(m+1)) {
     const T answer = boost::lexical_cast<T>(answers[i]);
     BOOST_REQUIRE_CLOSE(y.derivative(i), answer, eps);
   }

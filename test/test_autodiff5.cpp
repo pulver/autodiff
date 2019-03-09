@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
     auto x = x_sampler.next();
     v = (signbit(v) ? -1 : 1) * (max)(v, (nextafter)(T(0), ((std::numeric_limits<T>::max))()));
     if (signbit(x)) {
-      v = T(boost::math::itrunc(v));
+      v = static_cast<T>(boost::math::itrunc(v));
     }
 
     {

@@ -1275,7 +1275,7 @@ fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
     using std::frexp;
     using root_type = typename fvar<RealType,Order>::root_type;
     frexp(static_cast<root_type>(cr), exp);
-    return cr * exp2(-*exp);
+    return cr * static_cast<root_type>(exp2(-*exp));
 }
 
 template<typename RealType, size_t Order>

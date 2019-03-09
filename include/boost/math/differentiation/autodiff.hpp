@@ -1243,7 +1243,7 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
         derivatives[1] = numerator / *derivatives;
         for (size_t i=2 ; i<=order ; ++i)
         {
-            numerator *= -0.5 * ((i<<1)-3);
+            numerator *= root_type(-0.5) * ((static_cast<long>(i)<<1)-3);
             powers *= x;
             derivatives[i] = numerator / (powers * *derivatives);
         }

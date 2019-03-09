@@ -1243,7 +1243,7 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
         derivatives[1] = numerator / *derivatives;
         for (size_t i=2 ; i<=order ; ++i)
         {
-            numerator *= root_type(-0.5) * ((static_cast<long>(i)<<1)-3);
+            numerator *= root_type(-0.5) * ((2*i)-3);
             powers *= x;
             derivatives[i] = numerator / (powers * *derivatives);
         }
@@ -1299,7 +1299,7 @@ fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
     {
         const root_type d1 = -sin(static_cast<root_type>(cr));
         const root_type derivatives[4] { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i % 4]; });
     }
 }
 
@@ -1316,7 +1316,7 @@ fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
     {
         const root_type d1 = cos(static_cast<root_type>(cr));
         const root_type derivatives[4] { d0, d1, -d0, -d1 };
-        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i % 4]; });
     }
 }
 
@@ -1500,7 +1500,7 @@ fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
     else
     {
         const root_type derivatives[2] { d0, sinh(static_cast<root_type>(cr)) };
-        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&1]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i % 2]; });
     }
 }
 
@@ -1589,7 +1589,7 @@ fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
     else
     {
         for (size_t n=2 ; n<=order ; n+=2)
-            taylor[n] = (1-static_cast<int>(n&2)) / boost::math::factorial<root_type>(n+1);
+            taylor[n] = (1-(static_cast<int>(n)&2)) / boost::math::factorial<root_type>(static_cast<unsigned>(n)+1);
         return cr.apply_with_factorials([&taylor](size_t i) { return taylor[i]; });
     }
 }
@@ -1606,7 +1606,7 @@ fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
     else
     {
         const root_type derivatives[2] { d0, cosh(static_cast<root_type>(cr)) };
-        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i&1]; });
+        return cr.apply_with_horner([&derivatives](size_t i) { return derivatives[i % 2]; });
     }
 }
 

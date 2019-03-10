@@ -385,7 +385,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     {
       auto x_ =
-          ((min<T>))(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x)), ((std::numeric_limits<double>::max))());
+          ((min<T>))(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x)), ((std::numeric_limits<T>::max))());
 
       BOOST_REQUIRE_CLOSE(boost::math::lambert_w0(make_fvar<T, m>(x_)), boost::math::lambert_w0(x_),
                           100 * std::numeric_limits<T>::epsilon());

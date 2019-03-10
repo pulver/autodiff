@@ -997,7 +997,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_with_horner(const std::function
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(static_cast<unsigned>(order_sum))));
-  for (size_t i=order_sum ; i-- ;) {
+    for (size_t i=order_sum ; i-- ;) {
       (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(static_cast<unsigned>(i));
     }
   return accumulator;
@@ -1011,8 +1011,9 @@ fvar<RealType,Order>
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> accumulator(f(order_sum));
-    for (size_t i=order_sum ; i-- ;)
-        (accumulator *= epsilon) += f(i);
+    for (size_t i=order_sum ; i-- ;) {
+      (accumulator *= epsilon) += f(i);
+    }
     return accumulator;
 }
 
@@ -1022,10 +1023,11 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, Orders... orders) const
 {
-    if constexpr (0 < sizeof...(Orders))
-        return v.at(order).at(orders...);
-    else
-        return v.at(order);
+    if constexpr (0 < sizeof...(Orders)) {
+      return v.at(order).at(orders...);
+    } else {
+      return v.at(order);
+    }
 }
 #endif
 
@@ -1047,8 +1049,9 @@ RealType fvar<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, si
     static_assert(is_fvar<RealType>::value, "epsilon_inner_product() must have 1 < depth.");
     RealType accumulator = RealType();
     const size_t i0_max = m1 < j ? j-m1 : 0;
-    for (size_t i0=m0, i1=j-m0 ; i0<=i0_max ; ++i0, --i1)
-        accumulator += v.at(i0).epsilon_multiply(z0, isum0+i0, cr.v.at(i1), z1, isum1+i1);
+    for (size_t i0=m0, i1=j-m0 ; i0<=i0_max ; ++i0, --i1) {
+      accumulator += v.at(i0).epsilon_multiply(z0, isum0 + i0, cr.v.at(i1), z1, isum1 + i1);
+    }
     return accumulator;
 }
 
@@ -1064,12 +1067,18 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
     const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
     fvar<RealType,Order> retval = fvar<RealType,Order>();
-    if constexpr (is_fvar<RealType>::value)
-        for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
-            retval.v[j] = epsilon_inner_product(z0, isum0, m0, cr, z1, isum1, m1, j);
-    else
-        for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
-            retval.v[j] = std::inner_product(v.cbegin()+ssize_t(m0), v.cend()-ssize_t(i+m1), cr.v.crbegin()+ssize_t(i+m0), zero);
+    if constexpr (is_fvar<RealType>::value) {
+      for (size_t i = 0, j = Order; i <= i_max; ++i, --j) {
+        retval.v[j] = epsilon_inner_product(z0, isum0, m0, cr, z1, isum1, m1, j);
+      }
+    } else {
+      for (size_t i = 0, j = Order; i <= i_max; ++i, --j) {
+        retval.v[j] = std::inner_product(v.cbegin() + ssize_t(m0),
+                                         v.cend() - ssize_t(i + m1),
+                                         cr.v.crbegin() + ssize_t(i + m0),
+                                         zero);
+      }
+    }
     return retval;
 }
 #endif
@@ -1084,13 +1093,17 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
 {
     fvar<RealType,Order> retval(*this);
     const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
-    if constexpr (is_fvar<RealType>::value)
-        for (size_t i=m0 ; i<=Order ; ++i)
-            retval.v[i] = retval.v[i].epsilon_multiply(z0, isum0+i, ca);
-    else
-        for (size_t i=m0 ; i<=Order ; ++i)
-            if (retval.v[i] != static_cast<RealType>(0))
-                retval.v[i] *= ca;
+    if constexpr (is_fvar<RealType>::value) {
+      for (size_t i = m0; i <= Order; ++i) {
+        retval.v[i] = retval.v[i].epsilon_multiply(z0, isum0 + i, ca);
+      }
+    } else {
+      for (size_t i = m0; i <= Order; ++i) {
+        if (retval.v[i]!=static_cast<RealType>(0)) {
+          retval.v[i] *= ca;
+        }
+      }
+    }
     return retval;
 }
 #endif
@@ -1109,8 +1122,9 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
     root_type derivatives[order_sum+1]; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
     const root_type x0 = static_cast<root_type>(*this);
     *derivatives = 1 / x0;
-    for (size_t i=1 ; i<=order_sum ; ++i)
-        derivatives[i] = -derivatives[i-1] * i / x0;
+    for (size_t i=1 ; i<=order_sum ; ++i) {
+      derivatives[i] = -derivatives[i - 1]*i/x0;
+    }
     return apply([&derivatives](size_t j) { return derivatives[j]; });
 }
 
@@ -1127,11 +1141,14 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
     }
     else
     {
-        if (is_root || *itr != 0)
-            *itr *= ca; // Skip multiplication of 0 by ca=inf to avoid nan. Exception: root value is always multiplied.
-        for (++itr ; itr!=v.end() ; ++itr)
-            if (*itr != 0)
-                *itr *= ca;
+        if (is_root || *itr != 0) {
+          *itr *= ca; // Skip multiplication of 0 by ca=inf to avoid nan. Exception: root value is always multiplied.
+        }
+        for (++itr ; itr!=v.end() ; ++itr) {
+          if (*itr!=0) {
+            *itr *= ca;
+          }
+        }
     }
     return *this;
 }
@@ -1153,10 +1170,11 @@ fvar<RealType,Order>::operator int() const
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::set_root(const root_type& root)
 {
-    if constexpr (is_fvar<RealType>::value)
-        v.front().set_root(root);
-    else
-        v.front() = root;
+    if constexpr (is_fvar<RealType>::value) {
+      v.front().set_root(root);
+    } else {
+      v.front() = root;
+    }
     return *this;
 }
 #endif
@@ -1572,9 +1590,10 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
             for (size_t n=3 ; n<=order ; ++n)
             {
                 coef[n-1] = coef[n-2] * -static_cast<root_type>(2*n-3);
-                for (size_t j=n-2 ; j!=0 ; --j)
-                    (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];
-                coef[0] *= -static_cast<root_type>(n-1);
+                for (size_t j=n-2 ; j!=0 ; --j) {
+                  (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];
+                }
+              coef[0] *= -static_cast<root_type>(n-1);
                 d1powers *= derivatives[1];
                 derivatives[n] = d1powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
                     [&x](const root_type& a, const root_type& b) { return a*x + b; });
@@ -1683,7 +1702,7 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
     ((std::max))(Order0, Order1)>;
 #else
-        Order0<Order1 ? Order1 : Order0>;
+    Order0<Order1 ? Order1 : Order0>;
 #endif
 };
 
@@ -1699,9 +1718,11 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
 
 template <typename destination_t, typename RealType, std::size_t Order>
 inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) {
-  using root_type = typename differentiation::detail::fvar<RealType, Order>::root_type;
+  using root_type = differentiation::detail::get_root_type<decltype(from_v)>;
   return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
+
+static_assert(std::is_same<double, decltype(real_cast<double>(boost::math::differentiation::autodiff_v1::detail::fvar<float,3>{}))>::value, "");
 
 }  // namespace tools
 

@@ -1673,7 +1673,7 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
                       differentiation::detail::fvar<RealType1, Order1>> {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
-                                             std::max(Order0, Order1)>;
+    ((std::max))(Order0, Order1)>;
 #else
         Order0<Order1 ? Order1 : Order0>;
 #endif

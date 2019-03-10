@@ -1716,14 +1716,9 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template <typename RealType, std::size_t Order>
-struct promote_args<differentiation::detail::fvar<RealType, Order>> {
-  using type = differentiation::detail::fvar<typename promote_args<RealType>::type, Order>;
-};
-
 template <typename destination_t, typename RealType, std::size_t Order>
 inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) {
-  using root_type = typename differentiation::detail::get_root_type<decltype(from_v)>::type;
+  using root_type = typename differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>::type;
   return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
 

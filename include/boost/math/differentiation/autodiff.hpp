@@ -825,7 +825,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator/(const root_type& ca) const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> operator/(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
-    fvar retval;
+    fvar<RealType, Order> retval;
     retval.v.front() = ca / cr.v.front();
     if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
     {

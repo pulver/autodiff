@@ -1722,8 +1722,6 @@ inline destination_t real_cast(const differentiation::detail::fvar<RealType, Ord
   return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
 
-static_assert(std::is_same<double, decltype(real_cast<double>(boost::math::differentiation::autodiff_v1::detail::fvar<float,3>{}))>::value, "");
-
 }  // namespace tools
 
 namespace policies {

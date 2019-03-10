@@ -19,10 +19,10 @@ int main()
   using cpp_bin_float_50 = boost::multiprecision::cpp_bin_float_50;
   using namespace boost::math::differentiation;
 
-  constexpr int Nw=3; // Max order of derivative to calculate for w
-  constexpr int Nx=2; // Max order of derivative to calculate for x
-  constexpr int Ny=4; // Max order of derivative to calculate for y
-  constexpr int Nz=3; // Max order of derivative to calculate for z
+  constexpr std::size_t Nw=3; // Max order of derivative to calculate for w
+  constexpr std::size_t Nx=2; // Max order of derivative to calculate for x
+  constexpr std::size_t Ny=4; // Max order of derivative to calculate for y
+  constexpr std::size_t Nz=3; // Max order of derivative to calculate for z
   using var = autodiff_fvar<cpp_bin_float_50,Nw,Nx,Ny,Nz>;
   const var w = make_fvar<cpp_bin_float_50,Nw>(11);
   const var x = make_fvar<cpp_bin_float_50,0,Nx>(12);

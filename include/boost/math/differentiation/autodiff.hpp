@@ -1723,7 +1723,7 @@ struct promote_args<differentiation::detail::fvar<RealType, Order>> {
 
 template <typename destination_t, typename RealType, std::size_t Order>
 inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) {
-  using root_type = differentiation::detail::get_root_type<decltype(from_v)>;
+  using root_type = typename differentiation::detail::get_root_type<decltype(from_v)>::type;
   return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
 

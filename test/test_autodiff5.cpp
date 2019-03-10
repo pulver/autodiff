@@ -235,6 +235,38 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_derivatives, T, all_float_types) {
+  BOOST_MATH_STD_USING;
+  const T x = 0.5;
+  const T y = 0.5*boost::math::constants::root_three<T>();
+  constexpr size_t m = 5;
+  const auto z = atan2(make_fvar<T,m>(y), make_fvar<T,0,m>(x));
+  // Mathematica: Flatten@Transpose@Table[D[ArcTan[x,y],{x,i},{y,j}] /. {x->1/2, y->Sqrt[3]/2}, {i,0,5}, {j,0,5}]
+  const T expected[(m+1)*(m+1)] { boost::math::constants::third_pi<T>(),
+    -0.5*boost::math::constants::root_three<T>(), 0.5*boost::math::constants::root_three<T>(), 0,
+    -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0.5, 0.5, -2,
+    3, 12, -120, -0.5*boost::math::constants::root_three<T>(), 0, 3*boost::math::constants::root_three<T>(),
+    -12*boost::math::constants::root_three<T>(), 0, 360*boost::math::constants::root_three<T>(), 2, -3, -12,
+    120, -360, -2520, -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0,
+    -360*boost::math::constants::root_three<T>(), 2520*boost::math::constants::root_three<T>(), 0, 12, -120, 360,
+    2520, -40320, 181440 };
+  size_t k=0;
+  for (size_t i=0 ; i<=m ; ++i)
+    for (size_t j=0 ; j<=m ; ++j)
+      try {
+        auto autodiff_v = z.derivative(i,j);
+        auto anchor_v = expected[k++];
+        //std::cout << "z.derivative("<<i<<','<<j<<") = " << z.derivative(i,j) << std::endl;
+        if (anchor_v == 0)
+          BOOST_REQUIRE_SMALL(autodiff_v, 300000*boost::math::tools::epsilon<T>());
+        else
+          BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100*boost::math::tools::epsilon<T>());
+      } catch(...) {
+        std::cout << "Input: (i,j): ("<<i<<','<<j<<')' << std::endl;
+        std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
   BOOST_MATH_STD_USING;
   using test_constants = test_constants_t<T>;
@@ -248,8 +280,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     try {
-      auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
-      auto anchor_v = atan2(x, y);
+      auto autodiff_v = atan2(make_fvar<T, m>(y), make_fvar<T, m>(x));
+      auto anchor_v = atan2(y, x);
       BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
     } catch (...) {
       std::cout << "Input: x: " << x << " y: " << y << std::endl;

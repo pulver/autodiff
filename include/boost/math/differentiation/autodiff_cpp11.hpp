@@ -199,6 +199,28 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 
 template<typename RealType, size_t Order>
 template<typename RootType>
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type, const RootType&)
+{
+    std::for_each(v.begin(), v.end(), [](RealType& r) { r.negate(); });
+    return *this;
+}
+
+template<typename RealType, size_t Order>
+template<typename RootType>
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type, const RootType&)
+{
+    std::for_each(v.begin(), v.end(), [](RealType& a) { a = -a; });
+    return *this;
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>& fvar<RealType,Order>::negate()
+{
+    return negate_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, static_cast<root_type>(*this));
+}
+
+template<typename RealType, size_t Order>
+template<typename RootType>
 fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::true_type, const RootType& root)
 {
     v.front().set_root(root);

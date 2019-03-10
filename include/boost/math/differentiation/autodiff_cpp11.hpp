@@ -11,7 +11,7 @@
 //    C++17 is a higher-level language and is easier to maintain. For example, a number of functions which are
 //    lucidly read in autodiff.cpp are forced to be split into multiple structs/functions in this file for C++11.
 //  * Use of typename RootType and SizeType is a hack to prevent Visual Studio 2015 from compiling functions
-//    that are never called, that would otherwise produce compiler errors.
+//    that are never called, that would otherwise produce compiler errors. Also forces functions to be inline.
 
 #ifndef BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 #   error "Do not #include this file directly. This should only be #included by autodiff.hpp for C++11 compatibility."
@@ -94,12 +94,41 @@ get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::deriva
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
 }
 
+template<typename RootType, typename Func>
+class Curry
+{
+    const Func& f;
+    const size_t i;
+  public:
+    template <typename SizeType> // typename SizeType to force inline constructor.
+    Curry(const Func& f, SizeType i):f(f),i(i) { }
+    template <typename... Indices>
+    RootType operator()(Indices... indices) const { return f(i,indices...); }
+};
+
+// f : order -> derivative(order)/factorial(order)
+// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
+template<typename RealType, size_t Order>
+template<typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coefficients(
+    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
+{
+    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+    size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
+    using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
+    return_type accumulator = cr.apply_coefficients(
+        order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
+    while (i--)
+        (accumulator *= epsilon) += cr.apply_coefficients(
+            order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
+    return accumulator;
+}
+
 template<typename RealType, size_t Order>
 template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type,
     SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
-    const RealType zero(0);
     const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
     const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
@@ -195,6 +224,28 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 {
     return multiply_assign_by_root_type_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{},
         is_root, ca);
+}
+
+template<typename RealType, size_t Order>
+template<typename RootType>
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type, const RootType&)
+{
+    std::for_each(v.begin(), v.end(), [](RealType& r) { r.negate(); });
+    return *this;
+}
+
+template<typename RealType, size_t Order>
+template<typename RootType>
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type, const RootType&)
+{
+    std::for_each(v.begin(), v.end(), [](RealType& a) { a = -a; });
+    return *this;
+}
+
+template<typename RealType, size_t Order>
+fvar<RealType,Order>& fvar<RealType,Order>::negate()
+{
+    return negate_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, static_cast<root_type>(*this));
 }
 
 template<typename RealType, size_t Order>

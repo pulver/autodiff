@@ -235,6 +235,38 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_derivatives, T, all_float_types) {
+  BOOST_MATH_STD_USING;
+  const T x = 0.5;
+  const T y = 0.5*boost::math::constants::root_three<T>();
+  constexpr size_t m = 5;
+  const auto z = atan2(make_fvar<T,m>(y), make_fvar<T,0,m>(x));
+  // Mathematica: Flatten@Transpose@Table[D[ArcTan[x,y],{x,i},{y,j}] /. {x->1/2, y->Sqrt[3]/2}, {i,0,5}, {j,0,5}]
+  const T expected[(m+1)*(m+1)] { boost::math::constants::third_pi<T>(),
+    -0.5*boost::math::constants::root_three<T>(), 0.5*boost::math::constants::root_three<T>(), 0,
+    -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0.5, 0.5, -2,
+    3, 12, -120, -0.5*boost::math::constants::root_three<T>(), 0, 3*boost::math::constants::root_three<T>(),
+    -12*boost::math::constants::root_three<T>(), 0, 360*boost::math::constants::root_three<T>(), 2, -3, -12,
+    120, -360, -2520, -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0,
+    -360*boost::math::constants::root_three<T>(), 2520*boost::math::constants::root_three<T>(), 0, 12, -120, 360,
+    2520, -40320, 181440 };
+  size_t k=0;
+  for (size_t i=0 ; i<=m ; ++i)
+    for (size_t j=0 ; j<=m ; ++j)
+      try {
+        auto autodiff_v = z.derivative(i,j);
+        auto anchor_v = expected[k++];
+        if (anchor_v == 0)
+          BOOST_REQUIRE_SMALL(autodiff_v, 300000*boost::math::tools::epsilon<T>());
+        else
+          BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, 100*boost::math::tools::epsilon<T>());
+      } catch(...) {
+        std::cout << "Input: (i,j): ("<<i<<','<<j<<')' << std::endl;
+        std::rethrow_exception(std::exception_ptr(std::current_exception()));
+      }
+  //std::cout << "Should be 0: z.derivative(4,5) = " << z.derivative(4,5) << std::endl;
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
   BOOST_MATH_STD_USING;
   using test_constants = test_constants_t<T>;
@@ -248,8 +280,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
     auto x = x_sampler.next();
     auto y = y_sampler.next();
     try {
-      auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
-      auto anchor_v = atan2(x, y);
+      auto autodiff_v = atan2(make_fvar<T, m>(y), make_fvar<T, m>(x));
+      auto anchor_v = atan2(y, x);
       BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, boost::math::tools::epsilon<T>());
     } catch (...) {
       std::cout << "Input: x: " << x << " y: " << y << std::endl;
@@ -953,33 +985,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  {
-    test_detail::RandomSample<T> x_sampler{-2, 2};
-    T t_0 = 1;
-    T x = x_sampler.next();
-    T t_1 = x;
-    for (auto i : boost::irange(test_constants::n_samples)) {
-      std::ignore = i;
-      try {
-        std::swap(t_0, t_1);
-        auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
-        BOOST_REQUIRE_EQUAL(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            tmp);
-        t_1 = tmp;
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Input: x: " << x << "  t_0: " << t_0 << "  t_1: " << t_1 << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
-    }
-  }
   {
     test_detail::RandomSample<unsigned> n_sampler{0, 10};
     test_detail::RandomSample<T> x_sampler{-2, 2};

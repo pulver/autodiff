@@ -71,20 +71,20 @@ template <typename T> struct RandomSample {
   using dist_t = mp11::mp_if<is_integer_t, std::uniform_int_distribution<distribution_param_t>,
                              std::uniform_real_distribution<distribution_param_t>>;
 
-  template <bool> struct get_endpoint_t_ {
+  struct get_integral_endpoint {
     template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
       return static_cast<distribution_param_t>(finish);
     }
   };
 
-  template <> struct get_endpoint_t_<false> {
+  struct get_real_endpoint {
     template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
       return ((std::nextafter))(static_cast<distribution_param_t>(finish),
                                 ((std::numeric_limits<distribution_param_t>::max))());
     }
   };
 
-  using get_endpoint_t = get_endpoint_t_<is_integer_t::value>;
+  using get_endpoint_t = mp11::mp_if<is_integer_t, get_integral_endpoint, get_real_endpoint>;
 
   template <typename U, typename V>
   RandomSample(U start, V finish)

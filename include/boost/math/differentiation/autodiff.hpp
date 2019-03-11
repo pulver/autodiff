@@ -1580,6 +1580,8 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
     std::array<root_type,order> coef {{ -1, -1 }}; // as in derivatives[2].
     for (size_t n=3 ; n<=order ; ++n)
     {
+      using ssize_t = typename std::array<RealType, Order+1>::difference_type;
+
       coef[n-1] = coef[n-2] * -static_cast<root_type>(2*n-3);
       for (auto j=n-2 ; j!=0 ; --j) {
         (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];

@@ -265,6 +265,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_derivatives, T, all_float_types) {
         std::cout << "Input: (i,j): ("<<i<<','<<j<<')' << std::endl;
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }
+  //std::cout << "Should be 0: z.derivative(4,5) = " << z.derivative(4,5) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {

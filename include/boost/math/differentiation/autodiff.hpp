@@ -1227,7 +1227,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<Real
     root_type coef = 1;
     for (; i<=order && coef!=0 ; ++i)
     {
-        derivatives[i] = coef * pow(x0, y-i);
+        derivatives[i] = coef * pow(x0, y-i); // TODO compare accuracy with division on each step?
         coef *= y - i;
     }
     return x.apply_derivatives([&derivatives,i](size_t j) { return j < i ? derivatives[j] : 0; });
@@ -1362,7 +1362,6 @@ fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
 {
-    //return sin(cr) / cos(cr);
     using std::tan;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
@@ -1428,6 +1427,11 @@ fvar<RealType,Order> atan2(const typename fvar<RealType,Order>::root_type& ca, c
     }
 }
 
+// Calculate via blocks.
+// Should be 0:
+// z.derivative(4,5) = -0.00274658
+// z.derivative(4,5) = -1.66267e-11
+// z.derivative(4,5) = 6.245e-16
 // TODO WIP Calculates correctly, large error for small values, needs simplification/improvement.
 // Generalize helper methods to variadic parameters.
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
@@ -1437,39 +1441,35 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>> atan2(const fvar<RealType
     using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
     using root_type = typename return_type::root_type;
     constexpr size_t order = return_type::order_sum;
-    const root_type d00 = atan2(static_cast<root_type>(cr1), static_cast<root_type>(cr2));
+    const root_type y = static_cast<root_type>(cr1);
+    const root_type x = static_cast<root_type>(cr2);
+    const root_type d00 = atan2(y, x);
     if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
         return return_type(d00);
     else
     {
         constexpr size_t order1 = fvar<RealType1,Order1>::order_sum;
         constexpr size_t order2 = fvar<RealType2,Order2>::order_sum;
-        const root_type y = static_cast<root_type>(cr1);
-        const root_type x = static_cast<root_type>(cr2);
-        const auto d0_ = atan2(cr1, x); // lots of redundancy
-        const auto d_0 = atan2(y, cr2); // lots of redundancy
-        auto y2 = make_fvar<typename fvar<RealType1,Order1>::root_type,order1-1>(y);
-        y2 *= y2;
-        auto x2 = make_fvar<typename fvar<RealType2,Order2>::root_type,0,order2-1>(x);
-        x2 *= x2;
-        auto d11 = y2 - x2;
-        auto denom = y2 + x2;
-        d11 /= (denom *= denom); // (d^2/dxdy)atan2(y,x) = (y^2-x^2)/(y^2+x^2)^2
+        auto x01 = make_fvar<typename fvar<RealType2,Order2>::root_type,order-1>(x); // TODO verify order
+        const auto d01 = -y / ((x01*=x01)+=(y*y));
+        auto y10 = make_fvar<typename fvar<RealType1,Order1>::root_type,order-1>(y); // TODO verify order
+        auto x10 = make_fvar<typename fvar<RealType2,Order2>::root_type,0,order>(x); // TODO verify order
+        const auto d10 = x10 / ((x10*x10)+(y10*=y10));
+        auto f = [&d00,&d01,&d10](size_t i, size_t j) { return i ? d10.at(i-1,j)/i : j ? d01.at(j-1)/j : d00; };
         const fvar<RealType1,Order1> epsilon1 = fvar<RealType1,Order1>(cr1).set_root(0);
         const fvar<RealType2,Order2> epsilon2 = fvar<RealType2,Order2>(cr2).set_root(0);
-        return_type accumulator = d0_;
-        accumulator.set_root(0); // prevent double-sum of root value
-        accumulator += d_0;
-        //std::cout << "d11 = " << d11 << std::endl;
+        return_type accumulator = return_type();
         fvar<RealType1,Order1> epsilon1_power(1);
-        for (size_t i1=1 ; i1<=order1 ; ++i1)
+        for (size_t i1=0 ; i1<=order1 ; ++i1)
         {
-            epsilon1_power *= epsilon1;
+            if (i1)
+                epsilon1_power *= epsilon1;
             fvar<RealType2,Order2> epsilon2_power(1);
-            for (size_t i2=1, m=std::min(order2,order-i1) ; i2<=m ; ++i2)
+            for (size_t i2=0, m=std::min(order2,order-i1) ; i2<=m ; ++i2)
             {
-                epsilon2_power *= epsilon2;
-                accumulator += (epsilon2_power * epsilon1_power) * (d11.at(i1-1,i2-1)/(i1*i2));
+                if (i2)
+                    epsilon2_power *= epsilon2;
+                accumulator += (epsilon2_power * epsilon1_power) * f(i1,i2);
             }
         }
         return accumulator;

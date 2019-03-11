@@ -3,8 +3,9 @@
 //      (See accompanying file LICENSE_1_0.txt or copy at
 //           https://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/lexical_cast.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
+
+#include <boost/lexical_cast.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
 
@@ -156,7 +157,7 @@ int main() {
       for (std::size_t iy = 0; iy <= Ny; ++iy)
         for (std::size_t iz = 0; iz <= Nz; ++iz) {
           const type value = v.derivative(iw, ix, iy, iz);
-          const type answer = boost::lexical_cast<type>(answers[ia++]);
+          const type answer = boost::lexical_cast<type>(answers[static_cast<std::size_t>(ia++)]);
           const double error = static_cast<double>(fabs(value / answer - 1));
           max_relative_error = std::max(error, max_relative_error);
         }

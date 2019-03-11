@@ -134,7 +134,8 @@ fvar<RealType, Order> fvar<RealType, Order>::epsilon_multiply_cpp11(std::false_t
   fvar<RealType, Order> retval(*this);
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
   for (size_t i = m0; i <= Order; ++i)
-    if (retval.v[i] != static_cast<RealType>(0)) retval.v[i] *= ca;
+    if (!(retval.v[i] <= static_cast<RealType>(0) && retval.v[i] >= static_cast<RealType>(0)))
+      retval.v[i] *= ca;
   return retval;
 }
 
@@ -157,11 +158,13 @@ template <typename RealType, size_t Order>
 template <typename RootType>
 fvar<RealType, Order>& fvar<RealType, Order>::multiply_assign_by_root_type_cpp11(std::false_type, bool is_root,
                                                                                  const RootType& ca) {
+
   auto itr = v.begin();
-  if (is_root || *itr != 0)
+  if (is_root || !(*itr <= static_cast<RealType>(0) && *itr >= static_cast<RealType>(0)))
     *itr *= ca;  // Skip multiplication of 0 by ca=inf to avoid nan. Exception: root value is always multiplied.
   for (++itr; itr != v.end(); ++itr)
-    if (*itr != 0) *itr *= ca;
+    if (!(*itr <= static_cast<RealType>(0) && *itr >= static_cast<RealType>(0)))
+      *itr *= ca;
   return *this;
 }
 

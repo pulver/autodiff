@@ -7,15 +7,16 @@
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
 #include <boost/config.hpp>
+#include <boost/math/tools/config.hpp>
 
 #if defined(_MSC_VER) || defined(BOOST_MSVC)
 #define NOMINMAX
 #endif
 
-#include <boost/math/tools/config.hpp>
-#include <boost/math/policies/policy.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/math/policies/policy.hpp>
 #include <boost/math/special_functions.hpp>
+
 #include <boost/math/tools/promotion.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -361,6 +362,12 @@ private:
     fvar& set_root_cpp11(std::false_type, const RootType& root);
 #endif
 };
+
+template <typename T, typename U> static constexpr bool fpequal(const T& t, const U& u) noexcept {
+  using promoted_t = promote<T, U>;
+  return static_cast<promoted_t>(t) <= static_cast<promoted_t>(u) &&
+         static_cast<promoted_t>(t) >= static_cast<promoted_t>(u);
+}
 
 // C++11 compatibility
 #ifdef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -862,38 +869,38 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 bool fvar<RealType,Order>::operator==(const fvar<RealType2,Order2>& cr) const
 {
-    return v.front() == cr.v.front();
+    return fpequal(v.front(), cr.v.front());
 }
 
 template<typename RealType, size_t Order>
 bool fvar<RealType,Order>::operator==(const root_type& ca) const
 {
-    return v.front() == ca;
+    return fpequal(v.front(), ca);
 }
 
 template<typename RealType, size_t Order>
 bool operator==(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
-    return ca == cr.v.front();
+    return fpequal(ca, cr.v.front());
 }
 
 template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 bool fvar<RealType,Order>::operator!=(const fvar<RealType2,Order2>& cr) const
 {
-    return v.front() != cr.v.front();
+    return !(this->operator==(cr));
 }
 
 template<typename RealType, size_t Order>
 bool fvar<RealType,Order>::operator!=(const root_type& ca) const
 {
-    return v.front() != ca;
+    return !(this->operator==(ca));
 }
 
 template<typename RealType, size_t Order>
 bool operator!=(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
-    return ca != cr.v.front();
+  return !(fpequal(ca, cr.v.front()));
 }
 
 template<typename RealType, size_t Order>
@@ -1115,7 +1122,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
       }
     } else {
       for (size_t i = m0; i <= Order; ++i) {
-        if (retval.v[i]!=static_cast<RealType>(0)) {
+        if (!fpequal(retval.v[i], static_cast<RealType>(0))) {
           retval.v[i] *= ca;
         }
       }
@@ -1127,7 +1134,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
 template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse() const
 {
-    return static_cast<root_type>(*this) == 0 ? inverse_apply() : 1 / *this;
+    return fpequal(static_cast<root_type>(*this), static_cast<RealType>(0)) ? inverse_apply() : 1 / *this;
 }
 
 // This gives log(0.0) = depth(1)(-inf,inf,-inf,inf,-inf,inf)
@@ -1136,7 +1143,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
 {
     root_type derivatives[order_sum+1]; // LCOV_EXCL_LINE This causes a false negative on lcov coverage test.
-    const root_type x0 = static_cast<root_type>(*this);
+    const auto x0 = static_cast<root_type>(*this);
     *derivatives = 1 / x0;
     for (size_t i=1 ; i<=order_sum ; ++i) {
       derivatives[i] = -derivatives[i - 1]*i/x0;
@@ -1152,16 +1159,17 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
     if constexpr (is_fvar<RealType>::value)
     {
         itr->multiply_assign_by_root_type(is_root, ca);
-        for (++itr ; itr!=v.end() ; ++itr)
-            itr->multiply_assign_by_root_type(false, ca);
+        for (++itr ; itr!=v.end() ; ++itr) {
+          itr->multiply_assign_by_root_type(false, ca);
+        }
     }
     else
     {
-        if (is_root || *itr != 0) {
+        if (is_root || (!fpequal(*itr, static_cast<RealType>(0)))) {
           *itr *= ca; // Skip multiplication of 0 by ca=inf to avoid nan. Exception: root value is always multiplied.
         }
         for (++itr ; itr!=v.end() ; ++itr) {
-          if (*itr!=0) {
+          if (!fpequal(*itr, static_cast<RealType>(0))) {
             *itr *= ca;
           }
         }
@@ -1245,7 +1253,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x,const typename fvar<RealT
     const root_type x0 = static_cast<root_type>(x);
     size_t i = 0;
     root_type coef = 1;
-    for (; i<=order && coef!=0 ; ++i)
+    for (; i<=order && !fpequal(coef, root_type(0)); ++i)
     {
         derivatives[i] = coef * pow(x0, y-i);
         coef *= y - i;

@@ -51,6 +51,19 @@ using namespace boost::math::differentiation;
 namespace test_detail {
 
 /**
+ * Simple struct to hold constants that are used in each test
+ * since BOOST_AUTO_TEST_CASE_TEMPLATE doesn't support fixtures.
+ */
+template <typename T, typename Order> struct test_constants_t;
+
+template <typename T, typename Order, Order val> struct test_constants_t<T, std::integral_constant<Order, val>> {
+  static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
+                                               mp11::mp_int<10>, mp11::mp_int<25>>::value;
+  static constexpr Order order = val;
+  static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
+};
+
+/**
  * struct to emit pseudo-random values from a given interval.
  * Endpoints are closed or open depending on whether or not they're infinite).
  */
@@ -91,6 +104,7 @@ template <typename T> struct RandomSample {
       : rng_(std::random_device{}()), dist_(static_cast<distribution_param_t>(start), get_endpoint_t{}(finish)) {}
 
   T next() noexcept { return static_cast<T>(dist_(rng_)); }
+  T normalize(const T& x) noexcept { return x / (dist_.max() - dist_.min()); }
 
   std::mt19937 rng_;
   dist_t dist_;
@@ -102,19 +116,6 @@ static_assert(
 static_assert(std::is_same<typename RandomSample<bmp::cpp_bin_float_50>::dist_t,
                            std::uniform_real_distribution<long double>>::value,
               "");
-
-/**
- * Simple struct to hold constants that are used in each test
- * since BOOST_AUTO_TEST_CASE_TEMPLATE doesn't support fixtures.
- */
-template <typename T, typename Order> struct test_constants_t;
-
-template <typename T, typename Order, Order val> struct test_constants_t<T, std::integral_constant<Order, val>> {
-  static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
-                                               mp11::mp_int<10>, mp11::mp_int<25>>::value;
-  static constexpr Order order = val;
-  static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
-};
 
 }  // namespace test_detail
 

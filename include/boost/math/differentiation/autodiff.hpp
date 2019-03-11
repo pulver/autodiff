@@ -1046,7 +1046,7 @@ template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, Orders... orders) const
 {
     if constexpr (0 < sizeof...(Orders)) {
-      return v.at(order).at(orders...);
+      return v.at(order).at(static_cast<unsigned>(orders)...);
     } else {
       return v.at(order);
     }
@@ -1060,7 +1060,7 @@ template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
     static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-    return at(orders...) * (... * boost::math::factorial<root_type>(orders));
+    return at(static_cast<unsigned>(orders)...) * (... * boost::math::factorial<root_type>(static_cast<unsigned>(orders)));
 }
 #endif
 
@@ -1586,7 +1586,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
       }
       coef[0] *= -static_cast<root_type>(n-1);
       d1_powers *= derivatives[1];
-      derivatives[n] = d1_powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
+      derivatives[n] = d1_powers * std::accumulate(coef.crend()-ssize_t(n-1), coef.crend(), coef[n-1],
                                                   [&x](const root_type& a, const root_type& b) { return a*x + b; });
     }
     return cr.apply([&derivatives](size_t i) { return derivatives[i]; });

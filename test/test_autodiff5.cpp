@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 }
 
 {
-  auto b_norm = abs(b) / (((b_sampler.dist_.max))() - ((b_sampler.dist_.min))());
+  auto b_norm = b_sampler.normalize(abs(b));
   {
     auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
     auto anchor_v = boost::math::ibeta_inva(a_, b_norm, z);
@@ -602,10 +602,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   BOOST_MATH_STD_USING
   using boost::math::nextafter;
+  using boost::math::differentiation::detail::fpequal;
   using boost::math::tools::max;
   using std::max;
   using std::nextafter;
-  using boost::math::differentiation::detail::fpequal;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

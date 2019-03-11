@@ -131,34 +131,34 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
     }
 
-    auto z_normalized = z / (((z_sampler.dist_.max))() - ((z_sampler.dist_.min))());
+    auto z_normalized = z_sampler.normalize(z);
     {
-      auto a_normalized = a_sampler.next() / (((a_sampler.dist_.max))() - ((a_sampler.dist_.min))());
+      auto a_normalized = a_sampler.normalize(a_sampler.next());
 
       auto autodiff_v = boost::math::gamma_p_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
       auto anchor_v = boost::math::gamma_p_inv(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
     }
     {
-      auto a_normalized = a_sampler.next() / (((a_sampler.dist_.max))() - ((a_sampler.dist_.min))());
+      auto a_normalized = a_sampler.normalize(a_sampler.next());
       auto autodiff_v = boost::math::gamma_q_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
       auto anchor_v = boost::math::gamma_q_inv(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
     }
     {
-      auto a_normalized = a_sampler.next() / (((a_sampler.dist_.max))() - ((a_sampler.dist_.min))());
+      auto a_normalized = a_sampler.normalize(a_sampler.next());
       auto autodiff_v = boost::math::gamma_p_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
       auto anchor_v = boost::math::gamma_p_inva(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
     }
     {
-      auto a_normalized = a_sampler.next() / (((a_sampler.dist_.max))() - ((a_sampler.dist_.min))());
+      auto a_normalized = a_sampler.normalize(a_sampler.next());
       auto autodiff_v = boost::math::gamma_q_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
       auto anchor_v = boost::math::gamma_q_inva(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
     }
     {
-      auto a_normalized = a_sampler.next() / (((a_sampler.dist_.max))() - ((a_sampler.dist_.min))());
+      auto a_normalized = a_sampler.normalize(a_sampler.next());
       auto autodiff_v = boost::math::gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
       auto anchor_v = boost::math::gamma_p_derivative(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 5000 * 100 * std::numeric_limits<T>::epsilon());
@@ -384,8 +384,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     {
-      auto x_ =
-          ((min<T>))(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x)), ((std::numeric_limits<T>::max))());
+      auto x_ = (min<T>)(static_cast<T>(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x))),
+                         ((std::numeric_limits<T>::max))());
 
       BOOST_REQUIRE_CLOSE(boost::math::lambert_w0(make_fvar<T, m>(x_)), boost::math::lambert_w0(x_),
                           100 * std::numeric_limits<T>::epsilon());

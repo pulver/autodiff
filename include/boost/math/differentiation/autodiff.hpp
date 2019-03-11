@@ -67,12 +67,16 @@ struct get_order_sum : std::integral_constant<size_t, 0> {};
 template <typename RealType, size_t Order>
 struct get_order_sum<fvar<RealType,Order>> : std::integral_constant<size_t,get_order_sum<RealType>::value+Order> {};
 
+/* \brief The get_root_type template argument is potentially converted by std::decay due to the (if std::decay is not used):
+ * static_assert(std::is_same<typename get_root_type<const fvar<fvar<fvar<double, 4>, 0>, 0>>::type, const fvar<fvar<fvar<double, 4>, 0>, 0>>::value, "");
+ * static_assert(std::is_same<typename get_root_type<fvar<fvar<fvar<double, 4>, 0>, 0>>::type, double>::value, ""); */
+
 // Get non-fvar<> root type T of autodiff_fvar<T,O0,O1,O2,...>.
 template<typename RealType>
-struct get_root_type { using type = RealType; };
+struct get_root_type { using type = typename std::decay<RealType>::type; };
 
 template<typename RealType, size_t Order>
-struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
+struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<typename std::decay<RealType>::type>::type; };
 
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
@@ -1701,8 +1705,10 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template <typename DestinationT, typename RealType, std::size_t Order> DestinationT real_cast(differentiation::detail::fvar<RealType, Order> from_v) {
-  using root_type = typename differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>::type;
+template <typename DestinationT, typename RealType, std::size_t Order>
+DestinationT real_cast(differentiation::detail::fvar<RealType, Order> from_v) {
+  using root_type =
+      typename differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>::type;
   return static_cast<DestinationT>(static_cast<root_type>(from_v));
 }
 

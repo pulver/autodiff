@@ -159,7 +159,7 @@ int main() {
           const type value = v.derivative(iw, ix, iy, iz);
           const type answer = boost::lexical_cast<type>(answers[static_cast<std::size_t>(ia++)]);
           const double error = static_cast<double>(fabs(value / answer - 1));
-          max_relative_error = std::max(error, max_relative_error);
+          max_relative_error = (std::max)(error, max_relative_error);
         }
   std::cout << "max_relative_error = " << std::setprecision(3) << max_relative_error << " out of " << ia
             << " calculated values." << std::endl;

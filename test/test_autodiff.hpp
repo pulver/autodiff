@@ -59,10 +59,10 @@ namespace test_detail {
  */
 template <typename T, typename Order> struct test_constants_t;
 
-template <typename T, typename Order, Order val> struct test_constants_t<T, std::integral_constant<Order, val>> {
+template <typename T, typename Order, Order Val> struct test_constants_t<T, std::integral_constant<Order, Val>> {
   static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
                                                mp11::mp_int<10>, mp11::mp_int<25>>::value;
-  static constexpr Order order = val;
+  static constexpr Order order = Val;
   static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
 };
 
@@ -95,8 +95,8 @@ template <typename T> struct RandomSample {
 
   struct get_real_endpoint {
     template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
-      return ((std::nextafter))(static_cast<distribution_param_t>(finish),
-                                ((std::numeric_limits<distribution_param_t>::max))());
+      return std::nextafter(static_cast<distribution_param_t>(finish),
+                                (std::numeric_limits<distribution_param_t>::max)());
     }
   };
 
@@ -107,16 +107,16 @@ template <typename T> struct RandomSample {
       : rng_(std::random_device{}()), dist_(static_cast<distribution_param_t>(start), get_endpoint_t{}(finish)) {}
 
   T next() noexcept { return static_cast<T>(dist_(rng_)); }
-  T normalize(const T& x) noexcept { return x / (dist_.max() - dist_.min()); }
+  T normalize(const T& x) noexcept { return x / ((dist_.max)() - (dist_.min)()); }
 
   std::mt19937 rng_;
   dist_t dist_;
 };
-static_assert(std::is_same<typename RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
-static_assert(std::is_same<typename RandomSample<int64_t>::dist_t, std::uniform_int_distribution<int64_t>>::value, "");
+static_assert(std::is_same<RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
+static_assert(std::is_same<RandomSample<int64_t>::dist_t, std::uniform_int_distribution<int64_t>>::value, "");
 static_assert(
-    std::is_same<typename RandomSample<bmp::uint512_t>::dist_t, std::uniform_int_distribution<uint64_t>>::value, "");
-static_assert(std::is_same<typename RandomSample<bmp::cpp_bin_float_50>::dist_t,
+    std::is_same<RandomSample<bmp::uint512_t>::dist_t, std::uniform_int_distribution<uint64_t>>::value, "");
+static_assert(std::is_same<RandomSample<bmp::cpp_bin_float_50>::dist_t,
                            std::uniform_real_distribution<long double>>::value,
               "");
 

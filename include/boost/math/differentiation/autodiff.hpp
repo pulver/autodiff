@@ -9,10 +9,6 @@
 #include <boost/config.hpp>
 #include <boost/math/tools/config.hpp>
 
-#if defined(_MSC_VER) || defined(BOOST_MSVC)
-#define NOMINMAX
-#endif
-
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/special_functions.hpp>
@@ -610,7 +606,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
 {
-    for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+    for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
         v[i] = static_cast<RealType>(cr.v[i]);
     if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
         std::fill(v.begin()+(Order2+1), v.end(), static_cast<RealType>(0));
@@ -650,7 +646,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator+=(const fvar<RealType2,Order2>& cr)
 {
-    for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+    for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
         v[i] += cr.v[i];
     return *this;
 }
@@ -752,7 +748,7 @@ promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
     fvar<RealType,Order>::operator+(const fvar<RealType2,Order2>& cr) const
 {
     promote<fvar,fvar<RealType2,Order2>> retval{};
-    for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+    for (size_t i=0 ; i<=(std::min)(Order,Order2); ++i)
         retval.v[i] = v[i] + cr.v[i];
     if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
         for (auto i=Order+1 ; i<=Order2 ; ++i)
@@ -782,7 +778,7 @@ template <typename RealType2, size_t Order2>
 promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::operator-(
     const fvar<RealType2, Order2>& cr) const {
   promote<fvar, fvar<RealType2, Order2>> retval{};
-  for (size_t i = 0; i <= std::min(Order, Order2); ++i) {
+  for (size_t i = 0; i <= (std::min)(Order, Order2); ++i) {
     retval.v[i] = v[i] - cr.v[i];
   }
   if BOOST_AUTODIFF_IF_CONSTEXPR(Order < Order2) {

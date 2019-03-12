@@ -24,7 +24,6 @@
 
 #define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
-#include <boost/test/tools/floating_point_comparison.hpp>
 
 #if defined(_MSC_VER) || defined(BOOST_MSVC)
 #define NOMINMAX

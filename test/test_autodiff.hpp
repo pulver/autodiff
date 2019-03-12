@@ -41,7 +41,11 @@ using bin_float_types = mp11::mp_list<float, double, long double>;
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 /*using multiprecision_float_types =
     mp_list<bmp::cpp_dec_float_50, bmp::cpp_bin_float_50>;*/
+#if !defined(BOOST_VERSION) || BOOST_VERSION < 107000
 using multiprecision_float_types = mp11::mp_list<>;
+#else
+using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
+#endif
 
 using all_float_types = mp11::mp_append<bin_float_types, multiprecision_float_types>;
 

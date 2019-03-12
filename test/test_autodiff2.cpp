@@ -182,15 +182,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(frexp_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ldexp_test, T, all_float_types) {
-  using std::exp2;
-  using std::ldexp;
-  constexpr unsigned m = 3;
+  BOOST_MATH_STD_USING
+  using boost::multiprecision::ldexp;
+  constexpr auto m = 3u;
   const T cx = 3.5;
   const auto x = make_fvar<T, m>(cx);
-  constexpr unsigned exp = 3;
-  auto y = ldexp(x, exp);
-  BOOST_REQUIRE_EQUAL(y.derivative(0u), ldexp(cx, exp));
-  BOOST_REQUIRE_EQUAL(y.derivative(1u), exp2(exp));
+  constexpr auto exponent = 3;
+  auto y = ldexp(x, exponent);
+  BOOST_REQUIRE_EQUAL(y.derivative(0u), ldexp(cx, exponent));
+  BOOST_REQUIRE_EQUAL(y.derivative(1u), exp2(exponent));
   BOOST_REQUIRE_EQUAL(y.derivative(2u), 0);
   BOOST_REQUIRE_EQUAL(y.derivative(3u), 0);
 }

@@ -55,17 +55,62 @@ namespace detail {
 template<typename RealType, size_t Order>
 class fvar;
 
-template <typename>
-struct get_depth : std::integral_constant<size_t, 0> {};
+// Compile-time test for fvar<> type.
+namespace detail {
+template<typename /*RealType*/>
+struct is_fvar_value : std::false_type {};
 
-template <typename RealType, size_t Order>
-struct get_depth<fvar<RealType,Order>> : std::integral_constant<size_t,get_depth<RealType>::value+1> {};
+template<typename RealType, std::size_t Order>
+struct is_fvar_value<fvar<RealType, Order>> : std::true_type {};
+} // namespace detail
 
-template <typename>
-struct get_order_sum : std::integral_constant<size_t, 0> {};
+template<typename RealType>
+using is_fvar = detail::is_fvar_value<typename std::decay<RealType>::type>;
 
-template <typename RealType, size_t Order>
-struct get_order_sum<fvar<RealType,Order>> : std::integral_constant<size_t,get_order_sum<RealType>::value+Order> {};
+static_assert(!is_fvar<double>::value, "");
+static_assert(is_fvar<fvar<double, 4>>::value, "");
+static_assert(is_fvar<fvar<fvar<double, 4>, 3>>::value, "");
+
+static_assert(is_fvar<double>::value == is_fvar<const double>::value, "");
+static_assert(is_fvar<fvar<double, 4>>::value == is_fvar<const fvar<double, 4>>::value, "");
+static_assert(is_fvar<fvar<fvar<double, 4>, 3>>::value == is_fvar<const fvar<fvar<double, 4>, 3>>::value, "");
+
+namespace detail {
+template<typename /*RealType*/>
+struct get_depth_value : mp11::mp_size_t<0>{};
+
+template<typename RealType, std::size_t Order>
+struct get_depth_value<fvar<RealType, Order>> : mp11::mp_plus<typename get_depth_value<typename std::decay<RealType>::type>::type, mp11::mp_size_t<1>> {};
+} // namespace detail
+
+template <typename RealType>
+using get_depth = detail::get_depth_value<typename std::decay<RealType>::type>;
+
+static_assert(get_depth<double>::value == 0, "");
+static_assert(get_depth<fvar<double, 4>>::value == 1, "");
+static_assert(get_depth<fvar<fvar<double, 4>, 3>>::value == 2, "");
+static_assert(get_depth<double>::value == get_depth<const double>::value, "");
+static_assert(get_depth<fvar<double, 4>>::value == get_depth<const fvar<double, 4>>::value, "");
+static_assert(get_depth<fvar<fvar<double, 4>, 4>>::value == get_depth<const fvar<const fvar<double, 4>, 4>>::value, "");
+
+namespace detail {
+template<typename /*RealType*/>
+struct get_order_sum_value : mp11::mp_size_t<0>{};
+
+template<typename RealType, std::size_t Order>
+struct get_order_sum_value<fvar<RealType, Order>> : mp11::mp_plus<typename get_order_sum_value<typename std::decay<RealType>::type>::type, mp11::mp_size_t<Order>> {};
+} // namespace detail
+
+template<typename RealType>
+using get_order_sum = detail::get_order_sum_value<typename std::decay<RealType>::type>;
+
+static_assert(get_order_sum<double>::value == 0, "");
+static_assert(get_order_sum<fvar<double, 4>>::value == 4, "");
+static_assert(get_order_sum<fvar<fvar<double, 4>, 3>>::value == 7, "");
+static_assert(get_order_sum<double>::value == get_order_sum<const double>::value, "");
+static_assert(get_order_sum<fvar<double, 4>>::value == get_order_sum<const fvar<double, 4>>::value, "");
+static_assert(get_order_sum<fvar<fvar<double, 4>, 4>>::value == get_order_sum<const fvar<const fvar<double, 4>, 4>>::value, "");
+
 
 // Get non-fvar<> root type T of autodiff_fvar<T,O0,O1,O2,...>.
 template<typename RealType>
@@ -73,6 +118,8 @@ struct get_root_type { using type = RealType; };
 
 template<typename RealType, size_t Order>
 struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
+
+
 
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
@@ -518,13 +565,6 @@ long long lltrunc(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
-
-// Compile-time test for fvar<> type.
-template<typename>
-struct is_fvar : std::false_type {};
-
-template<typename RealType, size_t Order>
-struct is_fvar<fvar<RealType,Order>> : std::true_type {};
 
 template<typename RealType, size_t Order, size_t... Orders> // specialized for fvar<> below.
 struct nest_fvar { using type = fvar<typename nest_fvar<RealType,Orders...>::type,Order>; };

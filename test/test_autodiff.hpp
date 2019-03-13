@@ -8,6 +8,7 @@
 
 #include <boost/config.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
+
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -63,7 +64,7 @@ template <typename T, typename Order, Order Val> struct test_constants_t<T, std:
   static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
                                                mp11::mp_int<10>, mp11::mp_int<25>>::value;
   static constexpr Order order = Val;
-  static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
+  static constexpr T pct_epsilon() { return std::numeric_limits<T>::epsilon() * 100; }
 };
 
 /**

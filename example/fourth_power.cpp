@@ -17,7 +17,7 @@ int main()
 {
     using namespace boost::math::differentiation;
 
-    constexpr int Order=5; // The highest order derivative to be calculated.
+    constexpr std::size_t Order=5; // The highest order derivative to be calculated.
     const autodiff_fvar<double,Order> x = make_fvar<double,Order>(2.0); // Find derivatives at x=2.
     const autodiff_fvar<double,Order> y = fourth_power(x);
     for (std::size_t i=0 ; i<=Order ; ++i)

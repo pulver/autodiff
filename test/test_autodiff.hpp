@@ -34,7 +34,7 @@ namespace bmp = boost::multiprecision;
 
 // using bin_float_types = mp_list<float,double,long
 // double,bmp::cpp_bin_float_50>;
-using bin_float_types = mp11::mp_list<float, double, long double>;
+using bin_float_types = mp11::mp_list<float,double,long double>;
 //  cpp_bin_float_50 is fixed in boost 1.70
 // float blows up in unchecked_factorial
 
@@ -47,7 +47,7 @@ using multiprecision_float_types = mp11::mp_list<>;
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
 
-using all_float_types = mp11::mp_append<bin_float_types, multiprecision_float_types>;
+using all_float_types = mp11::mp_append<bin_float_types,multiprecision_float_types>;
 
 using namespace boost::math::differentiation;
 
@@ -59,9 +59,9 @@ namespace test_detail {
  */
 template <typename T, typename Order> struct test_constants_t;
 
-template <typename T, typename Order, Order Val> struct test_constants_t<T, std::integral_constant<Order, Val>> {
-  static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
-                                               mp11::mp_int<10>, mp11::mp_int<25>>::value;
+template <typename T, typename Order, Order Val> struct test_constants_t<T,std::integral_constant<Order,Val>> {
+  static constexpr int n_samples = mp11::mp_if<mp11::mp_or<bmp::is_number<T>,bmp::is_number_expression<T>>,
+                                               mp11::mp_int<10>,mp11::mp_int<25>>::value;
   static constexpr Order order = Val;
   static constexpr T pct_epsilon() { return 50 * std::numeric_limits<T>::epsilon() * 100; }
 };
@@ -72,19 +72,19 @@ template <typename T, typename Order, Order Val> struct test_constants_t<T, std:
  */
 
 template <typename T> struct RandomSample {
-  using is_multiprecision_t = mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>;
+  using is_multiprecision_t = mp11::mp_or<bmp::is_number<T>,bmp::is_number_expression<T>>;
   using numeric_limits_t = std::numeric_limits<T>;
   using is_integer_t = mp11::mp_bool<std::numeric_limits<T>::is_integer>;
 
   using distribution_param_t =
-      mp11::mp_if<is_multiprecision_t,
-                  mp11::mp_if<is_integer_t, mp11::mp_if_c<numeric_limits_t::is_signed, int64_t, uint64_t>, long double>,
-                  T>;
+  mp11::mp_if<is_multiprecision_t,
+              mp11::mp_if<is_integer_t,mp11::mp_if_c<numeric_limits_t::is_signed,int64_t,uint64_t>,long double>,
+              T>;
   static_assert((std::numeric_limits<T>::is_integer && std::numeric_limits<distribution_param_t>::is_integer) ||
-                    (!std::numeric_limits<T>::is_integer && !std::numeric_limits<distribution_param_t>::is_integer),
-                "T and distribution_param_t must either both be integral or both be not integral");
+                (!std::numeric_limits<T>::is_integer && !std::numeric_limits<distribution_param_t>::is_integer),
+    "T and distribution_param_t must either both be integral or both be not integral");
 
-  using dist_t = mp11::mp_if<is_integer_t, std::uniform_int_distribution<distribution_param_t>,
+  using dist_t = mp11::mp_if<is_integer_t,std::uniform_int_distribution<distribution_param_t>,
                              std::uniform_real_distribution<distribution_param_t>>;
 
   struct get_integral_endpoint {
@@ -96,15 +96,15 @@ template <typename T> struct RandomSample {
   struct get_real_endpoint {
     template <typename V> constexpr distribution_param_t operator()(V finish) const noexcept {
       return std::nextafter(static_cast<distribution_param_t>(finish),
-                                (std::numeric_limits<distribution_param_t>::max)());
+                            (std::numeric_limits<distribution_param_t>::max)());
     }
   };
 
-  using get_endpoint_t = mp11::mp_if<is_integer_t, get_integral_endpoint, get_real_endpoint>;
+  using get_endpoint_t = mp11::mp_if<is_integer_t,get_integral_endpoint,get_real_endpoint>;
 
-  template <typename U, typename V>
-  RandomSample(U start, V finish)
-      : rng_(std::random_device{}()), dist_(static_cast<distribution_param_t>(start), get_endpoint_t{}(finish)) {}
+  template <typename U, typename V> RandomSample(U start, V finish)
+    : rng_(std::random_device{}()),
+      dist_(static_cast<distribution_param_t>(start), get_endpoint_t{}(finish)) {}
 
   T next() noexcept { return static_cast<T>(dist_(rng_)); }
   T normalize(const T& x) noexcept { return x / ((dist_.max)() - (dist_.min)()); }
@@ -112,20 +112,20 @@ template <typename T> struct RandomSample {
   std::mt19937 rng_;
   dist_t dist_;
 };
-static_assert(std::is_same<RandomSample<float>::dist_t, std::uniform_real_distribution<float>>::value, "");
-static_assert(std::is_same<RandomSample<int64_t>::dist_t, std::uniform_int_distribution<int64_t>>::value, "");
+static_assert(std::is_same<RandomSample<float>::dist_t,std::uniform_real_distribution<float>>::value, "");
+static_assert(std::is_same<RandomSample<int64_t>::dist_t,std::uniform_int_distribution<int64_t>>::value, "");
 static_assert(
-    std::is_same<RandomSample<bmp::uint512_t>::dist_t, std::uniform_int_distribution<uint64_t>>::value, "");
+  std::is_same<RandomSample<bmp::uint512_t>::dist_t,std::uniform_int_distribution<uint64_t>>::value, "");
 static_assert(std::is_same<RandomSample<bmp::cpp_bin_float_50>::dist_t,
                            std::uniform_real_distribution<long double>>::value,
-              "");
+  "");
 
 }  // namespace test_detail
 
-template <typename T, int m = 3> using test_constants_t = test_detail::test_constants_t<T, mp11::mp_int<m>>;
+template <typename T, int m = 3> using test_constants_t = test_detail::test_constants_t<T,mp11::mp_int<m>>;
 
-template <typename W, typename X, typename Y, typename Z>
-promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y, const Z& z) {
+template <typename W, typename X, typename Y, typename Z> promote<W,X,Y,Z> mixed_partials_f(
+  const W& w, const X& x, const Y& y, const Z& z) {
   return exp(w * sin(x * log(y) / z) + sqrt(w * z / (x * y))) + w * w / tan(z);
 }
 
@@ -141,9 +141,9 @@ template <typename T> T Phi(const T& x) { return 0.5 * erfc(-boost::math::consta
 enum class CP { call, put };
 
 // Assume zero annual dividend yield (q=0).
-template <typename Price, typename Sigma, typename Tau, typename Rate>
-promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma,
-                                                            const Tau& tau, const Rate& r) {
+template <typename Price, typename Sigma, typename Tau, typename Rate> promote<Price,Sigma,Tau,Rate>
+black_scholes_option_price(CP cp, double K, const Price& S, const Sigma& sigma,
+                           const Tau& tau, const Rate& r) {
   const auto d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   const auto d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   if (cp == CP::call) {

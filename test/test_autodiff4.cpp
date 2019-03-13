@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 
   constexpr std::size_t m = 3;
   const T& cx = static_cast<T>(3.25);
-  auto x = make_fvar<T, m>(cx);
+  auto x = make_fvar<T,m>(cx);
   auto yl = lround(x);
   BOOST_REQUIRE_EQUAL(yl, lround(cx));
   auto yll = llround(x);
@@ -37,15 +37,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   constexpr std::size_t Nx = 2;
   constexpr std::size_t Ny = 4;
   constexpr std::size_t Nz = 3;
-  const auto w = make_fvar<T, Nw>(11);
-  const auto x = make_fvar<T, 0, Nx>(12);
-  const auto y = make_fvar<T, 0, 0, Ny>(13);
-  const auto z = make_fvar<T, 0, 0, 0, Nz>(14);
+  const auto w = make_fvar<T,Nw>(11);
+  const auto x = make_fvar<T,0,Nx>(12);
+  const auto y = make_fvar<T,0,0,Ny>(13);
+  const auto z = make_fvar<T,0,0,0,Nz>(14);
   const auto v = mixed_partials_f(w, x, y, z);  // auto = autodiff_fvar<T,Nw,Nx,Ny,Nz>
   // Calculated from Mathematica symbolic differentiation.
   const T answer = boost::lexical_cast<T>(
-      "1976.3196007477977177798818752904187209081211892187"
-      "5499076582535951111845769110560421820940516423255314");
+                                          "1976.3196007477977177798818752904187209081211892187"
+                                          "5499076582535951111845769110560421820940516423255314");
   // BOOST_REQUIRE_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
   const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
   BOOST_REQUIRE_LT(relative_error, eps);

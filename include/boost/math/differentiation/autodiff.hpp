@@ -410,8 +410,7 @@ class fvar {
   fvar &multiply_assign_by_root_type(bool is_root, const root_type & /*ca*/);
 
   template<typename RealType2, size_t Orders2>
-  friend
-  class fvar;
+  friend class fvar;
 
   template<typename RealType2, size_t Order2>
   friend std::ostream &operator<<(std::ostream &,
@@ -728,8 +727,8 @@ fvar<RealType, Order> &fvar<RealType, Order>::operator-=(const root_type &ca) {
 template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType, Order> &fvar<RealType, Order>::operator*=(const fvar<RealType2, Order2> &cr) {
-  using data_t = typename std::decay<decltype(v)>::type;
-  using ssize_t = typename data_t::difference_type;
+  using ssize_t = typename std::array<RealType, Order+1>::difference_type;
+
   const promote<RealType, RealType2> zero(0);
   if BOOST_AUTODIFF_IF_CONSTEXPR(Order <= Order2) {
     for (size_t i = 0, j = Order; i <= Order; ++i, --j) {
@@ -757,8 +756,8 @@ fvar<RealType, Order> &fvar<RealType, Order>::operator*=(const root_type &ca) {
 template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType, Order> &fvar<RealType, Order>::operator/=(const fvar<RealType2, Order2> &cr) {
-  using data_t = typename std::decay<decltype(v)>::type;
-  using ssize_t = typename data_t::difference_type;
+  using ssize_t = typename std::array<RealType, Order+1>::difference_type;
+
   const RealType zero(0);
   v.front() /= cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR(Order < Order2) {
@@ -902,8 +901,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 promote<fvar<RealType, Order>, fvar<RealType2, Order2>>
 fvar<RealType, Order>::operator/(const fvar<RealType2, Order2> &cr) const {
-  using data_t = typename std::decay<decltype(v)>::type;
-  using ssize_t = typename data_t::difference_type;
+  using ssize_t = typename std::array<RealType, Order+1>::difference_type;
 
   const promote<RealType, RealType2> zero(0);
   promote<fvar, fvar < RealType2, Order2>> retval;
@@ -946,8 +944,7 @@ fvar<RealType, Order> fvar<RealType, Order>::operator/(const root_type &ca) cons
 
 template<typename RealType, size_t Order>
 fvar<RealType, Order> operator/(const typename fvar<RealType, Order>::root_type &ca, const fvar<RealType, Order> &cr) {
-  using data_t = typename std::decay<decltype(cr.v)>::type;
-  using ssize_t = typename data_t::difference_type;
+  using ssize_t = typename std::array<RealType, Order+1>::difference_type;
 
   fvar <RealType, Order> retval;
   retval.v.front() = ca/cr.v.front();
@@ -1173,8 +1170,7 @@ fvar<RealType, Order> fvar<RealType, Order>::epsilon_multiply(size_t z0,
                                                               const fvar<RealType, Order> &cr,
                                                               size_t z1,
                                                               std::size_t isum1) const {
-  using data_t = typename std::decay<decltype(v)>::type;
-  using ssize_t = typename data_t::difference_type;
+  using ssize_t = typename std::array<RealType, Order+1>::difference_type;
 
   const RealType zero(0);
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;

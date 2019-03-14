@@ -433,6 +433,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   BOOST_MATH_STD_USING
   using boost::multiprecision::min;
   using std::min;
+  using std::fabs;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -442,11 +443,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
-    auto r = n == 0 ? 0 : ((min))(r_sampler.next(), n - 1);
-    auto autodiff_v =
-        boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
+    auto r = n == 0 ? 0 : (min)(r_sampler.next(), n - 1);
+    auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
     auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, (std::numeric_limits<autodiff_fvar<T, m>>::epsilon)());
   }
 }
 

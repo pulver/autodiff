@@ -13,11 +13,11 @@
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
-
 #include <boost/lexical_cast.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <boost/mp11/function.hpp>
 #include <boost/mp11/integral.hpp>
+#include <boost/type_traits/decay.hpp>
 
 #include <algorithm>
 #include <array>
@@ -64,24 +64,7 @@ template<typename RealType, std::size_t Order>
 struct is_fvar_value<fvar<RealType, Order>> : std::true_type {};
 
 template<typename RealType>
-using is_fvar = is_fvar_value<typename std::decay<RealType>::type>;
-
-namespace {
-template<typename... Ts>
-using eq_fvars_v = mp11::mp_same<mp11::mp_list<mp11::mp_transform_q<
-    mp11::mp_quote<mp11::mp_to_bool>,
-    mp11::mp_transform_q<mp11::mp_quote<is_fvar>, mp11::mp_list<Ts...>>>>>;
-
-static_assert(mp11::mp_not<is_fvar<double>>::value, "");
-static_assert(is_fvar<fvar<double, 4>>::value, "");
-static_assert(is_fvar<fvar<fvar<double, 4>, 3>>::value, "");
-
-static_assert(eq_fvars_v<double, const double>::value, "");
-static_assert(eq_fvars_v<fvar<double, 4>, const fvar<double, 4>>::value, "");
-static_assert(
-    eq_fvars_v<fvar<fvar<double, 4>, 3>, const fvar<fvar<double, 4>, 3>>::value,
-    "");
-}  // namespace
+using is_fvar = is_fvar_value<boost::decay_t<RealType>>;
 
 template<typename /*RealType*/>
 struct get_depth_value : mp11::mp_size_t<0> {};
@@ -89,25 +72,12 @@ struct get_depth_value : mp11::mp_size_t<0> {};
 template<typename RealType, std::size_t Order>
 struct get_depth_value<fvar<RealType, Order>>
     : mp11::mp_plus<
-        typename get_depth_value<typename std::decay<RealType>::type>::type,
+        typename get_depth_value<boost::decay_t<RealType>>::type,
         mp11::mp_size_t<1>> {
 };
 
 template<typename RealType>
-using get_depth = get_depth_value<typename std::decay<RealType>::type>;
-
-namespace {
-template<typename... Ts>
-using eq_depth_v = mp11::mp_same<mp11::mp_list<get_depth<Ts>...>>;
-static_assert(get_depth<double>::value==0, "");
-static_assert(get_depth<fvar<double, 4>>::value==1, "");
-static_assert(get_depth<fvar<fvar<double, 4>, 3>>::value==2, "");
-static_assert(eq_depth_v<double, const double>::value, "");
-static_assert(eq_depth_v<fvar<double, 4>, const fvar<double, 4>>::value, "");
-static_assert(eq_depth_v<fvar<fvar<double, 4>, 4>,
-                         const fvar<const fvar<double, 4>, 4>>::value,
-              "");
-}  // namespace
+using get_depth = get_depth_value<boost::decay_t<RealType>>;
 
 template<typename /*RealType*/>
 struct get_order_sum_value : mp11::mp_size_t<0> {};
@@ -115,27 +85,12 @@ struct get_order_sum_value : mp11::mp_size_t<0> {};
 template<typename RealType, std::size_t Order>
 struct get_order_sum_value<fvar<RealType, Order>>
     : mp11::mp_plus<typename get_order_sum_value<
-        typename std::decay<RealType>::type>::type,
+        boost::decay_t<RealType>>::type,
                     mp11::mp_size_t<Order>> {
 };
 
 template<typename RealType>
-using get_order_sum = get_order_sum_value<typename std::decay<RealType>::type>;
-
-namespace {
-static_assert(get_order_sum<double>::value==0, "");
-static_assert(get_order_sum<fvar<double, 4>>::value==4, "");
-static_assert(get_order_sum<fvar<fvar<double, 4>, 3>>::value==7, "");
-static_assert(get_order_sum<double>::value==
-                  get_order_sum<const double>::value,
-              "");
-static_assert(get_order_sum<fvar<double, 4>>::value==
-                  get_order_sum<const fvar<double, 4>>::value,
-              "");
-static_assert(get_order_sum<fvar<fvar<double, 4>, 4>>::value==
-                  get_order_sum<fvar<const fvar<double, 4>, 4>>::value,
-              "");
-}  // namespace
+using get_order_sum = get_order_sum_value<boost::decay_t<RealType>>;
 
 // Get non-fvar<> root type T of autodiff_fvar<T,O0,O1,O2,...>.
 template<typename RealType>

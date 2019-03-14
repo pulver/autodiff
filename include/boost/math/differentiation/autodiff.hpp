@@ -177,7 +177,7 @@ class fvar {
   fvar() = default;
 
   // Initialize a variable or constant.
-  fvar(const root_type &, bool is_variable);
+  fvar(const root_type & /*ca*/, bool is_variable);
 
   // RealType(cr) | RealType | RealType is copy constructible.
   fvar(const fvar &) = default;
@@ -190,7 +190,7 @@ class fvar {
   // RealType(ca) | RealType | RealType is copy constructible from the
   // arithmetic types.
   explicit fvar(
-      const root_type &);  // Initialize a constant. (No epsilon terms.)
+      const root_type & /*ca*/);  // Initialize a constant. (No epsilon terms.)
 
   template<typename RealType2>
   fvar(const RealType2 &ca);  // Supports any RealType2 for which
@@ -208,31 +208,31 @@ class fvar {
 
   // r += cr | RealType& | Adds cr to r.
   template<typename RealType2, size_t Order2>
-  fvar &operator+=(const fvar<RealType2, Order2> &);
+  fvar &operator+=(const fvar<RealType2, Order2> & /*cr*/);
 
   // r += ca | RealType& | Adds ar to r.
-  fvar &operator+=(const root_type &);
+  fvar &operator+=(const root_type & /*ca*/);
 
   // r -= cr | RealType& | Subtracts cr from r.
   template<typename RealType2, size_t Order2>
-  fvar &operator-=(const fvar<RealType2, Order2> &);
+  fvar &operator-=(const fvar<RealType2, Order2> & /*cr*/);
 
   // r -= ca | RealType& | Subtracts ca from r.
-  fvar &operator-=(const root_type &);
+  fvar &operator-=(const root_type & /*ca*/);
 
   // r *= cr | RealType& | Multiplies r by cr.
   template<typename RealType2, size_t Order2>
-  fvar &operator*=(const fvar<RealType2, Order2> &);
+  fvar &operator*=(const fvar<RealType2, Order2> & /*cr*/);
 
   // r *= ca | RealType& | Multiplies r by ca.
-  fvar &operator*=(const root_type &);
+  fvar &operator*=(const root_type & /*ca*/);
 
   // r /= cr | RealType& | Divides r by cr.
   template<typename RealType2, size_t Order2>
-  fvar &operator/=(const fvar<RealType2, Order2> &);
+  fvar &operator/=(const fvar<RealType2, Order2> & /*cr*/);
 
   // r /= ca | RealType& | Divides r by ca.
-  fvar &operator/=(const root_type &);
+  fvar &operator/=(const root_type & /*ca*/);
 
   // -r | RealType | Unary Negation.
   fvar operator-() const;
@@ -242,10 +242,10 @@ class fvar {
 
   // cr + cr2 | RealType | Binary Addition
   template<typename RealType2, size_t Order2>
-  promote<fvar, fvar<RealType2, Order2>> operator+(const fvar<RealType2, Order2> &) const;
+  promote<fvar, fvar<RealType2, Order2>> operator+(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr + ca | RealType | Binary Addition
-  fvar operator+(const root_type &) const;
+  fvar operator+(const root_type & /*ca*/) const;
 
   // ca + cr | RealType | Binary Addition
   template<typename RealType2, size_t Order2>
@@ -254,10 +254,10 @@ class fvar {
 
   // cr - cr2 | RealType | Binary Subtraction
   template<typename RealType2, size_t Order2>
-  promote<fvar, fvar<RealType2, Order2>> operator-(const fvar<RealType2, Order2> &) const;
+  promote<fvar, fvar<RealType2, Order2>> operator-(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr - ca | RealType | Binary Subtraction
-  fvar operator-(const root_type &) const;
+  fvar operator-(const root_type & /*ca*/) const;
 
   // ca - cr | RealType | Binary Subtraction
   template<typename RealType2, size_t Order2>
@@ -266,10 +266,10 @@ class fvar {
 
   // cr * cr2 | RealType | Binary Multiplication
   template<typename RealType2, size_t Order2>
-  promote<fvar, fvar<RealType2, Order2>> operator*(const fvar<RealType2, Order2> &) const;
+  promote<fvar, fvar<RealType2, Order2>> operator*(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr * ca | RealType | Binary Multiplication
-  fvar operator*(const root_type &) const;
+  fvar operator*(const root_type & /*ca*/) const;
 
   // ca * cr | RealType | Binary Multiplication
   template<typename RealType2, size_t Order2>
@@ -278,10 +278,10 @@ class fvar {
 
   // cr / cr2 | RealType | Binary Subtraction
   template<typename RealType2, size_t Order2>
-  promote<fvar, fvar<RealType2, Order2>> operator/(const fvar<RealType2, Order2> &) const;
+  promote<fvar, fvar<RealType2, Order2>> operator/(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr / ca | RealType | Binary Subtraction
-  fvar operator/(const root_type &) const;
+  fvar operator/(const root_type & /*ca*/) const;
 
   // ca / cr | RealType | Binary Subtraction
   template<typename RealType2, size_t Order2>
@@ -293,10 +293,10 @@ class fvar {
       size_t Order2>
   // This only compares the root term. All other terms
   // are ignored.
-  bool operator==(const fvar<RealType2, Order2> &) const;
+  bool operator==(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr == ca | bool | Equality Comparison
-  bool operator==(const root_type &) const;
+  bool operator==(const root_type & /*ca*/) const;
 
   // ca == cr | bool | Equality Comparison
   template<typename RealType2,
@@ -307,10 +307,10 @@ class fvar {
 
   // cr != cr2 | bool | Inequality Comparison
   template<typename RealType2, size_t Order2>
-  bool operator!=(const fvar<RealType2, Order2> &) const;
+  bool operator!=(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr != ca | bool | Inequality Comparison
-  bool operator!=(const root_type &) const;
+  bool operator!=(const root_type & /*ca*/) const;
 
   // ca != cr | bool | Inequality Comparison
   template<typename RealType2, size_t Order2>
@@ -319,10 +319,10 @@ class fvar {
 
   // cr <= cr2 | bool | Less than equal to.
   template<typename RealType2, size_t Order2>
-  bool operator<=(const fvar<RealType2, Order2> &) const;
+  bool operator<=(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr <= ca | bool | Less than equal to.
-  bool operator<=(const root_type &) const;
+  bool operator<=(const root_type & /*ca*/) const;
 
   // ca <= cr | bool | Less than equal to.
   template<typename RealType2, size_t Order2>
@@ -331,10 +331,10 @@ class fvar {
 
   // cr >= cr2 | bool | Greater than equal to.
   template<typename RealType2, size_t Order2>
-  bool operator>=(const fvar<RealType2, Order2> &) const;
+  bool operator>=(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr >= ca | bool | Greater than equal to.
-  bool operator>=(const root_type &) const;
+  bool operator>=(const root_type & /*ca*/) const;
 
   // ca >= cr | bool | Greater than equal to.
   template<typename RealType2, size_t Order2>
@@ -343,10 +343,10 @@ class fvar {
 
   // cr < cr2 | bool | Less than comparison.
   template<typename RealType2, size_t Order2>
-  bool operator<(const fvar<RealType2, Order2> &) const;
+  bool operator<(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr < ca | bool | Less than comparison.
-  bool operator<(const root_type &) const;
+  bool operator<(const root_type & /*ca*/) const;
 
   // ca < cr | bool | Less than comparison.
   template<typename RealType2, size_t Order2>
@@ -354,10 +354,10 @@ class fvar {
 
   // cr > cr2 | bool | Greater than comparison.
   template<typename RealType2, size_t Order2>
-  bool operator>(const fvar<RealType2, Order2> &) const;
+  bool operator>(const fvar<RealType2, Order2> & /*cr*/) const;
 
   // cr > ca | bool | Greater than comparison.
-  bool operator>(const root_type &) const;
+  bool operator>(const root_type & /*ca*/) const;
 
   // ca > cr | bool | Greater than comparison.
   template<typename RealType2, size_t Order2>
@@ -380,21 +380,21 @@ class fvar {
 
   explicit operator int() const;  // Must be explicit, otherwise overloaded operators are ambiguous.
 
-  fvar &set_root(const root_type &);
+  fvar &set_root(const root_type & /*root*/);
 
   // Use when function returns derivatives.
-  fvar apply(const std::function<root_type(size_t)> &) const;
+  fvar apply(const std::function<root_type(size_t)> & /*f*/) const;
 
   // Use when function returns derivative(i)/factorial(i) (slightly more
   // efficient than apply().)
-  fvar apply_with_factorials(const std::function<root_type(size_t)> &) const;
+  fvar apply_with_factorials(const std::function<root_type(size_t)> & /*f*/) const;
 
   // Same as apply() but uses horner method. May be more accurate in some cases
   // but not as good with inf derivatives.
-  fvar apply_with_horner(const std::function<root_type(size_t)> &) const;
+  fvar apply_with_horner(const std::function<root_type(size_t)> & /*f*/) const;
 
   // Same as apply_with_factorials() but uses horner method.
-  fvar apply_with_horner_factorials(const std::function<root_type(size_t)> &) const;
+  fvar apply_with_horner_factorials(const std::function<root_type(size_t)> & /*f*/) const;
 
  private:
   RealType epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
@@ -407,7 +407,7 @@ class fvar {
 
   fvar inverse_apply() const;
 
-  fvar &multiply_assign_by_root_type(bool is_root, const root_type &);
+  fvar &multiply_assign_by_root_type(bool is_root, const root_type & /*ca*/);
 
   template<typename RealType2, size_t Orders2>
   friend
@@ -475,144 +475,144 @@ static constexpr bool fpequal(const T &t, const U &u) noexcept {
 
 // fabs(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> fabs(const fvar<RealType, Order> &);
+fvar<RealType, Order> fabs(const fvar<RealType, Order> & /*cr*/);
 
 // abs(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> abs(const fvar<RealType, Order> &);
+fvar<RealType, Order> abs(const fvar<RealType, Order> & /*cr*/);
 
 // ceil(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> ceil(const fvar<RealType, Order> &);
+fvar<RealType, Order> ceil(const fvar<RealType, Order> & /*cr*/);
 
 // floor(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> floor(const fvar<RealType, Order> &);
+fvar<RealType, Order> floor(const fvar<RealType, Order> & /*cr*/);
 
 // exp(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> exp(const fvar<RealType, Order> &);
+fvar<RealType, Order> exp(const fvar<RealType, Order> & /*cr*/);
 
 // pow(cr, ca) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> pow(const fvar<RealType, Order> &, const typename fvar<RealType, Order>::root_type &);
+fvar<RealType, Order> pow(const fvar<RealType, Order> & /*x*/, const typename fvar<RealType, Order>::root_type & /*y*/);
 
 // pow(ca, cr) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> pow(const typename fvar<RealType, Order>::root_type &, const fvar<RealType, Order> &);
+fvar<RealType, Order> pow(const typename fvar<RealType, Order>::root_type & /*x*/, const fvar<RealType, Order> & /*y*/);
 
 // pow(cr1, cr2) | RealType
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
-promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> pow(const fvar<RealType1, Order1> &,
-                                                              const fvar<RealType2, Order2> &);
+promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> pow(const fvar<RealType1, Order1> & /*x*/,
+                                                              const fvar<RealType2, Order2> & /*y*/);
 
 // sqrt(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> sqrt(const fvar<RealType, Order> &);
+fvar<RealType, Order> sqrt(const fvar<RealType, Order> & /*cr*/);
 
 // log(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> log(const fvar<RealType, Order> &);
+fvar<RealType, Order> log(const fvar<RealType, Order> & /*cr*/);
 
 // frexp(cr1, &i) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> frexp(const fvar<RealType, Order> &, int *);
+fvar<RealType, Order> frexp(const fvar<RealType, Order> & /*cr*/, int * /*exp*/);
 
 // ldexp(cr1, i) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> ldexp(const fvar<RealType, Order> &, int);
+fvar<RealType, Order> ldexp(const fvar<RealType, Order> & /*cr*/, int /*exp*/);
 
 // cos(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> cos(const fvar<RealType, Order> &);
+fvar<RealType, Order> cos(const fvar<RealType, Order> & /*cr*/);
 
 // sin(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> sin(const fvar<RealType, Order> &);
+fvar<RealType, Order> sin(const fvar<RealType, Order> & /*cr*/);
 
 // asin(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> asin(const fvar<RealType, Order> &);
+fvar<RealType, Order> asin(const fvar<RealType, Order> & /*cr*/);
 
 // tan(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> tan(const fvar<RealType, Order> &);
+fvar<RealType, Order> tan(const fvar<RealType, Order> & /*cr*/);
 
 // atan(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> atan(const fvar<RealType, Order> &);
+fvar<RealType, Order> atan(const fvar<RealType, Order> & /*cr*/);
 
 // atan2(cr1,cr2) | RealType
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
-promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> atan2(const fvar<RealType1, Order1> &,
-                                                                const fvar<RealType2, Order2> &);
+promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> atan2(const fvar<RealType1, Order1> & /*cr1*/,
+                                                                const fvar<RealType2, Order2> & /*cr2*/);
 
 // fmod(cr1,cr2) | RealType
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
-promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> fmod(const fvar<RealType1, Order1> &,
-                                                               const fvar<RealType2, Order2> &);
+promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> fmod(const fvar<RealType1, Order1> & /*cr1*/,
+                                                               const fvar<RealType2, Order2> & /*cr2*/);
 
 // round(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> round(const fvar<RealType, Order> &);
+fvar<RealType, Order> round(const fvar<RealType, Order> & /*cr*/);
 
 // iround(cr1) | int
 template<typename RealType, size_t Order>
-int iround(const fvar<RealType, Order> &);
+int iround(const fvar<RealType, Order> & /*cr*/);
 
 // trunc(cr1) | RealType
 template<typename RealType, size_t Order>
-fvar<RealType, Order> trunc(const fvar<RealType, Order> &);
+fvar<RealType, Order> trunc(const fvar<RealType, Order> & /*cr*/);
 
 // itrunc(cr1) | int
 template<typename RealType, size_t Order>
-int itrunc(const fvar<RealType, Order> &);
+int itrunc(const fvar<RealType, Order> & /*cr*/);
 
 // Additional functions
 template<typename RealType, size_t Order>
-fvar<RealType, Order> acos(const fvar<RealType, Order> &);
+fvar<RealType, Order> acos(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> acosh(const fvar<RealType, Order> &);
+fvar<RealType, Order> acosh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> asinh(const fvar<RealType, Order> &);
+fvar<RealType, Order> asinh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> atanh(const fvar<RealType, Order> &);
+fvar<RealType, Order> atanh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> cosh(const fvar<RealType, Order> &);
+fvar<RealType, Order> cosh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> erf(const fvar<RealType, Order> &);
+fvar<RealType, Order> erf(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> erfc(const fvar<RealType, Order> &);
+fvar<RealType, Order> erfc(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> lambert_w0(const fvar<RealType, Order> &);
+fvar<RealType, Order> lambert_w0(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> sinc(const fvar<RealType, Order> &);
+fvar<RealType, Order> sinc(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> sinh(const fvar<RealType, Order> &);
+fvar<RealType, Order> sinh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-fvar<RealType, Order> tanh(const fvar<RealType, Order> &);
+fvar<RealType, Order> tanh(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-long lround(const fvar<RealType, Order> &);
+long lround(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-long long llround(const fvar<RealType, Order> &);
+long long llround(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-long long lltrunc(const fvar<RealType, Order> &);
+long long lltrunc(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order>
-long double truncl(const fvar<RealType, Order> &);
+long double truncl(const fvar<RealType, Order> & /*cr*/);
 
 template<typename RealType, size_t Order,
     size_t... Orders>  // specialized for fvar<> below.
@@ -643,14 +643,17 @@ template<typename RealType, size_t Order>
 fvar<RealType, Order>::fvar(const root_type &ca, const bool is_variable) {
   if constexpr (is_fvar<RealType>::value) {
     v.front() = RealType(ca, is_variable);
-    if constexpr (0 < Order)
+    if constexpr (0 < Order) {
       std::fill(v.begin() + 1, v.end(), static_cast<RealType>(0));
+    }
   } else {
     v.front() = ca;
-    if constexpr (0 < Order)
+    if constexpr (0 < Order) {
       v[1] = static_cast<root_type>(static_cast<int>(is_variable));
-    if constexpr (1 < Order)
+    }
+    if constexpr (1 < Order) {
       std::fill(v.begin() + 2, v.end(), static_cast<RealType>(0));
+    }
   }
 }
 #endif
@@ -769,7 +772,9 @@ fvar<RealType, Order> &fvar<RealType, Order>::operator/=(const fvar<RealType2, O
           cr.v.front();
     }
   } else {
-    for (size_t i = 1; i <= Order; ++i) v[i] /= cr.v.front();
+    for (size_t i = 1; i <= Order; ++i) {
+      v[i] /= cr.v.front();
+    }
   }
   return *this;
 }
@@ -798,8 +803,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 promote<fvar<RealType, Order>, fvar<RealType2, Order2>>
 fvar<RealType, Order>::operator+(const fvar<RealType2, Order2> &cr) const {
-  promote<fvar, fvar < RealType2, Order2>>
-  retval{};
+  promote<fvar, fvar<RealType2, Order2>> retval;
   for (size_t i = 0; i <= (std::min)(Order, Order2); ++i) {
     retval.v[i] = v[i] + cr.v[i];
   }
@@ -832,8 +836,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 promote<fvar<RealType, Order>, fvar<RealType2, Order2>>
 fvar<RealType, Order>::operator-(const fvar<RealType2, Order2> &cr) const {
-  promote<fvar, fvar < RealType2, Order2>>
-  retval{};
+  promote<fvar, fvar < RealType2, Order2>> retval;
   for (size_t i = 0; i <= (std::min)(Order, Order2); ++i) {
     retval.v[i] = v[i] - cr.v[i];
   }
@@ -870,8 +873,7 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
   using data_t = typename std::decay<decltype(v)>::type;
   using ssize_t = typename data_t::difference_type;
   const promote<RealType, RealType2> zero(0);
-  promote<fvar, fvar < RealType2, Order2>>
-  retval;
+  promote<fvar, fvar < RealType2, Order2>> retval;
   if BOOST_AUTODIFF_IF_CONSTEXPR(Order < Order2) {
     for (size_t i = 0, j = Order, k = Order2; i <= Order2; ++i, j && --j, --k) {
       retval.v[i] = std::inner_product(v.cbegin(), v.cend() - ssize_t(j), cr.v.crbegin() + ssize_t(k), zero);
@@ -904,8 +906,7 @@ fvar<RealType, Order>::operator/(const fvar<RealType2, Order2> &cr) const {
   using ssize_t = typename data_t::difference_type;
 
   const promote<RealType, RealType2> zero(0);
-  promote<fvar, fvar < RealType2, Order2>>
-  retval;
+  promote<fvar, fvar < RealType2, Order2>> retval;
   retval.v.front() = v.front()/cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR(Order < Order2) {
     for (size_t i = 1, j = Order2 - 1u; i <= Order; ++i, --j) {

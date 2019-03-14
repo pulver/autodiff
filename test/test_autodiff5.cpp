@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
     auto r = n == 0 ? 0 : (min)(r_sampler.next(), n - 1);
     auto autodiff_v = boost::math::binomial_coefficient<autodiff_fvar<T, m>>(n, r);
     auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-    BOOST_REQUIRE_CLOSE_FRACTION(autodiff_v, anchor_v, (std::numeric_limits<autodiff_fvar<T, m>>::epsilon)());
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon());
   }
 }
 

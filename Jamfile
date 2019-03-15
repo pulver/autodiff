@@ -10,7 +10,6 @@ project boost-autodiff
     :
     requirements
         <include>../../boost/math/differentiation/autodiff
-        <toolset>gcc:<warnings>on
     ;
 
 build-project test ;

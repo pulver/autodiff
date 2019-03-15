@@ -74,7 +74,7 @@ environment:
       CXXFLAGS: /EHsc
       CXXSTD: 14
 
-  - FLAVOR: Visual Studio 2015 C++11
+    - FLAVOR: Visual Studio 2015 C++11
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       TOOLSET: msvc-14.0
       B2_ADDRESS_MODEL: address-model=64,32

@@ -687,7 +687,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   BOOST_MATH_STD_USING
   using boost::math::nextafter;
-  using boost::math::differentiation::detail::fpequal;
   using boost::math::tools::max;
   using std::max;
   using std::nextafter;
@@ -702,8 +701,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = (fpequal(x, 0) ? 1 : 0) + y_sampler.next();
-    auto z = ((fpequal(x, 0) || fpequal(y, 0)) ? 1 : 0) + z_sampler.next();
+    auto y = (x != 0 ? 1 : 0) + y_sampler.next();
+    auto z = ((x == 0 || y == 0) ? 1 : 0) + z_sampler.next();
     auto p = (max)(p_sampler.next(),
                    nextafter(T(0), ((std::numeric_limits<T>::max))()));
     BOOST_REQUIRE_CLOSE(
@@ -715,8 +714,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
-  using boost::math::differentiation::detail::fpequal;
-
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 2000};
@@ -725,7 +722,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = (fpequal(x, 0) ? 1 : 0) + y_sampler.next();
+    auto y = (x == 0 ? 1 : 0) + y_sampler.next();
     auto z = z_sampler.next();
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y),

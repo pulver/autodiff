@@ -4,6 +4,7 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 #include "test_autodiff.hpp"
+#include <boost/test/tools/floating_point_comparison.hpp>
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
@@ -27,6 +28,22 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
     BOOST_REQUIRE_EQUAL(truncl(x), truncl(cx));
   }
 #endif
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
+  BOOST_MATH_STD_USING
+  using boost::math::fpclassify;
+  using std::fpclassify;
+  using boost::math::ulp;
+  using boost::math::epsilon_difference;
+
+  constexpr std::size_t m = 3;
+  // check zeros
+  {
+    auto x = make_fvar<T, m>(0.0);
+    auto y = T(-0.0);
+    BOOST_REQUIRE_EQUAL(x, y);
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {

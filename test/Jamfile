@@ -16,7 +16,6 @@ requirements
         <include>../include
         <toolset>msvc:<asynch-exceptions>on
         <toolset>msvc:<cxxflags>/bigobj
-        <toolset>clang:<cxxflags>
     ;
 
 test-suite boost-autodiff

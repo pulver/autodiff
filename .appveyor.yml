@@ -40,8 +40,8 @@ environment:
     # on Windows it is important to exercise all the possibilities, especially shared vs static, however most
     # libraries that care about this exercise it in their Jamfiles...
     # B2_ADDRESS_MODEL: address-model=64,32
-    # B2_LINK: link=shared,static
-    # B2_THREADING: threading=multi,single
+    # B2_LINK: link=static
+    # B2_THREADING: threading=single
     B2_VARIANT: variant=release,debug
 
   matrix:
@@ -49,8 +49,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      #B2_LINK: link=static
+      #B2_THREADING: threading=single
       #CXXFLAGS: cxxflags=-permissive-
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: latest # 2a
@@ -59,8 +59,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      B2_LINK: link=static
+      B2_THREADING: threading=single
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 17
 
@@ -68,8 +68,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      B2_LINK: link=static
+      B2_THREADING: threading=single
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 14
 
@@ -77,8 +77,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       TOOLSET: msvc-14.0
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      B2_LINK: link=static
+      B2_THREADING: threading=single
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 14
 
@@ -86,8 +86,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       TOOLSET: msvc-14.0
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      B2_LINK: link=static
+      B2_THREADING: threading=single
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 11
 
@@ -95,8 +95,8 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
       TOOLSET: msvc-10.0,msvc-11.0,msvc-12.0
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared,static
-      B2_THREADING: threading=multi,single
+      B2_LINK: link=static
+      B2_THREADING: threading=single
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 11
 

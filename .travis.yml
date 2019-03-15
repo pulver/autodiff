@@ -33,6 +33,7 @@ env:
     # - B2_LINK=link=shared,static
     # - B2_THREADING=threading=multi,single
     - B2_VARIANT=variant=release,debug
+    - secure: "v456ePbiii0k8vtUHPXivp/nrbBxV6+Jatldb6MHRBNtTNXJ6d2P8cv/c/0efZ7NsPLrKhw2ALt6uQyGvDjlv80aT4JJpkfouTW8Le4K/o53y+id2U+W27HyT1QpQostFrZI3mAEwB5g8VKvmAmPLca77zO58I5KzDbQCA7VGqWQtxzbkZhJWWjbodyYYntfm56pMTdS8TxsEaK5eOg4eWziIo+jlpYkpBGTM92VDaXjr9OhMi+lXRqWsD+S878DSPu4J4ApiI7vBtAPDoTIyFA14ubtL69rBe+orSXVgJxWRVvyN/O7AQnJz9Z9nKD1/hkWfrlHYn6K+sBSejZOQGMgeO3PtEiUkdI83ENfSBFNZKCyzTYd6sDde+jlZChmtJwgR8uECyOJw1W6+090Eham9j61VR1CnqKkaU/UZuAD4tZajm181/+tw5ufgh0q4NlXqMZQznGYTGlB8Uvdg7Wqo7ikZMGONgJZ+tCGJh0lJsNM+ERUahhvNgjZpplqqvOmLH7QnHRAc5+DTQSnWXbqaxBNMQfh3hkc5CIzL9GxL0KTfJvvuoQh5LqLRGMEG2n7lpgZlCDrfuKSCM8JLgmBSYciGJQeEC5eOw07fIzK3KxIw8FzzYOaRYjxOMJWIORxVCDE87z5WQj0kq5knRXgWe5Qbb4GrGqxQ967luM="
 
 install:
   - git clone https://github.com/boostorg/boost-ci.git boost-ci
@@ -50,6 +51,9 @@ branches:
   only:
     - develop
     - master
+
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 script:
   - cd $BOOST_ROOT/libs/$SELF

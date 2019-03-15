@@ -460,7 +460,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     BOOST_REQUIRE_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)),
-                        boost::math::cbrt(x), test_constants::pct_epsilon());
+                        boost::math::cbrt(x), 50 * test_constants::pct_epsilon());
   }
 }
 

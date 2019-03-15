@@ -452,43 +452,35 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, all_float_types) {
         test_constants::pct_epsilon());
     BOOST_REQUIRE_CLOSE(boost::math::nextafter(make_fvar<T, m>(static_cast<T>(i)), make_fvar<T, m>(static_cast<T>(i))),
                         ((make_fvar<T, m>(static_cast<T>(i)))), test_constants::pct_epsilon());
-    try {
-      i = 0;
-      BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 1),
-                          boost::math::float_advance(static_cast<T>(i), 1), test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2),
-                          boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2),
-                          test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(
-          boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 1),
-          boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2), -1),
-          test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -1),
-                          boost::math::float_advance(static_cast<T>(i), -1), test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2),
-                          boost::math::float_advance(static_cast<T>(i), -i - 2), test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(
-          boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 1),
-          boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2), 1),
-          test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 0),
-                          ((make_fvar<T, m>(static_cast<T>(i)))), test_constants::pct_epsilon());
 
-      BOOST_REQUIRE_CLOSE(boost::math::float_distance(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(i)),
-                          static_cast<T>(0), test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_next(make_fvar<T, m>(static_cast<T>(i))),
-                                                      make_fvar<T, m>(static_cast<T>(i))),
-                          ((make_fvar<T, m>(-1))), test_constants::pct_epsilon());
-      BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_prior(make_fvar<T, m>(static_cast<T>(i))),
-                                                      make_fvar<T, m>(static_cast<T>(i))),
-                          ((make_fvar<T, m>(1))), test_constants::pct_epsilon());
-    } catch (const std::domain_error&) {
-      std::cout << i << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    } catch (...) {
-      std::cout << i << std::endl;
-      std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 1),
+                        boost::math::float_advance(static_cast<T>(i), 1), test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2),
+                        boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2),
+                        test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(
+        boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 1),
+        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), i + 2), -1),
+        test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -1),
+                        boost::math::float_advance(static_cast<T>(i), -1), test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2),
+                        boost::math::float_advance(static_cast<T>(i), -i - 2), test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(
+        boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 1),
+        boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2), 1),
+        test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), 0),
+                        ((make_fvar<T, m>(static_cast<T>(i)))), test_constants::pct_epsilon());
+
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(make_fvar<T, m>(static_cast<T>(i)), static_cast<T>(i)),
+                        static_cast<T>(0), test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_next(make_fvar<T, m>(static_cast<T>(i))),
+                                                    make_fvar<T, m>(static_cast<T>(i))),
+                        ((make_fvar<T, m>(-1))), test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(boost::math::float_distance(boost::math::float_prior(make_fvar<T, m>(static_cast<T>(i))),
+                                                    make_fvar<T, m>(static_cast<T>(i))),
+                        ((make_fvar<T, m>(1))), test_constants::pct_epsilon());
   }
 }
 

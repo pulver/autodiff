@@ -18,11 +18,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
   auto y = atanh(x);
   // BOOST_REQUIRE_EQUAL(y.derivative(0) , atanh(cx)); // fails due to overload
   BOOST_REQUIRE_EQUAL(y.derivative(0u), atanh(static_cast<T>(x)));
-  BOOST_REQUIRE_CLOSE(y.derivative(1u), static_cast<T>(4) / 3, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2u), static_cast<T>(16) / 9, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3u), static_cast<T>(224) / 27, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4u), static_cast<T>(1280) / 27, eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5u), static_cast<T>(31232) / 81, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(1u), static_cast<T>(4 / 3), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(2u), static_cast<T>(16 / 9), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(3u), static_cast<T>(224 / 27), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4u), static_cast<T>(1280 / 27), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5u), static_cast<T>(31232 / 81), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {
@@ -76,15 +76,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
   auto y2 = sinc(make_fvar<T, 10>(0));
   BOOST_REQUIRE_CLOSE(y2.derivative(0u), T(1), eps);
   BOOST_REQUIRE_CLOSE(y2.derivative(1u), T(0), eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(2u), -cx / 3, eps);
+  BOOST_REQUIRE_CLOSE(y2.derivative(2u), -cx / T(3), eps);
   BOOST_REQUIRE_CLOSE(y2.derivative(3u), T(0), eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(4u), cx / 5, eps);
+  BOOST_REQUIRE_CLOSE(y2.derivative(4u), cx / T(5), eps);
   BOOST_REQUIRE_CLOSE(y2.derivative(5u), T(0), eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(6u), -cx / 7, eps);
+  BOOST_REQUIRE_CLOSE(y2.derivative(6u), -cx / T(7), eps);
   BOOST_REQUIRE_CLOSE(y2.derivative(7u), T(0), eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(8u), cx / 9, eps);
+  BOOST_REQUIRE_CLOSE(y2.derivative(8u), cx / T(9), eps);
   BOOST_REQUIRE_CLOSE(y2.derivative(9u), T(0), eps);
-  BOOST_REQUIRE_CLOSE(y2.derivative(10u), -cx / 11, eps);
+  BOOST_REQUIRE_CLOSE(y2.derivative(10u), -cx / T(11), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
   auto y = tan(x);
   BOOST_REQUIRE_CLOSE(y.derivative(0u), root_three, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), T(4), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2u), 8 * root_three, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(2u), T(8) * root_three, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), T(80), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4u), 352 * root_three, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4u), T(352) * root_three, eps);
   BOOST_REQUIRE_CLOSE(y.derivative(5u), T(5824), eps);
 }
 

@@ -87,7 +87,7 @@ environment:
       SCRIPT: ci\appveyor\mingw.bat
 
 install:
-  - set SELF=%APPVEYOR_PROJECT_NAME:-=autodiff
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
   - git clone https://github.com/boostorg/boost-ci.git C:\boost-ci
   - xcopy /s /e /q /i C:\boost-ci\ci .\ci
   - ci\appveyor\install.bat
@@ -97,7 +97,7 @@ build: off
 test_script:
   - set BOOST_BRANCH=develop
   - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
-  - set SELF=%APPVEYOR_PROJECT_NAME:-=autodiff
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
   - PATH=%ADDPATH%%PATH%
   # The definition of TOOLCXX omits CXXSTD= if it was not defined above
   - IF NOT DEFINED CXXSTD (SET TOOLCXX=toolset=%TOOLSET%) ELSE (SET TOOLCXX=toolset=%TOOLSET% cxxstd=%CXXSTD%)

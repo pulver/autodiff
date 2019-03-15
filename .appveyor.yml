@@ -3,6 +3,16 @@
 #      (See accompanying file LICENSE_1_0.txt or copy at
 #           https://www.boost.org/LICENSE_1_0.txt)
 
+version: 1.0.{build}-{branch}
+
+shallow_clone: true
+
+branches:
+  only:
+    - master
+    - develop
+    - ci
+
 environment:
   global:
     # see: http://www.boost.org/build/doc/html/bbv2/overview/invocation.html#bbv2.overview.invocation.properties
@@ -78,7 +88,7 @@ environment:
       SCRIPT: ci\appveyor\mingw.bat
 
 install:
-  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=autodiff
   - git clone https://github.com/boostorg/boost-ci.git C:\boost-ci
   - xcopy /s /e /q /i C:\boost-ci\ci .\ci
   - ci\appveyor\install.bat
@@ -86,7 +96,9 @@ install:
 build: off
 
 test_script:
-  - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
+  - set BOOST_BRANCH=develop
+  - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
+  - set SELF=%APPVEYOR_PROJECT_NAME:-=autodiff
   - PATH=%ADDPATH%%PATH%
   # The definition of TOOLCXX omits CXXSTD= if it was not defined above
   - IF NOT DEFINED CXXSTD (SET TOOLCXX=toolset=%TOOLSET%) ELSE (SET TOOLCXX=toolset=%TOOLSET% cxxstd=%CXXSTD%)

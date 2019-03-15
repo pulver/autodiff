@@ -9,11 +9,11 @@
 #include <boost/config.hpp>
 #include <boost/math/tools/config.hpp>
 
+#include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/mp11/algorithm.hpp>
 #include <boost/mp11/function.hpp>
 #include <boost/mp11/integral.hpp>

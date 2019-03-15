@@ -14,8 +14,9 @@ project boost-autodiff-test
 requirements
         <include>.
         <include>../include
-        <toolset>msvc:<asynch-exceptions>on
         <toolset>msvc:<cxxflags>/bigobj
+        <toolset>gcc:<warnings>on
+        <toolset>clang:<warnings>on
     ;
 
 test-suite boost-autodiff

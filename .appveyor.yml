@@ -11,7 +11,6 @@ branches:
   only:
     - master
     - develop
-    - ci
 
 environment:
   global:

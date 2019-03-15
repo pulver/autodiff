@@ -172,6 +172,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 // TODO(kbhat): Something in here is very slow with boost::multiprecision
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   BOOST_MATH_STD_USING
+  using boost::math::signbit;
+  using boost::multiprecision::signbit;
   using boost::math::nextafter;
   using boost::math::tools::max;
   using std::max;

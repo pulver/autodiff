@@ -45,32 +45,48 @@ environment:
     B2_VARIANT: variant=release,debug
 
   matrix:
-    - FLAVOR: Visual Studio 2017 C++2a Strict
+    - FLAVOR: Visual Studio 2017 C++2a
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
-      B2_ADDRESS_MODEL: address-model=64
-      CXXFLAGS: cxxflags=-permissive-
+      B2_ADDRESS_MODEL: address-model=64,32
+      #CXXFLAGS: cxxflags=-permissive-
+      CXXFLAGS: /EHsc
       CXXSTD: latest # 2a
 
     - FLAVOR: Visual Studio 2017 C++17
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
-      B2_ADDRESS_MODEL: address-model=64
+      B2_ADDRESS_MODEL: address-model=64,32
+      CXXFLAGS: /EHsc
       CXXSTD: 17
 
-    - FLAVOR: Visual Studio 2017 C++14 (Default)
+    - FLAVOR: Visual Studio 2017 C++14
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
       B2_ADDRESS_MODEL: address-model=64,32
+      CXXFLAGS: /EHsc
+      CXXSTD: 14
 
-    - FLAVOR: Visual Studio 2015 C++14 (Default)
+    - FLAVOR: Visual Studio 2015 C++14
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       TOOLSET: msvc-14.0
       B2_ADDRESS_MODEL: address-model=64,32
+      CXXFLAGS: /EHsc
+      CXXSTD: 14
+
+  - FLAVOR: Visual Studio 2015 C++11
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      CXXFLAGS: /EHsc
+      CXXSTD: 11
 
     - FLAVOR: Visual Studio 2010, 2012, 2013
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
       TOOLSET: msvc-10.0,msvc-11.0,msvc-12.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      CXXFLAGS: /EHsc
+      CXXSTD: 11
 
 #    - FLAVOR: cygwin (32-bit)
 #      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017

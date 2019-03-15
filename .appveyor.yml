@@ -90,6 +90,7 @@ install:
   - set SELF=%APPVEYOR_PROJECT_NAME:-=_%
   - git clone https://github.com/boostorg/boost-ci.git C:\boost-ci
   - xcopy /s /e /q /i C:\boost-ci\ci .\ci
+  - mkdir .\libs\%SELF%
   - ci\appveyor\install.bat
 
 build: off

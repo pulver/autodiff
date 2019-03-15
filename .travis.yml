@@ -37,7 +37,20 @@ env:
 install:
   - git clone https://github.com/boostorg/boost-ci.git boost-ci
   - cp -pr boost-ci/ci boost-ci/.codecov.yml .
-  - source ci/travis/install.sh
+  - export SELF=`basename $TRAVIS_BUILD_DIR`
+  - cd ..
+  - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+  - cd boost-root
+  - git submodule update -q --init libs/headers
+  - git submodule update -q --init tools/boost_install
+  - git submodule update -q --init tools/boostdep
+  - git submodule update -q --init tools/build
+  - cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
+  - export BOOST_ROOT="`pwd`"
+  - export PATH="`pwd`":$PATH
+  - python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools $DEPINST $SELF
+  - ./bootstrap.sh
+  - ./b2 headers
 
 addons:
   apt:

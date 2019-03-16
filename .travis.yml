@@ -95,7 +95,6 @@ anchors:
                                            "libc++-dev",
                                            "libstdc++-8-dev" ], sources: [ "llvm-toolchain-xenial-6.0",
                                                                            "ubuntu-toolchain-r-test"   ] } }
-  gcc-48:   &gcc-48   { apt: { packages: [ "g++-4.8"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
@@ -108,7 +107,6 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", env: [ "TOOLSET=gcc-4.8",     "CXXSTD=11"          ], addons: *gcc-48    }
     - { os: "linux", env: [ "TOOLSET=gcc-5",       "CXXSTD=11"          ], addons: *gcc-5     }
     - { os: "linux", env: [ "TOOLSET=gcc-6",       "CXXSTD=11,14"       ], addons: *gcc-6     }
     - { os: "linux", env: [ "TOOLSET=gcc-7",       "CXXSTD=11,14,17"    ], addons: *gcc-7     }

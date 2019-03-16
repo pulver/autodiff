@@ -110,38 +110,38 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-5 && CXX=g++-5 && COMPILER=g++-5 && CXXSTD=c++11"                                            ], addons: *gcc-5    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++11"                                            ], addons: *gcc-6    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=c++14"                                            ], addons: *gcc-6    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++11"                                            ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++14"                                            ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=c++17"                                            ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++11"                                            ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++14"                                            ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++17"                                            ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=c++2a"                                            ], addons: *gcc-8    }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-3.8 && CXX=clang++-3.8 && COMPILER=clang++-3.8 && CXXSTD=c++11"                            ], addons: *clang-38 }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-3.8 && CXX=clang++-3.8 && COMPILER=clang++-3.8 && CXXSTD=c++14"                            ], addons: *clang-38 }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-4.0 && CXX=clang++-4.0 && COMPILER=clang++-4.0 && CXXSTD=c++11"                            ], addons: *clang-4  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-4.0 && CXX=clang++-4.0 && COMPILER=clang++-4.0 && CXXSTD=c++14"                            ], addons: *clang-4  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++11"                            ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++14"                            ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=c++17"                            ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++11"                            ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++14"                            ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++17"                            ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++2a"                            ], addons: *clang-6  }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-5 && CXX=g++-5 && COMPILER=g++-5 && CXXSTD=11"                                            ], addons: *gcc-5    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=11"                                            ], addons: *gcc-6    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-6 && CXX=g++-6 && COMPILER=g++-6 && CXXSTD=14"                                            ], addons: *gcc-6    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=11"                                            ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=14"                                            ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-7 && CXX=g++-7 && COMPILER=g++-7 && CXXSTD=17"                                            ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=11"                                            ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=14"                                            ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=17"                                            ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ MATRIX_EVAL: "CC=gcc-8 && CXX=g++-8 && COMPILER=g++-8 && CXXSTD=2a"                                            ], addons: *gcc-8    }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-3.8 && CXX=clang++-3.8 && COMPILER=clang++-3.8 && CXXSTD=11"                            ], addons: *clang-38 }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-3.8 && CXX=clang++-3.8 && COMPILER=clang++-3.8 && CXXSTD=14"                            ], addons: *clang-38 }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-4.0 && CXX=clang++-4.0 && COMPILER=clang++-4.0 && CXXSTD=11"                            ], addons: *clang-4  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-4.0 && CXX=clang++-4.0 && COMPILER=clang++-4.0 && CXXSTD=14"                            ], addons: *clang-4  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=11"                            ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=14"                            ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-5.0 && CXX=clang++-5.0 && COMPILER=clang++-5.0 && CXXSTD=17"                            ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=11"                            ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=14"                            ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=17"                            ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=2a"                            ], addons: *clang-6  }
 
     # libc++
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++11 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++14 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++17 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=c++2a && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=11 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=14 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=17 && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ MATRIX_EVAL: "CC=clang-6.0 && CXX=clang++-6.0 && COMPILER=clang++-6.0 && CXXSTD=2a && CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
 
     # osx
-    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=c++11" ], osx_image: "xcode9.3" }
-    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=c++14" ], osx_image: "xcode9.3" }
-    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=c++17" ], osx_image: "xcode9.3" }
+    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=11" ], osx_image: "xcode9.3" }
+    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=14" ], osx_image: "xcode9.3" }
+    - { os: "osx", env: [ MATRIX_EVAL: "COMPILER=clang++ && CXXSTD=17" ], osx_image: "xcode9.3" }
 
     - os: linux
       env:

@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
   BOOST_MATH_STD_USING
   using namespace boost;
 
-  const T eps = 50 * 100 * boost::math::tools::epsilon<T>();  // percent
+  const T eps = 300 * 100 * boost::math::tools::epsilon<T>();  // percent
   constexpr unsigned m = 5;
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   BOOST_MATH_STD_USING
   using namespace boost;
 
-  const T eps = 50 * 100 * boost::math::tools::epsilon<T>();  // percent
+  const T eps = 300 * 100 * boost::math::tools::epsilon<T>();  // percent
   const T cx = 1.0;
   constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);

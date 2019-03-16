@@ -93,11 +93,6 @@ anchors:
                                            "libc++-dev",
                                            "libstdc++-8-dev" ], sources: [ "llvm-toolchain-trusty-6.0",
                                                                            "ubuntu-toolchain-r-test"   ] } }
-  clang-7:  &clang-7  { apt: { packages: [ "clang-7.0",
-                                           "libc7-dbg",
-                                           "libc++-dev",
-                                           "libstdc++-8-dev" ], sources: [ "llvm-toolchain-trusty-7.0",
-                                                                           "ubuntu-toolchain-r-test"   ] } }
   gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
@@ -118,7 +113,6 @@ jobs:
     - { os: "linux", env: [ "TOOLSET=clang-4.0",   "CXXSTD=11,14"       ], addons: *clang-4   }
     - { os: "linux", env: [ "TOOLSET=clang-5.0",   "CXXSTD=11,14,17"    ], addons: *clang-5   }
     - { os: "linux", env: [ "TOOLSET=clang-6.0",   "CXXSTD=11,14,17,2a" ], addons: *clang-6   }
-    - { os: "linux", env: [ "TOOLSET=clang-7.0",   "CXXSTD=11,14,17,2a" ], addons: *clang-7   }
 
     # to enable Intel ICC define INTEL_ICC_SERIAL_NUMBER and disable the following:
     # - { os: "linux", env: [ "TOOLSET=intel-linux", "CXXSTD=11,14,17"       ], addons: *gcc-7,
@@ -176,21 +170,6 @@ jobs:
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/valgrind.sh
-
-    - os: linux
-      env:
-        - COMMENT=valgrind
-        - TOOLSET=clang-7.0
-        - CXXSTD=11,14,17,2a
-        - DEFINES="define=BOOST_NO_STRESS_TEST=1"
-        - B2_VARIANT=variant=debug
-        - TESTFLAGS=testing.launcher=valgrind
-        - VALGRIND_OPTS=--error-exitcode=1
-      addons: *clang-7
-      script:
-        - cd $BOOST_ROOT/libs/$SELF
-        - ci/travis/valgrind.sh
-
 
     #################### Jobs to run on pushes to master, develop ###################
 

@@ -162,7 +162,7 @@ class fvar {
   fvar &operator=(const fvar &) = default;
 
   // r = cr | RealType& | Move assignment operator.
-  fvar &operator=(fvar &&) noexcept = default;
+  fvar &operator=(fvar &&) = default;
 
   // r = ca | RealType& | Assignment operator from the arithmetic types.
   // Handled by constructor that takes a single parameter of generic type.
@@ -1531,7 +1531,9 @@ fvar<RealType, Order> asinh(const fvar<RealType, Order> &cr) {
 
 template<typename RealType, size_t Order>
 fvar<RealType, Order> atanh(const fvar<RealType, Order> &cr) {
+  BOOST_MATH_STD_USING
   using std::atanh;
+  using boost::math::atanh;
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   const root_type d0 = atanh(static_cast<root_type>(cr));

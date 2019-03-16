@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
 
     auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
     auto anchor_v = atan2(x, y);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon());
   }
 }
 

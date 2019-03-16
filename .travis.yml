@@ -128,9 +128,9 @@ jobs:
     - os: linux
       env:
         - COMMENT=codecov.io
-        - TOOLSET=gcc-7
+        - TOOLSET=gcc-8
         - CXXSTD=11,14,17
-      addons: *gcc-7
+      addons: *gcc-8
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
         - cd $BOOST_ROOT/libs/$SELF
@@ -158,12 +158,12 @@ jobs:
     - os: linux
       env:
         - COMMENT=valgrind
-        - TOOLSET=clang-6.0
+        - TOOLSET=gcc-8
         - CXXSTD=11,14,17,2a
         - B2_VARIANT=variant=debug
         - TESTFLAGS=testing.launcher=valgrind
         - VALGRIND_OPTS=--error-exitcode=1
-      addons: *clang-6
+      addons: *gcc-8
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/valgrind.sh
@@ -175,10 +175,10 @@ jobs:
       if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (branch IN (develop, master)) AND (type IN (cron, push))
       env:
         - COMMENT="Coverity Scan"
-        - TOOLSET=gcc-7
+        - TOOLSET=gcc-8
         - B2_VARIANT=variant=debug
         - CXXSTD=11,14,17,2a
-      addons: *gcc-7
+      addons: *gcc-8
       script:
         - git clone https://github.com/boostorg/boost-ci.git boost-ci
         - export SELF=`basename $TRAVIS_BUILD_DIR`

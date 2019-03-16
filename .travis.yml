@@ -51,7 +51,7 @@ install:
   - echo "$SELF"
   - echo "$BOOST_ROOT"
   - echo "$PATH"
-  - python tools/boostdep/depinst/depinst.py --include test --include example $DEPINST $SELF
+  - python tools/boostdep/depinst/depinst.py $SELF
   - ./bootstrap.sh
   - ./b2 headers
 
@@ -155,7 +155,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=cppcheck
-        - CXXSTD=11,14,1z
+        - CXXSTD=17
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh

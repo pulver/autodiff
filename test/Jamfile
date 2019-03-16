@@ -12,16 +12,18 @@ import testing ;
 project boost-autodiff-test
 :
 requirements
-        <include>.
-        <include>../include
+        #<include>.
+        #<include>../include
     ;
 
-test-suite boost-autodiff
+test-suite minimal
     :
-    [ run test_autodiff1.cpp : : : : test_autodiff1 ]
-    [ run test_autodiff2.cpp : : : : test_autodiff2 ]
-    [ run test_autodiff3.cpp : : : : test_autodiff3 ]
-    [ run test_autodiff4.cpp : : : : test_autodiff4 ]
-    [ run test_autodiff5.cpp : : : : test_autodiff5 ]
-    [ run test_autodiff6.cpp : : : : test_autodiff6 ]
+    [ run test_autodiff1.cpp ]
+    [ run test_autodiff2.cpp ]
+    [ run test_autodiff3.cpp ]
+    [ run test_autodiff4.cpp ]
+    [ run test_autodiff5.cpp ]
+    [ run test_autodiff6.cpp ]
     ;
+
+test-suite all : minimal ;

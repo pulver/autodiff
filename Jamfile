@@ -6,11 +6,14 @@
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-project boost-autodiff
-    :
-    requirements
-        <include>../../boost/math/differentiation/autodiff
+import common ;
+
+project
+    : requirements
+    <implicit-dependency>/boost//headers
+    <include>$(BOOST_ROOT)
+    : default-build
     ;
 
 build-project test ;
-build-project example ;
+build-project examples ;

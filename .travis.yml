@@ -147,6 +147,7 @@ jobs:
       env:
         - COMMENT=codecov.io
         - TOOLSET=gcc-7
+        - CXXSTD=11,14,17
       addons: *gcc-7
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd

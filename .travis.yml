@@ -38,7 +38,7 @@ before_install:
 
 install:
   - git clone https://github.com/boostorg/boost-ci.git boost-ci
-  - cp -pr boost-ci/ci .
+  - cp -pr boost-ci/ci boost-ci/.codecov.yml .
   - export SELF=`basename $TRAVIS_BUILD_DIR`
   - cd ..
   - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
@@ -145,6 +145,16 @@ jobs:
 
     - os: linux
       env:
+        - COMMENT=codecov.io
+        - TOOLSET=gcc-7
+      addons: *gcc-7
+      script:
+        - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
+        - cd $BOOST_ROOT/libs/$SELF
+        - ci/travis/codecov.sh
+
+    - os: linux
+      env:
         - COMMENT=cppcheck
         - CXXSTD=17
       script:
@@ -190,16 +200,16 @@ jobs:
     #    - cd $BOOST_ROOT/libs/$SELF
     #    - ci/travis/coverity.sh
 
-after_success:
-  - cd $BOOST_ROOT/libs/$SELF
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff1.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff1; then ./test_autodiff1; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff2.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff2; then ./test_autodiff2; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff3.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff3; then ./test_autodiff3; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff4.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff4; then ./test_autodiff4; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff5.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff5; then ./test_autodiff5; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff6.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff6; then ./test_autodiff6; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x $COV_TOOL -a --relative-only; fi
+#after_success:
+#  - cd $BOOST_ROOT/libs/$SELF
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff1.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff1; then ./test_autodiff1; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff2.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff2; then ./test_autodiff2; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff3.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff3; then ./test_autodiff3; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff4.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff4; then ./test_autodiff4; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff5.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff5; then ./test_autodiff5; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff6.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff6; then ./test_autodiff6; fi; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x $COV_TOOL -a --relative-only; fi
 
 notifications:
   email:

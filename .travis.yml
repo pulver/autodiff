@@ -157,7 +157,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=cppcheck
-        - CXXSTD=17
+        - CXXSTD=11,14
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh

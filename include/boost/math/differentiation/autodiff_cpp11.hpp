@@ -76,7 +76,8 @@ template <typename RealType, size_t Order>
 template <typename... Orders>
 get_type_at<fvar<RealType, Order>, sizeof...(Orders)> fvar<RealType, Order>::derivative(Orders... orders) const {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(static_cast<unsigned>(orders)...) * product(math::factorial<root_type>(static_cast<unsigned>(orders))...);
+  return at(static_cast<std::size_t>(orders)...) *
+         product(math::factorial<root_type>(static_cast<unsigned>(orders))...);
 }
 
 template <typename RealType, size_t Order>
@@ -105,9 +106,10 @@ fvar<RealType, Order> fvar<RealType, Order>::epsilon_multiply_cpp11(std::false_t
   const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
   const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
   fvar<RealType, Order> retval = fvar<RealType, Order>();
-  for (size_t i = 0, j = Order; i <= i_max; ++i, --j)
+  for (size_t i = 0, j = Order; i <= i_max; ++i, --j) {
     retval.v[j] = std::inner_product(v.cbegin() + ssize_t(m0), v.cend() - ssize_t(i + m1),
                                      cr.v.crbegin() + ssize_t(i + m0), zero);
+  }
   return retval;
 }
 
@@ -133,8 +135,11 @@ fvar<RealType, Order> fvar<RealType, Order>::epsilon_multiply_cpp11(std::false_t
                                                                     const root_type& ca) const {
   fvar<RealType, Order> retval(*this);
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
-  for (size_t i = m0; i <= Order; ++i)
-    if (!(retval.v[i] <= static_cast<RealType>(0) && retval.v[i] >= static_cast<RealType>(0))) retval.v[i] *= ca;
+  for (size_t i = m0; i <= Order; ++i) {
+    if (retval.v[i]!=static_cast<RealType>(0)) {
+      retval.v[i] *= ca;
+    }
+  }
   return retval;
 }
 
@@ -158,10 +163,14 @@ template <typename RootType>
 fvar<RealType, Order>& fvar<RealType, Order>::multiply_assign_by_root_type_cpp11(std::false_type, bool is_root,
                                                                                  const RootType& ca) {
   auto itr = v.begin();
-  if (is_root || !(*itr <= static_cast<RealType>(0) && *itr >= static_cast<RealType>(0)))
+  if (is_root || *itr != 0) {
     *itr *= ca;  // Skip multiplication of 0 by ca=inf to avoid nan. Exception: root value is always multiplied.
-  for (++itr; itr != v.end(); ++itr)
-    if (!(*itr <= static_cast<RealType>(0) && *itr >= static_cast<RealType>(0))) *itr *= ca;
+  }
+  for (++itr; itr != v.end(); ++itr) {
+    if (*itr!=0) {
+      *itr *= ca;
+    }
+  }
   return *this;
 }
 

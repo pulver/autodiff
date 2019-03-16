@@ -146,7 +146,7 @@ jobs:
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
-        - bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only
+        - bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only -s "$BOOST_ROOT/libs/$SELF"/include -s "$BOOST_ROOT/libs/$SELF"/test
 
 
     - os: linux

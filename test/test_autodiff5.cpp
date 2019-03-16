@@ -28,14 +28,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai(x);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
       auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
       auto anchor_v = boost::math::airy_ai_prime(x);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x_));
       auto anchor_v = boost::math::airy_bi(x_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x_));
       auto anchor_v = boost::math::airy_bi_prime(x_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     if (i > 0) {
@@ -59,14 +59,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
         auto autodiff_v = boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i);
         auto anchor_v = boost::math::airy_ai_zero<T>(i);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
         auto autodiff_v = boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i);
         auto anchor_v = boost::math::airy_bi_zero<T>(i);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
     }
   }
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           boost::math::cyl_bessel_i(make_fvar<T, m>(v), make_fvar<T, m>(x));
       auto anchor_v = boost::math::cyl_bessel_i(v, x);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
       auto anchor_v = boost::math::cyl_bessel_j(v, x_j);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           boost::math::cyl_bessel_j_zero(make_fvar<T, m>(v), i + 1);
       auto anchor_v = boost::math::cyl_bessel_j_zero(v, i + 1);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           boost::math::cyl_bessel_k(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
       auto anchor_v = boost::math::cyl_bessel_k(v, x_k);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
                                                  make_fvar<T, m>(x_neumann));
       auto anchor_v = boost::math::cyl_neumann(v, x_neumann);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           boost::math::cyl_neumann_zero(make_fvar<T, m>(v), i + 1);
       auto anchor_v = boost::math::cyl_neumann_zero(v, i + 1);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                          2e3 * test_constants::pct_epsilon());
+                          1e4 * test_constants::pct_epsilon());
     }
 
     {
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
             i_, make_fvar<T, m>(v_));
         auto anchor_v = boost::math::sph_bessel<T>(i_, v_);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
       {
         auto v_ = (max)(abs(v),
@@ -263,7 +263,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
               i_, make_fvar<T, m>(v_));
           auto anchor_v = boost::math::sph_neumann<T>(i_, v_);
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                              2e3 * test_constants::pct_epsilon());
+                              1e4 * test_constants::pct_epsilon());
         } catch (const std::overflow_error&) {
           BOOST_REQUIRE_THROW(((boost::math::sph_neumann<autodiff_fvar<T, m>>(
                                   i_, make_fvar<T, m>(v_)))),
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
                                                           make_fvar<T, m>(x));
         auto anchor_v = boost::math::cyl_bessel_i_prime(v, x);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
                                                           make_fvar<T, m>(x_j));
         auto anchor_v = boost::math::cyl_bessel_j_prime(v, x_j);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
                                                           make_fvar<T, m>(x_k));
         auto anchor_v = boost::math::cyl_bessel_k_prime(v, x_k);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
@@ -305,7 +305,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
             make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
         auto anchor_v = boost::math::cyl_neumann_prime(v, x_neumann);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
             i_, make_fvar<T, m>(abs(v) + 1));
         auto anchor_v = boost::math::sph_bessel_prime<T>(i_, abs(v) + 1);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
 
       {
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
             i_, make_fvar<T, m>(abs(v) + 1));
         auto anchor_v = boost::math::sph_neumann_prime<T>(i_, abs(v) + 1);
         BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                            2e3 * test_constants::pct_epsilon());
+                            1e4 * test_constants::pct_epsilon());
       }
     }
   }
@@ -547,7 +547,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
     auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
     auto anchor_v = boost::math::digamma(x);
     BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                        2e3 * test_constants::pct_epsilon());
+                        1e4 * test_constants::pct_epsilon());
   }
 }
 

@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
   BOOST_MATH_STD_USING
   using namespace boost;
 
-  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
+  const T eps = 50 * 100 * boost::math::tools::epsilon<T>();  // percent
   constexpr unsigned m = 5;
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
@@ -46,17 +46,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   BOOST_MATH_STD_USING
   using namespace boost;
 
-  const T eps = 300 * boost::math::tools::epsilon<T>();  // percent
+  const T eps = 50 * 100 * boost::math::tools::epsilon<T>();  // percent
   const T cx = 1.0;
   constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);
   auto y = erf(x);
   BOOST_REQUIRE_EQUAL(y.derivative(0u), erf(static_cast<T>(x)));
-  BOOST_REQUIRE_CLOSE(y.derivative(1u), 2 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2u), -4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3u), 4 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4u), 8 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5u), -40 / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(1u), T(2) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(2u), T(-4) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(3u), T(4) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4u), T(8) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5u), T(-40) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
@@ -69,9 +69,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinc_test, T, bin_float_types) {
   BOOST_REQUIRE_CLOSE(y.derivative(0u), sin(cx), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), cos(cx) - sin(cx), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), sin(cx) - 2 * cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3u), 5 * cos(cx) - 3 * sin(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4u), 13 * sin(cx) - 20 * cos(cx), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5u), 101 * cos(cx) - 65 * sin(cx), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(3u), T(5) * cos(cx) - T(3) * sin(cx), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4u), T(13) * sin(cx) - T(20) * cos(cx), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5u), T(101) * cos(cx) - T(65) * sin(cx), eps);
   // Test at x = 0
   auto y2 = sinc(make_fvar<T, 10>(0));
   BOOST_REQUIRE_CLOSE(y2.derivative(0u), T(1), eps);

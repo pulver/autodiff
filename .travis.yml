@@ -108,14 +108,14 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", env: [ "TOOLSET=gcc-5",       "CXXSTD=11"          ], addons: *gcc-5     }
-    - { os: "linux", env: [ "TOOLSET=gcc-6",       "CXXSTD=11,14"       ], addons: *gcc-6     }
-    - { os: "linux", env: [ "TOOLSET=gcc-7",       "CXXSTD=11,14,17"    ], addons: *gcc-7     }
-    - { os: "linux", env: [ "TOOLSET=gcc-8",       "CXXSTD=11,14,17,2a" ], addons: *gcc-8     }
-    - { os: "linux", env: [ "TOOLSET=clang-3.8",   "CXXSTD=11,14"       ], addons: *clang-38  }
-    - { os: "linux", env: [ "TOOLSET=clang-4.0",   "CXXSTD=11,14"       ], addons: *clang-4   }
-    - { os: "linux", env: [ "TOOLSET=clang-5.0",   "CXXSTD=11,14,17"    ], addons: *clang-5   }
-    - { os: "linux", env: [ "TOOLSET=clang-6.0",   "CXXSTD=11,14,17,2a" ], addons: *clang-6   }
+    - { os: "linux", env: [ "TOOLSET=gcc-5",     "COMPILER=gcc++-5",     "CXXSTD=11"          ], addons: *gcc-5     }
+    - { os: "linux", env: [ "TOOLSET=gcc-6",     "COMPILER=gcc++-6",     "CXXSTD=11,14"       ], addons: *gcc-6     }
+    - { os: "linux", env: [ "TOOLSET=gcc-7",     "COMPILER=gcc++-7",     "CXXSTD=11,14,17"    ], addons: *gcc-7     }
+    - { os: "linux", env: [ "TOOLSET=gcc-8",     "COMPILER=gcc++-8",     "CXXSTD=11,14,17,2a" ], addons: *gcc-8     }
+    - { os: "linux", env: [ "TOOLSET=clang-3.8", "COMPILER=clang++-3.8", "CXXSTD=11,14"       ], addons: *clang-38  }
+    - { os: "linux", env: [ "TOOLSET=clang-4.0", "COMPILER=clang++-4.0", "CXXSTD=11,14"       ], addons: *clang-4   }
+    - { os: "linux", env: [ "TOOLSET=clang-5.0", "COMPILER=clang++-5.0", "CXXSTD=11,14,17"    ], addons: *clang-5   }
+    - { os: "linux", env: [ "TOOLSET=clang-6.0", "COMPILER=clang++-6.0", "CXXSTD=11,14,17,2a" ], addons: *clang-6   }
 
     # to enable Intel ICC define INTEL_ICC_SERIAL_NUMBER and disable the following:
     # - { os: "linux", env: [ "TOOLSET=intel-linux", "CXXSTD=11,14,17"       ], addons: *gcc-7,

@@ -91,15 +91,6 @@ environment:
       CXXFLAGS: cxxflags="/EHsc /bigobj"
       CXXSTD: 11
 
-    - FLAVOR: Visual Studio 2010, 2012, 2013
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      TOOLSET: msvc-10.0,msvc-11.0,msvc-12.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single
-      CXXFLAGS: cxxflags="/EHsc /bigobj"
-      CXXSTD: 11
-
 #    - FLAVOR: cygwin (32-bit)
 #      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 #      ADDPATH: C:\cygwin\bin;

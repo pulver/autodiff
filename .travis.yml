@@ -110,33 +110,33 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-5",     "CC=gcc-5", "CXX=g++-5" , "COMPILER=g++-5" , "CXXSTD=11"                                          ], addons: *gcc-5    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6" , "COMPILER=g++-6" , "CXXSTD=11"                                          ], addons: *gcc-6    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6" , "COMPILER=g++-6" , "CXXSTD=14"                                          ], addons: *gcc-6    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7" , "COMPILER=g++-7" , "CXXSTD=11"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7" , "COMPILER=g++-7" , "CXXSTD=14"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7" , "COMPILER=g++-7" , "CXXSTD=17"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8" , "COMPILER=g++-8" , "CXXSTD=11"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8" , "COMPILER=g++-8" , "CXXSTD=14"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8" , "COMPILER=g++-8" , "CXXSTD=17"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8" , "COMPILER=g++-8" , "CXXSTD=2a"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=11"                           ], addons: *clang-38 }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=14"                           ], addons: *clang-38 }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-4.0", "CC=clang-4.0", "CXX=clang++-4.0" , "COMPILER=clang++-4.0", "CXXSTD=11"                           ], addons: *clang-4  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-4.0", "CC=clang-4.0", "CXX=clang++-4.0" , "COMPILER=clang++-4.0", "CXXSTD=14"                           ], addons: *clang-4  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=11"                           ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=14"                           ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=17"                           ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=11"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=14"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=17"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=2a"                           ], addons: *clang-6  }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-5",     "CC=gcc-5", "CXX=g++-5", "COMPILER=g++-5", "CXXSTD=11", "COV_TOOL=gcov-5"                       ], addons: *gcc-5    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6", "COMPILER=g++-6", "CXXSTD=11", "COV_TOOL=gcov-6"                                         ], addons: *gcc-6    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6", "COMPILER=g++-6", "CXXSTD=14", "COV_TOOL=gcov-6"                                          ], addons: *gcc-6    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=14", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=17", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=11", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=14", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=17", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=2a", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-38 }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-38 }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-4.0", "CC=clang-4.0", "CXX=clang++-4.0" , "COMPILER=clang++-4.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-4  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-4.0", "CC=clang-4.0", "CXX=clang++-4.0" , "COMPILER=clang++-4.0", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-4  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=17", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=17", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=2a", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
 
     # libc++
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=11", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=14", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=17", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=2a", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=11", "COV_TOOL=llvm-cov", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=14", "COV_TOOL=llvm-cov", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=17", "COV_TOOL=llvm-cov", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=2a", "COV_TOOL=llvm-cov", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
 
     # osx
     - { os: "osx", env: [ "TOOLSET=clang", "COMPILER=clang++", "CXXSTD=11" ], osx_image: "xcode9.3" }
@@ -191,7 +191,6 @@ jobs:
     #    - ci/travis/coverity.sh
 
 after_success:
-  - echo $(which gcov)
   - cd $BOOST_ROOT/libs/$SELF
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff1.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff1; then ./test_autodiff1; fi; fi
@@ -200,7 +199,7 @@ after_success:
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff4.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff4; then ./test_autodiff4; fi; fi
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff5.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff5; then ./test_autodiff5; fi; fi
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff6.cpp -std=c++$CXXSTD -I$BOOST_ROOT -Iinclude -Wall -O0 --coverage -o ./test_autodiff6; then ./test_autodiff6; fi; fi
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x $(which gcov) -a --relative-only; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x $COV_TOOL -a --relative-only; fi
 
 notifications:
   email:

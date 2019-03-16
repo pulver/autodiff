@@ -113,9 +113,9 @@ jobs:
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-5",     "CC=gcc-5", "CXX=g++-5", "COMPILER=g++-5", "CXXSTD=11", "COV_TOOL=gcov-5"                       ], addons: *gcc-5    }
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6", "COMPILER=g++-6", "CXXSTD=11", "COV_TOOL=gcov-6"                                         ], addons: *gcc-6    }
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6", "COMPILER=g++-6", "CXXSTD=14", "COV_TOOL=gcov-6"                                          ], addons: *gcc-6    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=14", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=17", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    #- { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    #- { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=14", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11,14,17", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=11", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=14", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
     - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=17", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }

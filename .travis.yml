@@ -134,12 +134,18 @@ jobs:
       addons: *gcc-7
       script:
         - if pyenv shell 3.6.3; then pip3 install --user codecov; fi
-        - if $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff1 ; then ./test_autodiff1 ; fi
-        - if $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff2 ; then ./test_autodiff2 ; fi
-        - if $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff3 ; then ./test_autodiff3 ; fi
-        - if $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff4 ; then ./test_autodiff4 ; fi
-        - if $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff5 ; then ./test_autodiff5 ; fi
-        - if $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o test_autodiff6 ; then ./test_autodiff6 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff1.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff2.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff3.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff1.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff2.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff3.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
+        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
         - if $(env | grep -q ^CODE_ANALYSIS=); then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
 
 

@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
   auto x = make_fvar<T, m>(cx);
   auto y = atanh(x);
   // BOOST_REQUIRE_EQUAL(y.derivative(0) , atanh(cx)); // fails due to overload
-  BOOST_REQUIRE_EQUAL(y.derivative(0u), atanh(static_cast<T>(x)));
+  BOOST_REQUIRE_CLOSE(y.derivative(0u), atanh(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), static_cast<T>(4. / 3), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), static_cast<T>(16. / 9), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), static_cast<T>(224. / 27), eps);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_test, T, all_float_types) {
   constexpr unsigned m = 5;
   const auto x = make_fvar<T, m>(cx);
   auto y = erf(x);
-  BOOST_REQUIRE_EQUAL(y.derivative(0u), erf(static_cast<T>(x)));
+  BOOST_REQUIRE_CLOSE(y.derivative(0u), erf(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), T(2) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), T(-4) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), T(4) / (math::constants::e<T>() * math::constants::root_pi<T>()), eps);

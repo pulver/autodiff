@@ -130,30 +130,6 @@ jobs:
 
     - os: linux
       env:
-        - COMMENT=codecov.io
-        - TOOLSET=gcc-7
-        - CXXSTD=11,14,17
-        - COMPILER=g++-7
-      addons: *gcc-7
-      script:
-        - if pyenv shell 3.6.3; then pip3 install --user codecov; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff1.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff2.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff3.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++11 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff1.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff1 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff2.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff2 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff3.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff3 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
-        - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
-        - bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only -s "$BOOST_ROOT/libs/$SELF"
-
-
-    - os: linux
-      env:
         - COMMENT=cppcheck
         - CXXSTD=17
       script:
@@ -198,6 +174,16 @@ jobs:
     #  script:
     #    - cd $BOOST_ROOT/libs/$SELF
     #    - ci/travis/coverity.sh
+
+after_success:
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff1.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff1; then $BOOST_ROOT/libs/$SELF/test/test_autodiff1; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff2.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff2; then $BOOST_ROOT/libs/$SELF/test/test_autodiff2; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff3.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff3; then $BOOST_ROOT/libs/$SELF/test/test_autodiff3; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=$CXXSTD -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6; fi; fi
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi
 
 notifications:
   email:

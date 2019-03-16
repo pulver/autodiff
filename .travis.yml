@@ -48,7 +48,7 @@ install:
   - cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
   - export BOOST_ROOT="`pwd`"
   - export PATH="`pwd`":$PATH
-  - python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools $DEPINST $SELF
+  - python tools/boostdep/depinst/depinst.py --include benchmark --include example $DEPINST $SELF
   - ./bootstrap.sh
   - ./b2 headers
 
@@ -146,13 +146,13 @@ jobs:
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff4.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff4 ; fi
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff5.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff5 ; fi
         - if $COMPILER $BOOST_ROOT/libs/$SELF/test/test_autodiff6.cpp -std=c++17 -I$BOOST_ROOT -I$BOOST_ROOT/libs/$SELF/include -Wall -O0 --coverage -o $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; then $BOOST_ROOT/libs/$SELF/test/test_autodiff6 ; fi
-        - bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only -s "$BOOST_ROOT/libs/$SELF"/include -s "$BOOST_ROOT/libs/$SELF"/test
+        - bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only -s "$BOOST_ROOT/libs/$SELF"
 
 
     - os: linux
       env:
         - COMMENT=cppcheck
-        - CXXSTD=11,14,17,2a
+        - CXXSTD=11,14
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh

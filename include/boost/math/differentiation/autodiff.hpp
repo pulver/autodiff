@@ -17,7 +17,7 @@
 #include <boost/mp11/algorithm.hpp>
 #include <boost/mp11/function.hpp>
 #include <boost/mp11/integral.hpp>
-#include <boost/type_traits/decay.hpp>
+#include <boost/type_traits.hpp>
 
 #include <algorithm>
 #include <array>
@@ -140,7 +140,7 @@ class fvar {
   fvar(const fvar &) = default;
 
   // RealType(cr) | RealType | RealType is move constructible.
-  fvar(fvar&&) = default;
+  fvar(fvar&&) noexcept(boost::is_nothrow_move_constructible<RealType>::value) = default;
 
   // Be aware of implicit casting from one fvar<> type to another by this copy
   // constructor.
@@ -162,7 +162,7 @@ class fvar {
   fvar &operator=(const fvar &) = default;
 
   // r = cr | RealType& | Move assignment operator.
-  fvar &operator=(fvar &&) = default;
+  fvar &operator=(fvar &&) noexcept(boost::is_nothrow_move_assignable<RealType>::value) = default;
 
   // r = ca | RealType& | Assignment operator from the arithmetic types.
   // Handled by constructor that takes a single parameter of generic type.

@@ -1,0 +1,4 @@
+fixes:
+  - home/travis/build/*/boost-root/boost/::include/boost/
+  - home/travis/build/*/boost-root/libs/*/src/::src/
+  - home/travis/build/*/boost-root/libs/*/test/::test/

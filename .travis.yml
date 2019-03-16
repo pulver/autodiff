@@ -131,7 +131,7 @@ jobs:
         - COMMENT=codecov.io
         - TOOLSET=gcc-7
         - DEFINES="define=BOOST_NO_STRESS_TEST=1"
-        - CXXSTD=11,14,17,2a
+        - CXXSTD=11,14,17
       addons: *gcc-7
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
@@ -183,6 +183,22 @@ jobs:
         - CXXSTD=11,14,17,2a
       addons: *gcc-7
       script:
+        - git clone https://github.com/boostorg/boost-ci.git boost-ci
+        - export SELF=`basename $TRAVIS_BUILD_DIR`
+        - cd ..
+        - git clone -b $TRAVIS_BRANCH --depth 1 https://github.com/boostorg/boost.git boost-root
+        - cd boost-root
+        - git submodule update -q --init libs/headers
+        - git submodule update -q --init tools/boost_install
+        - git submodule update -q --init tools/boostdep
+        - git submodule update -q --init tools/build
+        - mkdir -p libs/$SELF
+        - cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
+        - export BOOST_ROOT="`pwd`"
+        - export PATH="`pwd`":$PATH
+        - python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools $DEPINST $SELF
+        - ./bootstrap.sh
+        - ./b2 headers
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/coverity.sh
 

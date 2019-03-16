@@ -129,12 +129,12 @@ jobs:
       env:
         - COMMENT=codecov.io
         - TOOLSET=gcc-7
-        - DEFINES="define=BOOST_NO_STRESS_TEST=1"
         - CXXSTD=11,14,17
       addons: *gcc-7
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
         - cd $BOOST_ROOT/libs/$SELF
+        - if $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$BOOST_ROOT/libs/$SELF -Iinclude -Wall -O0 --coverage -o test_autodiff1; then ./test_autodiff1; fi;
         - ci/travis/codecov.sh
 
     - os: linux
@@ -151,7 +151,6 @@ jobs:
         - B2_VARIANT=variant=debug
         - TOOLSET=gcc-8
         - CXXSTD=11,14,17,2a
-        - DEFINES="define=BOOST_NO_STRESS_TEST=1"
         - CXXFLAGS="cxxflags=-fno-omit-frame-pointer cxxflags=-fsanitize=undefined cxxflags=-fno-sanitize-recover=undefined"
         - LINKFLAGS="linkflags=-fsanitize=undefined linkflags=-fno-sanitize-recover=undefined linkflags=-fuse-ld=gold"
         - UBSAN_OPTIONS=print_stacktrace=1
@@ -162,7 +161,6 @@ jobs:
         - COMMENT=valgrind
         - TOOLSET=clang-6.0
         - CXXSTD=11,14,17,2a
-        - DEFINES="define=BOOST_NO_STRESS_TEST=1"
         - B2_VARIANT=variant=debug
         - TESTFLAGS=testing.launcher=valgrind
         - VALGRIND_OPTS=--error-exitcode=1

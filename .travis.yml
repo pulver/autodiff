@@ -135,6 +135,7 @@ jobs:
         - COMMENT=codecov.io
         - TOOLSET=gcc-7
         - DEFINES="define=BOOST_NO_STRESS_TEST=1"
+        - CXXSTD=11,14,17,2a
       addons: *gcc-7
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
@@ -144,6 +145,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=cppcheck
+        - CXXSTD=11,14,17,2a
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh
@@ -182,6 +184,7 @@ jobs:
       env:
         - COMMENT="Coverity Scan"
         - TOOLSET=gcc-7
+        - CXXSTD=11,14,17,2a
       addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF

@@ -125,9 +125,7 @@ class fvar {
   std::array<RealType, Order + 1> v;
 
  public:
-  using root_type =
-  typename get_root_type<RealType>::type;  // RealType in the root
-  // fvar<RealType,Order>.
+  using root_type = typename get_root_type<RealType>::type;  // RealType in the root of fvar<RealType,Order>.
 
   fvar() = default;
 
@@ -140,7 +138,7 @@ class fvar {
   fvar(const fvar &) = default;
 
   // RealType(cr) | RealType | RealType is move constructible.
-  /*fvar(fvar&&) noexcept(boost::is_nothrow_move_constructible<RealType>::value) = default;*/
+  fvar(fvar&&) noexcept(boost::is_nothrow_move_constructible<RealType>::value) = default;
 
   // Be aware of implicit casting from one fvar<> type to another by this copy
   // constructor.
@@ -162,11 +160,11 @@ class fvar {
   fvar &operator=(const fvar &) = default;
 
   // r = cr | RealType& | Move assignment operator.
-  /*fvar &operator=(fvar &&) noexcept(boost::is_nothrow_move_assignable<RealType>::value) = default;*/
+  fvar &operator=(fvar &&) noexcept(boost::is_nothrow_move_assignable<RealType>::value) = default;
 
   // r = ca | RealType& | Assignment operator from the arithmetic types.
   // Handled by constructor that takes a single parameter of generic type.
-  // fvar& operator=(const root_type&); // Set a constant.
+  //fvar& operator=(const root_type&); // Set a constant.
 
   // r += cr | RealType& | Adds cr to r.
   template<typename RealType2, size_t Order2>
@@ -1531,7 +1529,6 @@ fvar<RealType, Order> asinh(const fvar<RealType, Order> &cr) {
 
 template<typename RealType, size_t Order>
 fvar<RealType, Order> atanh(const fvar<RealType, Order> &cr) {
-  BOOST_MATH_STD_USING
   using std::atanh;
   using boost::math::atanh;
   using root_type = typename fvar<RealType, Order>::root_type;
@@ -1560,7 +1557,7 @@ fvar<RealType, Order> cosh(const fvar<RealType, Order> &cr) {
 
 template<typename RealType, size_t Order>
 fvar<RealType, Order> erf(const fvar<RealType, Order> &cr) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::erf;
   using std::erf;
 
@@ -1577,7 +1574,7 @@ fvar<RealType, Order> erf(const fvar<RealType, Order> &cr) {
 
 template<typename RealType, size_t Order>
 fvar<RealType, Order> erfc(const fvar<RealType, Order> &cr) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::erfc;
   using std::erfc;
 

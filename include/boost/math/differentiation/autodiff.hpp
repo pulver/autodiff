@@ -1084,7 +1084,7 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType, sizeof...(Orders)> fvar<RealType, Order>::at(std::size_t order, Orders... orders) const {
   if constexpr (0 < sizeof...(Orders)) {
-    return v.at(order).at(static_cast<unsigned>(orders)...);
+    return v.at(order).at(static_cast<std::size_t>(orders)...);
   } else {
     return v.at(order);
   }

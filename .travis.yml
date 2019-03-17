@@ -115,11 +115,8 @@ jobs:
 #    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-6",     "CC=gcc-6", "CXX=g++-6", "COMPILER=g++-6", "CXXSTD=14", "COV_TOOL=gcov-6"                                          ], addons: *gcc-6    }
     #- { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
     #- { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=14", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11,14,17", "COV_TOOL=gcov-7"                                          ], addons: *gcc-7    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=11", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=14", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=17", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
-    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=2a", "COV_TOOL=gcov-8"                                          ], addons: *gcc-8    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-7",     "CC=gcc-7", "CXX=g++-7", "COMPILER=g++-7", "CXXSTD=11,14,17"                                       ], addons: *gcc-7    }
+    - { os: "linux", compiler: "gcc",   env: [ "TOOLSET=gcc-8",     "CC=gcc-8", "CXX=g++-8", "COMPILER=g++-8", "CXXSTD=11,14,17,2a"                                        ], addons: *gcc-8    }
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-38 }
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-3.8", "CC=clang-3.8", "CXX=clang++-3.8" , "COMPILER=clang++-3.8", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-38 }
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-4.0", "CC=clang-4.0", "CXX=clang++-4.0" , "COMPILER=clang++-4.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-4  }
@@ -154,12 +151,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=cppcheck
-        - TOOLSET=clang-6
         - CXXSTD=14
-        - CXX=clang++
-        - CC=clang
-        - CXX_FOR_BUILD=clang++
-        - CC_FOR_BUILD=clang
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh

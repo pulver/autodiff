@@ -8,21 +8,22 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
-  BOOST_MATH_STD_USING
-  using namespace boost;
+  using boost::math::atanh;
+  using boost::math::differentiation::detail::atanh;
+  using boost::multiprecision::atanh;
 
-  const T eps = 3000 * 100 * std::numeric_limits<T>::epsilon();  // percent
+  const T eps = 3000 * test_constants_t<T>::pct_epsilon();  // percent
   constexpr unsigned m = 5;
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = atanh(x);
   // BOOST_REQUIRE_EQUAL(y.derivative(0) , atanh(cx)); // fails due to overload
   BOOST_REQUIRE_CLOSE(y.derivative(0u), atanh(static_cast<T>(x)), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(1u), static_cast<T>(4. / 3), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(2u), static_cast<T>(16. / 9), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(3u), static_cast<T>(224. / 27), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(4u), static_cast<T>(1280. / 27), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5u), static_cast<T>(31232. / 81), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(1u), static_cast<T>(4) / 3, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(2u), static_cast<T>(16)/ 9, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(3u), static_cast<T>(224) / 27, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(4u), static_cast<T>(1280) / 27, eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5u), static_cast<T>(31232) / 81, eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_test, T, all_float_types) {

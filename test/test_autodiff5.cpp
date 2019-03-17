@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
                             1e4 * test_constants::pct_epsilon());
       }
       {
-        auto v_ = (max)(abs(v),
+        auto v_ = (max)(T(abs(v)),
                         nextafter(T(abs(v)), 2 * (std::numeric_limits<T>::min)()));
         try {
           auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(
@@ -695,6 +695,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
   using std::nextafter;
   using boost::math::signbit;
   using boost::multiprecision::signbit;
+  using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -719,6 +721,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   using boost::math::nextafter;
   using boost::math::tools::max;
   using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
   using boost::math::signbit;
   using boost::multiprecision::signbit;
 

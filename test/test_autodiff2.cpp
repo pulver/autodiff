@@ -161,6 +161,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ylogx, T, all_float_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(frexp_test, T, all_float_types) {
   using std::exp2;
   using std::frexp;
+  using boost::multiprecision::exp2;
+  using boost::multiprecision::frexp;
   constexpr int m = 3;
   const T cx = 3.5;
   const auto x = make_fvar<T, m>(cx);

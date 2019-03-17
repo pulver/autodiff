@@ -259,6 +259,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -892,6 +895,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<unsigned> n_sampler{0u, 30};

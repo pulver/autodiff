@@ -50,4 +50,28 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   BOOST_REQUIRE_LT(relative_error, eps);
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(autodiff_tanh, T, all_float_types) {
+  using std::tanh;
+  using boost::multiprecision::tanh;
+  using boost::math::differentiation::detail::tanh;
+
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+  test_detail::RandomSample<T> x_sampler{-10, 10};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = x_sampler.next();
+    try {
+      BOOST_REQUIRE_CLOSE(tanh(make_fvar<T, m>(x)), tanh(x),
+                          test_constants::pct_epsilon());
+    } catch (const boost::math::rounding_error &) {
+      BOOST_REQUIRE_THROW(tanh(make_fvar<T, m>(x)), boost::wrapexcept<boost::math::rounding_error>);
+      BOOST_REQUIRE_THROW(tanh(x), boost::wrapexcept<boost::math::rounding_error>);
+    } catch (...) {
+      std::cout << "Input: x: " << x << std::endl;
+      std::rethrow_exception(std::exception_ptr(std::current_exception()));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

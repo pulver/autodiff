@@ -23,6 +23,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 100};
@@ -107,6 +111,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1000, 1000};
@@ -807,6 +815,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<unsigned> n_sampler{0, 50};
@@ -1080,6 +1092,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{0, 20};
@@ -1131,6 +1147,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
+  using std::isfinite;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-2000, 2000};

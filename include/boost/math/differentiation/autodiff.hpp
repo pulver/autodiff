@@ -1756,8 +1756,8 @@ DestinationT real_cast(differentiation::detail::fvar<RealType, Order> from_v) {
 
 namespace policies {
 
-template<class Policy, std::size_t Order>
-using fvar_t = differentiation::detail::fvar<Policy, Order>;
+template<class RealType, std::size_t Order>
+using fvar_t = differentiation::detail::fvar<RealType, Order>;
 template<class Policy, std::size_t Order>
 struct evaluation<fvar_t<float, Order>, Policy> {
   using type =

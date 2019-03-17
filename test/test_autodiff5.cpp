@@ -14,7 +14,7 @@ using namespace boost::math::differentiation;
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::multiprecision::min;
   using std::min;
 
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING;
+  ;
   using boost::math::acosh;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING;
+  ;
   using boost::math::asinh;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING;
+  ;
   using boost::math::nextafter;
   using std::nextafter;
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
-  BOOST_MATH_STD_USING;
+  ;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::multiprecision::min;
   using std::min;
   using test_constants = test_constants_t<T>;
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 
 // TODO(kbhat): Something in here is very slow with boost::multiprecision
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::signbit;
   using boost::multiprecision::signbit;
   using boost::math::nextafter;
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::multiprecision::min;
   using std::min;
   using std::fabs;
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::nextafter;
   using std::nextafter;
 
@@ -590,7 +590,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
 
   using boost::math::nextafter;
   using std::nextafter;
@@ -638,7 +638,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::tools::max;
   using std::max;
 
@@ -665,7 +665,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
   using boost::math::nextafter;
   using boost::math::tools::max;
   using std::max;
@@ -678,8 +677,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto y = (max)(y_sampler.next(),
-                   nextafter(T(0), ((std::numeric_limits<T>::max))()));
+    auto y = T(0);
+    while (fpclassify(y) == FP_ZERO) {
+      y = (max)(y_sampler.next(),
+          nextafter(T(0), T(signbit(y) ? -1 : 1)*((std::numeric_limits<T>::max))()));
+    }
+
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)),
         boost::math::ellint_rc(x, y), 2.5e3 * test_constants::pct_epsilon());
@@ -687,9 +690,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
   using boost::math::nextafter;
   using boost::math::tools::max;
+  using boost::math::fpclassify;
+  using boost::math::signbit;
   using std::max;
   using std::nextafter;
 
@@ -705,8 +709,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
     auto x = x_sampler.next();
     auto y = (x != 0 ? 1 : 0) + y_sampler.next();
     auto z = ((x == 0 || y == 0) ? 1 : 0) + z_sampler.next();
-    auto p = (max)(p_sampler.next(),
-                   nextafter(T(0), ((std::numeric_limits<T>::max))()));
+    auto p = T(0);
+
+    while (fpclassify(p) == FP_ZERO) {
+      p = (max)(p_sampler.next(),
+               nextafter(T(0), T(signbit(p) ? -1 : 1) * ((std::numeric_limits<T>::max))()));
+    }
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y),
                                make_fvar<T, m>(z), make_fvar<T, m>(p)),
@@ -734,7 +742,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
+  
   using boost::math::nextafter;
   using std::nextafter;
 

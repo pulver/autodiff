@@ -614,11 +614,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
-
-
   using boost::math::nextafter;
-  using std::nextafter;
+  using boost::multiprecision::nextafter;
 
+  using std::sin;
+  using boost::math::differentiation::detail::sin;
   using boost::multiprecision::min;
   using std::min;
 
@@ -632,7 +632,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
     std::ignore = i;
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
-    auto n = ((min))(((min))(n_sampler.next(), 1 / (sin(phi) * sin(phi))),
+    auto n = (min)((min)(n_sampler.next(), T(1) / (sin(phi) * sin(phi))),
                      nextafter(T(1), T(0)));
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n),

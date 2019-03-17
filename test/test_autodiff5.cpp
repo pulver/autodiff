@@ -590,7 +590,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
                         2.5e3 * test_constants::pct_epsilon());
     BOOST_REQUIRE_CLOSE(
         boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)),
-        boost::math::ellint_1(k, phi), 2.5e3 * test_constants::pct_epsilon());
+        boost::math::ellint_1(k, phi), 1e4 * test_constants::pct_epsilon());
   }
 }
 

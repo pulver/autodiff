@@ -130,6 +130,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   using boost::math::float_prior;
   using boost::multiprecision::atan;
   using boost::math::differentiation::detail::atan;
+  using boost::math::signbit;
+  using boost::multiprecision::signbit;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -138,7 +140,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = T(1);
-    while(fpclassify(abs(x)-1) == FP_ZERO) {
+    while(fpclassify(T(abs(x)-1)) == FP_ZERO) {
       x = signbit(x) * (float_prior(T(abs(x))));
     }
 
@@ -207,7 +209,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     auto v = v_sampler.next();
     auto x = x_sampler.next();
-    v = (signbit(v) ? -1 : 1) *
+    v = (
+        (v) ? -1 : 1) *
         (max)(v, (nextafter)(T(0), ((std::numeric_limits<T>::max))()));
     if (signbit(x)) {
       v = static_cast<T>(boost::math::itrunc(v));
@@ -688,6 +691,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
   using boost::math::tools::max;
   using std::max;
   using std::nextafter;
+  using boost::math::signbit;
+  using boost::multiprecision::signbit;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -697,7 +702,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     auto y = T(0);
-    while (fpclassify(y) == FP_ZERO) {
+    while (fpclassify(T(y)) == FP_ZERO) {
       y = (max)(y_sampler.next(),
           nextafter(T(0), T(signbit(y) ? -1 : 1)*((std::numeric_limits<T>::max))()));
     }
@@ -713,11 +718,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
   using boost::math::tools::max;
   using boost::math::fpclassify;
   using boost::math::signbit;
+  using boost::multiprecision::signbit;
+
   using std::max;
   using std::nextafter;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
+
   test_detail::RandomSample<T> x_sampler{0, 2000};
   test_detail::RandomSample<T> y_sampler{0, 2000};
   test_detail::RandomSample<T> z_sampler{0, 2000};
@@ -730,7 +738,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
     auto z = ((x == 0 || y == 0) ? 1 : 0) + z_sampler.next();
     auto p = T(0);
 
-    while (fpclassify(p) == FP_ZERO) {
+    while (fpclassify(T(p)) == FP_ZERO) {
       p = (max)(p_sampler.next(),
                nextafter(T(0), T(signbit(p) ? -1 : 1) * ((std::numeric_limits<T>::max))()));
     }

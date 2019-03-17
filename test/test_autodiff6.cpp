@@ -571,19 +571,27 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
-  using boost::math::tools::max;
-  using boost::multiprecision::log;
-  using boost::multiprecision::min;
-  using boost::multiprecision::sqrt;
-  using std::log;
   using std::max;
+  using boost::math::tools::max;
+  using boost::multiprecision::max;
+
+  using std::log;
+  using boost::multiprecision::log;
+  using boost::math::differentiation::detail::log;
+
   using std::min;
+  using boost::multiprecision::min;
+
   using std::sqrt;
+  using boost::multiprecision::sqrt;
+  using boost::math::differentiation::detail::sqrt;
+
+  using boost::math::nextafter;
+  using boost::multiprecision::nextafter;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{0, log(((std::numeric_limits<T>::max))())};
+  test_detail::RandomSample<T> x_sampler{0, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = ((max))(x_sampler.next(), boost::math::nextafter(static_cast<T>(0), ((std::numeric_limits<T>::max))()));

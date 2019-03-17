@@ -61,29 +61,43 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(factorials_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, all_float_types) {
+  using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
+  using boost::math::isfinite;
+  using boost::multiprecision::isfinite;
+  using boost::math::isnormal;
+  using boost::multiprecision::isnormal;
+  using boost::math::isinf;
+  using boost::multiprecision::isinf;
+  using boost::math::isnan;
+  using boost::multiprecision::isnan;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1000, 1000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
 
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(0)), FP_ZERO);
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(10)), FP_NORMAL);
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::infinity())), FP_INFINITE);
-    BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())), FP_NAN);
+    BOOST_REQUIRE_EQUAL(fpclassify(make_fvar<T, m>(0)), FP_ZERO);
+    BOOST_REQUIRE_EQUAL(fpclassify(make_fvar<T, m>(10)), FP_NORMAL);
+    BOOST_REQUIRE_EQUAL(fpclassify(make_fvar<T, m>(std::numeric_limits<T>::infinity())), FP_INFINITE);
+    BOOST_REQUIRE_EQUAL(fpclassify(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())), FP_NAN);
     if (std::numeric_limits<T>::has_denorm != std::denorm_absent) {
-      BOOST_REQUIRE_EQUAL(boost::math::fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())), FP_SUBNORMAL);
+      BOOST_REQUIRE_EQUAL(fpclassify(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())), FP_SUBNORMAL);
     }
 
-    BOOST_REQUIRE(boost::math::isfinite(make_fvar<T, m>(0)));
-    BOOST_REQUIRE(boost::math::isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
-    BOOST_REQUIRE(!boost::math::isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
-    BOOST_REQUIRE(boost::math::isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
-    BOOST_REQUIRE(boost::math::isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
+    BOOST_REQUIRE(isfinite(make_fvar<T, m>(0)));
+    BOOST_REQUIRE(isnormal(make_fvar<T, m>((std::numeric_limits<T>::min)())));
+    BOOST_REQUIRE(!isnormal(make_fvar<T, m>(std::numeric_limits<T>::denorm_min())));
+    BOOST_REQUIRE(isinf(make_fvar<T, m>(std::numeric_limits<T>::infinity())));
+    BOOST_REQUIRE(isnan(make_fvar<T, m>(std::numeric_limits<T>::quiet_NaN())));
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
+  using boost::math::nextafter;
+  using boost::multiprecision::nextafter;
+  
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> z_sampler{0, 34};
@@ -92,75 +106,88 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
     std::ignore = i;
     auto z = z_sampler.next();
     {
-      auto autodiff_v = boost::math::tgamma(make_fvar<T, m>(z));
-      auto anchor_v = boost::math::tgamma(z);
+      using boost::math::tgamma;
+      using boost::multiprecision::tgamma;
+
+      auto autodiff_v = tgamma(make_fvar<T, m>(z));
+      auto anchor_v = tgamma(z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
 
     {
-      auto autodiff_v = boost::math::tgamma1pm1(make_fvar<T, m>(z));
-      auto anchor_v = boost::math::tgamma1pm1(z);
+      using boost::math::tgamma1pm1;
+      auto autodiff_v = tgamma1pm1(make_fvar<T, m>(z));
+      auto anchor_v = tgamma1pm1(z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
 
     {
       int s1 = 0;
       int s2 = 0;
-      BOOST_REQUIRE_CLOSE(boost::math::lgamma(make_fvar<T, m>(z), std::addressof(s1)),
-                          boost::math::lgamma(z, std::addressof(s2)), 2.5e5 * test_constants::pct_epsilon());
+      using boost::math::lgamma;
+      using boost::multiprecision::lgamma;
+      BOOST_REQUIRE_CLOSE(lgamma(make_fvar<T, m>(z), std::addressof(s1)),
+                          lgamma(z, std::addressof(s2)), 2.5e5 * test_constants::pct_epsilon());
       BOOST_REQUIRE((std::addressof(s1) == nullptr && std::addressof(s2) == nullptr) || (s1 == s2));
     }
 
     {
-      auto a = boost::math::nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
-      auto autodiff_v = boost::math::tgamma_lower(make_fvar<T, m>(a), make_fvar<T, m>(z));
-      auto anchor_v = boost::math::tgamma_lower(a, z);
+      using boost::math::tgamma_lower;
+      auto a = nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
+      auto autodiff_v = tgamma_lower(make_fvar<T, m>(a), make_fvar<T, m>(z));
+      auto anchor_v = tgamma_lower(a, z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
 
     {
-      auto a = boost::math::nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
-      auto autodiff_v = boost::math::gamma_q(make_fvar<T, m>(a), make_fvar<T, m>(z));
-      auto anchor_v = boost::math::gamma_q(a, z);
+      using boost::math::gamma_q;
+      auto a = nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
+      auto autodiff_v = gamma_q(make_fvar<T, m>(a), make_fvar<T, m>(z));
+      auto anchor_v = gamma_q(a, z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
     {
-      auto a = boost::math::nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
-      auto autodiff_v = boost::math::gamma_p(make_fvar<T, m>(a), make_fvar<T, m>(z));
-      auto anchor_v = boost::math::gamma_p(a, z);
+      using boost::math::gamma_p;
+      auto a = nextafter(a_sampler.next(), ((std::numeric_limits<T>::max))());
+      auto autodiff_v = gamma_p(make_fvar<T, m>(a), make_fvar<T, m>(z));
+      auto anchor_v = gamma_p(a, z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
 
     auto z_normalized = z_sampler.normalize(z);
     {
+      using boost::math::gamma_p_inv;
       auto a_normalized = a_sampler.normalize(a_sampler.next());
-
-      auto autodiff_v = boost::math::gamma_p_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
-      auto anchor_v = boost::math::gamma_p_inv(a_normalized, z_normalized);
+      auto autodiff_v = gamma_p_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
+      auto anchor_v = gamma_p_inv(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
     {
+      using boost::math::gamma_q_inv;
       auto a_normalized = a_sampler.normalize(a_sampler.next());
-      auto autodiff_v = boost::math::gamma_q_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
-      auto anchor_v = boost::math::gamma_q_inv(a_normalized, z_normalized);
+      auto autodiff_v = gamma_q_inv(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
+      auto anchor_v = gamma_q_inv(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
     {
+      using boost::math::gamma_p_inva;
       auto a_normalized = a_sampler.normalize(a_sampler.next());
-      auto autodiff_v = boost::math::gamma_p_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
-      auto anchor_v = boost::math::gamma_p_inva(a_normalized, z_normalized);
+      auto autodiff_v = gamma_p_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
+      auto anchor_v = gamma_p_inva(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
     {
+      using boost::math::gamma_q_inva;
       auto a_normalized = a_sampler.normalize(a_sampler.next());
-      auto autodiff_v = boost::math::gamma_q_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
-      auto anchor_v = boost::math::gamma_q_inva(a_normalized, z_normalized);
+      auto autodiff_v = gamma_q_inva(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
+      auto anchor_v = gamma_q_inva(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
     {
+      using boost::math::gamma_p_derivative;
       auto a_normalized = a_sampler.normalize(a_sampler.next());
-      auto autodiff_v = boost::math::gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
-      auto anchor_v = boost::math::gamma_p_derivative(a_normalized, z_normalized);
+      auto autodiff_v = gamma_p_derivative(make_fvar<T, m>(a_normalized), make_fvar<T, m>(z_normalized));
+      auto anchor_v = gamma_p_derivative(a_normalized, z_normalized);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2.5e5 * test_constants::pct_epsilon());
     }
   }
@@ -408,13 +435,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(log1p_hpp, T, all_float_types) {
+  using boost::math::log1p;
+  using boost::multiprecision::log1p;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-1, 2000};
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    BOOST_REQUIRE_CLOSE(boost::math::log1p(make_fvar<T, m>(x)), boost::math::log1p(x),
+    BOOST_REQUIRE_CLOSE(log1p(make_fvar<T, m>(x)), log1p(x),
                         50 * test_constants::pct_epsilon());
   }
 }
@@ -560,7 +590,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(powm1_hpp, T, all_float_types) {
     auto y = ((min))(x_sampler.next(), log(sqrt(((std::numeric_limits<T>::max))()) + 1) / log(x + 1));
     auto autodiff_v = boost::math::powm1(make_fvar<T, m>(x), make_fvar<T, m>(y));
     auto anchor_v = boost::math::powm1(x, y);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1e6 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 2e6 * test_constants::pct_epsilon());
   }
 }
 

@@ -255,7 +255,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
     }
 
     {
-      auto x_neumann = abs(x);
+      auto x_neumann = abs(x)+1;
       auto autodiff_v = boost::math::cyl_neumann(make_fvar<T, m>(v),
                                                  make_fvar<T, m>(x_neumann));
       auto anchor_v = boost::math::cyl_neumann(v, x_neumann);

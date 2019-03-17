@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = T(1);
     while(fpclassify(T(abs(x)-1)) == FP_ZERO) {
-      x = signbit(x) * (float_prior(T(abs(x))));
+      x = x_sampler.next();
     }
 
     auto autodiff_v = atan(make_fvar<T, m>(x));
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
 
     auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
     auto anchor_v = atan2(x, y);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon());
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 200 * test_constants::pct_epsilon());
   }
 }
 

@@ -127,11 +127,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   using std::atan;
-  using boost::math::float_prior;
   using boost::multiprecision::atan;
   using boost::math::differentiation::detail::atan;
   using boost::math::signbit;
   using boost::multiprecision::signbit;
+  using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
+  using boost::math::float_prior;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

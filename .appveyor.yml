@@ -137,8 +137,8 @@ install:
   - git submodule update -q --init tools/boost_install
   - git submodule update -q --init tools/boostdep
   - git submodule update -q --init tools/build
-  - xcopy /s /e /q /I %APPVEYOR_BUILD_FOLDER% libs\autodiff
-  - python tools/boostdep/depinst/depinst.py autodiff
+  - xcopy /s /e /q /I %APPVEYOR_BUILD_FOLDER% libs\%SELF%
+  - python tools/boostdep/depinst/depinst.py %SELF%
   - cmd /c bootstrap
   - b2 headers
 

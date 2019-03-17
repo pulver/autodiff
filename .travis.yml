@@ -127,10 +127,7 @@ jobs:
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-5.0", "CC=clang-5.0", "CXX=clang++-5.0" , "COMPILER=clang++-5.0", "CXXSTD=17", "COV_TOOL=llvm-cov"                           ], addons: *clang-5  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=11", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=14", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=17", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
-    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=2a", "COV_TOOL=llvm-cov"                           ], addons: *clang-6  }
+    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0" , "COMPILER=clang++-6.0", "CXXSTD=11,14,17,2a"                          ], addons: *clang-6  }
 
     # libc++
 #    - { os: "linux", compiler: "clang", env: [ "TOOLSET=clang-6.0", "CC=clang-6.0", "CXX=clang++-6.0", "COMPILER=clang++-6.0", "CXXSTD=11", "COV_TOOL=llvm-cov", "CXXFLAGS=-stdlib=libc++" ], addons: *clang-6   }
@@ -159,6 +156,10 @@ jobs:
         - COMMENT=cppcheck
         - TOOLSET=clang-6
         - CXXSTD=14
+        - CXX=clang++
+        - CC=clang
+        - CXX_FOR_BUILD=clang++
+        - CC_FOR_BUILD=clang
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ci/travis/cppcheck.sh

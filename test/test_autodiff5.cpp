@@ -73,7 +73,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
-  ;
   using boost::math::acosh;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -90,7 +89,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
-  ;
   using boost::math::asinh;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -108,7 +106,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
-  ;
   using boost::math::nextafter;
   using std::nextafter;
 
@@ -128,8 +125,31 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
   }
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
+  using std::atan;
+  using boost::math::float_prior;
+  using boost::multiprecision::atan;
+  using boost::math::differentiation::detail::atan;
+
+  using test_constants = test_constants_t<T>;
+  static constexpr auto m = test_constants::order;
+
+  test_detail::RandomSample<T> x_sampler{-1, 1};
+  for (auto i : boost::irange(test_constants::n_samples)) {
+    std::ignore = i;
+    auto x = T(1);
+    while(fpclassify(abs(x)-1) == FP_ZERO) {
+      x = signbit(x) * (float_prior(T(abs(x))));
+    }
+
+    auto autodiff_v = atan(make_fvar<T, m>(x));
+    auto anchor_v = atan(x);
+    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
+                        1e3 * test_constants::pct_epsilon());
+  }
+}
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
-  ;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
 
@@ -171,7 +191,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 
 // TODO(kbhat): Something in here is very slow with boost::multiprecision
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
-  
   using boost::math::signbit;
   using boost::multiprecision::signbit;
   using boost::math::nextafter;
@@ -257,7 +276,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       }
       {
         auto v_ = (max)(abs(v),
-                        nextafter(abs(v), 2 * (std::numeric_limits<T>::min)()));
+                        nextafter(T(abs(v)), 2 * (std::numeric_limits<T>::min)()));
         try {
           auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(
               i_, make_fvar<T, m>(v_));

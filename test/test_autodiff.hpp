@@ -8,7 +8,7 @@
 
 #include <boost/config.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
-
+#include <boost/math/tools/big_constant.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -31,10 +31,10 @@ namespace bmp = boost::multiprecision;
 
 // using bin_float_types = mp_list<float,double,long
 // double,bmp::cpp_bin_float_50>;
-#if !defined(BOOST_USE_VALGRIND)
-using bin_float_types = mp11::mp_list<float, double, long double>;
-#else
+#if defined(BOOST_USE_VALGRIND)
 using bin_float_types = mp11::mp_list<float, double>;
+#else
+using bin_float_types = mp11::mp_list<float, double, long double>;
 #endif
 
 //  cpp_bin_float_50 is fixed in boost 1.70

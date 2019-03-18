@@ -19,10 +19,5 @@ project
     : default-build
     ;
 
-variant autodiff_valgrind
-  : debug
-  : <valgrind>on # Boost.Context uses this property
-  ;
-
 build-project test ;
 build-project example ;

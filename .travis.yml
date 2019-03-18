@@ -160,7 +160,7 @@ jobs:
         - COMMENT=valgrind
         - TOOLSET=clang-6.0
         - CXXSTD=11,14,17,2a
-        - B2_VARIANT=variant=debug
+        - B2_VARIANT=variant=autodiff_valgrind
         - TESTFLAGS=testing.launcher=valgrind
         - VALGRIND_OPTS=--error-exitcode=1
       addons: *clang-6

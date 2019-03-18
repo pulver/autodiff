@@ -160,9 +160,11 @@ jobs:
         - COMMENT=valgrind
         - TOOLSET=clang-6.0
         - CXXSTD=11,14,17,2a
-        - B2_VARIANT=variant=autodiff_valgrind
+        - B2_VARIANT=variant=debug
         - TESTFLAGS=testing.launcher=valgrind
         - VALGRIND_OPTS=--error-exitcode=1
+        - DEFINES="define=BOOST_USE_VALGRIND"
+
       addons: *clang-6
       script:
         - cd $BOOST_ROOT/libs/$SELF

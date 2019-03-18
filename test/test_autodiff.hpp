@@ -31,7 +31,12 @@ namespace bmp = boost::multiprecision;
 
 // using bin_float_types = mp_list<float,double,long
 // double,bmp::cpp_bin_float_50>;
+#if !defined(BOOST_USE_VALGRIND)
 using bin_float_types = mp11::mp_list<float, double, long double>;
+#else
+using bin_float_types = mp11::mp_list<float, double>;
+#endif
+
 //  cpp_bin_float_50 is fixed in boost 1.70
 // float blows up in unchecked_factorial
 

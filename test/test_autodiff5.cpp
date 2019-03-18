@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
     }
 
     {
-      auto x_ = ((min))(x, T(26));
+      auto x_ = (min)(x, T(26));
       auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x_));
       auto anchor_v = boost::math::airy_bi(x_);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,

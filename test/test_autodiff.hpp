@@ -32,7 +32,7 @@ namespace bmp = boost::multiprecision;
 // using bin_float_types = mp_list<float,double,long
 // double,bmp::cpp_bin_float_50>;
 #if defined(BOOST_USE_VALGRIND)
-using bin_float_types = mp11::mp_list<float, double>;
+using bin_float_types = mp11::mp_list<float>;
 #else
 using bin_float_types = mp11::mp_list<float, double, long double>;
 #endif

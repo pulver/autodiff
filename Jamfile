@@ -12,7 +12,9 @@ project
     : requirements
     <implicit-dependency>/boost//headers
     <include>$(BOOST_ROOT)
-    <toolset>msvc:<exception-handling>on/<asynch-exceptions>off/<extern-c-nothrow>on
+    <toolset>msvc:<exception-handling>on
+    <toolset>msvc:<asynch-exceptions>off
+    <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
     : default-build
     ;

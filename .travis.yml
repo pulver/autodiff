@@ -72,7 +72,8 @@ branches:
 
 script:
   - |-
-    echo "using $TOOLSET : : $COMPILER : ;" > ~/user-config.jam
+    echo "using $TOOLSET : : $COMPILER ;" > ~/user-config.jam
+  - cat ~/user-config.jam
   - cd $BOOST_ROOT/libs/$SELF
   - ci/travis/build.sh
 

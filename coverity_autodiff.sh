@@ -25,8 +25,8 @@ COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
 
-cd libs/$SELF/test
 echo "using gcc : : gcc-7 ;" > ~/coverity-user-config.jam
+cd libs/$SELF
 ../../../b2 toolset=gcc clean --user-config=~/coverity-user-config.jam
 rm -rf cov-int/
 cov-build --dir cov-int ../../../b2 toolset=gcc -q -j3 --user-config=~/coverity-user-config.jam

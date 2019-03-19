@@ -21,7 +21,7 @@
 # 4. Enable pull request builds in your boostorg/<library> account.
 #
 # That's it - the scripts will do everything else for you.
-sudo: false
+
 language: cpp
 
 env:
@@ -71,10 +71,8 @@ branches:
     - master
 
 script:
-  - |-
-    echo "using $TOOLSET : : $COMPILER ;" > $BOOST_ROOT/user-config.jam
   - cd $BOOST_ROOT/libs/$SELF
-  - ci/travis/build.sh --debug-configuration
+  - ci/travis/build.sh
 
 #
 # Default toolsets in Ubuntu
@@ -113,15 +111,15 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", env: [ "TOOLSET=gcc", "COMPILER=gcc-5", "CXXSTD=11"           ], addons: *gcc-5     }
-    - { os: "linux", env: [ "TOOLSET=gcc", "COMPILER=gcc-6",       "CXXSTD=11,14"        ], addons: *gcc-6     }
-    - { os: "linux", env: [ "TOOLSET=gcc", "COMPILER=gcc-7",       "CXXSTD=11,14,17"     ], addons: *gcc-7     }
-    - { os: "linux", env: [ "TOOLSET=gcc", "COMPILER=gcc-8",       "CXXSTD=11,14,17,2a"  ], addons: *gcc-8     }
-    - { os: "linux", env: [ "TOOLSET=clang", "COMPILER=clang-3.8",   "CXXSTD=11,14"        ], addons: *clang-38  }
-    - { os: "linux", env: [ "TOOLSET=clang", "COMPILER=clang-4.0",   "CXXSTD=11,14"        ], addons: *clang-4   }
-    - { os: "linux", env: [ "TOOLSET=clang", "COMPILER=clang-5.0",   "CXXSTD=11,14,17"     ], addons: *clang-5   }
-    - { os: "linux", env: [ "TOOLSET=clang", "COMPILER=clang-6.0",   "CXXSTD=11,14,17,2a"  ], addons: *clang-6   }
-    - { os: "linux", env: [ "TOOLSET=clang", "COMPILER=clang-6.0",   "CXXSTD=11,14,17,2a",
+    - { os: "linux", env: [ "TOOLSET=gcc-5",       "CXXSTD=11"           ], addons: *gcc-5     }
+    - { os: "linux", env: [ "TOOLSET=gcc-6",       "CXXSTD=11,14"        ], addons: *gcc-6     }
+    - { os: "linux", env: [ "TOOLSET=gcc-7",       "CXXSTD=11,14,17"     ], addons: *gcc-7     }
+    - { os: "linux", env: [ "TOOLSET=gcc-8",       "CXXSTD=11,14,17,2a"  ], addons: *gcc-8     }
+    - { os: "linux", env: [ "TOOLSET=clang-3.8",   "CXXSTD=11,14"        ], addons: *clang-38  }
+    - { os: "linux", env: [ "TOOLSET=clang-4.0",   "CXXSTD=11,14"        ], addons: *clang-4   }
+    - { os: "linux", env: [ "TOOLSET=clang-5.0",   "CXXSTD=11,14,17"     ], addons: *clang-5   }
+    - { os: "linux", env: [ "TOOLSET=clang-6.0",   "CXXSTD=11,14,17,2a"  ], addons: *clang-6   }
+    - { os: "linux", env: [ "TOOLSET=clang-6.0",   "CXXSTD=11,14,17,2a",
                             "CXXFLAGS=-stdlib=libc++"                    ], addons: *clang-6   }
 
     # osx
@@ -130,6 +128,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=codecov.io
+        - TOOLSET=gcc-7
         - CXXSTD=11,14,17
       addons: *gcc-7
       script:
@@ -149,8 +148,7 @@ jobs:
       env:
         - COMMENT=ubsan
         - B2_VARIANT=variant=debug
-        - TOOLSET=gcc
-        - COMPILER=gcc-8
+        - TOOLSET=gcc-8
         - CXXSTD=11,14,17,2a
         - CXXFLAGS="cxxflags=-fno-omit-frame-pointer cxxflags=-fsanitize=undefined cxxflags=-fno-sanitize-recover=undefined"
         - LINKFLAGS="linkflags=-fsanitize=undefined linkflags=-fno-sanitize-recover=undefined linkflags=-fuse-ld=gold"
@@ -160,8 +158,7 @@ jobs:
     - os: linux
       env:
         - COMMENT=valgrind
-        - TOOLSET=clang
-        - COMPILER=clang-6.0
+        - TOOLSET=clang-6.0
         - CXXSTD=11,14,17,2a
         - B2_VARIANT=variant=debug
         - TESTFLAGS=testing.launcher=valgrind
@@ -180,8 +177,7 @@ jobs:
       if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (branch IN (develop, master)) AND (type IN (cron, push))
       env:
         - COMMENT="Coverity Scan"
-        - TOOLSET=gcc
-        - COMPILER=gcc-7
+        - TOOLSET=gcc-7
         - B2_VARIANT=variant=debug
         - CXXSTD=17
       addons: *gcc-7

@@ -32,7 +32,7 @@ popd
 
 ci/travis/build.sh clean
 rm -rf cov-int/
-cov-configure --comptype gcc --compiler g++-7 --template
+#cov-configure --comptype gcc --compiler g++-7 --template
 cov-build --dir cov-int ci/travis/build.sh
 tar cJf cov-int.tar.xz cov-int/
 curl --form token="$COVERITY_SCAN_TOKEN" \

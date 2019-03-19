@@ -25,7 +25,7 @@ COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
 rm -rf $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
-echo "using gcc : 7.4 : /usr/bin/gcc-7 ; " > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+echo "using gcc : 7.4 : /usr/bin/g++-7 ; " > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 ci/travis/build.sh clean --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 rm -rf cov-int/
 cov-build --dir cov-int ci/travis/build.sh --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam

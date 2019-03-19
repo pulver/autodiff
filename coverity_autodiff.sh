@@ -1,13 +1,11 @@
 #! /bin/bash
 #
-# Copyright 2017 - 2018 James E. King III
+# Copyright 2017 James E. King, III
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
 #      http://www.boost.org/LICENSE_1_0.txt)
 #
 # Bash script to run in travis to perform a Coverity Scan build
-# To skip the coverity integration download (which is huge) if
-# you already have it from a previous run, add --skipdownload
 #
 
 #
@@ -20,24 +18,21 @@
 set -ex
 
 pushd /tmp
-if [[ "$1" != "--skipdownload" ]]; then
-  rm -rf coverity_tool.tgz cov-analysis*
-  wget -q https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=Autodiff" -O coverity_tool.tgz
-  tar xzf coverity_tool.tgz
-fi
-
+rm -rf coverity_tool.tgz cov-analysis*
+wget -nv https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=AutodiffF" -O coverity_tool.tgz
+tar xzf coverity_tool.tgz
 COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
 
-ci/travis/build.sh clean
+cd libs/$SELF/test
+../../../b2 toolset=gcc clean
 rm -rf cov-int/
-#cov-configure --comptype gcc --compiler g++-7 --template
-cov-build --dir cov-int ci/travis/build.sh
+cov-build --dir cov-int ../../../b2 toolset=gcc -q -j3
 tar cJf cov-int.tar.xz cov-int/
 curl --form token="$COVERITY_SCAN_TOKEN" \
      --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \
      --form file=@cov-int.tar.xz \
-     --form version="$TRAVIS_BRANCH" \
+     --form version="$(git describe --tags)" \
      --form description="Autodiff" \
      https://scan.coverity.com/builds?project="Autodiff"

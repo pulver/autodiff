@@ -19,7 +19,7 @@ set -ex
 
 pushd /tmp
 rm -rf coverity_tool.tgz cov-analysis*
-wget -nv https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=AutodiffF" -O coverity_tool.tgz
+wget -nv https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=Autodiff" -O coverity_tool.tgz
 tar xzf coverity_tool.tgz
 COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH

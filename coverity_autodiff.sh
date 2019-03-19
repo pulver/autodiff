@@ -25,6 +25,7 @@ if [[ "$1" != "--skipdownload" ]]; then
   wget -q https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=autodiff" -O coverity_tool.tgz
   tar xzf coverity_tool.tgz
 fi
+
 COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd

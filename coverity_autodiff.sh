@@ -41,4 +41,3 @@ curl --form token="$COVERITY_SCAN_TOKEN" \
      --form version="$TRAVIS_BRANCH" \
      --form description="Autodiff" \
      https://scan.coverity.com/builds?project="Autodiff"
-#!/usr/bin/env bash

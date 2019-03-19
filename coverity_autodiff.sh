@@ -22,7 +22,7 @@ set -ex
 pushd /tmp
 if [[ "$1" != "--skipdownload" ]]; then
   rm -rf coverity_tool.tgz cov-analysis*
-  wget -q https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=autodiff" -O coverity_tool.tgz
+  wget -q https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_SCAN_TOKEN&project=Autodiff" -O coverity_tool.tgz
   tar xzf coverity_tool.tgz
 fi
 
@@ -38,6 +38,6 @@ curl --form token="$COVERITY_SCAN_TOKEN" \
      --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \
      --form file=@cov-int.tar.xz \
      --form version="$TRAVIS_BRANCH" \
-     --form description="autodiff" \
-     https://scan.coverity.com/builds?project="autodiff"
+     --form description="Autodiff" \
+     https://scan.coverity.com/builds?project="Autodiff"
 #!/usr/bin/env bash

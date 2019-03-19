@@ -26,10 +26,9 @@ export PATH=$COVBIN:$PATH
 popd
 
 echo "using gcc : : gcc-7 ;" > ~/coverity-user-config.jam
-cd libs/$SELF
-../../../b2 toolset=gcc clean --user-config=~/coverity-user-config.jam
+ci/travis/build.sh clean --user-config=~/coverity-user-config.jam
 rm -rf cov-int/
-cov-build --dir cov-int ../../../b2 toolset=gcc -q -j3 --user-config=~/coverity-user-config.jam
+cov-build --dir cov-int ci/travis/build.sh --user-config=~/coverity-user-config.jam
 tar cJf cov-int.tar.xz cov-int/
 curl --form token="$COVERITY_SCAN_TOKEN" \
      --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \

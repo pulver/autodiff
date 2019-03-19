@@ -182,6 +182,7 @@ jobs:
         - CXXSTD=11,14,17,2a
       addons: *gcc-7
       script:
+        - chmod 755 $BOOST_ROOT/libs/$SELF
         - cd $BOOST_ROOT/libs/$SELF
         - ./coverity_autodiff.sh
 

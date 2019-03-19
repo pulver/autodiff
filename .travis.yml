@@ -180,6 +180,7 @@ jobs:
         - TOOLSET=gcc
         - B2_VARIANT=variant=debug
         - CXXSTD=17
+      addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-

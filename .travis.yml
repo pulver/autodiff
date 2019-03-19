@@ -183,8 +183,7 @@ jobs:
       addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF
-        - ls ./
-        - coverity_autodiff.sh
+        - ./coverity_autodiff.sh
 
 notifications:
   email:

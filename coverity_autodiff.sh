@@ -24,7 +24,7 @@ tar xzf coverity_tool.tgz
 COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
-
+cov-configure --comptype gcc --compiler g++-7 --template
 cd $BOOST_ROOT/libs/$SELF
 ci/travis/build.sh clean
 rm -rf cov-int/

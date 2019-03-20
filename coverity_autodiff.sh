@@ -25,10 +25,12 @@ COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
 rm -rf $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
-echo "using gcc : 7.4 : /usr/bin/g++-7 ; " > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
-ci/travis/build.sh clean --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+# echo "using gcc : 7.4 : /usr/bin/g++-7 ; " > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+# ci/travis/build.sh clean --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+ci/travis/build.sh clean
 rm -rf cov-int/
-cov-build --dir cov-int ci/travis/build.sh --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+# cov-build --dir cov-int ci/travis/build.sh --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+cov-build --dir cov-int ci/travis/build.sh
 tar cJf cov-int.tar.xz cov-int/
 curl --form token="$COVERITY_SCAN_TOKEN" \
      --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \

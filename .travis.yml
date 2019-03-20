@@ -142,7 +142,7 @@ jobs:
         - CXXSTD=11,14
       script:
         - cd $BOOST_ROOT/libs/$SELF
-        - ci/travis/cppcheck.sh
+        - ./autodiff_cppcheck.sh
 
     - os: linux
       env:

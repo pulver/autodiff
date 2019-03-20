@@ -25,7 +25,7 @@ COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
 
-echo "using gcc : 7.4 : /usr/bin/g++-7;" > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
+echo "using gcc : 7.4 : /usr/bin/g++-7 ;" > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 cov-configure --comptype gcc --compiler g++-7 --template
 cd $BOOST_ROOT/libs/$SELF
 ci/travis/build.sh clean --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam

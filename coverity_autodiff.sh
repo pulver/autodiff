@@ -24,11 +24,13 @@ tar xzf coverity_tool.tgz
 COVBIN=$(echo $(pwd)/cov-analysis*/bin)
 export PATH=$COVBIN:$PATH
 popd
+
+echo "using gcc : 7.4 : /usr/bin/g++-7;" > $BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 cov-configure --comptype gcc --compiler g++-7 --template
 cd $BOOST_ROOT/libs/$SELF
-ci/travis/build.sh clean
+ci/travis/build.sh clean --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 rm -rf cov-int/
-cov-build --dir cov-int ci/travis/build.sh
+cov-build --dir cov-int ci/travis/build.sh --user-config=$BOOST_ROOT/libs/$SELF/coverity-user-config.jam
 tar cJf cov-int.tar.xz cov-int/
 curl --form token="$COVERITY_SCAN_TOKEN" \
      --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \

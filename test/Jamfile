@@ -6,24 +6,18 @@
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-import os ;
 import testing ;
 
-project boost-autodiff-test
-:
-requirements
-        #<include>.
-        #<include>../include
-    ;
+project boost/autodiff/test :
+    requirements
+        <implicit-dependency>/boost//headers
+;
 
-test-suite minimal
-    :
-    [ run test_autodiff1.cpp ]
-    [ run test_autodiff2.cpp ]
-    [ run test_autodiff3.cpp ]
-    [ run test_autodiff4.cpp ]
-    [ run test_autodiff5.cpp ]
-    [ run test_autodiff6.cpp ]
-    ;
+run test_autodiff1.cpp ;
+run test_autodiff2.cpp ;
+run test_autodiff3.cpp ;
+run test_autodiff4.cpp ;
+run test_autodiff5.cpp ;
+run test_autodiff6.cpp ;
 
-test-suite all : minimal ;
+

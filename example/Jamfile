@@ -6,12 +6,12 @@
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-project boost-autodiff-example
-    : # requirements
-    ;
+project boost/autodiff/example :
+;
 
-exe black_scholes : black_scholes.cpp ;
-exe fourth_power : fourth_power.cpp ;
-exe mixed_partials : mixed_partials.cpp ;
-exe multiprecision : multiprecision.cpp ;
-exe simple : simple.cpp ;
+run black_scholes.cpp ;
+run fourth_power.cpp ;
+run mixed_partials.cpp ;
+run multiprecision.cpp ;
+run simple.cpp ;
+

@@ -40,7 +40,7 @@ while IFS=',' read -ra ADDR; do
     done
 done <<< "$CXXSTD"
 
-~/cppcheck/bin/cppcheck -I${BOOST_ROOT} ${STANDARDS} --enable=all --error-exitcode=1 \
+~/cppcheck/bin/cppcheck -Iinclude -I${BOOST_ROOT} ${STANDARDS} --enable=all --error-exitcode=1 \
      --force --check-config --suppress=*:boost/preprocessor/tuple/size.hpp \
      -UBOOST_USER_CONFIG -UBOOST_COMPILER_CONFIG -UBOOST_STDLIB_CONFIG -UBOOST_PLATFORM_CONFIG \
      ${BOOST_ROOT}/libs/$SELF | grep -v 'Cppcheck does not need standard library headers'

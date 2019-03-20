@@ -179,7 +179,7 @@ jobs:
         - COMMENT="Coverity Scan"
         - TOOLSET=gcc
         - B2_VARIANT=variant=debug
-        - CXXSTD=17
+        - CXXSTD=14
       addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF

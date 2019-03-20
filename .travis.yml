@@ -140,6 +140,8 @@ jobs:
       env:
         - COMMENT=cppcheck
         - CXXSTD=11,14
+        - export CC=gcc-7
+        - export CXX=g++-7
       addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF
@@ -181,6 +183,8 @@ jobs:
         - TOOLSET=gcc
         - B2_VARIANT=variant=debug
         - CXXSTD=11
+        - export CC=gcc-7
+        - export CXX=g++-7
       addons: *gcc-7
       script:
         - cd $BOOST_ROOT/libs/$SELF

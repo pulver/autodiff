@@ -400,25 +400,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
   }
   {
     auto autodiff_v = boost::math::ibeta_derivative(
-        make_fvar<T, m>(a_ - 1), make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z));
-    auto anchor_v = boost::math::ibeta_derivative(a_ - 1, b_ - 1, z);
+        make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+    auto anchor_v = boost::math::ibeta_derivative(a_, b_, z);
     BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                         1e4 * test_constants::pct_epsilon());
   }
 
-  {{auto autodiff_v = boost::math::ibeta_inv(
-        make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-  auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
-  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                      1e4 * test_constants::pct_epsilon());
-}
-{
-  auto autodiff_v = boost::math::ibetac_inv(
-      make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
-  auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
-  BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
-                      1e4 * test_constants::pct_epsilon());
-}
+  {
+    {
+      auto autodiff_v = boost::math::ibeta_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+      auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1e4*test_constants::pct_epsilon());
+    }
+    {
+      auto autodiff_v = boost::math::ibetac_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+      auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1e4 * test_constants::pct_epsilon());
+    }
 }
 {
   auto b_norm = b_sampler.normalize(abs(b));

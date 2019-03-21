@@ -503,8 +503,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       std::swap(t_0, t_1);
       auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
       BOOST_REQUIRE_EQUAL(
-          boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0),
-                                      make_fvar<T, m>(t_1)),
+          static_cast<T>(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0),
+                                      make_fvar<T, m>(t_1))),
           tmp);
       t_1 = tmp;
     }

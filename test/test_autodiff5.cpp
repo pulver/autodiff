@@ -185,13 +185,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
     {
       auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::bernoulli_b2n<T>(i);
-      BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
+      BOOST_REQUIRE_EQUAL(static_cast<T>(autodiff_v), static_cast<T>(anchor_v));
     }
     {
       auto i_ = (min)(19, i);
       auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
       auto anchor_v = boost::math::tangent_t2n<T>(i_);
-      BOOST_REQUIRE_EQUAL(autodiff_v, anchor_v);
+      BOOST_REQUIRE_EQUAL(static_cast<T>(autodiff_v), static_cast<T>(anchor_v));
     }
   }
 }
@@ -532,7 +532,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       BOOST_REQUIRE_EQUAL(
           static_cast<T>(boost::math::chebyshev_next(
               make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1))),
-          tmp);
+          static_cast<T>(tmp));
       t_1 = tmp;
     }
   }

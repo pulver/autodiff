@@ -156,6 +156,13 @@ static_assert(std::is_same<RandomSample<bmp::cpp_bin_float_50>::dist_t,
 
 }  // namespace test_detail
 
+template<typename T>
+static bool isZeroOrSubnormal(const T& t) noexcept {
+  using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
+  return fpclassify(t) == FP_ZERO || fpclassify(t) == FP_SUBNORMAL;
+}
+
 template <typename T, int m = 3>
 using test_constants_t = test_detail::test_constants_t<T, mp11::mp_int<m>>;
 

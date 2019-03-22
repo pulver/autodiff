@@ -366,7 +366,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jacobi_zeta_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
   using boost::multiprecision::min;
   using std::min;
 
@@ -379,30 +378,42 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(laguerre_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto n = n_sampler.next();
-    auto r = ((min))(n - 1, r_sampler.next());
+    auto r = (min)(n - 1, r_sampler.next());
     auto x = x_sampler.next();
 
     {
-      auto autodiff_v = boost::math::laguerre(n, make_fvar<T, m>(x));
+      auto autodiff_v = static_cast<T>(boost::math::laguerre(n, make_fvar<T, m>(x)));
       auto anchor_v = boost::math::laguerre(n, x);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon());
+      if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
+      } else {
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
+      }
     }
     {
-      auto autodiff_v = boost::math::laguerre(n, r, make_fvar<T, m>(x));
+      auto autodiff_v = static_cast<T>(boost::math::laguerre(n, r, make_fvar<T, m>(x)));
       auto anchor_v = boost::math::laguerre(n, r, x);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50 * test_constants::pct_epsilon());
+      if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
+        BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
+      } else {
+        BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
+      }
     }
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
-  BOOST_MATH_STD_USING
   using boost::math::nextafter;
   using boost::math::tools::max;
   using boost::multiprecision::min;
   using std::max;
   using std::min;
   using std::nextafter;
+  using std::fabs;
+  using boost::math::differentiation::detail::fabs;
+  using boost::multiprecision::fabs;
 
   using promoted_t = promote<T, double>;
   using test_constants = test_constants_t<T>;
@@ -414,23 +425,37 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lambert_w_hpp, T, all_float_types) {
     {
       auto x_ = (min<T>)(static_cast<T>(((max<promoted_t>))(-exp(promoted_t(-1)), promoted_t(x))),
                          ((std::numeric_limits<T>::max))());
-
-      BOOST_REQUIRE_CLOSE(boost::math::lambert_w0(make_fvar<T, m>(x_)), boost::math::lambert_w0(x_),
-                          50 * test_constants::pct_epsilon());
-
-      BOOST_REQUIRE_CLOSE(boost::math::lambert_w0_prime(make_fvar<T, m>(x)), boost::math::lambert_w0_prime(x),
-                          50 * test_constants::pct_epsilon());
+      {
+        auto autodiff_v = static_cast<T>(boost::math::lambert_w0(make_fvar<T, m>(x_)));
+        auto anchor_v = boost::math::lambert_w0(x_);
+        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
+          BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
+        } else {
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
+        }
+      }
+      {
+        auto autodiff_v = static_cast<T>(boost::math::lambert_w0_prime(make_fvar<T, m>(x_)));
+        auto anchor_v = boost::math::lambert_w0_prime(x_);
+        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
+          BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
+        } else {
+          BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
+        }
+      }
     }
 
     {
-      auto x_ = nextafter(static_cast<T>(nextafter(((max))(-exp(promoted_t(-1)), -abs(promoted_t(x))),
+      auto x_ = nextafter(static_cast<T>(nextafter(((max))(static_cast<promoted_t>(-exp(-1)), -fabs(promoted_t(x))),
                                                    ((std::numeric_limits<promoted_t>::max))())),
                           ((std::numeric_limits<T>::max))());
+      x_ = (max)(static_cast<T>(-0.36), x_);
       BOOST_REQUIRE_CLOSE(boost::math::lambert_wm1(make_fvar<T, m>(x_)), boost::math::lambert_wm1(x_),
-                          50 * test_constants::pct_epsilon());
-
+          50*test_constants::pct_epsilon());
       BOOST_REQUIRE_CLOSE(boost::math::lambert_wm1_prime(make_fvar<T, m>(x_)), boost::math::lambert_wm1_prime(x_),
-                          50 * test_constants::pct_epsilon());
+          50*test_constants::pct_epsilon());
     }
   }
 }

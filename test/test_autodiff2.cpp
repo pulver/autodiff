@@ -5,6 +5,8 @@
 
 #include "test_autodiff.hpp"
 
+using namespace boost::math::differentiation;
+
 BOOST_AUTO_TEST_SUITE(test_autodiff_2)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(one_over_one_plus_x_squared, T, all_float_types) {
@@ -315,7 +317,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_derivative, T, bin_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, bin_float_types) {
   const T eps = 300 * std::numeric_limits<T>::epsilon();  // percent
-  using std::asinh;
+  using boost::math::asinh;
   constexpr unsigned m = 5;
   const T cx = 1;
   auto x = make_fvar<T, m>(cx);

@@ -19,5 +19,7 @@ run test_autodiff3.cpp ;
 run test_autodiff4.cpp ;
 run test_autodiff5.cpp ;
 run test_autodiff6.cpp ;
+run test_autodiff7.cpp ;
+run test_autodiff8.cpp ;
 
 

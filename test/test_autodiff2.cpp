@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
   BOOST_REQUIRE_CLOSE(y.derivative(2u), -2 / (3 * boost::math::constants::root_three<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), 1 / boost::math::constants::root_three<T>(), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(4u), -22 / (9 * boost::math::constants::root_three<T>()), eps);
-  BOOST_REQUIRE_CLOSE(y.derivative(5u), 227 / (27 * boost::math::constants::root_three<T>()), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(5u), 227 / (27 * boost::math::constants::root_three<T>()), 2*eps);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, bin_float_types) {

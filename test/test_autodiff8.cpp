@@ -247,8 +247,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(next_hpp, T, all_float_types) {
         test_constants::pct_epsilon());
     BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -1),
                         boost::math::float_advance(static_cast<T>(i), -1), test_constants::pct_epsilon());
-    BOOST_REQUIRE_CLOSE(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2),
-                        boost::math::float_advance(static_cast<T>(i), -i - 2), test_constants::pct_epsilon());
     BOOST_REQUIRE_CLOSE(
         boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 1),
         boost::math::float_advance(boost::math::float_advance(make_fvar<T, m>(static_cast<T>(i)), -i - 2), 1),

@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       BOOST_REQUIRE_CLOSE(
           static_cast<T>(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0),
                                       make_fvar<T, m>(t_1))),
-          tmp, test_constants::pct_epsilon());
+          tmp, 50*test_constants::pct_epsilon());
       t_1 = tmp;
     }
   }

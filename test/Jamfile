@@ -8,11 +8,7 @@
 
 import testing ;
 
-use-project boost : $(BOOST_ROOT) ;
-
-project boost/autodiff/test : requirements
-    <include>$(BOOST_ROOT)
-    <library>/boost/test//boost_unit_test_framework
+project boost/autodiff/test :
 ;
 
 unit-test test_autodiff1 : test_autodiff1.cpp : ;

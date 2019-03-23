@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acos_test, T, bin_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
   const T eps = 300 * std::numeric_limits<T>::epsilon();  // percent
-  using std::acosh;
+  using boost::math::acosh;
   constexpr unsigned m = 5;
   const T cx = 2;
   auto x = make_fvar<T, m>(cx);

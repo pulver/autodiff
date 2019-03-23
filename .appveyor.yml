@@ -56,6 +56,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: x86_64
       B2_ADDRESS_MODEL: address-model=64
+      B2_VARIANT: variant=release
       CXXSTD: 17
       DEFINES: define=__USE_ISOC99
       SCRIPT: ci\appveyor\mingw.bat
@@ -64,6 +65,25 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: x86_64
       B2_ADDRESS_MODEL: address-model=64
+      B2_VARIANT: variant=debug
+      CXXSTD: 17
+      DEFINES: define=__USE_ISOC99
+      SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_VARIANT: variant=release
+      CXXSTD: 11,14
+      DEFINES: define=__USE_ISOC99
+      SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_VARIANT: variant=debug
       CXXSTD: 11,14
       DEFINES: define=__USE_ISOC99
       SCRIPT: ci\appveyor\mingw.bat

@@ -11,7 +11,7 @@
 //    C++17 is a higher-level language and is easier to maintain. For example, a number of functions which are
 //    lucidly read in autodiff.cpp are forced to be split into multiple structs/functions in this file for C++11.
 //  * Use of typename RootType and SizeType is a hack to prevent Visual Studio 2015 from compiling functions
-//    that are never called, that would otherwise produce compiler errors.
+//    that are never called, that would otherwise produce compiler errors. Also forces functions to be inline.
 
 #ifndef BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 #   error "Do not #include this file directly. This should only be #included by autodiff.hpp for C++11 compatibility."
@@ -92,6 +92,38 @@ get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::deriva
 {
     static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
+}
+
+template<typename RootType, typename Func>
+class Curry
+{
+    const Func& f;
+    const size_t i;
+  public:
+    template <typename SizeType> // typename SizeType to force inline constructor.
+    Curry(const Func& f, SizeType i):f(f),i(i) { }
+    template <typename... Indices>
+    RootType operator()(Indices... indices) const { return f(i,indices...); }
+};
+
+// f : order -> derivative(order)/factorial(order)
+// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
+template<typename RealType, size_t Order>
+template<typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coefficients(
+    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
+{
+    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+    size_t i = std::min(order, order_sum);
+    using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
+    return_type accumulator = cr.apply_coefficients(
+        //order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
+        order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
+    while (i--)
+        (accumulator *= epsilon) += cr.apply_coefficients(
+            //order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
+            order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
+    return accumulator;
 }
 
 template<typename RealType, size_t Order>

@@ -10,10 +10,13 @@ int main()
 {
     using namespace boost::math::differentiation;
     using T = double;
-    const T x = 0.5;
-    const T y = 0.5*boost::math::constants::root_three<T>();
+    const T cx = 0.5;
+    const T cy = 0.5*boost::math::constants::root_three<T>();
     constexpr size_t m = 5;
-    const auto z = atan2(make_fvar<T,m>(y), make_fvar<T,0,m>(x));
+    //const auto z = atan2(make_fvar<T,m>(cy), make_fvar<T,0,m>(cx));
+    const auto y = make_fvar<T,m>(cy);
+    const auto x = make_fvar<T,0,m>(cx);
+    const auto z = atan2(y, x);
     // Mathematica: Flatten@Transpose@Table[D[ArcTan[x,y],{x,i},{y,j}] /. {x->1/2, y->Sqrt[3]/2}, {i,0,5}, {j,0,5}]
     const T expected[(m+1)*(m+1)] { boost::math::constants::third_pi<T>(),
         -0.5*boost::math::constants::root_three<T>(), 0.5*boost::math::constants::root_three<T>(), 0,

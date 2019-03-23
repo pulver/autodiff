@@ -284,24 +284,22 @@ class fvar
 
     fvar& set_root(const root_type&);
 
-    // Use when function returns derivative(i)/factorial(i) and may have some infinite derivatives.
-    fvar apply_coefficients(const std::function<root_type(size_t)>&) const;
-
-    //// Same as apply_coefficients() with horner method, but inf derivatives produce nan values for higher orders.
-    //fvar apply_coefficients_with_horner(const std::function<root_type(size_t)>&) const;
-
+    // Apply coefficients using horner method.
     template<typename Func, typename Fvar, typename... Fvars>
-    promote<fvar<RealType,Order>,Fvar,Fvars...> apply_coefficients_with_horner(const size_t order,
+    promote<fvar<RealType,Order>,Fvar,Fvars...> apply_coefficients(const size_t order,
         const Func& f, const Fvar& cr, Fvars&&... fvars) const;
 
     template<typename Func>
-    fvar apply_coefficients_with_horner(const size_t order, const Func& f) const;
+    fvar apply_coefficients(const size_t order, const Func& f) const;
 
-    // Use when function returns derivatives and may have some infinite derivates.
+    // Use when function returns derivative(i)/factorial(i) and may have some infinite derivatives.
+    fvar apply_coefficients_nonhorner(const std::function<root_type(size_t)>&) const;
+
+    // Apply derivatives using horner method.
     fvar apply_derivatives(const std::function<root_type(size_t)>&) const;
 
-    // Same as apply_derivatives() with horner method, but inf derivatives produce nan values for higher orders.
-    fvar apply_derivatives_with_horner(const std::function<root_type(size_t)>&) const;
+    // Use when function returns derivatives and may have some infinite derivates.
+    fvar apply_derivatives_nonhorner(const std::function<root_type(size_t)>&) const;
 
 private:
 
@@ -970,11 +968,44 @@ bool operator>(const typename fvar<RealType,Order>::root_type& ca, const fvar<Re
 
 /*** Other methods and functions ***/
 
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+// f : order -> derivative(order)/factorial(order)
+// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
+template<typename RealType, size_t Order>
+template<typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coefficients(
+    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
+{
+    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+    size_t i = std::min(order, order_sum);
+    promote<fvar<RealType,Order>,Fvar,Fvars...> accumulator = cr.apply_coefficients(
+        order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
+    while (i--)
+        (accumulator *= epsilon) += cr.apply_coefficients(
+            order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
+    return accumulator;
+}
+#endif
+
+// f : order -> derivative(order)/factorial(order)
+// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().
+template<typename RealType, size_t Order>
+template<typename Func>
+fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients(const size_t order, const Func& f) const
+{
+    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+    size_t i = std::min(order, order_sum);
+    fvar<RealType,Order> accumulator = f(i);
+    while (i--)
+        (accumulator *= epsilon) += f(i);
+    return accumulator;
+}
+
 // f : order -> derivative(order)/factorial(order)
 // Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().
 template<typename RealType, size_t Order>
 fvar<RealType,Order>
-    fvar<RealType,Order>::apply_coefficients(const std::function<root_type(size_t)>& f) const
+    fvar<RealType,Order>::apply_coefficients_nonhorner(const std::function<root_type(size_t)>& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
@@ -987,24 +1018,21 @@ fvar<RealType,Order>
     return accumulator;
 }
 
-/*
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().
+// f : order -> derivative(order)
 template<typename RealType, size_t Order>
 fvar<RealType,Order>
-    fvar<RealType,Order>::apply_coefficients_with_horner(const std::function<root_type(size_t)>& f) const
+    fvar<RealType,Order>::apply_derivatives(const std::function<root_type(size_t)>& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    fvar<RealType,Order> accumulator(f(order_sum));
+    fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(order_sum)));
     for (size_t i=order_sum ; i-- ;)
-        (accumulator *= epsilon) += f(i);
+        (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
     return accumulator;
 }
-*/
 
 // f : order -> derivative(order)
 template<typename RealType, size_t Order>
-fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives(const std::function<root_type(size_t)>& f) const
+fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const std::function<root_type(size_t)>& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
@@ -1014,18 +1042,6 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives(const std::function
         epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
         accumulator += epsilon_i.epsilon_multiply(i, 0, f(i) / boost::math::factorial<root_type>(i));
     }
-    return accumulator;
-}
-
-// f : order -> derivative(order)
-template<typename RealType, size_t Order>
-fvar<RealType,Order>
-    fvar<RealType,Order>::apply_derivatives_with_horner(const std::function<root_type(size_t)>& f) const
-{
-    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(order_sum)));
-    for (size_t i=order_sum ; i-- ;)
-        (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
     return accumulator;
 }
 
@@ -1134,7 +1150,7 @@ fvar<RealType,Order> fvar<RealType,Order>::inverse_apply() const
     *derivatives = 1 / x0;
     for (size_t i=1 ; i<=order_sum ; ++i)
         derivatives[i] = -derivatives[i-1] * i / x0;
-    return apply_derivatives([&derivatives](size_t j) { return derivatives[j]; });
+    return apply_derivatives_nonhorner([&derivatives](size_t j) { return derivatives[j]; });
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1221,7 +1237,7 @@ fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
     using std::exp;
     using root_type = typename fvar<RealType,Order>::root_type;
     const root_type d0 = exp(static_cast<root_type>(cr));
-    return cr.apply_derivatives_with_horner([&d0](size_t) { return d0; });
+    return cr.apply_derivatives([&d0](size_t) { return d0; });
 }
 
 template<typename RealType, size_t Order>
@@ -1239,7 +1255,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<Real
         derivatives[i] = coef * pow(x0, y-i); // TODO compare accuracy with division on each step?
         coef *= y - i;
     }
-    return x.apply_derivatives([&derivatives,i](size_t j) { return j < i ? derivatives[j] : 0; });
+    return x.apply_derivatives_nonhorner([&derivatives,i](size_t j) { return j < i ? derivatives[j] : 0; });
 }
 
 template<typename RealType, size_t Order>
@@ -1278,7 +1294,7 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
             powers *= x;
             derivatives[i] = numerator / (powers * *derivatives);
         }
-        return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i]; });
+        return cr.apply_derivatives_nonhorner([&derivatives](size_t i) { return derivatives[i]; });
     }
 }
 
@@ -1295,7 +1311,7 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
     else
     {
         const auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
-        return cr.apply_coefficients([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients_nonhorner([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1330,7 +1346,7 @@ fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
     {
         const root_type d1 = -sin(static_cast<root_type>(cr));
         const root_type derivatives[4] { d0, d1, -d0, -d1 };
-        return cr.apply_derivatives_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 
@@ -1347,7 +1363,7 @@ fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
     {
         const root_type d1 = cos(static_cast<root_type>(cr));
         const root_type derivatives[4] { d0, d1, -d0, -d1 };
-        return cr.apply_derivatives_with_horner([&derivatives](size_t i) { return derivatives[i&3]; });
+        return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i&3]; });
     }
 }
 
@@ -1364,7 +1380,7 @@ fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = sqrt((x*=x).negate()+=1).inverse(); // asin'(x) = 1 / sqrt(1-x*x).
-        return cr.apply_coefficients([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients_nonhorner([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1381,7 +1397,7 @@ fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
     {
         auto c = cos(make_fvar<root_type,order-1>(static_cast<root_type>(cr)));
         const auto d1 = (c*=c).inverse(); // tan'(x) = 1 / cos(x)^2
-        return cr.apply_coefficients([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients_nonhorner([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1398,7 +1414,7 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = ((x*=x)+=1).inverse(); // atan'(x) = 1 / (x*x+1).
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1415,7 +1431,7 @@ fvar<RealType,Order> atan2(const fvar<RealType,Order>& cr, const typename fvar<R
     {
         auto y = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = ca / ((y*=y)+=(ca*ca)); // (d/dy)atan2(y,x) = x / (y*y+x*x)
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1432,71 +1448,8 @@ fvar<RealType,Order> atan2(const typename fvar<RealType,Order>::root_type& ca, c
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = -ca / ((x*=x)+=(ca*ca)); // (d/dx)atan2(y,x) = -y / (x*x+y*y)
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
-}
-
-/*
-// Calculate via blocks.
-// Should be 0:
-// z.derivative(4,5) = -0.00274658
-// z.derivative(4,5) = -1.66267e-11
-// z.derivative(4,5) = 6.245e-16
-// TODO WIP Calculates correctly, large error for small values, needs simplification/improvement.
-// Generalize helper methods to variadic parameters.
-template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
-promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>> atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
-{
-    using std::atan2;
-    using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
-    using root_type = typename return_type::root_type;
-    constexpr size_t order = return_type::order_sum;
-    const root_type y = static_cast<root_type>(cr1);
-    const root_type x = static_cast<root_type>(cr2);
-    const root_type d00 = atan2(y, x);
-    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-        return return_type(d00);
-    else
-    {
-        constexpr size_t order1 = fvar<RealType1,Order1>::order_sum;
-        constexpr size_t order2 = fvar<RealType2,Order2>::order_sum;
-        auto x01 = make_fvar<typename fvar<RealType2,Order2>::root_type,order2-1>(x);
-        const auto d01 = -y / ((x01*=x01)+=(y*y));
-        auto y10 = make_fvar<typename fvar<RealType1,Order1>::root_type,order1-1>(y);
-        auto x10 = make_fvar<typename fvar<RealType2,Order2>::root_type,0,order2>(x);
-        const auto d10 = x10 / ((x10*x10)+(y10*=y10));
-        auto f = [&d00,&d01,&d10](size_t i, size_t j) { return i ? d10.at(i-1,j)/i : j ? d01.at(j-1)/j : d00; };
-        const fvar<RealType1,Order1> epsilon1 = fvar<RealType1,Order1>(cr1).set_root(0);
-        const fvar<RealType2,Order2> epsilon2 = fvar<RealType2,Order2>(cr2).set_root(0);
-        return_type accumulator = return_type();
-        fvar<RealType1,Order1> epsilon1_power(1);
-        for (size_t i1=0 ; i1<=order1 ; ++i1)
-        {
-            if (i1)
-                epsilon1_power *= epsilon1;
-            fvar<RealType2,Order2> epsilon2_power(1);
-            for (size_t i2=0, m=std::min(order2,order-i1) ; i2<=m ; ++i2)
-            {
-                if (i2)
-                    epsilon2_power *= epsilon2;
-                accumulator += (epsilon2_power * epsilon1_power) * f(i1,i2);
-            }
-        }
-        return accumulator;
-    }
-}
-*/
-
-template <typename T, typename F>
-T accumulate(size_t a, size_t b, T acc, F f)
-{
-    for(const bool inc = a < b ; ; inc ? ++a : --a)
-    {
-        f(acc, a);
-        if (a == b)
-            break;
-    }
-    return acc;
 }
 
 // Calculate via horner. No change to accuracies.
@@ -1505,7 +1458,8 @@ T accumulate(size_t a, size_t b, T acc, F f)
 // z.derivative(4,5) = -1.66267e-11 (double)
 // z.derivative(4,5) = 6.245e-16    (long double)
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
-promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>> atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
+promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
+    atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
     using std::atan2;
     using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
@@ -1526,39 +1480,8 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>> atan2(const fvar<RealType
         auto x10 = make_fvar<typename fvar<RealType2,Order2>::root_type,0,order2>(x);
         const auto d10 = x10 / ((x10*x10)+(y10*=y10));
         auto f = [&d00,&d01,&d10](size_t i, size_t j) { return i ? d10.at(i-1,j)/i : j ? d01.at(j-1)/j : d00; };
-        return cr1.apply_coefficients_with_horner(order, f, cr2);
+        return cr1.apply_coefficients(order, f, cr2);
     }
-}
-
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().
-template<typename RealType, size_t Order>
-template<typename Func>
-fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients_with_horner(const size_t order, const Func& f) const
-{
-    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    size_t i = std::min(order, order_sum);
-    fvar<RealType,Order> accumulator = f(i);
-    while (i--)
-        (accumulator *= epsilon) += f(i);
-    return accumulator;
-}
-
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
-template<typename RealType, size_t Order>
-template<typename Func, typename Fvar, typename... Fvars>
-promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coefficients_with_horner(
-    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
-{
-    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    size_t i = std::min(order, order_sum);
-    promote<fvar<RealType,Order>,Fvar,Fvars...> accumulator = cr.apply_coefficients_with_horner(
-        order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
-    while (i--)
-        (accumulator *= epsilon) += cr.apply_coefficients_with_horner(
-            order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
-    return accumulator;
 }
 
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
@@ -1623,7 +1546,7 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = sqrt((x*=x).negate()+=1).inverse().negate(); // acos'(x) = -1 / sqrt(1-x*x).
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1640,7 +1563,7 @@ fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = sqrt((x*=x)-=1).inverse(); // acosh'(x) = 1 / sqrt(x*x-1).
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1657,7 +1580,7 @@ fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = sqrt((x*=x)+=1).inverse(); // asinh'(x) = 1 / sqrt(x*x+1).
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1674,7 +1597,7 @@ fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr));
         const auto d1 = ((x*=x).negate()+=1).inverse(); // atanh'(x) = 1 / (1-x*x)
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1690,7 +1613,7 @@ fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
     else
     {
         const root_type derivatives[2] { d0, sinh(static_cast<root_type>(cr)) };
-        return cr.apply_derivatives_with_horner([&derivatives](size_t i) { return derivatives[i&1]; });
+        return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i&1]; });
     }
 }
 
@@ -1707,7 +1630,7 @@ fvar<RealType,Order> erf(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr)); // d1 = 2/sqrt(pi)*exp(-x*x)
         const auto d1 = 2*boost::math::constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1724,7 +1647,7 @@ fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
     {
         auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr)); // erfc'(x) = -erf'(x)
         const auto d1 = -2*boost::math::constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
-        return cr.apply_coefficients_with_horner(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
+        return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
     }
 }
 
@@ -1744,7 +1667,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
         const root_type expw = exp(*derivatives);
         derivatives[1] = 1 / (static_cast<root_type>(cr) + expw);
         if BOOST_AUTODIFF_IF_CONSTEXPR (order == 1)
-            return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i]; });
+            return cr.apply_derivatives_nonhorner([&derivatives](size_t i) { return derivatives[i]; });
         else
         {
             root_type d1powers = derivatives[1] * derivatives[1];
@@ -1761,7 +1684,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
                 derivatives[n] = d1powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
                     [&x](const root_type& a, const root_type& b) { return a*x + b; });
             }
-            return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i]; });
+            return cr.apply_derivatives_nonhorner([&derivatives](size_t i) { return derivatives[i]; });
         }
     }
 }
@@ -1780,7 +1703,7 @@ fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
     {
         for (size_t n=2 ; n<=order ; n+=2)
             taylor[n] = (1-static_cast<int>(n&2)) / boost::math::factorial<root_type>(n+1);
-        return cr.apply_coefficients([&taylor](size_t i) { return taylor[i]; });
+        return cr.apply_coefficients_nonhorner([&taylor](size_t i) { return taylor[i]; });
     }
 }
 
@@ -1796,7 +1719,7 @@ fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
     else
     {
         const root_type derivatives[2] { d0, cosh(static_cast<root_type>(cr)) };
-        return cr.apply_derivatives_with_horner([&derivatives](size_t i) { return derivatives[i&1]; });
+        return cr.apply_derivatives([&derivatives](size_t i) { return derivatives[i&1]; });
     }
 }
 

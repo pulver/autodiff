@@ -8,10 +8,11 @@
 
 import testing ;
 
-lib boost_unit_test_framework ;
+use-project boost : $(BOOST_ROOT) ;
 
-project boost/autodiff/test :
-    <library>../../test//boost_unit_test_framework
+project boost/autodiff/test : requirements
+    <include>$(BOOST_ROOT)
+    <library>/boost/test//boost_unit_test_framework
     <link>shared:<define>BOOST_TEST_DYN_LINK=1
 
 ;

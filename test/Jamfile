@@ -8,9 +8,12 @@
 
 import testing ;
 
+lib boost_unit_test_framework ;
+
 project boost/autodiff/test :
-    <library>/boost/test//boost_unit_test_framework
+    <library>../../test//boost_unit_test_framework
     <link>shared:<define>BOOST_TEST_DYN_LINK=1
+
 ;
 
 unit-test test_autodiff1 : test_autodiff1.cpp : ;

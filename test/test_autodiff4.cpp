@@ -241,13 +241,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
     {
       auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
       auto anchor_v = boost::math::bernoulli_b2n<T>(i);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*(std::numeric_limits<T>::epsilon)());
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
     }
     {
       auto i_ = (min)(19, i);
       auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
       auto anchor_v = boost::math::tangent_t2n<T>(i_);
-      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*(std::numeric_limits<T>::epsilon)());
+      BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 50*test_constants::pct_epsilon());
     }
   }
 }

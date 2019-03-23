@@ -1434,7 +1434,7 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
 {
-    using std::acosh;
+    using boost::math::acosh;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = acosh(static_cast<root_type>(cr));
@@ -1451,7 +1451,7 @@ fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
 {
-    using std::asinh;
+    using boost::math::asinh;
     using root_type = typename fvar<RealType,Order>::root_type;
     constexpr size_t order = fvar<RealType,Order>::order_sum;
     const root_type d0 = asinh(static_cast<root_type>(cr));

@@ -57,7 +57,7 @@ environment:
       ARCH: x86_64
       B2_ADDRESS_MODEL: address-model=64
       CXXSTD: 11,14,17
-      #DEFINES: define=__USE_ISOC99
+      DEFINES: define=__USE_ISOC99
       SCRIPT: ci\appveyor\mingw.bat
 
     - FLAVOR: Visual Studio 2017 C++2a

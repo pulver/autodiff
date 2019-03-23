@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_test, T, bin_float_types) {
   auto y = acosh(x);
   // BOOST_REQUIRE_EQUAL(y.derivative(0) == acosh(cx)); // FAILS! acosh(2) is
   // overloaded for integral types
-  BOOST_REQUIRE_EQUAL(y.derivative(0u), acosh(static_cast<T>(x)));
+  BOOST_REQUIRE_CLOSE(y.derivative(0u), acosh(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), 1 / boost::math::constants::root_three<T>(), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), -2 / (3 * boost::math::constants::root_three<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), 1 / boost::math::constants::root_three<T>(), eps);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asin_test, T, bin_float_types) {
   const T cx = 0.5;
   auto x = make_fvar<T, m>(cx);
   auto y = asin(x);
-  BOOST_REQUIRE_CLOSE(y.derivative(0u), asin(cx), eps);
+  BOOST_REQUIRE_CLOSE(y.derivative(0u), asin(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), 1 / sqrt(1 - cx * cx), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), cx / pow(1 - cx * cx, 1.5), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), (2 * cx * cx + 1) / pow(1 - cx * cx, 2.5), eps);
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_test, T, bin_float_types) {
   const T cx = 1;
   auto x = make_fvar<T, m>(cx);
   auto y = asinh(x);
-  BOOST_REQUIRE_EQUAL(y.derivative(0u), asinh(cx));
+  BOOST_REQUIRE_CLOSE(y.derivative(0u), asinh(static_cast<T>(x)), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(1u), 1 / boost::math::constants::root_two<T>(), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(2u), -1 / (2 * boost::math::constants::root_two<T>()), eps);
   BOOST_REQUIRE_CLOSE(y.derivative(3u), 1 / (4 * boost::math::constants::root_two<T>()), eps);

@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1e4*test_constants::pct_epsilon());
     }
     {
-      auto autodiff_v = boost::math::ibetac_inv(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+      auto autodiff_v = boost::math::ibetac_inv<autodiff_fvar<T, m>>(make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
       auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
       BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 1e4 * test_constants::pct_epsilon());
     }

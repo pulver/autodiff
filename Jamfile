@@ -16,6 +16,8 @@ project
     <toolset>msvc:<asynch-exceptions>off
     <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
+    <toolset>gcc:<warnings>all
+    <toolset>clang:<warnings>all
     : default-build
     ;
 

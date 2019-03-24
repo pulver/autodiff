@@ -52,7 +52,7 @@ void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const
 template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType, sizeof...(Orders)>
-    fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... orders) const
+    fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... /*orders*/) const
 {
     return v.at(order);
 }
@@ -74,7 +74,7 @@ get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, O
 }
 
 template<typename T, typename... Ts>
-constexpr T product(Ts... factors)
+constexpr T product(Ts... /*factors*/)
 {
     return 1;
 }
@@ -90,7 +90,7 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
+    static_assert(sizeof...(Orders) <= depth::value, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
     return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
 }
 
@@ -114,7 +114,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
+    size_t i = std::min(order, order_sum::value);
     using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
     return_type accumulator = cr.apply_coefficients(
         order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
@@ -129,8 +129,8 @@ template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type,
     SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
-    const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
-    const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
+    const size_t m0 = order_sum::value + isum0 < Order + z0 ? Order + z0 - (order_sum::value + isum0) : 0;
+    const size_t m1 = order_sum::value + isum1 < Order + z1 ? Order + z1 - (order_sum::value + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
     fvar<RealType,Order> retval = fvar<RealType,Order>();
     for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
@@ -144,8 +144,8 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_typ
     SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
     const RealType zero(0);
-    const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
-    const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
+    const size_t m0 = order_sum::value + isum0 < Order + z0 ? Order + z0 - (order_sum::value + isum0) : 0;
+    const size_t m1 = order_sum::value + isum1 < Order + z1 ? Order + z1 - (order_sum::value + isum1) : 0;
     const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
     fvar<RealType,Order> retval = fvar<RealType,Order>();
     for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
@@ -167,7 +167,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type
     SizeType z0, size_t isum0, const root_type& ca) const
 {
     fvar<RealType,Order> retval(*this);
-    const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
+    const size_t m0 = order_sum::value + isum0 < Order + z0 ? Order + z0 - (order_sum::value + isum0) : 0;
     for (size_t i=m0 ; i<=Order ; ++i)
         retval.v[i] = retval.v[i].epsilon_multiply(z0, isum0+i, ca);
     return retval;
@@ -179,7 +179,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_typ
     SizeType z0, size_t isum0, const root_type& ca) const
 {
     fvar<RealType,Order> retval(*this);
-    const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
+    const size_t m0 = order_sum::value + isum0 < Order + z0 ? Order + z0 - (order_sum::value + isum0) : 0;
     for (size_t i=m0 ; i<=Order ; ++i)
         if (retval.v[i] != static_cast<RealType>(0))
             retval.v[i] *= ca;

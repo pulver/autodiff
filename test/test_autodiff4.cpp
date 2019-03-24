@@ -210,26 +210,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   }
 }
 
-/*
-BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {
-  using test_constants = test_constants_t<T>;
-  static constexpr auto m = test_constants::order;
-
-  test_detail::RandomSample<T> x_sampler{-2000, 2000};
-  test_detail::RandomSample<T> y_sampler{-2000, 2000};
-
-  for (auto i : boost::irange(test_constants::n_samples)) {
-    std::ignore = i;
-    auto x = x_sampler.next();
-    auto y = y_sampler.next();
-
-    auto autodiff_v = atan2(make_fvar<T, m>(x), make_fvar<T, m>(y));
-    auto anchor_v = atan2(x, y);
-    BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v, 200 * test_constants::pct_epsilon());
-  }
-}
-*/
-
 BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 
   using boost::multiprecision::min;

@@ -148,22 +148,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   {
-    test_detail::RandomSample<T> x_sampler{-2, 2};
-    T t_0 = 1;
-    T x = x_sampler.next();
-    T t_1 = x;
-    for (auto i : boost::irange(test_constants::n_samples)) {
-      std::ignore = i;
-      std::swap(t_0, t_1);
-      auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
-      BOOST_REQUIRE_CLOSE(
-          static_cast<T>(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0),
-                                      make_fvar<T, m>(t_1))),
-          tmp, 50*test_constants::pct_epsilon());
-      t_1 = tmp;
-    }
-  }
-  {
     test_detail::RandomSample<unsigned> n_sampler{0u, 10u};
     test_detail::RandomSample<T> x_sampler{-2, 2};
     for (auto i : boost::irange(test_constants::n_samples)) {

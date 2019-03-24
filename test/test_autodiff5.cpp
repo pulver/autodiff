@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
       }
 
-
+      try {
         auto autodiff_v =
             boost::math::ibeta(make_fvar<T, m>(a_ - 1), make_fvar<T, m>(b_ - 1),
                                make_fvar<T, m>(z));

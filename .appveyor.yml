@@ -40,8 +40,8 @@ environment:
     # on Windows it is important to exercise all the possibilities, especially shared vs static, however most
     # libraries that care about this exercise it in their Jamfiles...
     # B2_ADDRESS_MODEL: address-model=64,32
-    # B2_LINK: link=static
-    # B2_THREADING: threading=single
+    # B2_LINK: link=shared,static
+    # B2_THREADING: threading=multi,single
     B2_VARIANT: variant=release,debug
 
   matrix:
@@ -81,46 +81,22 @@ environment:
       DEFINES: define=__USE_ISOC99
       SCRIPT: ci\appveyor\mingw.bat
 
-    - FLAVOR: Visual Studio 2017 C++2a
+    - FLAVOR: Visual Studio 2017
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc-14.1
       B2_ADDRESS_MODEL: address-model=64,32
-      #B2_LINK: link=static
-      #B2_THREADING: threading=single
+      B2_LINK: link=static,shared
+      B2_THREADING: threading=single,multi
       #CXXFLAGS: cxxflags=-permissive-
-      CXXSTD: latest # 2a
+      CXXSTD: 11,14,17,2a
 
-    - FLAVOR: Visual Studio 2017 C++17
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc-14.1
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single
-      CXXSTD: 17
-
-    - FLAVOR: Visual Studio 2017 C++14
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc-14.1
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single
-      CXXSTD: 14
-
-    - FLAVOR: Visual Studio 2015 C++14
+    - FLAVOR: Visual Studio 2015
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       TOOLSET: msvc-14.0
       B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single
-      CXXSTD: 14
-
-    - FLAVOR: Visual Studio 2015 C++11
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single
-      CXXSTD: 11
+      B2_LINK: link=static,shared
+      B2_THREADING: threading=single,multi
+      CXXSTD: 11,14
 
 install:
   - set SELF=%APPVEYOR_PROJECT_NAME:-=_%

@@ -994,7 +994,11 @@ template<typename Func>
 fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients(const size_t order, const Func& f) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+    size_t i = std::min(order, order_sum);
+#else
     size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
+#endif
     fvar<RealType,Order> accumulator = f(i);
     while (i--)
         (accumulator *= epsilon) += f(i);

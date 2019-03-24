@@ -51,9 +51,6 @@ install:
   - cp -r $TRAVIS_BUILD_DIR/* libs/$SELF
   - export BOOST_ROOT="`pwd`"
   - export PATH="`pwd`":$PATH
-  - echo "$SELF"
-  - echo "$BOOST_ROOT"
-  - echo "$PATH"
   - python tools/boostdep/depinst/depinst.py $SELF
   - ./bootstrap.sh
   - ./b2 headers

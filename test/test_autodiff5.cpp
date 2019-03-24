@@ -256,7 +256,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_derivatives, T, all_float_types) {
       try {
         auto autodiff_v = z.derivative(i,j);
         auto anchor_v = expected[k++];
-        //std::cout << "z.derivative("<<i<<','<<j<<") = " << z.derivative(i,j) << std::endl;
         if (anchor_v == 0)
           BOOST_REQUIRE_SMALL(autodiff_v, 300000*boost::math::tools::epsilon<T>());
         else
@@ -265,7 +264,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_derivatives, T, all_float_types) {
         std::cout << "Input: (i,j): ("<<i<<','<<j<<')' << std::endl;
         std::rethrow_exception(std::exception_ptr(std::current_exception()));
       }
-  std::cout << "Should be 0: z.derivative(4,5) = " << z.derivative(4,5) << std::endl;
+  //std::cout << "Should be 0: z.derivative(4,5) = " << z.derivative(4,5) << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atan2_function, T, all_float_types) {

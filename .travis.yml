@@ -7,7 +7,7 @@ language: cpp
 
 cache:
   directories:
-    - $HOME/cache1
+    - $HOME/cache2
 
 matrix:
   include:
@@ -109,18 +109,18 @@ before_install:
 # - mkdir -p ~/$TRAVIS_BUILD_NUMBER
 # - pip install --user awscli
 # - aws s3 sync s3://travis-build-stages-shared-storage-test/$TRAVIS_BUILD_NUMBER ~/$TRAVIS_BUILD_NUMBER
-  - if [ \! -d $HOME/cache1/boost_1_70_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/beta/1.70.0.beta1.rc3/source/boost_1_70_0_b1_rc3.tar.bz2 | tar xj -C $HOME/cache1 -f -; fi
+  - if [ \! -d $HOME/cache2/boost_1_70_0 ]; then curl -L -s -S https://dl.bintray.com/boostorg/beta/1.70.0.beta1/source/boost_1_70_0_b1.tar.bz2 | tar xj -C $HOME/cache2 -f -; fi
   - eval "${MATRIX_EVAL}"
 
 script:
   - ls
   - $COMPILER --version
-  - $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff1
-  - $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff2
-  - $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff3
-  - $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff4
-  - $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff5
-  - $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -o test_autodiff6
+  - $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff1
+  - $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff2
+  - $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff3
+  - $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff4
+  - $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff5
+  - $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -o test_autodiff6
   - ./test_autodiff1
   - ./test_autodiff2
   - ./test_autodiff3
@@ -132,10 +132,10 @@ script:
 
 after_success:
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if pyenv shell 3.6.3; then pip3 install --user codecov; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff1; then ./test_autodiff1; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff2; then ./test_autodiff2; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff3; then ./test_autodiff3; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff4; then ./test_autodiff4; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff5; then ./test_autodiff5; fi; fi
-  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache1/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff6; then ./test_autodiff6; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff1.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff1; then ./test_autodiff1; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff2.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff2; then ./test_autodiff2; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff3.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff3; then ./test_autodiff3; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff4.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff4; then ./test_autodiff4; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff5.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff5; then ./test_autodiff5; fi; fi
+  - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then if $COMPILER test/test_autodiff6.cpp -std=$CXXSTD -I$HOME/cache2/boost_1_70_0 -Iinclude -Wall -O0 --coverage -o test_autodiff6; then ./test_autodiff6; fi; fi
   - if [ "${TRAVIS_COMPILER}" = "gcc" -a "${TRAVIS_OS_NAME}" = "linux" ]; then bash <(curl -s https://codecov.io/bash) -X coveragepy -x gcov-7 -a --relative-only; fi

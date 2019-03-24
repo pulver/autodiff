@@ -987,33 +987,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   {
-    test_detail::RandomSample<T> x_sampler{-2, 2};
-    T t_0 = 1;
-    T x = x_sampler.next();
-    T t_1 = x;
-    for (auto i : boost::irange(test_constants::n_samples)) {
-      std::ignore = i;
-      try {
-        std::swap(t_0, t_1);
-        auto tmp = boost::math::chebyshev_next(x, t_0, t_1);
-        BOOST_REQUIRE_EQUAL(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            tmp);
-        t_1 = tmp;
-      } catch (const std::domain_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::domain_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::domain_error>);
-      } catch (const std::overflow_error &) {
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(make_fvar<T, m>(x), make_fvar<T, m>(t_0), make_fvar<T, m>(t_1)),
-                            boost::wrapexcept<std::overflow_error>);
-        BOOST_REQUIRE_THROW(boost::math::chebyshev_next(x, t_0, t_1), boost::wrapexcept<std::overflow_error>);
-      } catch (...) {
-        std::cout << "Input: x: " << x << "  t_0: " << t_0 << "  t_1: " << t_1 << std::endl;
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }
-    }
-  }
-  {
     test_detail::RandomSample<unsigned> n_sampler{0, 10};
     test_detail::RandomSample<T> x_sampler{-2, 2};
     for (auto i : boost::irange(test_constants::n_samples)) {

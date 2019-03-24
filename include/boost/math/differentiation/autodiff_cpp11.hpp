@@ -114,7 +114,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    size_t i = std::min(order, order_sum);
+    size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
     using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
     return_type accumulator = cr.apply_coefficients(
         //order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);

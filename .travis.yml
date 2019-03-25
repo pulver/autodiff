@@ -164,7 +164,6 @@ jobs:
         - TESTFLAGS=testing.launcher=valgrind
         - VALGRIND_OPTS=--error-exitcode=1
         - DEFINES="define=BOOST_USE_VALGRIND"
-
       addons: *clang-6
       script:
         - cd $BOOST_ROOT/libs/$SELF

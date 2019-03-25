@@ -997,7 +997,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients(const size_t order
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
     size_t i = std::min(order, order_sum);
 #else
-    size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
+    size_t i = order < order_sum ? order : order_sum;
 #endif
     fvar<RealType,Order> accumulator = f(i);
     while (i--)

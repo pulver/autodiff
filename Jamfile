@@ -1,0 +1,25 @@
+# Boost.Autodiff
+#
+# Copyright (c) 2018-2019 Matthew Pulver
+#
+# Use, modification and distribution is subject to the Boost Software License,
+# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
+import common ;
+
+project
+    : requirements
+    <implicit-dependency>/boost//headers
+    <include>$(BOOST_ROOT)
+    <toolset>msvc:<exception-handling>on
+    <toolset>msvc:<asynch-exceptions>off
+    <toolset>msvc:<extern-c-nothrow>on
+    <toolset>msvc:<cxxflags>/bigobj
+    <toolset>gcc:<warnings>all
+    <toolset>clang:<warnings>all
+    : default-build
+    ;
+
+build-project test ;
+build-project example ;

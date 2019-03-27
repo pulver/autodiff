@@ -9,8 +9,9 @@
 template<typename T>
 T fourth_power(const T& x)
 {
-    const T second_power = x * x;
-    return second_power * second_power;
+    T x4 = x * x; // retval in operator*() uses x4's memory via named return value optimization (NRVO).
+    x4 *= x4;     // No copies of x4 are made within operator*=() even when squaring.
+    return x4;    // x4 uses y's memory in main() via NRVO (thus so does retval in operator*() above).
 }
 
 int main()

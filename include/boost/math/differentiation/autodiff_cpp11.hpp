@@ -40,6 +40,7 @@ template<typename RealType, size_t Order>
 template<typename RootType>
 void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const bool is_variable)
 {
+  static_assert(std::is_same<boost::decay_t<RootType>, boost::decay_t<RealType>>::value, "");
   v.front() = ca;
   if (0 < Order)
   {
@@ -52,7 +53,7 @@ void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const
 template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType, sizeof...(Orders)>
-fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... orders) const
+fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... /*orders*/) const
 {
   return v.at(order);
 }
@@ -74,7 +75,7 @@ get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, O
 }
 
 template<typename T, typename... Ts>
-constexpr T product(Ts... factors)
+constexpr T product(Ts... /*factors*/)
 {
   return 1;
 }
@@ -91,7 +92,7 @@ template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(orders...) * product(boost::math::factorial<root_type>(orders)...);
+  return at(static_cast<std::size_t>(orders)...) * product(boost::math::factorial<root_type>(static_cast<unsigned>(orders))...);
 }
 
 template<typename RootType, typename Func>
@@ -114,7 +115,8 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-  size_t i = std::min(order, get_order_sum<fvar<RealType,Order>>::value);
+  constexpr auto fvar_order_sum = fvar<RealType,Order>::order_sum;
+  size_t i = (std::min)(order, fvar_order_sum);
   using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
   return_type accumulator = cr.apply_coefficients(
       order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
@@ -230,7 +232,9 @@ template<typename RealType, size_t Order>
 template<typename RootType>
 fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type, const RootType&)
 {
-  std::for_each(v.begin(), v.end(), [](RealType& r) { r.negate(); });
+  for (auto& r : v) {
+    r.negate();
+  }
   return *this;
 }
 
@@ -238,7 +242,9 @@ template<typename RealType, size_t Order>
 template<typename RootType>
 fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type, const RootType&)
 {
-  std::for_each(v.begin(), v.end(), [](RealType& a) { a = -a; });
+  for (auto& a : v) {
+    a = -a;
+  }
   return *this;
 }
 

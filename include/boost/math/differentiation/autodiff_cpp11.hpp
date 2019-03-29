@@ -40,7 +40,6 @@ template<typename RealType, size_t Order>
 template<typename RootType>
 void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const bool is_variable)
 {
-  static_assert(std::is_same<boost::decay_t<RootType>, boost::decay_t<RealType>>::value, "");
   v.front() = ca;
   if (0 < Order)
   {

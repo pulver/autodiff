@@ -985,6 +985,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
             order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
     return accumulator;
 }
+#endif
 
 // f : order -> derivative(order)/factorial(order)
 // Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().

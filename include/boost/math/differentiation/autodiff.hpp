@@ -1291,8 +1291,10 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
     for (size_t i=1 ; i<=order ; ++i)
     {
       derivatives[i] = numerator / (powers * *derivatives);
-      numerator *= root_type(-0.5 * (((i+1)<<1)-3));
-      powers *= x;
+      if (i < order) {
+        numerator *= root_type(-0.5 * (((i + 1) << 1) - 3));
+        powers *= x;
+      }
     }
     return cr.apply_derivatives_nonhorner([&derivatives](size_t i) { return derivatives[i]; });
   }
@@ -1782,9 +1784,9 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
-           std::max(Order0,Order1)>;
+    (std::max)(Order0,Order1)>;
 #else
-          Order0 < Order1 ? Order1 : Order0>;
+    Order0 < Order1 ? Order1 : Order0>;
 #endif
 };
 

@@ -994,8 +994,11 @@ template<typename Func>
 fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients(const size_t order, const Func& f) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-  constexpr auto fvar_order_sum = fvar<RealType,Order>::order_sum;
-  size_t i = (std::min)(order, fvar_order_sum);
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+  size_t i = std::min(order, order_sum);
+#else
+  size_t i = order < order_sum ? order : order_sum;
+#endif
   fvar<RealType,Order> accumulator = f(i);
   while (i--)
     (accumulator *= epsilon) += f(i);
@@ -1025,9 +1028,9 @@ fvar<RealType,Order>
 fvar<RealType,Order>::apply_derivatives(const std::function<root_type(size_t)>& f) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-  fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(order_sum)));
+  fvar<RealType,Order> accumulator(static_cast<root_type>(f(order_sum)/boost::math::factorial<root_type>(static_cast<unsigned>(order_sum))));
   for (size_t i=order_sum ; i-- ;)
-    (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(i);
+    (accumulator *= epsilon) += f(i) / boost::math::factorial<root_type>(static_cast<unsigned>(i));
   return accumulator;
 }
 
@@ -1041,7 +1044,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const std
   for (size_t i=1 ; i<=order_sum ; ++i)
   {   // accumulator += (epsilon_i *= epsilon) * (f(i) / boost::math::factorial<root_type>(i));
     epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
-    accumulator += epsilon_i.epsilon_multiply(i, 0, f(i) / boost::math::factorial<root_type>(i));
+    accumulator += epsilon_i.epsilon_multiply(i, 0, f(i) / boost::math::factorial<root_type>(static_cast<unsigned>(i)));
   }
   return accumulator;
 }
@@ -1065,8 +1068,8 @@ template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
-    static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-    return at(orders...) * (... * boost::math::factorial<root_type>(orders));
+  static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
+  return at(orders...) * (... * boost::math::factorial<root_type>(static_cast<unsigned>(orders)));
 }
 #endif
 
@@ -1288,13 +1291,16 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
   {
     root_type numerator = 0.5;
     root_type powers = 1;
-    for (size_t i=1 ; i<=order ; ++i)
+    #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+      derivatives[1] = numerator / *derivatives;
+    #else // for compilers that compile this branch when order=0.
+      derivatives[std::min(size_t(1),order)] = numerator / *derivatives;
+    #endif
+    for (size_t i=2 ; i<=order ; ++i)
     {
+      numerator *= -0.5 * ((i<<1)-3);
+      powers *= x;
       derivatives[i] = numerator / (powers * *derivatives);
-      if (i < order) {
-        numerator *= root_type(-0.5 * (((i + 1) << 1) - 3));
-        powers *= x;
-      }
     }
     return cr.apply_derivatives_nonhorner([&derivatives](size_t i) { return derivatives[i]; });
   }
@@ -1704,7 +1710,7 @@ fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
   else
   {
     for (size_t n=2 ; n<=order ; n+=2)
-      taylor[n] = (1-static_cast<int>(n&2)) / boost::math::factorial<root_type>(n+1);
+      taylor[n] = (1-static_cast<int>(n&2)) / boost::math::factorial<root_type>(static_cast<unsigned>(n+1));
     return cr.apply_coefficients_nonhorner([&taylor](size_t i) { return taylor[i]; });
   }
 }
@@ -1784,9 +1790,9 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
-    (std::max)(Order0,Order1)>;
+           std::max(Order0,Order1)>;
 #else
-    Order0 < Order1 ? Order1 : Order0>;
+          Order0 < Order1 ? Order1 : Order0>;
 #endif
 };
 

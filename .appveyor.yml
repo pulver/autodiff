@@ -23,11 +23,6 @@ version: 1.0.{build}-{branch}
 
 shallow_clone: true
 
-branches:
-  only:
-    - develop
-    - master
-
 matrix:
   # Adding MAYFAIL to any matrix job allows it to fail but the build stays green:
   allow_failures:
@@ -122,7 +117,7 @@ install:
   - git clone https://github.com/boostorg/boost-ci.git C:\boost-ci
   - xcopy /s /e /q /i C:\boost-ci\ci .\ci
   - cd ..
-  - git clone -b %APPVEYOR_REPO_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
+  - git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root
   - cd boost-root
   - git submodule update -q --init libs/headers
   - git submodule update -q --init tools/boost_install

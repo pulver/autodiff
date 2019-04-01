@@ -577,7 +577,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>::fvar(const fvar<RealType2,Order2>& cr)
 {
-  for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+  for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     v[i] = static_cast<RealType>(cr.v[i]);
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
     std::fill(v.begin()+(Order2+1), v.end(), static_cast<RealType>(0));
@@ -617,7 +617,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator+=(const fvar<RealType2,Order2>& cr)
 {
-  for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+  for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     v[i] += cr.v[i];
   return *this;
 }
@@ -714,7 +714,7 @@ promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator+(const fvar<RealType2,Order2>& cr) const
 {
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
-  for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+  for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     retval.v[i] = v[i] + cr.v[i];
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=Order+1 ; i<=Order2 ; ++i)
@@ -745,7 +745,7 @@ promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator-(const fvar<RealType2,Order2>& cr) const
 {
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
-  for (size_t i=0 ; i<=std::min(Order,Order2) ; ++i)
+  for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     retval.v[i] = v[i] - cr.v[i];
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=Order+1 ; i<=Order2 ; ++i)
@@ -977,7 +977,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
 {
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-    size_t i = std::min(order, order_sum);
+    size_t i = (std::min)(order, order_sum);
     promote<fvar<RealType,Order>,Fvar,Fvars...> accumulator = cr.apply_coefficients(
         order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...);
     while (i--)
@@ -995,7 +995,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_coefficients(const size_t order
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
-  size_t i = std::min(order, order_sum);
+  size_t i = (std::min)(order, order_sum);
 #else
   size_t i = order < order_sum ? order : order_sum;
 #endif
@@ -1294,7 +1294,7 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
     #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
       derivatives[1] = numerator / *derivatives;
     #else // for compilers that compile this branch when order=0.
-      derivatives[std::min(size_t(1),order)] = numerator / *derivatives;
+      derivatives[(std::min)(size_t(1),order)] = numerator / *derivatives;
     #endif
     for (size_t i=2 ; i<=order ; ++i)
     {
@@ -1790,7 +1790,7 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 {
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
-           std::max(Order0,Order1)>;
+           (std::max)(Order0,Order1)>;
 #else
           Order0 < Order1 ? Order1 : Order0>;
 #endif

@@ -24,12 +24,12 @@ namespace detail {
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const root_type& ca, const bool is_variable)
 {
-  fvar_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, ca, is_variable);
+  fvar_cpp11(is_fvar<RealType>{}, ca, is_variable);
 }
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-void fvar<RealType,Order>::fvar_cpp11(std::true_type, const RootType& ca, const bool is_variable)
+void fvar<RealType,Order>::fvar_cpp11(std::true_type /* is_fvar */, const RootType& ca, const bool is_variable)
 {
   v.front() = RealType(ca, is_variable);
   if (0 < Order)
@@ -38,7 +38,7 @@ void fvar<RealType,Order>::fvar_cpp11(std::true_type, const RootType& ca, const 
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const bool is_variable)
+void fvar<RealType,Order>::fvar_cpp11(std::false_type /* !is_fvar */, const RootType& ca, const bool is_variable)
 {
   v.front() = ca;
   if (0 < Order)
@@ -52,7 +52,7 @@ void fvar<RealType,Order>::fvar_cpp11(std::false_type, const RootType& ca, const
 template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType, sizeof...(Orders)>
-fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... /*orders*/) const
+fvar<RealType,Order>::at_cpp11(std::true_type /* sizeof...(orders) == 0 */, size_t order, Orders... /*orders*/) const
 {
   return v.at(order);
 }
@@ -60,7 +60,7 @@ fvar<RealType,Order>::at_cpp11(std::true_type, size_t order, Orders... /*orders*
 template<typename RealType, size_t Order>
 template<typename... Orders>
 get_type_at<RealType, sizeof...(Orders)>
-fvar<RealType,Order>::at_cpp11(std::false_type, size_t order, Orders... orders) const
+fvar<RealType,Order>::at_cpp11(std::false_type /* sizeof...(orders) > 0 */, size_t order, Orders... orders) const
 {
   return v.at(order).at(orders...);
 }
@@ -76,7 +76,7 @@ get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, O
 template<typename T, typename... Ts>
 constexpr T product(Ts... /*factors*/)
 {
-  return 1;
+  return static_cast<T>(1);
 }
 
 template<typename T, typename... Ts>
@@ -127,7 +127,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
 
 template<typename RealType, size_t Order>
 template<typename SizeType>
-fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type,
+fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type /* is_fvar */,
                                                                   SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
@@ -141,7 +141,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type
 
 template<typename RealType, size_t Order>
 template<typename SizeType>
-fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type,
+fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type /* !is_fvar */,
                                                                   SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
   const RealType zero(0);
@@ -158,13 +158,13 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
                                                             const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
-  return epsilon_multiply_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{},
+  return epsilon_multiply_cpp11(is_fvar<RealType>{},
                                 z0, isum0, cr, z1, isum1);
 }
 
 template<typename RealType, size_t Order>
 template<typename SizeType>
-fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type,
+fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type /* is_fvar */,
                                                                   SizeType z0, size_t isum0, const root_type& ca) const
 {
   fvar<RealType,Order> retval(*this);
@@ -176,7 +176,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::true_type
 
 template<typename RealType, size_t Order>
 template<typename SizeType>
-fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type,
+fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type /* !is_fvar */,
                                                                   SizeType z0, size_t isum0, const root_type& ca) const
 {
   fvar<RealType,Order> retval(*this);
@@ -191,12 +191,12 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
                                                             const root_type& ca) const
 {
-  return epsilon_multiply_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, z0, isum0, ca);
+  return epsilon_multiply_cpp11(is_fvar<RealType>{}, z0, isum0, ca);
 }
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(std::true_type,
+fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(std::true_type  /* is_fvar */,
                                                                                bool is_root, const RootType& ca)
 {
   auto itr = v.begin();
@@ -208,7 +208,7 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(s
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(std::false_type,
+fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(std::false_type /* !is_fvar */,
                                                                                bool is_root, const RootType& ca)
 {
   auto itr = v.begin();
@@ -223,13 +223,12 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type_cpp11(s
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is_root, const root_type& ca)
 {
-  return multiply_assign_by_root_type_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{},
-                                            is_root, ca);
+  return multiply_assign_by_root_type_cpp11(is_fvar<RealType>{}, is_root, ca);
 }
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type, const RootType&)
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type /* is_fvar */, const RootType&)
 {
   std::for_each(v.begin(), v.end(), [](RealType& r) { r.negate(); });
   return *this;
@@ -237,7 +236,7 @@ fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::true_type, const R
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type, const RootType&)
+fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type /* !is_fvar */, const RootType&)
 {
   std::for_each(v.begin(), v.end(), [](RealType& a) { a = -a; });
   return *this;
@@ -246,12 +245,12 @@ fvar<RealType,Order>& fvar<RealType,Order>::negate_cpp11(std::false_type, const 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::negate()
 {
-  return negate_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, static_cast<root_type>(*this));
+  return negate_cpp11(is_fvar<RealType>{}, static_cast<root_type>(*this));
 }
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::true_type, const RootType& root)
+fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::true_type /* is_fvar */, const RootType& root)
 {
   v.front().set_root(root);
   return *this;
@@ -259,7 +258,7 @@ fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::true_type, const
 
 template<typename RealType, size_t Order>
 template<typename RootType>
-fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::false_type, const RootType& root)
+fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::false_type /* !is_fvar */, const RootType& root)
 {
   v.front() = root;
   return *this;
@@ -268,7 +267,7 @@ fvar<RealType,Order>& fvar<RealType,Order>::set_root_cpp11(std::false_type, cons
 template<typename RealType, size_t Order>
 fvar<RealType,Order>& fvar<RealType,Order>::set_root(const root_type& root)
 {
-  return set_root_cpp11(std::integral_constant<bool,is_fvar<RealType>::value>{}, root);
+  return set_root_cpp11(is_fvar<RealType>{}, root);
 }
 
 } // namespace detail

@@ -114,8 +114,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
-  constexpr auto fvar_order_sum = fvar<RealType,Order>::order_sum;
-  size_t i = (std::min)(order, fvar_order_sum);
+  size_t i = order < order_sum ? order : order_sum;
   using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
   return_type accumulator = cr.apply_coefficients(
       order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
@@ -123,6 +122,48 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_coeffici
     (accumulator *= epsilon) += cr.apply_coefficients(
         order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...);
   return accumulator;
+}
+
+// f : order -> derivative(order)/factorial(order)
+// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
+template<typename RealType, size_t Order>
+template<typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivatives(
+    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
+{
+  const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+  size_t i = order < order_sum ? order : order_sum;
+  using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
+  return_type accumulator = cr.apply_derivatives(
+      order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...)
+      / factorial<root_type>(static_cast<unsigned>(i));
+  while (i--)
+    (accumulator *= epsilon) += cr.apply_derivatives(
+        order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...)
+        / factorial<root_type>(static_cast<unsigned>(i));
+  return accumulator;
+}
+
+// f : order -> derivative(order)
+template<typename RealType, size_t Order>
+template<typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivatives_nonhorner(
+    const size_t order, const Func& f, const Fvar& cr, Fvars&&... fvars) const
+{
+    const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
+    fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
+    using return_type = promote<fvar<RealType,Order>,Fvar,Fvars...>;
+    return_type accumulator = cr.apply_derivatives_nonhorner(
+        order, Curry<typename return_type::root_type,Func>(f,0), std::forward<Fvars>(fvars)...);
+    const size_t i_max = order < order_sum ? order : order_sum;
+    for (size_t i=1 ; i<=i_max ; ++i)
+    { // accumulator += (epsilon_i *= epsilon) * (f(i) / factorial<root_type>(i));
+      epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
+      accumulator += epsilon_i.epsilon_multiply(i, 0, cr.apply_derivatives_nonhorner(
+            order-i, Curry<typename return_type::root_type,Func>(f,i), std::forward<Fvars>(fvars)...)
+            / factorial<root_type>(static_cast<unsigned>(i)), 0, 0);
+    }
+    return accumulator;
 }
 
 template<typename RealType, size_t Order>

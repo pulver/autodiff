@@ -1307,6 +1307,7 @@ fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<RealType,Order>::root_type& y)
 {
+  using std::fabs;
   using std::pow;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
@@ -1314,7 +1315,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<Real
   root_type derivatives[order+1] { pow(x0, y) };
   for (size_t i=0 ; i<order && y-i!=0 ; ++i)
     derivatives[i+1] = (y-i) * derivatives[i] / x0;
-  if (x0 == static_cast<root_type>(0))
+  if (fabs(x0) < std::numeric_limits<root_type>::epsilon())
     return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
   else
     return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
@@ -1323,6 +1324,7 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<Real
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, const fvar<RealType,Order>& y)
 {
+  using std::fabs;
   using std::log;
   using std::pow;
   using root_type = typename fvar<RealType,Order>::root_type;
@@ -1333,7 +1335,7 @@ fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, cons
   *derivatives = pow(x, y0);
   for (size_t i=0 ; i<order ; ++i)
     derivatives[i+1] = derivatives[i] * logx;
-  if (x == static_cast<root_type>(0))
+  if (fabs(x) < std::numeric_limits<root_type>::epsilon())
     return y.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
   else
     return y.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
@@ -1343,6 +1345,7 @@ template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
     pow(const fvar<RealType1,Order1>& x, const fvar<RealType2,Order2>& y)
 {
+  using std::fabs;
   using std::pow;
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
@@ -1374,7 +1377,7 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
         sum += binomial * dxydx[i-k] * lognx[j].derivative(k);
       }
       return sum; };
-    if (x == static_cast<typename fvar<RealType1,Order1>::root_type>(0))
+    if (fabs(x0) < std::numeric_limits<root_type>::epsilon())
       return x.apply_derivatives_nonhorner(order, f, y);
     else
       return x.apply_derivatives(order, f, y);

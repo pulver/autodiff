@@ -40,7 +40,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(exp_test, T, all_float_types) {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
   const T eps = 201 * std::numeric_limits<T>::epsilon();  // percent
-  using std::exp;
   using std::log;
   using std::pow;
   constexpr unsigned m = 5;
@@ -59,7 +58,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
   auto z1 = pow(cx, y);
   BOOST_REQUIRE_CLOSE(z1.derivative(0u, 0u), pow(cx, cy), eps);
   for (auto j : boost::irange(1u, n + 1)) {
-    BOOST_REQUIRE_CLOSE(z1.derivative(0u, j), pow(log(cx), j) * exp(cy * log(cx)), eps);
+    BOOST_REQUIRE_CLOSE(z1.derivative(0u, j), pow(log(cx), j) * pow(cx, cy), eps);
   }
 
   for (auto i : boost::irange(1u, m + 1)) {
@@ -68,7 +67,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
     }
   }
 
-  auto z2 = pow(x, y);
+  const auto z2 = pow(x, y);
+
   for (auto j : boost::irange(n + 1)) {
     BOOST_REQUIRE_CLOSE(z2.derivative(0u, j), pow(cx, cy) * pow(log(cx), j), eps);
   }
@@ -88,6 +88,73 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow, T, bin_float_types) {
       z2.derivative(2u, 4u),
       pow(cx, cy - 2) * pow(log(cx), 2) * (4 * (2 * cy - 1) * log(cx) + (4 - 1) * 4 + (cy - 1) * cy * pow(log(cx), 2)),
       eps);
+}
+
+// TODO Tests around x=0 or y=0: pow(x,y)
+BOOST_AUTO_TEST_CASE_TEMPLATE(pow2, T, bin_float_types) {
+  const T eps = 4000 * std::numeric_limits<T>::epsilon();  // percent
+  using std::pow;
+  constexpr unsigned m = 5;
+  constexpr unsigned n = 5;
+  const T cx = 2;
+  const T cy = 5/2.0;
+  const auto x = make_fvar<T, m>(cx);
+  const auto y = make_fvar<T, 0, n>(cy);
+  const auto z = pow(x, y);
+  using namespace boost::math::constants;
+  // Mathematica: Export["pow.csv", Flatten@Table[ Simplify@D[x^y,{x,i},{y,j}] /. {x->2, y->5/2},
+  //                    { i, 0, 5 }, { j, 0, 5 } ] ]
+  // sed -rf pow.sed < pow.csv
+  // with pow.sed script:
+  // s/Log\[2\]\^([0-9]+)/pow(ln_two<T>(),\1)/g
+  // s/Log\[2\]/ln_two<T>()/g
+  // s/Sqrt\[2\]/root_two<T>()/g
+  // s/[0-9]\/[0-9]+/\0.0/g
+  // s/^"/static_cast<T>(/
+  // s/"$/),/
+  const T mathematica[] {
+    static_cast<T>(4*root_two<T>()),
+    static_cast<T>(4*root_two<T>()*ln_two<T>()),
+    static_cast<T>(4*root_two<T>()*pow(ln_two<T>(),2)),
+    static_cast<T>(4*root_two<T>()*pow(ln_two<T>(),3)),
+    static_cast<T>(4*root_two<T>()*pow(ln_two<T>(),4)),
+    static_cast<T>(4*root_two<T>()*pow(ln_two<T>(),5)),
+    static_cast<T>(5*root_two<T>()),
+    static_cast<T>(2*root_two<T>()*(1 + (5*ln_two<T>())/2)),
+    static_cast<T>(2*root_two<T>()*ln_two<T>()*(2 + (5*ln_two<T>())/2)),
+    static_cast<T>(2*root_two<T>()*pow(ln_two<T>(),2)*(3 + (5*ln_two<T>())/2)),
+    static_cast<T>(2*root_two<T>()*pow(ln_two<T>(),3)*(4 + (5*ln_two<T>())/2)),
+    static_cast<T>(2*root_two<T>()*pow(ln_two<T>(),4)*(5 + (5*ln_two<T>())/2)),
+    static_cast<T>(15/(2*root_two<T>())),
+    static_cast<T>(root_two<T>()*(4 + (15*ln_two<T>())/4)),
+    static_cast<T>(root_two<T>()*(2 + 8*ln_two<T>() + (15*pow(ln_two<T>(),2))/4)),
+    static_cast<T>(root_two<T>()*ln_two<T>()*(6 + 12*ln_two<T>() + (15*pow(ln_two<T>(),2))/4)),
+    static_cast<T>(root_two<T>()*pow(ln_two<T>(),2)*(12 + 16*ln_two<T>() + (15*pow(ln_two<T>(),2))/4)),
+    static_cast<T>(root_two<T>()*pow(ln_two<T>(),3)*(20 + 20*ln_two<T>() + (15*pow(ln_two<T>(),2))/4)),
+    static_cast<T>(15/(8*root_two<T>())),
+    static_cast<T>((23/4.0 + (15*ln_two<T>())/8)/root_two<T>()),
+    static_cast<T>((9 + (23*ln_two<T>())/2 + (15*pow(ln_two<T>(),2))/8)/root_two<T>()),
+    static_cast<T>((6 + 27*ln_two<T>() + (69*pow(ln_two<T>(),2))/4 + (15*pow(ln_two<T>(),3))/8)/root_two<T>()),
+    static_cast<T>((ln_two<T>()*(24 + 54*ln_two<T>() + 23*pow(ln_two<T>(),2) + (15*pow(ln_two<T>(),3))/8))/root_two<T>()),
+    static_cast<T>((pow(ln_two<T>(),2)*(60 + 90*ln_two<T>() + (115*pow(ln_two<T>(),2))/4 + (15*pow(ln_two<T>(),3))/8))/root_two<T>()),
+    static_cast<T>(-15/(32*root_two<T>())),
+    static_cast<T>((-1 - (15*ln_two<T>())/16)/(2*root_two<T>())),
+    static_cast<T>((7 - 2*ln_two<T>() - (15*pow(ln_two<T>(),2))/16)/(2*root_two<T>())),
+    static_cast<T>((24 + 21*ln_two<T>() - 3*pow(ln_two<T>(),2) - (15*pow(ln_two<T>(),3))/16)/(2*root_two<T>())),
+    static_cast<T>((24 + 96*ln_two<T>() + 42*pow(ln_two<T>(),2) - 4*pow(ln_two<T>(),3) - (15*pow(ln_two<T>(),4))/16)/(2*root_two<T>())),
+    static_cast<T>((ln_two<T>()*(120 + 240*ln_two<T>() + 70*pow(ln_two<T>(),2) - 5*pow(ln_two<T>(),3) - (15*pow(ln_two<T>(),4))/16))/(2*root_two<T>())),
+    static_cast<T>(45/(128*root_two<T>())),
+    static_cast<T>((9/16.0 + (45*ln_two<T>())/32)/(4*root_two<T>())),
+    static_cast<T>((-25/2.0 + (9*ln_two<T>())/8 + (45*pow(ln_two<T>(),2))/32)/(4*root_two<T>())),
+    static_cast<T>((-15 - (75*ln_two<T>())/2 + (27*pow(ln_two<T>(),2))/16 + (45*pow(ln_two<T>(),3))/32)/(4*root_two<T>())),
+    static_cast<T>((60 - 60*ln_two<T>() - 75*pow(ln_two<T>(),2) + (9*pow(ln_two<T>(),3))/4 + (45*pow(ln_two<T>(),4))/32)/(4*root_two<T>())),
+    static_cast<T>((120 + 300*ln_two<T>() - 150*pow(ln_two<T>(),2) - 125*pow(ln_two<T>(),3) + (45*pow(ln_two<T>(),4))/16 + (45*pow(ln_two<T>(),5))/32)/(4*root_two<T>())) };
+  unsigned k=0;
+  for (unsigned i : boost::irange(m + 1)) {
+    for (unsigned j : boost::irange(n + 1)) {
+      BOOST_REQUIRE_CLOSE(z.derivative(i, j), mathematica[k++], eps);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sqrt_test, T, all_float_types) {

@@ -103,12 +103,12 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-4.8",     "B2_CXXSTD=03,11"    ], addons: *gcc-48    }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-4.8",     "B2_CXXSTD=11"    ], addons: *gcc-48    }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-5",       "B2_CXXSTD=11"       ], addons: *gcc-5     }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-6",       "B2_CXXSTD=11,14"    ], addons: *gcc-6     }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-7",       "B2_CXXSTD=11,14,17" ], addons: *gcc-7     }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-8",       "B2_CXXSTD=14,17,2a" ], addons: *gcc-8     }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-3.8",   "B2_CXXSTD=03,11,14" ], addons: *clang-38  }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-3.8",   "B2_CXXSTD=11,14" ], addons: *clang-38  }
     - { os: "linux", env: [ "B2_TOOLSET=clang-4.0",   "B2_CXXSTD=11,14"    ], addons: *clang-4   }
     - { os: "linux", env: [ "B2_TOOLSET=clang-5.0",   "B2_CXXSTD=11,14,17" ], addons: *clang-5   }
     - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=14,17,2a" ], addons: *clang-6   }
@@ -116,9 +116,9 @@ jobs:
     - { os: "linux", env: [ "B2_TOOLSET=clang-8",     "B2_CXXSTD=14,17,2a" ], addons: *clang-8   }
 
     # libc++
-    - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=03,11,14,17,2a",
+    - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=11,14,17,2a",
                             "B2_CXXFLAGS=-stdlib=libc++"                   ], addons: *clang-6   }
-    - { os: "osx"  , env: [ "B2_TOOLSET=clang",       "B2_CXXSTD=03,11,17" ]                     }
+    - { os: "osx"  , env: [ "B2_TOOLSET=clang",       "B2_CXXSTD=11,17" ]                     }
                             
   # to enable Intel ICC define INTEL_ICC_SERIAL_NUMBER and the following:
   # - { os: "linux", env: [ "B2_TOOLSET=intel-linux", "B2_CXXSTD=11,14,17" ], addons: *gcc-7,
@@ -147,7 +147,7 @@ jobs:
         - COMMENT=ubsan
         - B2_VARIANT=variant=debug
         - B2_TOOLSET=gcc-8
-        - B2_CXXSTD=03,11,14,17,2a
+        - B2_CXXSTD=11,14,17,2a
         - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"
         - B2_CXXFLAGS="cxxflags=-fno-omit-frame-pointer cxxflags=-fsanitize=undefined cxxflags=-fno-sanitize-recover=undefined"
         - B2_LINKFLAGS="linkflags=-fsanitize=undefined linkflags=-fno-sanitize-recover=undefined linkflags=-fuse-ld=gold"
@@ -158,7 +158,7 @@ jobs:
       env:
         - COMMENT=valgrind
         - B2_TOOLSET=clang-6.0
-        - B2_CXXSTD=03,11,14,17,2a
+        - B2_CXXSTD=11,14,17,2a
         - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"
         - B2_VARIANT=variant=debug
         - B2_TESTFLAGS=testing.launcher=valgrind

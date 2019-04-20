@@ -76,7 +76,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ADDPATH: C:\cygwin\bin;
       B2_ADDRESS_MODEL: address-model=32
-      B2_CXXSTD: 03,11
+      B2_CXXSTD: 11
       # https://github.com/boostorg/test/issues/144
       B2_DEFINES: define=_POSIX_C_SOURCE=200112L
       B2_THREADING: threadapi=pthread
@@ -96,7 +96,7 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: i686
       B2_ADDRESS_MODEL: address-model=32
-      B2_CXXSTD: 03,11
+      B2_CXXSTD: 11
       SCRIPT: ci\appveyor\mingw.bat
 
     - FLAVOR: mingw64

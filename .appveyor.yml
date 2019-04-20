@@ -23,11 +23,6 @@ version: 1.0.{build}-{branch}
 
 shallow_clone: true
 
-branches:
-  only:
-    - develop
-    - master
-
 matrix:
   # Adding MAYFAIL to any matrix job allows it to fail but the build stays green:
   allow_failures:

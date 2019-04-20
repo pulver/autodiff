@@ -8,7 +8,7 @@
 # See: https://github.com/boostorg/boost-ci
 #
 # Instructions for customizing this script for your library:
-# 
+#
 # 1. Customize the compilers and language levels you want in the 'jobs'.
 # 2. If you have more than include/, src/, test/, example/, examples/, or
 #    tools/ directories, modify your Travis CI project and add the environment
@@ -45,12 +45,7 @@ addons:
       - binutils-gold
       - gdb
       - libc6-dbg
-        
-branches:
-  only:
-    - develop
-    - master
-    
+
 script:
   - cd $BOOST_ROOT/libs/$SELF
   - ci/travis/build.sh
@@ -119,13 +114,13 @@ jobs:
     - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=11,14,17,2a",
                             "B2_CXXFLAGS=-stdlib=libc++"                   ], addons: *clang-6   }
     - { os: "osx"  , env: [ "B2_TOOLSET=clang",       "B2_CXXSTD=11,17" ]                     }
-                            
+
   # to enable Intel ICC define INTEL_ICC_SERIAL_NUMBER and the following:
   # - { os: "linux", env: [ "B2_TOOLSET=intel-linux", "B2_CXXSTD=11,14,17" ], addons: *gcc-7,
   #     script: cd $BOOST_ROOT/libs/$SELF && ci/travis/intelicc.sh                               }
 
     - os: linux
-      env: 
+      env:
         - COMMENT=codecov.io
         - B2_TOOLSET=gcc-7
         - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"

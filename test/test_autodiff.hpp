@@ -14,7 +14,6 @@
 
 #include <boost/mp11/integral.hpp>
 #include <boost/mp11/list.hpp>
-#include <boost/mp11/mpl.hpp>
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
 

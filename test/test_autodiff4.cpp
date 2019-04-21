@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, boost::mp11::mp_list<boost::multiprecision::cpp_bin_float_50>) {
   BOOST_MATH_STD_USING
 
   const T eps = 30 * std::numeric_limits<T>::epsilon();
@@ -71,7 +71,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
-
   using boost::multiprecision::min;
   using std::min;
 

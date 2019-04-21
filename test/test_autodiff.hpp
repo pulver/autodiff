@@ -156,11 +156,29 @@ static_assert(std::is_same<RandomSample<bmp::cpp_bin_float_50>::dist_t,
 
 }  // namespace test_detail
 
+// will be removed in a near-future PR
 template<typename T>
 static bool isZeroOrSubnormal(T t) noexcept {
   using boost::math::fpclassify;
   using boost::multiprecision::fpclassify;
   return fpclassify(t) == FP_ZERO || fpclassify(t) == FP_SUBNORMAL;
+}
+
+template<typename T>
+auto isNearZero(T t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::value, bool>::type
+{
+  using std::sqrt;
+  using boost::multiprecision::sqrt;
+  using boost::math::fpclassify;
+  using boost::multiprecision::fpclassify;
+  return fpclassify(t) == FP_ZERO || fpclassify(t) == FP_SUBNORMAL || boost::math::fpc::is_small(t, sqrt(std::numeric_limits<T>::epsilon()));
+}
+
+template<typename T>
+auto isNearZero(T t) noexcept -> typename std::enable_if<detail::is_fvar<T>::value, bool>::type
+{
+  using root_type = typename T::root_type;
+  return isNearZero(static_cast<root_type>(t));
 }
 
 template <typename T, int m = 3>

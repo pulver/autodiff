@@ -1095,7 +1095,7 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivati
 // f : order -> derivative(order)
 template<typename RealType, size_t Order>
 template<typename Func>
-fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const size_t order, const Func& f) const
+fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const size_t /*order*/, const Func& f) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
   fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i

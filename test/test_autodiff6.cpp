@@ -242,10 +242,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
 
-    BOOST_REQUIRE_CLOSE(erf(make_fvar<T, m>(x)), boost::math::erf(x),
-                        200 * test_constants::pct_epsilon());
-    BOOST_REQUIRE_CLOSE(erfc(make_fvar<T, m>(x)), boost::math::erfc(x),
-                        200 * test_constants::pct_epsilon());
+    BOOST_REQUIRE(isNearZero(fabs(erf(make_fvar<T, m>(x))-boost::math::erf(x))));
+    BOOST_REQUIRE(isNearZero(fabs(erfc(make_fvar<T, m>(x))-boost::math::erfc(x))));
   }
 }
 

@@ -11,13 +11,12 @@ import common ;
 project autodiff
     : requirements
     <implicit-dependency>/boost//headers
-    <include>$(BOOST_ROOT)
     <toolset>msvc:<exception-handling>on
     <toolset>msvc:<asynch-exceptions>off
     <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
-    <toolset>clang:<cxxflags>"-pedantic -Wextra"
-    <toolset>gcc:<cxxflags>"-pedantic -Wextra"
+    <toolset>clang:<cxxflags>"-Weverything -Wall -Wextra -pedantic -isystem ${BOOST_ROOT}"
+    <toolset>gcc:<cxxflags>"-Wall -Wextra -pedantic -isystem ${BOOST_ROOT}"
     : default-build
     <warnings>all
     ;

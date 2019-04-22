@@ -9,7 +9,7 @@ using namespace boost::math::differentiation;
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> a_sampler{-2000, 2000};
@@ -24,16 +24,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       auto a_ = abs(a) + 1;
       auto b_ = abs(b) + 1;
       try {
-        auto autodiff_v = static_cast<T>(boost::math::beta(
-            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z)));
-        auto anchor_v = static_cast<T>(boost::math::beta(a_, b_, z));
-        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        auto autodiff_v = boost::math::beta(
+            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::beta(a_, b_, z);
+        /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
           BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
           BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
         } else {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
-        }
+        }*/
+        BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
       } catch (const boost::math::evaluation_error &) {
         BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(a_),
                                               make_fvar<T, m>(b_),
@@ -51,16 +52,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       }
 
       try {
-        auto autodiff_v = static_cast<T>(boost::math::betac(
-            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z)));
-        auto anchor_v = static_cast<T>(boost::math::betac(a_, b_, z));
-        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        auto autodiff_v = boost::math::betac(
+            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::betac(a_, b_, z);
+        BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
           BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
           BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
         } else {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
-        }
+        }*/
       } catch (const boost::math::evaluation_error &) {
         BOOST_REQUIRE_THROW(boost::math::betac(make_fvar<T, m>(a_),
                                                make_fvar<T, m>(b_),
@@ -79,17 +81,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 
 
       try {
-        auto autodiff_v =
-            static_cast<T>(boost::math::ibeta(make_fvar<T, m>(a_ - 1), make_fvar<T, m>(b_ - 1),
-                               make_fvar<T, m>(z)));
-        auto anchor_v = static_cast<T>(boost::math::ibeta(a_ - 1, b_ - 1, z));
-        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a_ - 1), make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::ibeta(a_ - 1, b_ - 1, z);
+        BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
           BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
           BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
         } else {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
-        }
+        }*/
       } catch (const boost::math::evaluation_error &) {
         BOOST_REQUIRE_THROW(boost::math::ibeta(make_fvar<T, m>(a_ - 1),
                                                make_fvar<T, m>(b_ - 1),
@@ -108,16 +109,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 
       try {
         auto autodiff_v =
-            static_cast<T>(boost::math::ibetac(make_fvar<T, m>(a_ - 1),
-                                make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z)));
-        auto anchor_v = static_cast<T>(boost::math::ibetac(a_ - 1, b_ - 1, z));
-        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+            boost::math::ibetac(make_fvar<T, m>(a_ - 1),
+                                make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::ibetac(a_ - 1, b_ - 1, z);
+        BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
           BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
           BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
         } else {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
-        }
+        }*/
       } catch (const std::overflow_error &) {
         BOOST_REQUIRE_THROW(boost::math::ibetac(make_fvar<T, m>(a_ - 1),
                                                 make_fvar<T, m>(b_ - 1),
@@ -126,17 +128,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         BOOST_REQUIRE_THROW(boost::math::ibetac(a_ - 1, b_ - 1, z),
                             boost::wrapexcept<std::overflow_error>);
       }
+
       try {
-        auto autodiff_v = static_cast<T>(boost::math::ibeta_derivative(
-            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z)));
-        auto anchor_v = static_cast<T>(boost::math::ibeta_derivative(a_, b_, z));
-        if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+        auto autodiff_v = boost::math::ibeta_derivative(
+            make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+        auto anchor_v = boost::math::ibeta_derivative(a_, b_, z);
+        BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
           BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
           BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
         } else {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
-        }
+        }*/
       } catch (const boost::math::evaluation_error &) {
         BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                           make_fvar<T, m>(b_),
@@ -155,16 +159,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
 
       {
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibeta_inv(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibeta_inv<T>(a_, b_, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibeta_inv(
+              make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                             make_fvar<T, m>(b_),
@@ -182,16 +187,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         }
 
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibetac_inv<autodiff_fvar<T, m>>(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibetac_inv<T>(a_, b_, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibetac_inv<autodiff_fvar<T, m>>(
+              make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                             make_fvar<T, m>(b_),
@@ -211,16 +217,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
       {
         auto b_norm = b_sampler.normalize(abs(b));
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibeta_inva(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibeta_inva(a_, b_norm, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta_inva(a_, b_norm, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibeta_inva(make_fvar<T, m>(a_),
                                                       make_fvar<T, m>(b_norm),
@@ -238,16 +244,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         }
 
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibetac_inva(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibetac_inva(a_, b_norm, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibetac_inva(
+              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac_inva(a_, b_norm, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibetac_inva(make_fvar<T, m>(a_),
                                                        make_fvar<T, m>(b_norm),
@@ -265,16 +272,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         }
 
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibeta_invb(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibeta_invb(a_, b_norm, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibeta_invb(
+              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibeta_invb(a_, b_norm, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibeta_invb(make_fvar<T, m>(a_),
                                                       make_fvar<T, m>(b_norm),
@@ -292,16 +300,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
         }
 
         try {
-          auto autodiff_v = static_cast<T>(boost::math::ibetac_invb(
-              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z)));
-          auto anchor_v = static_cast<T>(boost::math::ibetac_invb(a_, b_norm, z));
-          if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
+          auto autodiff_v = boost::math::ibetac_invb(
+              make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
+          auto anchor_v = boost::math::ibetac_invb(a_, b_norm, z);
+          BOOST_TEST_REQUIRE(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          /*if (isZeroOrSubnormal(autodiff_v) || isZeroOrSubnormal(anchor_v)) {
             BOOST_REQUIRE_SMALL(autodiff_v, std::numeric_limits<T>::epsilon());
             BOOST_REQUIRE_SMALL(anchor_v, std::numeric_limits<T>::epsilon());
           } else {
             BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                                 1e4*test_constants::pct_epsilon());
-          }
+          }*/
         } catch (const boost::math::evaluation_error &) {
           BOOST_REQUIRE_THROW(boost::math::ibetac_invb(make_fvar<T, m>(a_),
                                                        make_fvar<T, m>(b_norm),
@@ -421,8 +430,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
-    auto autodiff_v = static_cast<T>(boost::math::digamma(make_fvar<T, m>(x)));
-    auto anchor_v = static_cast<T>(boost::math::digamma(x));
+    auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
+    auto anchor_v = boost::math::digamma(x);
     BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                         1e4 * test_constants::pct_epsilon());
   }

@@ -188,6 +188,7 @@ template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type /* !is_fvar */,
                                                                   SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const RealType zero(0);
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
   const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;

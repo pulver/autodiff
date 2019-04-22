@@ -48,10 +48,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, boost::mp11::mp_list<boost::multiprecision::cpp_bin_float_50>) {
+#if defined(BOOST_VERSION) && BOOST_VERSION >= 107000
+BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   BOOST_MATH_STD_USING
 
-  const T eps = 30 * std::numeric_limits<T>::epsilon();
+  const T eps = 3000 * std::numeric_limits<T>::epsilon();
   constexpr std::size_t Nw = 3;
   constexpr std::size_t Nx = 2;
   constexpr std::size_t Ny = 4;
@@ -69,6 +70,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, boost::mp11::mp_list<boost::mul
   const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
   BOOST_REQUIRE_LT(relative_error, eps);
 }
+#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
   using boost::multiprecision::min;

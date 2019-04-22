@@ -658,6 +658,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator*=(const fvar<RealType2,Order2>& cr)
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const promote<RealType,RealType2> zero(0);
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order <= Order2)
     for (size_t i=0, j=Order ; i<=Order ; ++i, --j)
@@ -682,6 +683,7 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator/=(const fvar<RealType2,Order2>& cr)
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const RealType zero(0);
   v.front() /= cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
@@ -786,6 +788,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator*(const fvar<RealType2,Order2>& cr) const
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const promote<RealType,RealType2> zero(0);
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
@@ -816,6 +819,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator/(const fvar<RealType2,Order2>& cr) const
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const promote<RealType,RealType2> zero(0);
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   retval.v.front() = v.front() / cr.v.front();
@@ -849,6 +853,7 @@ fvar<RealType,Order> fvar<RealType,Order>::operator/(const root_type& ca) const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> operator/(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   fvar<RealType,Order> retval;
   retval.v.front() = ca / cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
@@ -1078,13 +1083,13 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivati
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
     promote<fvar<RealType,Order>,Fvar,Fvars...> accumulator = cr.apply_derivatives_nonhorner(
-        order, [&f](auto... indices) { return f(0,indices...); }, std::forward<Fvars>(fvars)...);
+        order, [&f](auto... indices) { return f(0,static_cast<std::size_t>(indices)...); }, std::forward<Fvars>(fvars)...);
     const size_t i_max = (std::min)(order, order_sum);
     for (size_t i=1 ; i<=i_max ; ++i)
     { // accumulator += (epsilon_i *= epsilon) * (f(i) / factorial<root_type>(i));
       epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
       accumulator += epsilon_i.epsilon_multiply(i, 0, cr.apply_derivatives_nonhorner(
-            order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...)
+            order-i, [&f,i](auto... indices) { return f(i,static_cast<std::size_t>(indices)...); }, std::forward<Fvars>(fvars)...)
             / factorial<root_type>(static_cast<unsigned>(i)), 0, 0);
     }
     return accumulator;
@@ -1098,7 +1103,7 @@ fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const siz
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
   fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
-  fvar<RealType,Order> accumulator = fvar<RealType,Order>(f(0));
+  fvar<RealType,Order> accumulator = fvar<RealType,Order>(f(0u));
   for (size_t i=1 ; i<=order_sum ; ++i)
   { // accumulator += (epsilon_i *= epsilon) * (f(i) / factorial<root_type>(i));
     epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
@@ -1114,7 +1119,7 @@ template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, Orders... orders) const
 {
     if constexpr (0 < sizeof...(Orders))
-        return v.at(order).at(orders...);
+        return v.at(order).at(static_cast<std::size_t>(orders)...);
     else
         return v.at(order);
 }
@@ -1127,7 +1132,7 @@ template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(orders...) * (... * factorial<root_type>(static_cast<unsigned>(orders)));
+  return at(static_cast<std::size_t>(orders)...) * (... * factorial<root_type>(static_cast<unsigned>(orders)));
 }
 #endif
 
@@ -1148,6 +1153,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
+    using ssize_t = typename std::make_signed<std::size_t>::type;
     const RealType zero(0);
     const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
     const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
@@ -1158,7 +1164,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
             retval.v[j] = epsilon_inner_product(z0, isum0, m0, cr, z1, isum1, m1, j);
     else
         for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
-            retval.v[j] = std::inner_product(v.cbegin()+m0, v.cend()-(i+m1), cr.v.crbegin()+(i+m0), zero);
+            retval.v[j] = std::inner_product(v.cbegin()+ssize_t(m0), v.cend()-ssize_t(i+m1), cr.v.crbegin()+ssize_t(i+m0), zero);
     return retval;
 }
 #endif
@@ -1387,6 +1393,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 {
   using std::sqrt;
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   root_type derivatives[order+1];
@@ -1779,6 +1786,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
   using boost::math::lambert_w0;
   using std::exp;
   using root_type = typename fvar<RealType,Order>::root_type;
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   root_type derivatives[order+1];
   *derivatives = lambert_w0(static_cast<root_type>(cr));

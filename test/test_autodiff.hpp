@@ -6,10 +6,13 @@
 #ifndef BOOST_MATH_TEST_AUTODIFF_HPP
 #define BOOST_MATH_TEST_AUTODIFF_HPP
 
+#ifndef BOOST_TEST_MODULE
+#define BOOST_TEST_MODULE test_autodiff
+#endif
+
 #include <boost/math/tools/config.hpp>
 
 #include <boost/math/differentiation/autodiff.hpp>
-#include <boost/math/tools/big_constant.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
 
@@ -23,14 +26,11 @@
 #include <cstdlib>
 #include <random>
 
-#define BOOST_TEST_MODULE test_autodiff
 #include <boost/test/included/unit_test.hpp>
 
 namespace mp11 = boost::mp11;
 namespace bmp = boost::multiprecision;
 
-// using bin_float_types = mp_list<float,double,long
-// double,bmp::cpp_bin_float_50>;
 #if defined(BOOST_USE_VALGRIND) || defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
 using bin_float_types = mp11::mp_list<float>;
 #else
@@ -40,14 +40,13 @@ using bin_float_types = mp11::mp_list<float, double, long double>;
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 /*using multiprecision_float_types =
     mp_list<bmp::cpp_dec_float_50, bmp::cpp_bin_float_50>;*/
-/*
+
 #if !defined(BOOST_VERSION) || BOOST_VERSION < 107000
 using multiprecision_float_types = mp11::mp_list<>;
 #else
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
-*/
-using multiprecision_float_types = mp11::mp_list<>;
+
 using all_float_types =
     mp11::mp_append<bin_float_types, multiprecision_float_types>;
 
@@ -153,16 +152,8 @@ static_assert(std::is_same<RandomSample<bmp::cpp_bin_float_50>::dist_t,
 
 }  // namespace test_detail
 
-// will be removed in a near-future PR
 template<typename T>
-static bool isZeroOrSubnormal(T t) noexcept {
-  using boost::math::fpclassify;
-  using boost::multiprecision::fpclassify;
-  return fpclassify(t) == FP_ZERO || fpclassify(t) == FP_SUBNORMAL;
-}
-
-template<typename T>
-auto isNearZero(T t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::value, bool>::type
+auto isNearZero(const T& t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::value, bool>::type
 {
   using std::sqrt;
   using boost::multiprecision::sqrt;
@@ -172,7 +163,7 @@ auto isNearZero(T t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::va
 }
 
 template<typename T>
-auto isNearZero(T t) noexcept -> typename std::enable_if<detail::is_fvar<T>::value, bool>::type
+auto isNearZero(const T& t) noexcept -> typename std::enable_if<detail::is_fvar<T>::value, bool>::type
 {
   using root_type = typename T::root_type;
   return isNearZero(static_cast<root_type>(t));

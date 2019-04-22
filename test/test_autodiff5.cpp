@@ -41,6 +41,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::beta(a_, b_, z),
                             boost::wrapexcept<boost::math::evaluation_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(boost::math::beta(make_fvar<T, m>(a_),
+                                              make_fvar<T, m>(b_),
+                                              make_fvar<T, m>(z)),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::beta(a_, b_, z),
+                            boost::wrapexcept<std::overflow_error>);
       }
 
       try {
@@ -61,7 +68,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::betac(a_, b_, z),
                             boost::wrapexcept<boost::math::evaluation_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(boost::math::betac(make_fvar<T, m>(a_),
+                                               make_fvar<T, m>(b_),
+                                               make_fvar<T, m>(z)),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::betac(a_, b_, z),
+                            boost::wrapexcept<std::overflow_error>);
       }
+
 
       try {
         auto autodiff_v =
@@ -82,7 +97,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::ibeta(a_ - 1, b_ - 1, z),
                             boost::wrapexcept<boost::math::evaluation_error>);
-      }
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(boost::math::ibeta(make_fvar<T, m>(a_ - 1),
+                                               make_fvar<T, m>(b_ - 1),
+                                               make_fvar<T, m>(z)),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::ibeta(a_ - 1, b_ - 1, z),
+                            boost::wrapexcept<std::overflow_error>);
+    }
 
       try {
         auto autodiff_v =
@@ -96,13 +118,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
           BOOST_REQUIRE_CLOSE(autodiff_v, anchor_v,
                               1e4*test_constants::pct_epsilon());
         }
-      } catch (const boost::math::evaluation_error &) {
+      } catch (const std::overflow_error &) {
         BOOST_REQUIRE_THROW(boost::math::ibetac(make_fvar<T, m>(a_ - 1),
                                                 make_fvar<T, m>(b_ - 1),
                                                 make_fvar<T, m>(z)),
-                            boost::wrapexcept<boost::math::evaluation_error>);
+                            boost::wrapexcept<std::overflow_error>);
         BOOST_REQUIRE_THROW(boost::math::ibetac(a_ - 1, b_ - 1, z),
-                            boost::wrapexcept<boost::math::evaluation_error>);
+                            boost::wrapexcept<std::overflow_error>);
       }
       try {
         auto autodiff_v = static_cast<T>(boost::math::ibeta_derivative(
@@ -122,6 +144,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                             boost::wrapexcept<boost::math::evaluation_error>);
         BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
                             boost::wrapexcept<boost::math::evaluation_error>);
+      } catch (const std::overflow_error &) {
+        BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
+                                                          make_fvar<T, m>(b_),
+                                                          make_fvar<T, m>(z)),
+                            boost::wrapexcept<std::overflow_error>);
+        BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
+                            boost::wrapexcept<std::overflow_error>);
       }
 
       {
@@ -137,12 +166,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                                 1e4*test_constants::pct_epsilon());
           }
         } catch (const boost::math::evaluation_error &) {
-          BOOST_REQUIRE_THROW(boost::math::ibeta_inv(make_fvar<T, m>(a_),
-                                                     make_fvar<T, m>(b_),
-                                                     make_fvar<T, m>(z)),
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
+                                                            make_fvar<T, m>(b_),
+                                                            make_fvar<T, m>(z)),
                               boost::wrapexcept<boost::math::evaluation_error>);
-          BOOST_REQUIRE_THROW(boost::math::ibeta_inv(a_, b_, z),
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
+                                                            make_fvar<T, m>(b_),
+                                                            make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
 
         try {
@@ -157,12 +193,19 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                                 1e4*test_constants::pct_epsilon());
           }
         } catch (const boost::math::evaluation_error &) {
-          BOOST_REQUIRE_THROW(boost::math::ibetac_inv(make_fvar<T, m>(a_),
-                                                      make_fvar<T, m>(b_),
-                                                      make_fvar<T, m>(z)),
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
+                                                            make_fvar<T, m>(b_),
+                                                            make_fvar<T, m>(z)),
                               boost::wrapexcept<boost::math::evaluation_error>);
-          BOOST_REQUIRE_THROW(boost::math::ibetac_inv(a_, b_, z),
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
+                                                            make_fvar<T, m>(b_),
+                                                            make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibeta_derivative(a_, b_, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
       }
       {
@@ -185,6 +228,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                               boost::wrapexcept<boost::math::evaluation_error>);
           BOOST_REQUIRE_THROW(boost::math::ibeta_inva(a_, b_norm, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibeta_inva(make_fvar<T, m>(a_),
+                                                      make_fvar<T, m>(b_norm),
+                                                      make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibeta_inva(a_, b_norm, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
 
         try {
@@ -205,6 +255,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                               boost::wrapexcept<boost::math::evaluation_error>);
           BOOST_REQUIRE_THROW(boost::math::ibetac_inva(a_, b_norm, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibetac_inva(make_fvar<T, m>(a_),
+                                                       make_fvar<T, m>(b_norm),
+                                                       make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibetac_inva(a_, b_norm, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
 
         try {
@@ -225,6 +282,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                               boost::wrapexcept<boost::math::evaluation_error>);
           BOOST_REQUIRE_THROW(boost::math::ibeta_invb(a_, b_norm, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibeta_invb(make_fvar<T, m>(a_),
+                                                      make_fvar<T, m>(b_norm),
+                                                      make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibeta_invb(a_, b_norm, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
 
         try {
@@ -245,6 +309,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, all_float_types) {
                               boost::wrapexcept<boost::math::evaluation_error>);
           BOOST_REQUIRE_THROW(boost::math::ibetac_invb(a_, b_norm, z),
                               boost::wrapexcept<boost::math::evaluation_error>);
+        } catch (const std::overflow_error &) {
+          BOOST_REQUIRE_THROW(boost::math::ibetac_invb(make_fvar<T, m>(a_),
+                                                       make_fvar<T, m>(b_norm),
+                                                       make_fvar<T, m>(z)),
+                              boost::wrapexcept<std::overflow_error>);
+          BOOST_REQUIRE_THROW(boost::math::ibetac_invb(a_, b_norm, z),
+                              boost::wrapexcept<std::overflow_error>);
         }
       }
     }

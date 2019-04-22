@@ -54,8 +54,6 @@ branches:
 
 script:
   - cd $BOOST_ROOT/libs/$SELF
-  - echo $(readlink -f "../../boost/math/special_functions/detail/lambert_w_lookup_table.ipp")
-  - echo $(pwd)
   - ci/travis/build.sh
 
 #

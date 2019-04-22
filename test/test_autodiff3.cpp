@@ -4,6 +4,7 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 #include "test_autodiff.hpp"
+#include <boost/utility/identity_type.hpp>
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 
@@ -104,7 +105,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, bin_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<double, long double>))) {
   using std::tanh;
   using std::pow;
   constexpr std::array<const char *, 6> tanh_derivatives
@@ -119,7 +120,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, bin_float_types) {
   auto x = make_fvar<T, m>(cx);
   auto t = tanh(x);
   for (auto i : boost::irange(tanh_derivatives.size())) {
-    BOOST_REQUIRE(isNearZero(fabs(t.derivative(i)-boost::lexical_cast<T>(tanh_derivatives[i]))));
+    BOOST_TEST_CHECK(isNearZero(fabs(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i]))));
   }
 }
 

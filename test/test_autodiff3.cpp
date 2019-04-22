@@ -105,6 +105,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
   }
 }
 
+#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
 BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<double, long double>))) {
   using std::tanh;
   using std::pow;
@@ -123,6 +124,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<d
     BOOST_TEST_REQUIRE(isNearZero(fabs(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i]))));
   }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(tan_test, T, bin_float_types) {
   BOOST_MATH_STD_USING

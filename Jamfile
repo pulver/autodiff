@@ -15,7 +15,7 @@ project autodiff
     <toolset>msvc:<asynch-exceptions>off
     <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
-    <toolset>clang:<cxxflags>"-Weverything -Wall -Wextra -pedantic -isystem ${BOOST_ROOT}"
+    <toolset>clang:<cxxflags>"-Weverything -Wall -Wextra -pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-header-hygiene -Wno-used-but-marked-unused -Wno-global-constructors -Wno-disabled-macro-expansion --system-header-prefix=${BOOST_ROOT}"
     <toolset>gcc:<cxxflags>"-Wall -Wextra -pedantic -isystem ${BOOST_ROOT}"
     : default-build
     <warnings>all

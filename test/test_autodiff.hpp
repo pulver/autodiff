@@ -6,7 +6,6 @@
 #ifndef BOOST_MATH_TEST_AUTODIFF_HPP
 #define BOOST_MATH_TEST_AUTODIFF_HPP
 
-#include <boost/config.hpp>
 #include <boost/math/tools/config.hpp>
 
 #include <boost/math/differentiation/autodiff.hpp>
@@ -37,9 +36,6 @@ using bin_float_types = mp11::mp_list<float>;
 #else
 using bin_float_types = mp11::mp_list<float, double, long double>;
 #endif
-
-//  cpp_bin_float_50 is fixed in boost 1.70
-// float blows up in unchecked_factorial
 
 // cpp_dec_float_50 cannot be used with close_at_tolerance
 /*using multiprecision_float_types =

@@ -6,7 +6,6 @@
 #ifndef BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
-#include <boost/config.hpp>
 #include <boost/math/tools/config.hpp>
 
 #include <boost/math/constants/constants.hpp>

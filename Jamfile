@@ -8,7 +8,7 @@
 
 import common ;
 
-project
+project autodiff
     : requirements
     <implicit-dependency>/boost//headers
     <include>$(BOOST_ROOT)
@@ -16,9 +16,10 @@ project
     <toolset>msvc:<asynch-exceptions>off
     <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
-    <toolset>gcc:<warnings>all
-    <toolset>clang:<warnings>all
+    <toolset>clang:<cxxflags>"-pedantic -Wextra"
+    <toolset>gcc:<cxxflags>"-pedantic -Wextra"
     : default-build
+    <warnings>all
     ;
 
 build-project test ;

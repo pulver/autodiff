@@ -7,16 +7,15 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 
 import testing ;
+import ../../config/checks/config : requires ;
 
-project boost/autodiff/test :
-;
-
-unit-test test_autodiff1 : test_autodiff1.cpp : ;
-unit-test test_autodiff2 : test_autodiff2.cpp : ;
-unit-test test_autodiff3 : test_autodiff3.cpp : ;
-unit-test test_autodiff4 : test_autodiff4.cpp : ;
-unit-test test_autodiff5 : test_autodiff5.cpp : ;
-unit-test test_autodiff6 : test_autodiff6.cpp : ;
-unit-test test_autodiff7 : test_autodiff7.cpp : ;
-unit-test test_autodiff8 : test_autodiff8.cpp : ;
-
+test-suite autodiff_tests
+    :   [ run test_autodiff1.cpp ]
+        [ run test_autodiff2.cpp ]
+        [ run test_autodiff3.cpp ]
+        [ run test_autodiff4.cpp ]
+        [ run test_autodiff5.cpp ]
+        [ run test_autodiff6.cpp ]
+        [ run test_autodiff7.cpp ]
+        [ run test_autodiff8.cpp ]
+    ;

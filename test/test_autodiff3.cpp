@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<d
   auto x = make_fvar<T, m>(cx);
   auto t = tanh(x);
   for (auto i : boost::irange(tanh_derivatives.size())) {
-    BOOST_TEST_CHECK(isNearZero(fabs(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i]))));
+    BOOST_TEST_REQUIRE(isNearZero(fabs(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i]))));
   }
 }
 

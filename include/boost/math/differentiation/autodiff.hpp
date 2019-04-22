@@ -662,13 +662,13 @@ fvar<RealType,Order>& fvar<RealType,Order>::operator*=(const fvar<RealType2,Orde
   const promote<RealType,RealType2> zero(0);
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order <= Order2)
     for (size_t i=0, j=Order ; i<=Order ; ++i, --j)
-      v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
+      v[j] = std::inner_product(v.cbegin(), v.cend()-ssize_t(i), cr.v.crbegin()+ssize_t(i), zero);
   else
   {
     for (size_t i=0, j=Order ; i<=Order-Order2 ; ++i, --j)
-      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+i, zero);
+      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+ssize_t(i), zero);
     for (size_t i=Order-Order2+1, j=Order2-1 ; i<=Order ; ++i, --j)
-      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+(j+1), v.crbegin()+i, zero);
+      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+ssize_t(j+1), v.crbegin()+ssize_t(i), zero);
   }
   return *this;
 }
@@ -687,10 +687,10 @@ fvar<RealType,Order>& fvar<RealType,Order>::operator/=(const fvar<RealType2,Orde
   v.front() /= cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, --j, --k)
-      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
+      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), v.crbegin()+ssize_t(k), zero)) /= cr.v.front();
   else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
-      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
+      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), v.crbegin()+ssize_t(k), zero)) /= cr.v.front();
   else
     for (size_t i=1 ; i<=Order ; ++i)
       v[i] /= cr.v.front();
@@ -791,10 +791,10 @@ fvar<RealType,Order>::operator*(const fvar<RealType2,Order2>& cr) const
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=0, j=Order, k=Order2 ; i<=Order2 ; ++i, j&&--j, --k)
-      retval.v[i] = std::inner_product(v.cbegin(), v.cend()-j, cr.v.crbegin()+k, zero);
+      retval.v[i] = std::inner_product(v.cbegin(), v.cend()-ssize_t(j), cr.v.crbegin()+ssize_t(k), zero);
   else
     for (size_t i=0, j=Order2, k=Order ; i<=Order ; ++i, j&&--j, --k)
-      retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-j, v.crbegin()+k, zero);
+      retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-ssize_t(j), v.crbegin()+ssize_t(k), zero);
   return retval;
 }
 
@@ -824,15 +824,15 @@ fvar<RealType,Order>::operator/(const fvar<RealType2,Order2>& cr) const
   {
     for (size_t i=1, j=Order2-1 ; i<=Order ; ++i, --j)
       retval.v[i] = (v[i] -
-          std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)) / cr.v.front();
+          std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(j+1), zero)) / cr.v.front();
     for (size_t i=Order+1, j=Order2-Order-1 ; i<=Order2 ; ++i, --j)
       retval.v[i] =
-          -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero) / cr.v.front();
+          -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(j+1), zero) / cr.v.front();
   }
   else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
       retval.v[i] =
-          (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero)) / cr.v.front();
+          (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(k), zero)) / cr.v.front();
   else
     for (size_t i=1 ; i<=Order ; ++i)
       retval.v[i] = v[i] / cr.v.front();
@@ -856,7 +856,7 @@ fvar<RealType,Order> operator/(const typename fvar<RealType,Order>::root_type& c
   {
     const RealType zero(0);
     for (size_t i=1, j=Order-1 ; i<=Order ; ++i, --j)
-      retval.v[i] = -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)
+      retval.v[i] = -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-ssize_t(j), retval.v.crbegin()+ssize_t(j+1), zero)
           / cr.v.front();
   }
   return retval;
@@ -1406,7 +1406,7 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 #endif
     for (size_t i=2 ; i<=order ; ++i)
     {
-      numerator *= -0.5 * ((i<<1)-3);
+      numerator *= root_type(-0.5) * ((ssize_t(i)<<1)-3);
       powers *= x;
       derivatives[i] = numerator / (powers * *derivatives);
     }
@@ -1442,13 +1442,13 @@ fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
   using std::frexp;
   using root_type = typename fvar<RealType,Order>::root_type;
   frexp(static_cast<root_type>(cr), exp);
-  return cr * exp2(-*exp);
+  return cr * static_cast<root_type>(exp2(-*exp));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
-  // argument to std::exp2 must be casted to RealType, otherwise std::exp2 returns double (always)
+  // argument to std::exp2 must be casted to root_type, otherwise std::exp2 returns double (always)
   using std::exp2;
   return cr * exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
@@ -1804,7 +1804,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
           (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];
         coef[0] *= -static_cast<root_type>(n-1);
         d1powers *= derivatives[1];
-        derivatives[n] = d1powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
+        derivatives[n] = d1powers * std::accumulate(coef.crend()-ssize_t(n-1), coef.crend(), coef[n-1],
                                                     [&x](const root_type& a, const root_type& b) { return a*x + b; });
       }
       return cr.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });

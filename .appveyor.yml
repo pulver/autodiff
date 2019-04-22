@@ -46,42 +46,6 @@ environment:
     B2_VARIANT: variant=release,debug
 
   matrix:
-    - FLAVOR: Visual Studio 2017 C++17 (Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2017 C++17 (Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2015 (Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2015 (Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
     - FLAVOR: cygwin (32-bit)
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ADDPATH: C:\cygwin\bin;
@@ -118,6 +82,42 @@ environment:
       B2_CXXSTD: 11,14,17
       B2_DEFINES: define=__USE_ISOC99
       SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: Visual Studio 2017 C++17 (Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      #B2_CXXFLAGS: cxxflags=-permissive-
+
+    - FLAVOR: Visual Studio 2017 C++17 (Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      #B2_CXXFLAGS: cxxflags=-permissive-
+
+    - FLAVOR: Visual Studio 2015 (Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      #B2_CXXFLAGS: cxxflags=-permissive-
+
+    - FLAVOR: Visual Studio 2015 (Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      #B2_CXXFLAGS: cxxflags=-permissive-
 
 install:
   - set SELF=%APPVEYOR_PROJECT_NAME:-=_%

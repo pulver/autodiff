@@ -7,6 +7,8 @@
 #define BOOST_MATH_TEST_AUTODIFF_HPP
 
 #include <boost/config.hpp>
+#include <boost/math/tools/config.hpp>
+
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/math/tools/big_constant.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>

@@ -41,9 +41,10 @@ using bin_float_types = mp11::mp_list<float, double, long double>;
 /*using multiprecision_float_types =
     mp_list<bmp::cpp_dec_float_50, bmp::cpp_bin_float_50>;*/
 
-#if !defined(BOOST_VERSION) || BOOST_VERSION < 107000
+#if !defined(BOOST_VERSION) || BOOST_VERSION < 107000 || defined(BOOST_USE_VALGRIND) || defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS) || defined(BOOST_NO_STRESS_TEST)
 using multiprecision_float_types = mp11::mp_list<>;
 #else
+#define BOOST_AUTODIFF_TEST_MULTIPRECISION
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
 
@@ -156,10 +157,12 @@ template<typename T>
 auto isNearZero(const T& t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::value, bool>::type
 {
   using std::sqrt;
-  using boost::multiprecision::sqrt;
+  using std::fabs;
+  using boost::multiprecision::fabs;
+  using boost::math::differentiation::detail::fabs;
   using boost::math::fpclassify;
   using boost::multiprecision::fpclassify;
-  return fpclassify(t) == FP_ZERO || fpclassify(t) == FP_SUBNORMAL || boost::math::fpc::is_small(t, sqrt(std::numeric_limits<T>::epsilon()));
+  return fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL || boost::math::fpc::is_small(fabs(t), sqrt(std::numeric_limits<T>::epsilon()));
 }
 
 template<typename T>
@@ -169,10 +172,10 @@ auto isNearZero(const T& t) noexcept -> typename std::enable_if<detail::is_fvar<
   return isNearZero(static_cast<root_type>(t));
 }
 
-template <typename T, int m = 3>
-using test_constants_t = test_detail::test_constants_t<T, mp11::mp_int<m>>;
+template <typename T, std::size_t m = 5>
+using test_constants_t = test_detail::test_constants_t<T, mp11::mp_size_t<m>>;
 
-template <typename W, typename X, typename Y, typename Z>
+``template <typename W, typename X, typename Y, typename Z>
 promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y,
                                      const Z& z) {
   return exp(w * sin(x * log(y) / z) + sqrt(w * z / (x * y))) + w * w / tan(z);

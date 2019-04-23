@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
   }
 }
 
-#if defined(BOOST_VERSION) && BOOST_VERSION >= 107000
+#if defined(BOOST_AUTODIFF_TEST_MULTIPRECISION)
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
   BOOST_MATH_STD_USING
 

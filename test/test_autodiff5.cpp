@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(binomial_hpp, T, all_float_types) {
     // This is a hard function to test for type float due to a specialization of boost::math::binomial_coefficient
     auto autodiff_v = std::is_same<T, float>::value ? make_fvar<T, m>(boost::math::binomial_coefficient<T>(n, r)) : boost::math::binomial_coefficient<T>(n, r);
     auto anchor_v = boost::math::binomial_coefficient<T>(n, r);
-    BOOST_CHECK_EQUAL(autodiff_v, anchor_v);
+    BOOST_CHECK_EQUAL(autodiff_v.derivative(0u), anchor_v);
   }
 }
 
@@ -285,8 +285,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cbrt_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    BOOST_CHECK_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)),
-                        boost::math::cbrt(x), 50 * test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(boost::math::cbrt(make_fvar<T, m>(x)).derivative(0u),
+                      boost::math::cbrt(x), 50 * test_constants::pct_epsilon());
   }
 }
 
@@ -300,15 +300,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       std::ignore = i;
       auto n = n_sampler.next();
       auto x = x_sampler.next();
-      BOOST_CHECK_CLOSE(boost::math::chebyshev_t(n, make_fvar<T, m>(x)),
+      BOOST_CHECK_CLOSE(boost::math::chebyshev_t(n, make_fvar<T, m>(x)).derivative(0u),
                           boost::math::chebyshev_t(n, x),
                           40 * test_constants::pct_epsilon());
 
-      BOOST_CHECK_CLOSE(boost::math::chebyshev_u(n, make_fvar<T, m>(x)),
+      BOOST_CHECK_CLOSE(boost::math::chebyshev_u(n, make_fvar<T, m>(x)).derivative(0u),
                           boost::math::chebyshev_u(n, x),
                           40 * test_constants::pct_epsilon());
 
-      BOOST_CHECK_CLOSE(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)),
+      BOOST_CHECK_CLOSE(boost::math::chebyshev_t_prime(n, make_fvar<T, m>(x)).derivative(0u),
                           boost::math::chebyshev_t_prime(n, x),
                           40 * test_constants::pct_epsilon());
 
@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cospi_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    BOOST_CHECK_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)),
+    BOOST_CHECK_CLOSE(boost::math::cos_pi(make_fvar<T, m>(x)).derivative(0u),
                         boost::math::cos_pi(x), test_constants::pct_epsilon());
   }
 }
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(digamma_hpp, T, all_float_types) {
     auto x = nextafter(x_sampler.next(), ((std::numeric_limits<T>::max))());
     auto autodiff_v = boost::math::digamma(make_fvar<T, m>(x));
     auto anchor_v = boost::math::digamma(x);
-    BOOST_CHECK_CLOSE(autodiff_v, anchor_v,
+    BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
                         1e4 * test_constants::pct_epsilon());
   }
 }

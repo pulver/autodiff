@@ -48,8 +48,7 @@ using multiprecision_float_types = mp11::mp_list<>;
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
 
-using all_float_types =
-    mp11::mp_append<bin_float_types, multiprecision_float_types>;
+using all_float_types = bin_float_types;
 
 using namespace boost::math::differentiation;
 

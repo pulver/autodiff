@@ -12,12 +12,19 @@ BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types) {
   using boost::math::lltrunc;
+  using boost::math::differentiation::detail::lltrunc;
+  using boost::multiprecision::lltrunc;
+  using boost::math::differentiation::detail::llround;
+  using boost::multiprecision::llround;
   using std::llround;
+  using boost::math::differentiation::detail::lround;
+  using boost::multiprecision::lround;
   using std::lround;
+  using boost::math::differentiation::detail::truncl;
   using std::truncl;
 
   constexpr std::size_t m = 3;
-  const T& cx = static_cast<T>(3.25);
+  const auto& cx = static_cast<T>(3.25);
   auto x = make_fvar<T, m>(cx);
   auto yl = lround(x);
   BOOST_CHECK_EQUAL(yl, lround(cx));
@@ -27,7 +34,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types)
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
   if constexpr (!boost::multiprecision::is_number<T>::value && !boost::multiprecision::is_number_expression<T>::value) {
-    BOOST_CHECK_EQUAL(truncl(x).derivative(0u), truncl(cx));
+    BOOST_CHECK_EQUAL(truncl(x), truncl(cx));
   }
 #endif
 }

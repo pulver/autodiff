@@ -1931,10 +1931,11 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
   using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template<typename ToType, typename RealType, std::size_t Order>
-inline ToType real_cast(const differentiation::detail::fvar<RealType, Order> &from_v)
+template<typename destination_t, typename RealType, std::size_t Order>
+inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order> &from_v)
 {
-  return static_cast<ToType>(static_cast<RealType>(from_v));
+  using root_type = typename differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>::type;
+  return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
 
 } // namespace tools

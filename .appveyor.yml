@@ -44,6 +44,7 @@ environment:
     # B2_LINK: link=shared,static
     # B2_THREADING: threading=multi,single
     B2_VARIANT: variant=release,debug
+    BOOST_BRANCH: master
 
   matrix:
     - FLAVOR: Visual Studio 2017 C++17 (static Linking)

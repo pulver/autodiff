@@ -50,7 +50,6 @@ branches:
   only:
     - develop
     - master
-    - /feature\/.*/
 
 script:
   - cd $BOOST_ROOT/libs/$SELF

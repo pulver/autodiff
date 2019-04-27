@@ -14,6 +14,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/mp11/function.hpp>
+#include <boost/utility/identity_type.hpp>
 
 #include <algorithm>
 #include <array>
@@ -1932,11 +1933,12 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
 };
 
 template<typename destination_t, typename RealType, std::size_t Order>
-inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order> &from_v)
+inline destination_t real_cast(const differentiation::detail::fvar<RealType, Order>& from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(typename BOOST_IDENTITY_TYPE((differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>))::type))
 {
   using root_type = typename differentiation::detail::get_root_type<differentiation::detail::fvar<RealType, Order>>::type;
   return static_cast<destination_t>(static_cast<root_type>(from_v));
 }
+
 
 } // namespace tools
 

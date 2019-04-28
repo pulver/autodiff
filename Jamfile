@@ -14,7 +14,8 @@ project autodiff
     <toolset>msvc:<asynch-exceptions>off
     <toolset>msvc:<extern-c-nothrow>on
     <toolset>msvc:<cxxflags>/bigobj
-    <toolset>msvc:<cxxflags>/permissive-
+    <toolset>msvc-14.1:<cxxflags>/permissive-
+    <toolset>msvc-14.2:<cxxflags>/permissive-
     <toolset>msvc:<cxxflags>/wd4244
     <toolset>msvc:<cxxflags>/wd4305
     <toolset>msvc:<cxxflags>/wd4701

@@ -725,7 +725,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator+(const fvar<RealType2,Order2>& cr) const
 {
-  promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval{};
+  promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     retval.v[i] = v[i] + cr.v[i];
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
@@ -756,7 +756,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator-(const fvar<RealType2,Order2>& cr) const
 {
-  promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval{};
+  promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     retval.v[i] = v[i] - cr.v[i];
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)

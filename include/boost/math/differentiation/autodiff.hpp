@@ -1457,8 +1457,9 @@ fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
-{
-  BOOST_MATH_STD_USING
+{  
+  using std::exp2;
+  using std::frexp;
   using multiprecision::exp2;
   using multiprecision::frexp;
 
@@ -1471,7 +1472,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
   // argument to std::exp2 must be casted to root_type, otherwise std::exp2 returns double (always)
-  BOOST_MATH_STD_USING
+  using std::exp2;
   using multiprecision::exp2;
   return cr * exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
@@ -1921,7 +1922,7 @@ long long llround(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 long long lltrunc(const fvar<RealType,Order>& cr)
 {
-  BOOST_MATH_STD_USING
+  using math::lltrunc;
   using multiprecision::lltrunc;
   return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }

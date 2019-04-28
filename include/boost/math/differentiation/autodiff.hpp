@@ -1439,20 +1439,20 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 
 // Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
 template<typename RealType, size_t Order>
-fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
+fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 {
-  BOOST_MATH_STD_USING
-  using multiprecision::log;
-  using root_type = typename fvar<RealType,Order>::root_type;
-  constexpr size_t order = fvar<RealType,Order>::order_sum;
-  const auto& d0 = log(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-    return fvar<RealType,Order>(d0);
-  else
-  {
-    const auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
-    return cr.apply_coefficients_nonhorner([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
-  }
+	using std::log;
+	using multiprecision::log;
+	using root_type = typename fvar<RealType, Order>::root_type;
+	constexpr size_t order = fvar<RealType, Order>::order_sum;
+	const auto d0 = log(static_cast<root_type>(cr));
+	if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+	  return fvar<RealType, Order>(d0);
+	else
+	{
+	  const auto d1 = make_fvar<root_type, order - 1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
+	  return cr.apply_coefficients_nonhorner([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+	}
 }
 
 template<typename RealType, size_t Order>
@@ -1977,7 +1977,7 @@ struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1
 template<typename destination_t, typename RealType, std::size_t Order>
 inline BOOST_MATH_CONSTEXPR destination_t real_cast(differentiation::detail::fvar<RealType, Order> from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType))
 {
-  return static_cast<destination_t>(static_cast<RealType>(from_v));
+	return static_cast<destination_t>(static_cast<RealType>(from_v));
 }
 
 

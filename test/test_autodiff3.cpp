@@ -9,10 +9,6 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_test, T, all_float_types) {
-  using boost::math::atanh;
-  using boost::math::differentiation::detail::atanh;
-  using boost::multiprecision::atanh;
-
   const T eps = 3000 * test_constants_t<T>::pct_epsilon();  // percent
   constexpr unsigned m = 5;
   const T cx = 0.5;

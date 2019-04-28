@@ -40,7 +40,7 @@ install:
   - ls /home/travis/build/kedarbhat/autodiff/
   - ls /home/travis/build/kedarbhat/autodiff/tools
   - echo "${TRAVIS_BUILD_DIR}"
-  - source $TRAVIS_BUILD_DIR/tools/travis-install.sh
+  - $TRAVIS_BUILD_DIR/tools/travis-install.sh
 
 addons:
   apt:

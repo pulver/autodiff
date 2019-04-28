@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
       "1976.3196007477977177798818752904187209081211892187"
       "5499076582535951111845769110560421820940516423255314");
   // BOOST_CHECK_CLOSE(v.derivative(Nw,Nx,Ny,Nz), answer, eps); // Doesn't work for cpp_dec_float
-  const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz).derivative(0u) / answer - 1));
+  const T relative_error = static_cast<T>(fabs(v.derivative(Nw, Nx, Ny, Nz) / answer - 1));
   BOOST_CHECK_LT(relative_error, eps);
 }
 #endif

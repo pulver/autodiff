@@ -177,6 +177,7 @@ using test_constants_t = test_detail::test_constants_t<T, mp11::mp_size_t<m>>;
 template <typename W, typename X, typename Y, typename Z>
 promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y,
                                      const Z& z) {
+
   return exp(w * sin(x * log(y) / z) + sqrt(w * z / (x * y))) + w * w / tan(z);
 }
 

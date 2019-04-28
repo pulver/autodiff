@@ -42,7 +42,7 @@ install:
   - echo "${TRAVIS_BUILD_DIR}"
   - cd $TRAVIS_BUILD_DIR/tools
   - ls ./
-  - source ./travis-install.sh
+  - source ./travis_install.sh
 
 addons:
   apt:

@@ -37,8 +37,7 @@ env:
 install:
   - git clone https://github.com/boostorg/boost-ci.git boost-ci
   - cp -pr boost-ci/ci boost-ci/.codecov.yml .
-  - ls $TRAVIS_BUILD_DIR
-  - source ./tools/travis-install.sh
+  - source $TRAVIS_BUILD_DIR/tools/travis-install.sh
 
 addons:
   apt:

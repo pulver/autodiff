@@ -47,6 +47,38 @@ environment:
     BOOST_BRANCH: master
 
   matrix:
+    - FLAVOR: Visual Studio 2017 C++17 (Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1      
+
+    - FLAVOR: Visual Studio 2017 C++17 (Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1      
+
+    - FLAVOR: Visual Studio 2015 (Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14      
+
+    - FLAVOR: Visual Studio 2015 (Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      
     - FLAVOR: mingw32
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: i686
@@ -72,14 +104,14 @@ environment:
       B2_VARIANT: variant=release
       SCRIPT: ci\appveyor\mingw.bat
 
-    # - FLAVOR: mingw64
-    #   APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    #   ARCH: x86_64
-    #   B2_ADDRESS_MODEL: address-model=64
-    #   B2_CXXSTD: 17
-    #   B2_DEFINES: define=__USE_ISOC99
-    #   B2_VARIANT: variant=debug
-    #   SCRIPT: ci\appveyor\mingw.bat
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_CXXSTD: 17
+      B2_DEFINES: define=__USE_ISOC99
+      B2_VARIANT: variant=debug
+      SCRIPT: ci\appveyor\mingw.bat
 
     - FLAVOR: cygwin (32-bit)
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
@@ -101,43 +133,7 @@ environment:
       # https://github.com/boostorg/test/issues/144
       B2_DEFINES: define=_POSIX_C_SOURCE=200112L define=__USE_ISOC99
       B2_THREADING: threadapi=pthread
-      B2_TOOLSET: gcc
-
-    - FLAVOR: Visual Studio 2017 C++17 (Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2017 C++17 (Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2015 (Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      #B2_CXXFLAGS: cxxflags=-permissive-
-
-    - FLAVOR: Visual Studio 2015 (Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      #B2_CXXFLAGS: cxxflags=-permissive-
+      B2_TOOLSET: gcc     
 
 install:
   - set SELF=%APPVEYOR_PROJECT_NAME:-=_%

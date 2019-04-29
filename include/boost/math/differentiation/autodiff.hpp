@@ -13,6 +13,7 @@
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/mp11/function.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>
 #include <array>
@@ -22,7 +23,6 @@
 #include <numeric>
 #include <ostream>
 #include <type_traits>
-#include <boost/multiprecision/rational_adaptor.hpp>
 
 // Automatic Differentiation v1
 namespace boost { namespace math { namespace differentiation { inline namespace autodiff_v1 {
@@ -30,8 +30,8 @@ namespace boost { namespace math { namespace differentiation { inline namespace 
 namespace detail {
 
 template<typename RealType, typename... RealTypes>
-struct promote_args_n { using type = typename tools::promote_args_2<RealType,
-                                                                                 typename promote_args_n<RealTypes...>::type>::type; };
+struct promote_args_n { using type = typename tools::promote_args_2<RealType, 
+	                                                                typename promote_args_n<RealTypes...>::type>::type; };
 
 template<typename RealType>
 struct promote_args_n<RealType> { using type = typename tools::promote_arg<RealType>::type; };
@@ -1246,16 +1246,20 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 #endif
 
 template<typename RealType, size_t Order>
-template<typename T>
-fvar<RealType,Order>::operator T() const
-{
-	return static_cast<T>(v.front());
-}
-
-template<typename RealType, size_t Order>
 fvar<RealType, Order>::operator root_type() const
 {
 	return static_cast<root_type>(v.front());
+}
+
+template<typename RealType, size_t Order>
+template<typename T>
+fvar<RealType,Order>::operator T() const
+{
+	if BOOST_AUTODIFF_IF_CONSTEXPR (multiprecision::is_number<root_type>::value) {
+		return tools::real_cast<T>(static_cast<root_type>(v.front()));
+	} else {
+		return static_cast<T>(static_cast<root_type>(v.front()));
+	}
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1948,13 +1952,20 @@ class numeric_limits<boost::math::differentiation::detail::fvar<RealType,Order>>
 } // namespace std
 
 namespace boost { namespace math { namespace tools {
+namespace detail {
+template<typename RealType, std::size_t Order>
+using autodiff_fvar_type = differentiation::detail::fvar<RealType, Order>;
+
+template<typename RealType, std::size_t Order>
+using autodiff_root_type = typename autodiff_fvar_type<RealType, Order>::root_type;
+} // namespace detail
 
 // See boost/math/tools/promotion.hpp
 template<typename RealType0, size_t Order0, typename RealType1, size_t Order1>
-struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
-                      differentiation::detail::fvar<RealType1, Order1>>
+struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>,
+                      detail::autodiff_fvar_type<RealType1, Order1>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
+  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
            (std::max)(Order0,Order1)>;
 #else
@@ -1962,24 +1973,29 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 #endif
 };
 
-template<typename RealType0, size_t Order0, typename RealType1>
-struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1>
+template<typename RealType, size_t Order>
+struct promote_args<detail::autodiff_fvar_type<RealType, Order>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
+	using type = detail::autodiff_fvar_type<typename promote_args<RealType>::type, Order>;
+};
+
+template<typename RealType0, size_t Order0, typename RealType1>
+struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>, RealType1>
+{
+  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order0>;
 };
 
 template<typename RealType0, typename RealType1, size_t Order1>
-struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>>
+struct promote_args_2<RealType0, detail::autodiff_fvar_type<RealType1, Order1>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
+  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
 template<typename destination_t, typename RealType, std::size_t Order>
-inline BOOST_MATH_CONSTEXPR destination_t real_cast(differentiation::detail::fvar<RealType, Order> from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType))
+inline BOOST_MATH_CONSTEXPR destination_t real_cast(const detail::autodiff_fvar_type<RealType, Order>& from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType))
 {
-	return static_cast<destination_t>(static_cast<RealType>(from_v));
+	return real_cast<destination_t>(static_cast<detail::autodiff_root_type<RealType, Order>>(from_v));
 }
-
 
 } // namespace tools
 

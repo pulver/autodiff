@@ -5,8 +5,6 @@
 
 #include "test_autodiff.hpp"
 
-using namespace boost::math::differentiation;
-
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {

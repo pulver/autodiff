@@ -5,13 +5,11 @@
 
 #include "test_autodiff.hpp"
 
-using namespace boost::math::differentiation;
+BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 
 /*********************************************************************************************************************
  * special functions tests
  *********************************************************************************************************************/
-
-BOOST_AUTO_TEST_SUITE(test_autodiff_6)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;

@@ -20,13 +20,12 @@
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <algorithm>
 #include <cfenv>
 #include <cstdlib>
 #include <random>
-
-#include <boost/test/included/unit_test.hpp>
 
 namespace mp11 = boost::mp11;
 namespace bmp = boost::multiprecision;
@@ -48,7 +47,7 @@ using multiprecision_float_types = mp11::mp_list<>;
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
 
-using all_float_types = bin_float_types;
+using all_float_types = mp11::mp_append<bin_float_types, mp11::mp_list<>>;
 
 using namespace boost::math::differentiation;
 

@@ -4,23 +4,20 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 #include "test_autodiff.hpp"
-#include <boost/test/tools/floating_point_comparison.hpp>
-
-using namespace boost::math::differentiation;
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_4)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(lround_llround_lltrunc_truncl, T, all_float_types) {
   using boost::math::lltrunc;
-  using boost::math::differentiation::detail::lltrunc;
+  using detail::lltrunc;
   using boost::multiprecision::lltrunc;
-  using boost::math::differentiation::detail::llround;
+  using detail::llround;
   using boost::multiprecision::llround;
-  using std::llround;
-  using boost::math::differentiation::detail::lround;
+  using boost::math::llround;
+  using detail::lround;
   using boost::multiprecision::lround;
-  using std::lround;
-  using boost::math::differentiation::detail::truncl;
+  using boost::math::lround;
+  using detail::truncl;
   using std::truncl;
 
   constexpr std::size_t m = 3;

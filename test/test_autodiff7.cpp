@@ -8,6 +8,7 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_7)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(expm1_hpp, T, all_float_types) {
+  using std::log;
   using boost::multiprecision::log;
   using boost::math::differentiation::detail::log;
   using test_constants = test_constants_t<T>;

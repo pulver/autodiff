@@ -4,6 +4,7 @@
 //           https://www.boost.org/LICENSE_1_0.txt)
 
 #include "test_autodiff.hpp"
+#include <boost/utility/identity_type.hpp>
 
 BOOST_AUTO_TEST_SUITE(test_autodiff_3)
 

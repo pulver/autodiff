@@ -20,7 +20,7 @@
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
-#include <boost/test/unit_test.hpp>
+#include <boost/test/included/unit_test.hpp>
 
 #include <algorithm>
 #include <cfenv>

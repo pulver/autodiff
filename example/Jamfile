@@ -12,7 +12,9 @@ import ../../config/checks/config : requires ;
 test-suite autodiff_example
     :   [ run atan2.cpp ]
         [ run black_scholes.cpp ]
-        [ run fourth_power.cpp ]        
+        [ run fourth_power.cpp ]
+        [ run mixed_partials.cpp ]
+        [ run multiprecision.cpp ]
         [ run simple.cpp ]
     ;
 

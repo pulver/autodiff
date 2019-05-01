@@ -43,11 +43,11 @@ using bin_float_types = mp11::mp_list<float, double, long double>;
 #if !defined(BOOST_VERSION) || BOOST_VERSION < 107000 || defined(BOOST_USE_VALGRIND) || defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS) || defined(BOOST_NO_STRESS_TEST)
 using multiprecision_float_types = mp11::mp_list<>;
 #else
-#define BOOST_AUTODIFF_TEST_MULTIPRECISION
+#define BOOST_AUTODIFF_TESTING_INCLUDE_MULTIPRECISION
 using multiprecision_float_types = mp11::mp_list<bmp::cpp_bin_float_50>;
 #endif
 
-using all_float_types = mp11::mp_append<bin_float_types, mp11::mp_list<>>;
+using all_float_types = mp11::mp_append<bin_float_types, multiprecision_float_types>;
 
 using namespace boost::math::differentiation;
 

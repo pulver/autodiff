@@ -13,6 +13,7 @@
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
 #include <boost/mp11/function.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>
@@ -30,8 +31,7 @@ namespace boost { namespace math { namespace differentiation { inline namespace 
 namespace detail {
 
 template<typename RealType, typename... RealTypes>
-struct promote_args_n { using type = typename tools::promote_args_2<RealType, 
-	                                                                typename promote_args_n<RealTypes...>::type>::type; };
+struct promote_args_n { using type = typename tools::promote_args_2<RealType, typename promote_args_n<RealTypes...>::type>::type; };
 
 template<typename RealType>
 struct promote_args_n<RealType> { using type = typename tools::promote_arg<RealType>::type; };
@@ -46,17 +46,40 @@ namespace detail {
 template<typename RealType, size_t Order>
 class fvar;
 
+// Compile-time test for fvar<> type.
+template<typename T>
+struct is_fvar_t : std::false_type{};
+
+template<typename RealType, size_t Order>
+struct is_fvar_t<fvar<RealType,Order>> : std::true_type {};
+
+template<typename T>
+using is_fvar = is_fvar_t<decay_t<T>>;
+
+template<typename RealType, size_t Order, size_t... Orders> // specialized for fvar<> below.
+struct nest_fvar { using type = fvar<typename nest_fvar<RealType,Orders...>::type,Order>; };
+
+template<typename RealType, size_t Order>
+struct nest_fvar<RealType,Order> { using type = fvar<RealType,Order>; };
+
+
 template <typename>
-struct get_depth : std::integral_constant<size_t, 0> {};
+struct get_depth_t : std::integral_constant<size_t, 0> {};
 
 template <typename RealType, size_t Order>
-struct get_depth<fvar<RealType,Order>> : std::integral_constant<size_t,get_depth<RealType>::value+1> {};
+struct get_depth_t<fvar<RealType,Order>> : std::integral_constant<size_t, get_depth_t<RealType>::value+1> {};
+
+template<typename T>
+using get_depth = get_depth_t<decay_t<T>>;
 
 template <typename>
-struct get_order_sum : std::integral_constant<size_t, 0> {};
+struct get_order_sum_t : std::integral_constant<size_t, 0> {};
 
 template <typename RealType, size_t Order>
-struct get_order_sum<fvar<RealType,Order>> : std::integral_constant<size_t,get_order_sum<RealType>::value+Order> {};
+struct get_order_sum_t<fvar<RealType,Order>> : std::integral_constant<size_t, get_order_sum_t<RealType>::value+Order> {};
+
+template<typename T>
+using get_order_sum = get_order_sum_t<decay_t<T>>;
 
 // Get non-fvar<> root type T of autodiff_fvar<T,O0,O1,O2,...>.
 template<typename RealType>
@@ -64,6 +87,7 @@ struct get_root_type { using type = RealType; };
 
 template<typename RealType, size_t Order>
 struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
+
 
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
@@ -278,9 +302,9 @@ class fvar
   static constexpr size_t order_sum = get_order_sum<fvar>::value;
 
   explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
-    
-  template<typename T>
-  explicit operator T() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+
+  template<typename T, typename = typename boost::enable_if<boost::is_arithmetic<decay_t<T>>>::type>
+  explicit operator T() const; // Must be explicit; multiprecision has trouble without the std::enable_if
 
   fvar& set_root(const root_type&);
 
@@ -535,19 +559,6 @@ long long lltrunc(const fvar<RealType,Order>&);
 
 template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
-
-// Compile-time test for fvar<> type.
-template<typename>
-struct is_fvar : std::false_type {};
-
-template<typename RealType, size_t Order>
-struct is_fvar<fvar<RealType,Order>> : std::true_type {};
-
-template<typename RealType, size_t Order, size_t... Orders> // specialized for fvar<> below.
-struct nest_fvar { using type = fvar<typename nest_fvar<RealType,Orders...>::type,Order>; };
-
-template<typename RealType, size_t Order>
-struct nest_fvar<RealType,Order> { using type = fvar<RealType,Order>; };
 
 } // namespace detail
 
@@ -1248,18 +1259,14 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 template<typename RealType, size_t Order>
 fvar<RealType, Order>::operator root_type() const
 {
-	return static_cast<root_type>(v.front());
+  return static_cast<root_type>(v.front());
 }
 
 template<typename RealType, size_t Order>
-template<typename T>
+template<typename T, typename /*unused*/>
 fvar<RealType,Order>::operator T() const
 {
-	if BOOST_AUTODIFF_IF_CONSTEXPR (multiprecision::is_number<root_type>::value) {
-		return tools::real_cast<T>(static_cast<root_type>(v.front()));
-	} else {
-		return static_cast<T>(static_cast<root_type>(v.front()));
-	}
+  return static_cast<T>(static_cast<root_type>(v.front()));
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1321,10 +1328,10 @@ fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<RealType,Order>::root_type& y)
 {
-	BOOST_MATH_STD_USING
-	using multiprecision::pow;
-	using multiprecision::log;
-	using multiprecision::fabs;
+  BOOST_MATH_STD_USING
+  using multiprecision::pow;
+  using multiprecision::log;
+  using multiprecision::fabs;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type x0 = static_cast<root_type>(x);
@@ -1469,7 +1476,7 @@ fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
 
   using root_type = typename fvar<RealType,Order>::root_type;
   frexp(static_cast<root_type>(cr), exp);
-  return cr * exp2(-*exp);
+  return cr * static_cast<root_type>(exp2(-*exp));
 }
 
 template<typename RealType, size_t Order>
@@ -1976,7 +1983,7 @@ struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>,
 template<typename RealType, size_t Order>
 struct promote_args<detail::autodiff_fvar_type<RealType, Order>>
 {
-	using type = detail::autodiff_fvar_type<typename promote_args<RealType>::type, Order>;
+  using type = detail::autodiff_fvar_type<typename promote_args<RealType>::type, Order>;
 };
 
 template<typename RealType0, size_t Order0, typename RealType1>
@@ -1988,13 +1995,13 @@ struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>, RealType1>
 template<typename RealType0, typename RealType1, size_t Order1>
 struct promote_args_2<RealType0, detail::autodiff_fvar_type<RealType1, Order1>>
 {
-  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order1>;
+      using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
 template<typename destination_t, typename RealType, std::size_t Order>
 inline BOOST_MATH_CONSTEXPR destination_t real_cast(const detail::autodiff_fvar_type<RealType, Order>& from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType))
 {
-	return real_cast<destination_t>(static_cast<detail::autodiff_root_type<RealType, Order>>(from_v));
+      return real_cast<destination_t>(static_cast<detail::autodiff_root_type<RealType, Order>>(from_v));
 }
 
 } // namespace tools

@@ -176,12 +176,12 @@ jobs:
     - os: linux
       if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (type IN (cron, push))
       env:
-        - COMMENT="Coverity Scan" 
+        - COMMENT="Coverity Scan"
         - B2_TOOLSET=clang
-	- COVERITY_PROJECT_NAME="Autodiff"
+        - COVERITY_PROJECT_NAME="Autodiff"
       script:
         - cd $BOOST_ROOT/libs/$SELF
-	- ./tools/coverity.sh
+        - ./tools/coverity.sh
 
 notifications:
   email:

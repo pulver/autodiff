@@ -51,7 +51,7 @@ branches:
   only:
     - develop
     - master
-    - /feature\/.*/
+	- /feature\/.*/
 
 script:
   - cd $BOOST_ROOT/libs/$SELF
@@ -92,8 +92,8 @@ anchors:
                                            "libc++-dev",
                                            "libstdc++-8-dev" ], sources: [ "llvm-toolchain-xenial-8",
                                                                            "ubuntu-toolchain-r-test"   ] } }
-  gcc-48:   &gcc-48   { apt: { packages: [ "g++-4.8"         ], sources: [ "ubuntu-toolchain-r-test"   ] } }
-  gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
+  gcc-48:   &gcc-48   { apt: { packages: [ "g++-4.8"         ]                                           } }
+  gcc-5:    &gcc-5    { apt: { packages: [ "g++-5"           ]                                           } }
   gcc-6:    &gcc-6    { apt: { packages: [ "g++-6"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-7:    &gcc-7    { apt: { packages: [ "g++-7"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
   gcc-8:    &gcc-8    { apt: { packages: [ "g++-8"           ], sources: [ "ubuntu-toolchain-r-test"   ] } }
@@ -105,17 +105,17 @@ jobs:
 
   include:
     # libstdc++
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-4.8",     "B2_CXXSTD=11"          ], addons: *gcc-48    }
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-5",       "B2_CXXSTD=11"          ], addons: *gcc-5     }
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-6",       "B2_CXXSTD=11,14"       ], addons: *gcc-6     }
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-7",       "B2_CXXSTD=11,14,17"    ], addons: *gcc-7     }
-    - { os: "linux", env: [ "B2_TOOLSET=gcc-8",       "B2_CXXSTD=11,14,17,2a" ], addons: *gcc-8     }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-3.8",   "B2_CXXSTD=11,14"       ], addons: *clang-38  }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-4.0",   "B2_CXXSTD=11,14"       ], addons: *clang-4   }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-5.0",   "B2_CXXSTD=11,14,17"    ], addons: *clang-5   }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=11,14,17,2a" ], addons: *clang-6   }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-7",     "B2_CXXSTD=11,14,17,2a" ], addons: *clang-7   }
-    - { os: "linux", env: [ "B2_TOOLSET=clang-8",     "B2_CXXSTD=11,14,17,2a" ], addons: *clang-8   }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-4.8",     "B2_CXXSTD=11"       ], addons: *gcc-48    }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-5",       "B2_CXXSTD=11"       ], addons: *gcc-5     }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-6",       "B2_CXXSTD=11,14"    ], addons: *gcc-6     }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-7",       "B2_CXXSTD=11,14,17" ], addons: *gcc-7     }
+    - { os: "linux", env: [ "B2_TOOLSET=gcc-8",       "B2_CXXSTD=14,17,2a" ], addons: *gcc-8     }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-3.8",   "B2_CXXSTD=11,14"    ], addons: *clang-38  }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-4.0",   "B2_CXXSTD=11,14"    ], addons: *clang-4   }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-5.0",   "B2_CXXSTD=11,14,17" ], addons: *clang-5   }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=14,17,2a" ], addons: *clang-6   }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-7",     "B2_CXXSTD=14,17,2a" ], addons: *clang-7   }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-8",     "B2_CXXSTD=14,17,2a" ], addons: *clang-8   }
 
     # libc++
     - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=11,14,17,2a",
@@ -131,7 +131,6 @@ jobs:
         - COMMENT=codecov.io
         - B2_TOOLSET=gcc-7
         - B2_DEFINES="define=BOOST_NO_STRESS_TEST=1"
-        - B2_CXXSTD=11,14,17
       addons: *gcc-7
       script:
         - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
@@ -174,15 +173,15 @@ jobs:
     #################### Jobs to run on pushes to master, develop ###################
 
     # Coverity Scan
-    # - os: linux
-    #   if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (branch IN (develop, master)) AND (type IN (cron, push))
-    #   env:
-    #     - COMMENT="Coverity Scan"
-    #     - B2_TOOLSET=gcc
-    #     - B2_VARIANT=variant=debug
-    #   script:
-    #     - cd $BOOST_ROOT/libs/$SELF
-    #     - ci/travis/coverity.sh
+    - os: linux
+      if: (env(COVERITY_SCAN_NOTIFICATION_EMAIL) IS present) AND (type IN (cron, push))
+      env:
+        - COMMENT="Coverity Scan"
+        - B2_TOOLSET=clang
+		- COVERITY_PROJECT_NAME="Autodiff"
+      script:
+        - cd $BOOST_ROOT/libs/$SELF
+		- ./tools/coverity.sh
 
 notifications:
   email:

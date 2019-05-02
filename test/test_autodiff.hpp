@@ -10,6 +10,11 @@
 #define BOOST_TEST_MODULE test_autodiff
 #endif
 
+#ifndef BOOST_ALLOW_DEPRECATED_HEADERS
+#define BOOST_ALLOW_DEPRECATED_HEADERS // artifact of sp_typeinfo.hpp inclusion from unit_test.hpp
+#endif
+
+
 #include <boost/math/tools/config.hpp>
 
 #include <boost/math/differentiation/autodiff.hpp>

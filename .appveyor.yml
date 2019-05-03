@@ -47,79 +47,6 @@ environment:
     BOOST_BRANCH: master
 
   matrix:
-    - FLAVOR: Visual Studio 2017 (Release Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      B2_VARIANT: variant=release
-
-      
-    - FLAVOR: Visual Studio 2017 (Debug Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      B2_VARIANT: variant=debug
-
-    - FLAVOR: Visual Studio 2017 (Release Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1
-      B2_VARIANT: variant=release
-      
-    - FLAVOR: Visual Studio 2017 (Debug Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_CXXSTD: 11,14,17,2a
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_TOOLSET: msvc-14.1 
-      B2_VARIANT: variant=debug
-
-    - FLAVOR: Visual Studio 2015 (Release Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14      
-      B2_VARIANT: variant=release
-      
-    - FLAVOR: Visual Studio 2015 (Debug Static Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=static
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      B2_VARIANT: variant=debug
-      
-    - FLAVOR: Visual Studio 2015 (Release Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14      
-      B2_VARIANT: variant=release
-      
-    - FLAVOR: Visual Studio 2015 (Debug Shared Linking)
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      B2_TOOLSET: msvc-14.0
-      B2_ADDRESS_MODEL: address-model=64,32
-      B2_LINK: link=shared
-      B2_THREADING: threading=single,multi
-      B2_CXXSTD: 11,14
-      B2_VARIANT: variant=debug
-      
     - FLAVOR: mingw32
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ARCH: i686
@@ -198,7 +125,80 @@ environment:
       # https://github.com/boostorg/test/issues/144
       B2_DEFINES: define=_POSIX_C_SOURCE=200112L define=__USE_ISOC99
       B2_THREADING: threadapi=pthread
-      B2_TOOLSET: gcc     
+      B2_TOOLSET: gcc
+
+    - FLAVOR: Visual Studio 2017 (Release Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      B2_VARIANT: variant=release
+
+
+    - FLAVOR: Visual Studio 2017 (Debug Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      B2_VARIANT: variant=debug
+
+    - FLAVOR: Visual Studio 2017 (Release Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      B2_VARIANT: variant=release
+
+    - FLAVOR: Visual Studio 2017 (Debug Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_CXXSTD: 11,14,17,2a
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_TOOLSET: msvc-14.1
+      B2_VARIANT: variant=debug
+
+    - FLAVOR: Visual Studio 2015 (Release Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      B2_VARIANT: variant=release
+
+    - FLAVOR: Visual Studio 2015 (Debug Static Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=static
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      B2_VARIANT: variant=debug
+
+    - FLAVOR: Visual Studio 2015 (Release Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      B2_VARIANT: variant=release
+
+    - FLAVOR: Visual Studio 2015 (Debug Shared Linking)
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      B2_TOOLSET: msvc-14.0
+      B2_ADDRESS_MODEL: address-model=64,32
+      B2_LINK: link=shared
+      B2_THREADING: threading=single,multi
+      B2_CXXSTD: 11,14
+      B2_VARIANT: variant=debug
 
 install:
   - set SELF=%APPVEYOR_PROJECT_NAME:-=_%

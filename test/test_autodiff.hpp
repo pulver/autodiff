@@ -20,12 +20,13 @@
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
-
+#include <boost/mp11/function.hpp>
 #include <boost/mp11/integral.hpp>
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/test/included/unit_test.hpp>
+#include <boost/utility/identity_type.hpp>
 
 #include <algorithm>
 #include <cfenv>
@@ -61,23 +62,22 @@ template <typename T>
 using is_multiprecision_t =
     mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>;
 
+template<bool IfValue, typename ThenType, typename ElseType>
+using if_c = mp11::mp_eval_if_c<IfValue, ThenType, mp11::mp_identity_t, ElseType>;
+
+template<typename IfType, typename ThenType, typename ElseType>
+using if_t = if_c<IfType::value, ThenType, ElseType>;
+
 /**
  * Simple struct to hold constants that are used in each test
  * since BOOST_AUTO_TEST_CASE_TEMPLATE doesn't support fixtures.
  */
-template <typename T, typename Order>
-struct test_constants_t;
-
-template <typename T, typename Order, Order Val>
-struct test_constants_t<T, std::integral_constant<Order, Val>> {
-  static constexpr int n_samples =
-      mp11::mp_if<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>,
-                  mp11::mp_int<10>, mp11::mp_int<25>>::value;
-  static constexpr Order order = Val;
-  static constexpr T pct_epsilon() noexcept {
-    return mp11::mp_if<is_multiprecision_t<T>, mp11::mp_int<2>,
-                       mp11::mp_int<1>>::value *
-           std::numeric_limits<T>::epsilon() * 100;
+template <typename T, std::size_t OrderValue>
+struct test_constants_t {
+  static constexpr auto n_samples = if_t<mp11::mp_or<bmp::is_number<T>, bmp::is_number_expression<T>>, mp11::mp_int<10>, mp11::mp_int<25>>::value;      
+  static constexpr auto order = OrderValue;
+  static constexpr T pct_epsilon() BOOST_NOEXCEPT {
+	return (is_multiprecision_t<T>::value ? 2 : 1) * std::numeric_limits<T>::epsilon() * 100;
   }
 };
 
@@ -91,10 +91,10 @@ struct RandomSample {
   using numeric_limits_t = std::numeric_limits<T>;
   using is_integer_t = mp11::mp_bool<std::numeric_limits<T>::is_integer>;
 
-  using distribution_param_t = mp11::mp_if<
+  using distribution_param_t = if_t<
       is_multiprecision_t<T>,
-      mp11::mp_if<is_integer_t,
-                  mp11::mp_if_c<numeric_limits_t::is_signed, int64_t, uint64_t>,
+      if_t<is_integer_t,
+                  if_c<numeric_limits_t::is_signed, int64_t, uint64_t>,
                   long double>,
       T>;
   static_assert((std::numeric_limits<T>::is_integer &&
@@ -104,10 +104,9 @@ struct RandomSample {
                 "T and distribution_param_t must either both be integral or "
                 "both be not integral");
 
-  using dist_t =
-      mp11::mp_if<is_integer_t,
-                  std::uniform_int_distribution<distribution_param_t>,
-                  std::uniform_real_distribution<distribution_param_t>>;
+  using dist_t = if_t<is_integer_t,
+	std::uniform_int_distribution<distribution_param_t>,
+	std::uniform_real_distribution<distribution_param_t>>;
 
   struct get_integral_endpoint {
     template <typename V>
@@ -124,8 +123,7 @@ struct RandomSample {
     }
   };
 
-  using get_endpoint_t =
-      mp11::mp_if<is_integer_t, get_integral_endpoint, get_real_endpoint>;
+  using get_endpoint_t = if_t<is_integer_t, get_integral_endpoint, get_real_endpoint>;
 
   template <typename U, typename V>
   RandomSample(U start, V finish)
@@ -160,11 +158,13 @@ template<typename T>
 auto isNearZero(const T& t) noexcept -> typename std::enable_if<!detail::is_fvar<T>::value, bool>::type
 {
   using std::sqrt;
+  using bmp::sqrt;
+  using detail::sqrt;
   using std::fabs;
-  using boost::multiprecision::fabs;
-  using boost::math::differentiation::detail::fabs;
+  using bmp::fabs;
+  using detail::fabs;
   using boost::math::fpclassify;
-  using boost::multiprecision::fpclassify;
+  using bmp::fpclassify;
   return fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL || boost::math::fpc::is_small(fabs(t), sqrt(std::numeric_limits<T>::epsilon()));
 }
 
@@ -175,8 +175,8 @@ auto isNearZero(const T& t) noexcept -> typename std::enable_if<detail::is_fvar<
   return isNearZero(static_cast<root_type>(t));
 }
 
-template <typename T, std::size_t m = 5>
-using test_constants_t = test_detail::test_constants_t<T, mp11::mp_size_t<m>>;
+template <typename T, std::size_t Order = 5>
+using test_constants_t = test_detail::test_constants_t<T, Order>;
 
 template <typename W, typename X, typename Y, typename Z>
 promote<W, X, Y, Z> mixed_partials_f(const W& w, const X& x, const Y& y,

@@ -501,9 +501,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(inverse, T, all_float_types) {
   }
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {
-  BOOST_MATH_STD_USING
-
+BOOST_AUTO_TEST_CASE_TEMPLATE(division, T, all_float_types) {  
   constexpr std::size_t m = 3;
   constexpr std::size_t n = 4;
   const T cx = 16.0;
@@ -630,8 +628,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(greater_than_or_equal_to, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, all_float_types) {
-  BOOST_MATH_STD_USING
-
+  using std::abs;
+  using bmp::abs;
   constexpr std::size_t m = 3;
   const T cx = 11.0;
   const auto x = make_fvar<T, m>(cx);
@@ -659,8 +657,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ceil_and_floor, T, all_float_types) {
-  BOOST_MATH_STD_USING
-
+  using std::ceil;
+  using std::floor;
+  using bmp::ceil;
+  using bmp::floor;
   constexpr std::size_t m = 3;
   T tests[]{-1.5, 0.0, 1.5};
   for (T& test : tests) {

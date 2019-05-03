@@ -102,9 +102,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinh_and_cosh, T, bin_float_types) {
 }
 
 #ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<double, long double>))) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, all_float_types) {
+  using bmp::tanh;
+  using detail::tanh;
   using std::tanh;
-  using std::pow;
+  using bmp::fabs;
+  using detail::fabs;
+  using std::fabs;
   constexpr std::array<const char *, 6> tanh_derivatives
       {{"0.76159415595576488811945828260479359041276859725793655159681050012195324457663848345894752167367671442190275970155",
         "0.4199743416140260693944967390417014449171867282307709547133114402445898995240483056156940088623187260",
@@ -117,7 +121,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(tanh_test, T, BOOST_IDENTITY_TYPE((mp11::mp_list<d
   auto x = make_fvar<T, m>(cx);
   auto t = tanh(x);
   for (auto i : boost::irange(tanh_derivatives.size())) {
-    BOOST_TEST_WARN(isNearZero(fabs(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i]))));
+    BOOST_TEST_WARN(isNearZero(t.derivative(i) - boost::lexical_cast<T>(tanh_derivatives[i])));
   }
 }
 #endif

@@ -8,6 +8,10 @@
 BOOST_AUTO_TEST_SUITE(test_autodiff_5)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
+	using std::fabs;
+	using detail::fabs;
+	using bmp::fabs;
+
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> a_sampler{-2000, 2000};
@@ -19,13 +23,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
     auto b = b_sampler.next();
     auto z = z_sampler.next();
     {
-      auto a_ = abs(a) + 1;
-      auto b_ = abs(b) + 1;
+      auto a_ = fabs(a) + 1;
+      auto b_ = fabs(b) + 1;
       try {
         auto autodiff_v = boost::math::beta(
             make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::beta(a_, b_, z);
-        BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
       } catch (const boost::math::evaluation_error &) {
         BOOST_CHECK_THROW(boost::math::beta(make_fvar<T, m>(a_),
                                               make_fvar<T, m>(b_),
@@ -46,7 +50,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
         auto autodiff_v = boost::math::betac(
             make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::betac(a_, b_, z);
-        BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
       } catch (const boost::math::evaluation_error &) {
         BOOST_CHECK_THROW(boost::math::betac(make_fvar<T, m>(a_),
                                                make_fvar<T, m>(b_),
@@ -67,7 +71,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
       try {
         auto autodiff_v = boost::math::ibeta(make_fvar<T, m>(a_ - 1), make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z));
         auto anchor_v = boost::math::ibeta(a_ - 1, b_ - 1, z);
-        BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
       } catch (const boost::math::evaluation_error &) {
         BOOST_CHECK_THROW(boost::math::ibeta(make_fvar<T, m>(a_ - 1),
                                                make_fvar<T, m>(b_ - 1),
@@ -89,7 +93,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
             boost::math::ibetac(make_fvar<T, m>(a_ - 1),
                                 make_fvar<T, m>(b_ - 1), make_fvar<T, m>(z));
         auto anchor_v = boost::math::ibetac(a_ - 1, b_ - 1, z);
-        BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
       } catch (const std::overflow_error &) {
         BOOST_CHECK_THROW(boost::math::ibetac(make_fvar<T, m>(a_ - 1),
                                                 make_fvar<T, m>(b_ - 1),
@@ -103,7 +107,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
         auto autodiff_v = boost::math::ibeta_derivative(
             make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
         auto anchor_v = boost::math::ibeta_derivative(a_, b_, z);
-        BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+        BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
       } catch (const boost::math::evaluation_error &) {
         BOOST_CHECK_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                           make_fvar<T, m>(b_),
@@ -125,7 +129,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
           auto autodiff_v = boost::math::ibeta_inv(
               make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inv<T>(a_, b_, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                             make_fvar<T, m>(b_),
@@ -146,7 +150,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
           auto autodiff_v = boost::math::ibetac_inv<autodiff_fvar<T, m>>(
               make_fvar<T, m>(a_), make_fvar<T, m>(b_), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_inv<T>(a_, b_, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibeta_derivative(make_fvar<T, m>(a_),
                                                             make_fvar<T, m>(b_),
@@ -168,7 +172,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
         try {
           auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inva(a_, b_norm, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibeta_inva(make_fvar<T, m>(a_),
                                                       make_fvar<T, m>(b_norm),
@@ -189,7 +193,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
           auto autodiff_v = boost::math::ibetac_inva(
               make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_inva(a_, b_norm, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibetac_inva(make_fvar<T, m>(a_),
                                                        make_fvar<T, m>(b_norm),
@@ -210,7 +214,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
           auto autodiff_v = boost::math::ibeta_invb(
               make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_invb(a_, b_norm, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibeta_invb(make_fvar<T, m>(a_),
                                                       make_fvar<T, m>(b_norm),
@@ -231,7 +235,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
           auto autodiff_v = boost::math::ibetac_invb(
               make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibetac_invb(a_, b_norm, z);
-          BOOST_TEST_WARN(isNearZero(fabs(autodiff_v.derivative(0)-anchor_v)));
+          BOOST_TEST_WARN(isNearZero(autodiff_v.derivative(0)-anchor_v));
         } catch (const boost::math::evaluation_error &) {
           BOOST_CHECK_THROW(boost::math::ibetac_invb(make_fvar<T, m>(a_),
                                                        make_fvar<T, m>(b_norm),

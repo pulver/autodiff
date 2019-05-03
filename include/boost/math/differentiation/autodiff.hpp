@@ -12,8 +12,6 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <boost/mp11/function.hpp>
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>
@@ -95,7 +93,9 @@ struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
-  typename conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
+	typename conditional<Depth == 0, fvar<RealType, Order>, typename type_at<RealType, Depth - 1>::type>::type;
+};
+
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;

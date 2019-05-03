@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = T(1);
-    while(fpclassify(T(abs(x)-1)) == FP_ZERO) {
+    while(fpclassify(T(fabs(x)-1)) == FP_ZERO) {
       x = x_sampler.next();
     }
 
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
     }
 
     {
-      auto x_j = abs(x) + 1;
+      auto x_j = fabs(x) + 1;
       try {
         auto autodiff_v =
             boost::math::cyl_bessel_j(make_fvar<T, m>(v), make_fvar<T, m>(x_j));
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
     }
 
     {
-      auto x_k = abs(x) + 1;
+      auto x_k = fabs(x) + 1;
       try {
         auto autodiff_v =
             boost::math::cyl_bessel_k(make_fvar<T, m>(v), make_fvar<T, m>(x_k));
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
     }
 
     {
-      auto x_neumann = abs(x)+1;
+      auto x_neumann = fabs(x)+1;
       try {
         auto autodiff_v = boost::math::cyl_neumann(make_fvar<T, m>(v),
                                                    make_fvar<T, m>(x_neumann));
@@ -374,23 +374,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       auto i_ = static_cast<unsigned>(i);
       try {
         auto autodiff_v = boost::math::sph_bessel<autodiff_fvar<T, m>>(
-            i_, make_fvar<T, m>(abs(v)));
-        auto anchor_v = boost::math::sph_bessel<T>(i_, abs(v));
+            i_, make_fvar<T, m>(fabs(v)));
+        auto anchor_v = boost::math::sph_bessel<T>(i_, fabs(v));
         BOOST_WARN_CLOSE(autodiff_v.derivative(0u), anchor_v,
                                1e4*test_constants::pct_epsilon());
       } catch (const std::overflow_error&) {
-        BOOST_CHECK_THROW((boost::math::sph_bessel<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(abs(v))),
+        BOOST_CHECK_THROW((boost::math::sph_bessel<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(fabs(v))),
                             boost::wrapexcept<std::overflow_error>);
-        BOOST_CHECK_THROW(boost::math::sph_bessel<T>(i_, abs(v)),
+        BOOST_CHECK_THROW(boost::math::sph_bessel<T>(i_, fabs(v)),
                             boost::wrapexcept<std::overflow_error>);
       } catch(...) {
-        std::cout << "Inputs: i: " << i_ << " v: " << (abs(v)) << std::endl;
+        std::cout << "Inputs: i: " << i_ << " v: " << (fabs(v)) << std::endl;
         std::rethrow_exception(std::current_exception());
       }
 
       {
-        auto v_ = (max)(T(abs(v)),
-                        nextafter(T(abs(v)), 2 * (std::numeric_limits<T>::min)()));
+        auto v_ = (max)(T(fabs(v)),
+                        nextafter(T(fabs(v)), 2 * (std::numeric_limits<T>::min)()));
         try {
           auto autodiff_v = boost::math::sph_neumann<autodiff_fvar<T, m>>(
               i_, make_fvar<T, m>(v_));
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       }
 
       {
-        auto x_j = abs(x) + 1;
+        auto x_j = fabs(x) + 1;
         try {
           auto autodiff_v = boost::math::cyl_bessel_j_prime(make_fvar<T, m>(v),
                                                             make_fvar<T, m>(x_j));
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       }
 
       {
-        auto x_k = abs(x) + 1;
+        auto x_k = fabs(x) + 1;
         try {
           auto autodiff_v = boost::math::cyl_bessel_k_prime(make_fvar<T, m>(v),
                                                             make_fvar<T, m>(x_k));
@@ -464,7 +464,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       }
 
       {
-        auto x_neumann = abs(x) + 1;
+        auto x_neumann = fabs(x) + 1;
         try {
           auto autodiff_v = boost::math::cyl_neumann_prime(
               make_fvar<T, m>(v), make_fvar<T, m>(x_neumann));
@@ -484,33 +484,33 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
 
       try {
         auto autodiff_v = boost::math::sph_bessel_prime<autodiff_fvar<T, m>>(
-            i_, make_fvar<T, m>(abs(v) + 1));
-        auto anchor_v = boost::math::sph_bessel_prime<T>(i_, abs(v) + 1);
+            i_, make_fvar<T, m>(fabs(v) + 1));
+        auto anchor_v = boost::math::sph_bessel_prime<T>(i_, fabs(v) + 1);
         BOOST_WARN_CLOSE(autodiff_v.derivative(0u), anchor_v,
                                1e4*test_constants::pct_epsilon());
       } catch (const std::overflow_error&) {
-        BOOST_CHECK_THROW((boost::math::sph_neumann<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(abs(v) + 1)),
+        BOOST_CHECK_THROW((boost::math::sph_neumann<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(fabs(v) + 1)),
                             boost::wrapexcept<std::overflow_error>);
-        BOOST_CHECK_THROW((boost::math::sph_neumann<T>)(i_, abs(v) + 1),
+        BOOST_CHECK_THROW((boost::math::sph_neumann<T>)(i_, fabs(v) + 1),
                             boost::wrapexcept<std::overflow_error>);
       } catch(...) {
-        std::cout << "Inputs: i: " << i_ << " v: " << ((abs(v)+1)) << std::endl;
+        std::cout << "Inputs: i: " << i_ << " v: " << ((fabs(v)+1)) << std::endl;
         std::rethrow_exception(std::current_exception());
       }
 
       try {
         auto autodiff_v = boost::math::sph_neumann_prime<autodiff_fvar<T, m>>(
-            i_, make_fvar<T, m>(abs(v) + 1));
-        auto anchor_v = boost::math::sph_neumann_prime<T>(i_, abs(v) + 1);
+            i_, make_fvar<T, m>(fabs(v) + 1));
+        auto anchor_v = boost::math::sph_neumann_prime<T>(i_, fabs(v) + 1);
         BOOST_WARN_CLOSE(autodiff_v.derivative(0u), anchor_v,
                                1e4*test_constants::pct_epsilon());
       } catch (const std::overflow_error&) {
-        BOOST_CHECK_THROW((boost::math::sph_neumann_prime<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(abs(v) + 1)),
+        BOOST_CHECK_THROW((boost::math::sph_neumann_prime<autodiff_fvar<T, m>>)(i_, (make_fvar<T, m>)(fabs(v) + 1)),
                             boost::wrapexcept<std::overflow_error>);
-        BOOST_CHECK_THROW((boost::math::sph_neumann_prime<T>)(i_, abs(v) + 1),
+        BOOST_CHECK_THROW((boost::math::sph_neumann_prime<T>)(i_, fabs(v) + 1),
                             boost::wrapexcept<std::overflow_error>);
       } catch(...) {
-        std::cout << "Inputs: i: " << i << " v: " << (abs(v)+1) << std::endl;
+        std::cout << "Inputs: i: " << i << " v: " << (fabs(v)+1) << std::endl;
         std::rethrow_exception(std::current_exception());
       }
     }

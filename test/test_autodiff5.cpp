@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(beta_hpp, T, bin_float_types) {
         }
       }
       {
-        auto b_norm = b_sampler.normalize(abs(b));
+        auto b_norm = b_sampler.normalize(fabs(b));
         try {
           auto autodiff_v = boost::math::ibeta_inva(make_fvar<T, m>(a_), make_fvar<T, m>(b_norm), make_fvar<T, m>(z));
           auto anchor_v = boost::math::ibeta_inva(a_, b_norm, z);

@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(heuman_lambda_hpp, T, all_float_types) {
 	static constexpr auto m = test_constants::order;
 	test_detail::RandomSample<T> x_sampler{ -1, 1 };
 	test_detail::RandomSample<T> phi_sampler{ -boost::math::constants::two_pi<T>(),
-											 boost::math::constants::two_pi<T>() };
+                                                   boost::math::constants::two_pi<T>() };
 	for (auto i : boost::irange(test_constants::n_samples)) {
 		std::ignore = i;
 		auto x = x_sampler.next();

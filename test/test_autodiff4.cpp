@@ -54,7 +54,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(equality, T, all_float_types) {
 
 #if defined(BOOST_AUTODIFF_TESTING_INCLUDE_MULTIPRECISION)
 BOOST_AUTO_TEST_CASE_TEMPLATE(multiprecision, T, multiprecision_float_types) {
-  BOOST_MATH_STD_USING
+  using std::fabs;
+  using boost::multiprecision::fabs;
+  using detail::fabs;
 
   const T eps = 3000 * std::numeric_limits<T>::epsilon();
   constexpr std::size_t Nw = 3;
@@ -196,6 +198,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
   using boost::math::fpclassify;
   using boost::multiprecision::fpclassify;
   using boost::math::float_prior;
+  using std::fabs;
+  using boost::multiprecision::fabs;
+  using detail::fabs;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -247,6 +252,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   using boost::math::tools::max;
   using std::max;
   using std::nextafter;
+  using std::fabs;
+  using boost::multiprecision::fabs;
+  using detail::fabs;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;

@@ -627,30 +627,31 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(greater_than_or_equal_to, T, all_float_types) {
   BOOST_CHECK_GT(cx, y);
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(abs_test, T, all_float_types) {
-  using std::abs;
-  using bmp::abs;
+BOOST_AUTO_TEST_CASE_TEMPLATE(fabs_test, T, all_float_types) {
+  using std::fabs;
+  using bmp::fabs;
+  using detail::fabs;
   constexpr std::size_t m = 3;
   const T cx = 11.0;
   const auto x = make_fvar<T, m>(cx);
-  auto a = abs(x);
-  BOOST_CHECK_EQUAL(a.derivative(0), abs(cx));
+  auto a = fabs(x);
+  BOOST_CHECK_EQUAL(a.derivative(0), fabs(cx));
   BOOST_CHECK_EQUAL(a.derivative(1), 1.0);
   BOOST_CHECK_EQUAL(a.derivative(2), 0.0);
   BOOST_CHECK_EQUAL(a.derivative(3), 0.0);
-  a = abs(-x);
-  BOOST_CHECK_EQUAL(a.derivative(0), abs(cx));
-  BOOST_CHECK_EQUAL(a.derivative(1), 1.0);  // abs(-x) = abs(x)
+  a = fabs(-x);
+  BOOST_CHECK_EQUAL(a.derivative(0), fabs(cx));
+  BOOST_CHECK_EQUAL(a.derivative(1), 1.0);  // fabs(-x) = fabs(x)
   BOOST_CHECK_EQUAL(a.derivative(2), 0.0);
   BOOST_CHECK_EQUAL(a.derivative(3), 0.0);
   const auto xneg = make_fvar<T, m>(-cx);
-  a = abs(xneg);
-  BOOST_CHECK_EQUAL(a.derivative(0), abs(cx));
+  a = fabs(xneg);
+  BOOST_CHECK_EQUAL(a.derivative(0), fabs(cx));
   BOOST_CHECK_EQUAL(a.derivative(1), -1.0);
   BOOST_CHECK_EQUAL(a.derivative(2), 0.0);
   BOOST_CHECK_EQUAL(a.derivative(3), 0.0);
   const auto zero = make_fvar<T, m>(0);
-  a = abs(zero);
+  a = fabs(zero);
   for (auto i : boost::irange(m + 1)) {
     BOOST_CHECK_EQUAL(a.derivative(i), 0.0);
   }

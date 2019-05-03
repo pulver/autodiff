@@ -178,7 +178,7 @@ jobs:
       env:
         - COMMENT="Coverity Scan"
         - B2_TOOLSET=clang
-        - B2_CXXSTD=11,17
+        - B2_CXXSTD=17
         - COVERITY_PROJECT_NAME="Autodiff"
       script:
         - cd $BOOST_ROOT/libs/$SELF

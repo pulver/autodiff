@@ -16,7 +16,6 @@
 
 #include <boost/math/tools/config.hpp>
 
-#include <boost/math/cstdfloat/cstdfloat_types.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_dec_float.hpp>
@@ -26,7 +25,6 @@
 #include <boost/mp11/utility.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/test/included/unit_test.hpp>
-#include <boost/utility/identity_type.hpp>
 
 #include <algorithm>
 #include <cfenv>
@@ -164,8 +162,13 @@ auto isNearZero(const T& t) noexcept -> typename std::enable_if<!detail::is_fvar
   using bmp::fabs;
   using detail::fabs;
   using boost::math::fpclassify;
-  using bmp::fpclassify;
-  return fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL || boost::math::fpc::is_small(fabs(t), sqrt(std::numeric_limits<T>::epsilon()));
+  using std::sqrt;
+  if (fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL) {
+    return true;
+  }
+  const auto tolerance = sqrt(std::numeric_limits<T>::epsilon());
+  BOOST_TEST_WARN(fabs(t) <= tolerance, "t: " << fabs(t) << " tolerance: " << tolerance);
+  return fabs(t) <= tolerance;
 }
 
 template<typename T>

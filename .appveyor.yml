@@ -65,46 +65,6 @@ environment:
       B2_VARIANT: variant=debug
       SCRIPT: ci\appveyor\mingw.bat
 
-    - FLAVOR: mingw64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARCH: x86_64
-      B2_ADDRESS_MODEL: address-model=64
-      B2_CXXSTD: 11
-      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
-      B2_DEFINES: define=__USE_ISOC99
-      B2_VARIANT: variant=release
-      SCRIPT: ci\appveyor\mingw.bat
-
-    - FLAVOR: mingw64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARCH: x86_64
-      B2_ADDRESS_MODEL: address-model=64
-      B2_CXXSTD: 11
-      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
-      B2_DEFINES: define=__USE_ISOC99
-      B2_VARIANT: variant=debug
-      SCRIPT: ci\appveyor\mingw.bat
-
-    - FLAVOR: mingw64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARCH: x86_64
-      B2_ADDRESS_MODEL: address-model=64
-      B2_CXXSTD: 17
-      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
-      B2_DEFINES: define=__USE_ISOC99
-      B2_VARIANT: variant=release
-      SCRIPT: ci\appveyor\mingw.bat
-
-    - FLAVOR: mingw64
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      ARCH: x86_64
-      B2_ADDRESS_MODEL: address-model=64
-      B2_CXXSTD: 17
-      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
-      B2_DEFINES: define=__USE_ISOC99
-      B2_VARIANT: variant=debug
-      SCRIPT: ci\appveyor\mingw.bat
-
     - FLAVOR: cygwin (32-bit)
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       ADDPATH: C:\cygwin\bin;
@@ -126,6 +86,47 @@ environment:
       B2_DEFINES: define=_POSIX_C_SOURCE=200112L define=__USE_ISOC99
       B2_THREADING: threadapi=pthread
       B2_TOOLSET: gcc
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_CXXSTD: 11
+      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
+      B2_DEFINES: define=__USE_ISOC99
+      B2_VARIANT: variant=release
+      SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_CXXSTD: 11
+      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
+      B2_DEFINES: define=__USE_ISOC99
+      B2_VARIANT: variant=debug
+      SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_CXXSTD: 17
+      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
+      B2_DEFINES: define=__USE_ISOC99
+      B2_VARIANT: variant=release
+      SCRIPT: ci\appveyor\mingw.bat
+
+    - FLAVOR: mingw64
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      ARCH: x86_64
+      B2_ADDRESS_MODEL: address-model=64
+      B2_CXXSTD: 17
+      B2_CXXFLAGS: cxxflags=-Wa,-mbig-obj
+      B2_DEFINES: define=__USE_ISOC99
+      B2_VARIANT: variant=debug
+      SCRIPT: ci\appveyor\mingw.bat
+
 
     - FLAVOR: Visual Studio 2017 (Release Shared Linking)
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017

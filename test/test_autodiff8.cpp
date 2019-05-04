@@ -334,6 +334,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
                            boost::math::pow<6>(j)));
     BOOST_CHECK(isNearZero(boost::math::pow<7>(fvar_j).derivative(0u) -
                            boost::math::pow<7>(j)));
+    std::cout << fvar_j << " " << j << " " << std::setprecision(std::numeric_limits<T>::max_digits10+1) << boost::math::pow<8>(fvar_j).derivative(0u) << " " << boost::math::pow<8>(j) << std::endl;
+    std::cout << fvar_j << " " << j << " " << std::setprecision(std::numeric_limits<T>::max_digits10+1) << boost::math::pow<9>(fvar_j).derivative(0u) << " " << boost::math::pow<9>(j) << std::endl;
     BOOST_CHECK(isNearZero(boost::math::pow<8>(fvar_j).derivative(0u) -
                            boost::math::pow<8>(j)));
     BOOST_CHECK(isNearZero(boost::math::pow<9>(fvar_j).derivative(0u) -

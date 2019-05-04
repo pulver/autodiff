@@ -22,10 +22,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_1_hpp, T, all_float_types) {
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     BOOST_CHECK_CLOSE(boost::math::ellint_1(make_fvar<T, m>(k)).derivative(0u),
-                        boost::math::ellint_1(k),
-                        2.5e3 * test_constants::pct_epsilon());
+                      boost::math::ellint_1(k),
+                      2.5e3 * test_constants::pct_epsilon());
     BOOST_CHECK_CLOSE(
-        boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi)).derivative(0u),
+        boost::math::ellint_1(make_fvar<T, m>(k), make_fvar<T, m>(phi))
+            .derivative(0u),
         boost::math::ellint_1(k, phi), 1e4 * test_constants::pct_epsilon());
   }
 }
@@ -41,10 +42,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_2_hpp, T, all_float_types) {
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     BOOST_CHECK_CLOSE(boost::math::ellint_2(make_fvar<T, m>(k)).derivative(0u),
-                        boost::math::ellint_2(k),
-                        2.5e3 * test_constants::pct_epsilon());
+                      boost::math::ellint_2(k),
+                      2.5e3 * test_constants::pct_epsilon());
     BOOST_CHECK_CLOSE(
-        boost::math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi)).derivative(0u),
+        boost::math::ellint_2(make_fvar<T, m>(k), make_fvar<T, m>(phi))
+            .derivative(0u),
         boost::math::ellint_2(k, phi), 2.5e3 * test_constants::pct_epsilon());
   }
 }
@@ -53,10 +55,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
   using boost::math::nextafter;
   using boost::multiprecision::nextafter;
 
-  using std::sin;
   using boost::math::differentiation::detail::sin;
   using boost::multiprecision::min;
   using std::min;
+  using std::sin;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -70,11 +72,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_3_hpp, T, all_float_types) {
     auto phi = phi_sampler.next();
     auto n = (min)((min)(n_sampler.next(), T(1) / (sin(phi) * sin(phi))),
                    nextafter(T(1), T(0)));
-    BOOST_CHECK_CLOSE(
-        boost::math::ellint_3(make_fvar<T, m>(k), make_fvar<T, m>(n),
-                              make_fvar<T, m>(phi)).derivative(0u),
-        boost::math::ellint_3(k, n, phi),
-        2.5e3 * test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(boost::math::ellint_3(make_fvar<T, m>(k),
+                                            make_fvar<T, m>(n),
+                                            make_fvar<T, m>(phi))
+                          .derivative(0u),
+                      boost::math::ellint_3(k, n, phi),
+                      2.5e3 * test_constants::pct_epsilon());
   }
 }
 
@@ -89,10 +92,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_d_hpp, T, all_float_types) {
     auto k = k_sampler.next();
     auto phi = phi_sampler.next();
     BOOST_CHECK_CLOSE(boost::math::ellint_d(make_fvar<T, m>(k)).derivative(0u),
-                        boost::math::ellint_d(k),
-                        2.5e3 * test_constants::pct_epsilon());
+                      boost::math::ellint_d(k),
+                      2.5e3 * test_constants::pct_epsilon());
     BOOST_CHECK_CLOSE(
-        boost::math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi)).derivative(0u),
+        boost::math::ellint_d(make_fvar<T, m>(k), make_fvar<T, m>(phi))
+            .derivative(0u),
         boost::math::ellint_d(k, phi), 2.5e3 * test_constants::pct_epsilon());
   }
 }
@@ -119,20 +123,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rf_hpp, T, all_float_types) {
 
     BOOST_CHECK_CLOSE(
         boost::math::ellint_rf(make_fvar<T, m>(x), make_fvar<T, m>(y),
-                               make_fvar<T, m>(z)).derivative(0u),
+                               make_fvar<T, m>(z))
+            .derivative(0u),
         boost::math::ellint_rf(x, y, z), 2.5e3 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
+  using boost::math::fpclassify;
   using boost::math::nextafter;
+  using boost::math::signbit;
   using boost::math::tools::max;
+  using boost::multiprecision::fpclassify;
+  using boost::multiprecision::signbit;
   using std::max;
   using std::nextafter;
-  using boost::math::signbit;
-  using boost::multiprecision::signbit;
-  using boost::math::fpclassify;
-  using boost::multiprecision::fpclassify;
 
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
@@ -144,21 +149,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rc_hpp, T, all_float_types) {
     auto y = T(0);
     while (fpclassify(T(y)) == FP_ZERO) {
       y = (max)(y_sampler.next(),
-                nextafter(T(0), T(signbit(y) ? -1 : 1)*((std::numeric_limits<T>::max))()));
+                nextafter(T(0), T(signbit(y) ? -1 : 1) *
+                                    ((std::numeric_limits<T>::max))()));
     }
 
     BOOST_CHECK_CLOSE(
-        boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y)).derivative(0u),
+        boost::math::ellint_rc(make_fvar<T, m>(x), make_fvar<T, m>(y))
+            .derivative(0u),
         boost::math::ellint_rc(x, y), 2.5e3 * test_constants::pct_epsilon());
   }
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
-  using boost::math::nextafter;
-  using boost::math::tools::max;
   using boost::math::fpclassify;
-  using boost::multiprecision::fpclassify;
+  using boost::math::nextafter;
   using boost::math::signbit;
+  using boost::math::tools::max;
+  using boost::multiprecision::fpclassify;
   using boost::multiprecision::signbit;
 
   using std::max;
@@ -181,11 +188,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rj_hpp, T, all_float_types) {
 
     while (fpclassify(T(p)) == FP_ZERO) {
       p = (max)(p_sampler.next(),
-                nextafter(T(0), T(signbit(p) ? -1 : 1) * ((std::numeric_limits<T>::max))()));
+                nextafter(T(0), T(signbit(p) ? -1 : 1) *
+                                    ((std::numeric_limits<T>::max))()));
     }
     BOOST_CHECK_CLOSE(
         boost::math::ellint_rj(make_fvar<T, m>(x), make_fvar<T, m>(y),
-                               make_fvar<T, m>(z), make_fvar<T, m>(p)).derivative(0u),
+                               make_fvar<T, m>(z), make_fvar<T, m>(p))
+            .derivative(0u),
         boost::math::ellint_rj(x, y, z, p),
         2.5e3 * test_constants::pct_epsilon());
   }
@@ -204,7 +213,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rd_hpp, T, all_float_types) {
     auto z = z_sampler.next();
     BOOST_CHECK_CLOSE(
         boost::math::ellint_rd(make_fvar<T, m>(x), make_fvar<T, m>(y),
-                               make_fvar<T, m>(z)).derivative(0u),
+                               make_fvar<T, m>(z))
+            .derivative(0u),
         boost::math::ellint_rd(x, y, z), 2.5e3 * test_constants::pct_epsilon());
   }
 }
@@ -227,7 +237,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ellint_rg_hpp, T, all_float_types) {
     auto z = z_sampler.next();
     BOOST_CHECK_CLOSE(
         boost::math::ellint_rg(make_fvar<T, m>(x), make_fvar<T, m>(y),
-                               make_fvar<T, m>(z)).derivative(0u),
+                               make_fvar<T, m>(z))
+            .derivative(0u),
         boost::math::ellint_rg(x, y, z), 50 * test_constants::pct_epsilon());
   }
 }
@@ -240,8 +251,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(erf_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
 
-    BOOST_CHECK(isNearZero(erf(make_fvar<T, m>(x)).derivative(0u)-boost::math::erf(x)));
-    BOOST_CHECK(isNearZero(erfc(make_fvar<T, m>(x)).derivative(0u)-boost::math::erfc(x)));
+    BOOST_CHECK(isNearZero(erf(make_fvar<T, m>(x)).derivative(0u) -
+                           boost::math::erf(x)));
+    BOOST_CHECK(isNearZero(erfc(make_fvar<T, m>(x)).derivative(0u) -
+                           boost::math::erfc(x)));
   }
 }
 
@@ -250,16 +263,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(expint_hpp, T, all_float_types) {
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{1, 83};
   for (auto n :
-      boost::irange(1u, static_cast<unsigned>(test_constants::n_samples))) {
+       boost::irange(1u, static_cast<unsigned>(test_constants::n_samples))) {
     auto x = x_sampler.next();
     BOOST_CHECK_CLOSE(boost::math::expint(n, make_fvar<T, m>(x)).derivative(0u),
-                        boost::math::expint(n, x),
-                        200 * test_constants::pct_epsilon());
+                      boost::math::expint(n, x),
+                      200 * test_constants::pct_epsilon());
 
     for (auto y : {-1, 1}) {
-      BOOST_CHECK_CLOSE(boost::math::expint(make_fvar<T, m>(x * y)).derivative(0u),
-                          boost::math::expint(x * y),
-                          200 * test_constants::pct_epsilon());
+      BOOST_CHECK_CLOSE(
+          boost::math::expint(make_fvar<T, m>(x * y)).derivative(0u),
+          boost::math::expint(x * y), 200 * test_constants::pct_epsilon());
     }
   }
 }

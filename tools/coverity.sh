@@ -48,4 +48,4 @@ curl --cacert /tmp/scanca.cer \
      --form description="$COVERITY_PROJECT_NAME" \
      https://scan.coverity.com/builds?project="$COVERITY_PROJECT_NAME"
 
-exit ?!
+exit 0

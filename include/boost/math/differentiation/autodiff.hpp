@@ -8,6 +8,7 @@
 
 #include <boost/math/tools/config.hpp>
 
+#include <boost/cstdfloat.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
@@ -1309,9 +1310,9 @@ fvar<RealType,Order> ceil(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> floor(const fvar<RealType,Order>& cr)
 {
-	BOOST_MATH_STD_USING
-	using multiprecision::floor;
-	return fvar<RealType,Order>(floor(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
+  BOOST_MATH_STD_USING
+  using multiprecision::floor;
+  return fvar<RealType,Order>(floor(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
 template<typename RealType, size_t Order>
@@ -1452,8 +1453,8 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 {
-	using std::log;
-	using multiprecision::log;
+    BOOST_MATH_STD_USING
+    using multiprecision::log;
 	using root_type = typename fvar<RealType, Order>::root_type;
 	constexpr size_t order = fvar<RealType, Order>::order_sum;
 	const auto d0 = log(static_cast<root_type>(cr));
@@ -1468,7 +1469,7 @@ fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
-{  
+{
   using std::exp2;
   using std::frexp;
   using multiprecision::exp2;
@@ -1624,7 +1625,7 @@ template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
 atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
-  BOOST_MATH_STD_USING;
+  BOOST_MATH_STD_USING
   using multiprecision::atan2;
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
@@ -1777,7 +1778,7 @@ fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
 {
-  BOOST_MATH_STD_USING_CORE
+  BOOST_MATH_STD_USING
   using multiprecision::cosh;
   using multiprecision::sinh;
   using root_type = typename fvar<RealType,Order>::root_type;

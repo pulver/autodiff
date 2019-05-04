@@ -324,23 +324,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
     const auto &fvar_j = make_fvar<T, m>(j);
     if (std::is_same<T, float>::value) {
       std::cout << fvar_j << " " << j << " "
-                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
+                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << 5
                 << boost::math::pow<5>(fvar_j).derivative(0u) << " "
                 << boost::math::pow<5>(j) << " fabs(diff): " << fabs(boost::math::pow<5>(fvar_j).derivative(0u)-boost::math::pow<5>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
-                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
+                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << 6
                 << boost::math::pow<6>(fvar_j).derivative(0u) << " "
                 << boost::math::pow<6>(j) <<  " fabs(diff): " << fabs(boost::math::pow<6>(fvar_j).derivative(0u)-boost::math::pow<6>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
-                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
+                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << 7
                 << boost::math::pow<7>(fvar_j).derivative(0u) << " "
                 << boost::math::pow<7>(j) << " fabs(diff): " << fabs(boost::math::pow<7>(fvar_j).derivative(0u)-boost::math::pow<7>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
-                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
+                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << 8
                 << boost::math::pow<8>(fvar_j).derivative(0u) << " "
                 << boost::math::pow<8>(j) << " fabs(diff): " << fabs(boost::math::pow<8>(fvar_j).derivative(0u)-boost::math::pow<8>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
-                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
+                << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << 9
                 << boost::math::pow<9>(fvar_j).derivative(0u) << " "
                 << boost::math::pow<9>(j) << " fabs(diff): " << fabs(boost::math::pow<9>(fvar_j).derivative(0u)-boost::math::pow<9>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
     }

@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, bin_float_types) {
   }
 }
 
-
+#if !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)) && !defined(__CYGWIN32__)
 BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
   using bmp::fabs;
   using detail::fabs;
@@ -322,28 +322,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
   for (auto i : boost::irange(10)) {
     const auto &j = static_cast<T>(i);
     const auto &fvar_j = make_fvar<T, m>(j);
-    if (std::is_same<T, float>::value) {
-      std::cout << fvar_j << " " << j << " "
-                << 5 << " " << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << std::fixed
-                << boost::math::pow<5>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<5>(j) << " fabs(diff): " << fabs(boost::math::pow<5>(fvar_j).derivative(0u)-boost::math::pow<5>(j)) << " " << fabs(boost::math::pow<5>(fvar_j)-boost::math::pow<5>(j)).derivative(0u) << " " << std::numeric_limits<T>::epsilon() << std::endl;
-      std::cout << fvar_j << " " << j << " "
-                << 6 << " " << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << std::fixed
-                << boost::math::pow<6>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<6>(j) <<  " fabs(diff): " << fabs(boost::math::pow<6>(fvar_j).derivative(0u)-boost::math::pow<6>(j)) << " " << fabs(boost::math::pow<6>(fvar_j)-boost::math::pow<6>(j)).derivative(0u) << " " << std::numeric_limits<T>::epsilon() << std::endl;
-      std::cout << fvar_j << " " << j << " "
-                << 8 << " " << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << std::fixed
-                << boost::math::pow<7>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<7>(j) << " fabs(diff): " << fabs(boost::math::pow<7>(fvar_j).derivative(0u)-boost::math::pow<7>(j)) << " " << fabs(boost::math::pow<7>(fvar_j)-boost::math::pow<7>(j)).derivative(0u) << " " << std::numeric_limits<T>::epsilon() << std::endl;
-      std::cout << fvar_j << " " << j << " "
-                << 8 << " " << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << std::fixed
-                << boost::math::pow<8>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<8>(j) << " fabs(diff): " << fabs(boost::math::pow<8>(fvar_j).derivative(0u)-boost::math::pow<8>(j)) << " " << fabs(boost::math::pow<8>(fvar_j)-boost::math::pow<8>(j)).derivative(0u) << " " << std::numeric_limits<T>::epsilon() << std::endl;
-      std::cout << fvar_j << " " << j << " "
-                << 9 << " " << std::setprecision(std::numeric_limits<T>::max_digits10 + 1) << std::fixed
-                << boost::math::pow<9>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<9>(j) << " fabs(diff): " << fabs(boost::math::pow<9>(fvar_j).derivative(0u)-boost::math::pow<9>(j)) << " " << fabs(boost::math::pow<9>(fvar_j)-boost::math::pow<9>(j)).derivative(0u) << " " << std::numeric_limits<T>::epsilon() << std::endl;
-    }
     BOOST_CHECK(isNearZero(boost::math::pow<0>(fvar_j).derivative(0u) -
                            boost::math::pow<0>(j)));
     BOOST_CHECK(isNearZero(boost::math::pow<1>(fvar_j).derivative(0u) -
@@ -366,6 +344,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
                            boost::math::pow<9>(j)));
   }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
@@ -439,6 +418,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
   }
 }
 
+#if !(defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR)) && !defined(__CYGWIN32__)
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
   using bmp::fabs;
   using detail::fabs;
@@ -452,13 +432,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
     if (x != 0) {
       auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::sinhc_pi(x);
-      if (std::is_same<T, float>::value) {
-        std::cout << "Sinh: Input: " << std::setprecision(std::numeric_limits<T>::max_digits10+1) << std::fixed << x << " Autodiff: " << autodiff_v.derivative(0u) << " Float: " << anchor_v <<  " fabs(diff): " << fabs(autodiff_v.derivative(0u)-anchor_v) << " Epsilon: " << std::numeric_limits<T>::epsilon() <<  std::endl;
-      }
       BOOST_CHECK(isNearZero(autodiff_v.derivative(0u) - anchor_v));
     }
   }
 }
+#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;

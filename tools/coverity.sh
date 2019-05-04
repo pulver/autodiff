@@ -47,3 +47,5 @@ curl --cacert /tmp/scanca.cer \
      --form version="$BOOST_BRANCH” \
      --form description="$COVERITY_PROJECT_NAME" \
      https://scan.coverity.com/builds?project="$COVERITY_PROJECT_NAME"
+
+exit ?!

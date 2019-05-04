@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, bin_float_types) {
   }
 }
 
-#if !defined(BOOST_WINAPI_IS_MINGW) && !defined(__CYGWIN32__)
+#if !defined(__MINGW32__) && !defined(__CYGWIN32__)
 BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
   using bmp::fabs;
   using detail::fabs;
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
   }
 }
 
-#if !defined(BOOST_WINAPI_IS_MINGW) && !defined(__CYGWIN32__)
+#if !defined(__MINGW32__) && !defined(__CYGWIN32__)
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
   using bmp::fabs;
   using detail::fabs;

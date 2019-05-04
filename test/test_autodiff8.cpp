@@ -314,6 +314,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, bin_float_types) {
 
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
+  using bmp::fabs;
+  using detail::fabs;
+  using std::fabs;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(10)) {
@@ -323,23 +326,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
       std::cout << fvar_j << " " << j << " "
                 << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
                 << boost::math::pow<5>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<5>(j) << " " << std::numeric_limits<T>::epsilon() << std::endl;
+                << boost::math::pow<5>(j) << " fabs(diff): " << fabs(boost::math::pow<5>(fvar_j).derivative(0u)-boost::math::pow<5>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
                 << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
                 << boost::math::pow<6>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<6>(j) << " " << std::numeric_limits<T>::epsilon() << std::endl;
+                << boost::math::pow<6>(j) <<  " fabs(diff): " << fabs(boost::math::pow<6>(fvar_j).derivative(0u)-boost::math::pow<6>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
                 << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
                 << boost::math::pow<7>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<7>(j) << " " << std::numeric_limits<T>::epsilon() << std::endl;
+                << boost::math::pow<7>(j) << " fabs(diff): " << fabs(boost::math::pow<7>(fvar_j).derivative(0u)-boost::math::pow<7>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
                 << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
                 << boost::math::pow<8>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<8>(j) << " " << std::numeric_limits<T>::epsilon() << std::endl;
+                << boost::math::pow<8>(j) << " fabs(diff): " << fabs(boost::math::pow<8>(fvar_j).derivative(0u)-boost::math::pow<8>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
       std::cout << fvar_j << " " << j << " "
                 << std::setprecision(std::numeric_limits<T>::max_digits10 + 1)
                 << boost::math::pow<9>(fvar_j).derivative(0u) << " "
-                << boost::math::pow<9>(j) << " " << std::numeric_limits<T>::epsilon() << std::endl;
+                << boost::math::pow<9>(j) << " fabs(diff): " << fabs(boost::math::pow<9>(fvar_j).derivative(0u)-boost::math::pow<9>(j)) << " " << std::numeric_limits<T>::epsilon() << std::endl;
     }
     BOOST_CHECK(isNearZero(boost::math::pow<0>(fvar_j).derivative(0u) -
                            boost::math::pow<0>(j)));
@@ -437,6 +440,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
+  using bmp::fabs;
+  using detail::fabs;
+  using std::fabs;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   test_detail::RandomSample<T> x_sampler{-80, 80};
@@ -447,7 +453,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
       auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::sinhc_pi(x);
       if (std::is_same<T, float>::value) {
-        std::cout << "Sinh: Input: " << std::setprecision(std::numeric_limits<T>::max_digits10+1) <<  x << " Autodiff: " << autodiff_v.derivative(0u) << " Float: " << anchor_v << " Epsilon: " << std::numeric_limits<T>::epsilon() <<  std::endl;
+        std::cout << "Sinh: Input: " << std::setprecision(std::numeric_limits<T>::max_digits10+1) <<  x << " Autodiff: " << autodiff_v.derivative(0u) << " Float: " << anchor_v <<  "fabs(diff): " << fabs(autodiff_v.derivative(0u)-anchor_v) << " Epsilon: " << std::numeric_limits<T>::epsilon() <<  std::endl;
       }
       BOOST_CHECK(isNearZero(autodiff_v.derivative(0u) - anchor_v));
     }

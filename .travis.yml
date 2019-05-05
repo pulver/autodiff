@@ -182,6 +182,7 @@ jobs:
       env:
         - COMMENT="Coverity Scan"
         - B2_TOOLSET=clang
+        - COVERITY_PROJECT_NAME="Autodiff"		
       script:
         - cd $BOOST_ROOT/libs/$SELF
         - ./tools/coverity.sh

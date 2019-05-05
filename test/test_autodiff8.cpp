@@ -312,39 +312,43 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(owens_t_hpp, T, bin_float_types) {
   }
 }
 
-#if !defined(__MINGW32__) && !defined(__CYGWIN32__)
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(pow_hpp, T, all_float_types) {
-  using bmp::fabs;
-  using detail::fabs;
-  using std::fabs;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
   for (auto i : boost::irange(10)) {
-    const auto &j = static_cast<T>(i);
-    const auto &fvar_j = make_fvar<T, m>(j);
-    BOOST_CHECK(isNearZero(boost::math::pow<0>(fvar_j).derivative(0u) -
-                           boost::math::pow<0>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<1>(fvar_j).derivative(0u) -
-                           boost::math::pow<1>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<2>(fvar_j).derivative(0u) -
-                           boost::math::pow<2>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<3>(fvar_j).derivative(0u) -
-                           boost::math::pow<3>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<4>(fvar_j).derivative(0u) -
-                           boost::math::pow<4>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<5>(fvar_j).derivative(0u) -
-                           boost::math::pow<5>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<6>(fvar_j).derivative(0u) -
-                           boost::math::pow<6>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<7>(fvar_j).derivative(0u) -
-                           boost::math::pow<7>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<8>(fvar_j).derivative(0u) -
-                           boost::math::pow<8>(j)));
-    BOOST_CHECK(isNearZero(boost::math::pow<9>(fvar_j).derivative(0u) -
-                           boost::math::pow<9>(j)));
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<0>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<0>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<1>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<1>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<2>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<2>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<3>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<3>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<4>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<4>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<5>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<5>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<6>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<6>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<7>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<7>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<8>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<8>(static_cast<T>(i)), test_constants::pct_epsilon());
+    BOOST_CHECK_CLOSE(
+        boost::math::pow<9>(make_fvar<T, m>(static_cast<T>(i))).derivative(0u),
+        boost::math::pow<9>(static_cast<T>(i)), test_constants::pct_epsilon());
   }
 }
-#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(polygamma_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;
@@ -418,25 +422,21 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sin_pi_hpp, T, all_float_types) {
   }
 }
 
-#if !defined(__MINGW32__) && !defined(__CYGWIN32__)
 BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
-  using bmp::fabs;
-  using detail::fabs;
-  using std::fabs;
   using test_constants = test_constants_t<T>;
   static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> x_sampler{-80, 80};
+  test_detail::RandomSample<T> x_sampler{ -80, 80 };
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
     if (x != 0) {
       auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::sinhc_pi(x);
-      BOOST_CHECK(isNearZero(autodiff_v.derivative(0u) - anchor_v));
+      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
+                        50 * test_constants::pct_epsilon());
     }
   }
 }
-#endif
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(spherical_harmonic_hpp, T, all_float_types) {
   using test_constants = test_constants_t<T>;

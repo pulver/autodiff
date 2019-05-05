@@ -40,12 +40,4 @@ rm -rf cov-int/
 cov-build --dir cov-int ci/travis/build.sh
 tail -50 cov-int/build-log.txt 
 tar cJf cov-int.tar.xz cov-int/
-curl --cacert /tmp/scanca.cer \
-     --form token="$COVERITY_SCAN_TOKEN" \
-     --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" \
-     --form file=@cov-int.tar.xz \
-     --form version="$BOOST_BRANCH” \
-     --form description="$COVERITY_PROJECT_NAME" \
-     https://scan.coverity.com/builds?project="$COVERITY_PROJECT_NAME"
-
-exit 0
+curl --cacert /tmp/scanca.cer --form token="$COVERITY_SCAN_TOKEN" --form email="$COVERITY_SCAN_NOTIFICATION_EMAIL" --form file=@cov-int.tar.xz --form version="$BOOST_BRANCH” --form description="$COVERITY_PROJECT_NAME" https://scan.coverity.com/builds?project="$COVERITY_PROJECT_NAME"

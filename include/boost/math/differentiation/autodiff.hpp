@@ -1303,7 +1303,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> ceil(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::ceil;
+  
   return fvar<RealType,Order>(ceil(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1311,7 +1311,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> floor(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::floor;
+  
   return fvar<RealType,Order>(floor(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1319,7 +1319,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::exp;
+  
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   using root_type = typename fvar<RealType,Order>::root_type;
   const root_type d0 = exp(static_cast<root_type>(cr));
@@ -1330,9 +1330,9 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<RealType,Order>::root_type& y)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::pow;
-  using multiprecision::log;
-  using multiprecision::fabs;
+  
+  
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type x0 = static_cast<root_type>(x);
@@ -1349,9 +1349,9 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, const fvar<RealType,Order>& y)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::pow;
-  using multiprecision::log;
-  using multiprecision::fabs;
+  
+  
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type logx = log(x);
@@ -1371,9 +1371,9 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
     pow(const fvar<RealType1,Order1>& x, const fvar<RealType2,Order2>& y)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::pow;
-  using multiprecision::log;
-  using multiprecision::fabs;
+  
+  
+  
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
   constexpr size_t order = return_type::order_sum;
@@ -1416,7 +1416,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::sqrt;
+  
   using ssize_t = std::make_signed<std::size_t>::type;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
@@ -1454,7 +1454,7 @@ template<typename RealType, size_t Order>
 fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 {
     BOOST_MATH_STD_USING
-    using multiprecision::log;
+    
     using root_type = typename fvar<RealType, Order>::root_type;
     constexpr size_t order = fvar<RealType, Order>::order_sum;
     const root_type d0 = log(static_cast<root_type>(cr));
@@ -1473,7 +1473,7 @@ fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
   using std::exp2;
   using std::frexp;
   using multiprecision::exp2;
-  using multiprecision::frexp;
+  
 
   using root_type = typename fvar<RealType,Order>::root_type;
   frexp(static_cast<root_type>(cr), exp);
@@ -1493,8 +1493,8 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::cos;
-  using multiprecision::sin;
+  
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cos(static_cast<root_type>(cr));
@@ -1512,7 +1512,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::cos;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sin(static_cast<root_type>(cr));
@@ -1530,7 +1530,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::asin;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = asin(static_cast<root_type>(cr));
@@ -1548,7 +1548,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::tan;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = tan(static_cast<root_type>(cr));
@@ -1566,7 +1566,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::atan;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atan(static_cast<root_type>(cr));
@@ -1654,7 +1654,7 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
 fmod(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
   using math::trunc;
-  using multiprecision::trunc;
+  
   const auto numer = static_cast<typename fvar<RealType1,Order1>::root_type>(cr1);
   const auto denom = static_cast<typename fvar<RealType2,Order2>::root_type>(cr2);
   return cr1 - cr2 * trunc(numer/denom);
@@ -1664,7 +1664,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> round(const fvar<RealType,Order>& cr)
 {
   using math::round;
-  using multiprecision::round;
+  
   return fvar<RealType,Order>(round(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1672,7 +1672,7 @@ template<typename RealType, size_t Order>
 int iround(const fvar<RealType,Order>& cr)
 {
   using math::iround;
-  using multiprecision::iround;
+  
   return iround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1680,7 +1680,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> trunc(const fvar<RealType,Order>& cr)
 {
   using math::trunc;
-  using multiprecision::trunc;
+  
   return fvar<RealType,Order>(trunc(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1688,7 +1688,7 @@ template<typename RealType, size_t Order>
 int itrunc(const fvar<RealType,Order>& cr)
 {
   using math::itrunc;
-  using multiprecision::itrunc;
+  
   return itrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1707,7 +1707,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::acos;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = acos(static_cast<root_type>(cr));
@@ -1725,7 +1725,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
 {
   using math::acosh;
-  using multiprecision::acosh;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = acosh(static_cast<root_type>(cr));
@@ -1743,7 +1743,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
 {
   using math::asinh;
-  using multiprecision::asinh;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = asinh(static_cast<root_type>(cr));
@@ -1761,7 +1761,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
 {
   using math::atanh;
-  using multiprecision::atanh;
+  
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atanh(static_cast<root_type>(cr));
@@ -1779,8 +1779,8 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::cosh;
-  using multiprecision::sinh;
+  
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cosh(static_cast<root_type>(cr));
@@ -1797,7 +1797,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> erf(const fvar<RealType,Order>& cr)
 {
   using math::erf;
-  using multiprecision::erf;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = erf(static_cast<root_type>(cr));
@@ -1815,7 +1815,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
 {
   using math::erfc;
-  using multiprecision::erfc;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = erfc(static_cast<root_type>(cr));
@@ -1834,7 +1834,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
   using math::lambert_w0;
-  using multiprecision::exp;
+  
 	
   using root_type = typename fvar<RealType,Order>::root_type;
   using ssize_t = std::make_signed<std::size_t>::type;
@@ -1892,8 +1892,8 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  using multiprecision::sinh;
-  using multiprecision::cosh;
+  
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sinh(static_cast<root_type>(cr));
@@ -1919,7 +1919,7 @@ template<typename RealType, size_t Order>
 long lround(const fvar<RealType,Order>& cr)
 {
   using math::lround;
-  using multiprecision::lround;
+  
   return lround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1927,7 +1927,7 @@ template<typename RealType, size_t Order>
 long long llround(const fvar<RealType,Order>& cr)
 {
   using math::llround;
-  using multiprecision::llround;
+  
   return llround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1935,7 +1935,7 @@ template<typename RealType, size_t Order>
 long long lltrunc(const fvar<RealType,Order>& cr)
 {
   using math::lltrunc;
-  using multiprecision::lltrunc;
+  
   return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 

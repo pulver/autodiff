@@ -163,12 +163,7 @@ auto isNearZero(const T& t) noexcept -> typename std::enable_if<!detail::is_fvar
   using detail::fabs;
   using boost::math::fpclassify;
   using std::sqrt;
-  if (fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL) {
-    return true;
-  }
-  const auto tolerance = sqrt(std::numeric_limits<T>::epsilon());
-  BOOST_TEST_WARN(fabs(t) <= tolerance, "t: " << fabs(t) << " tolerance: " << tolerance);
-  return fabs(t) <= tolerance;
+  return fpclassify(fabs(t)) == FP_ZERO || fpclassify(fabs(t)) == FP_SUBNORMAL || boost::math::fpc::is_small(fabs(t), sqrt(std::numeric_limits<T>::epsilon()));
 }
 
 template<typename T>

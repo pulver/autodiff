@@ -55,6 +55,7 @@ branches:
   - /feature\/.*/
   - /fix\/.*/
   - /pr\/.*/
+  - fix-codecov
 
 script:
   - cd $BOOST_ROOT/libs/$SELF

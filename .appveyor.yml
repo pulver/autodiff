@@ -31,6 +31,7 @@ branches:
     - /feature\/.*/
     - /fix\/.*/
     - /pr\/.*/
+    - fix-codecov
 
 matrix:
   # Adding MAYFAIL to any matrix job allows it to fail but the build stays green:

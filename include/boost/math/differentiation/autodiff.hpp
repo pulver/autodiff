@@ -1303,7 +1303,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> ceil(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   return fvar<RealType,Order>(ceil(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1311,7 +1310,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> floor(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   return fvar<RealType,Order>(floor(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
@@ -1319,7 +1317,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   using root_type = typename fvar<RealType,Order>::root_type;
   const root_type d0 = exp(static_cast<root_type>(cr));
@@ -1330,9 +1327,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<RealType,Order>::root_type& y)
 {
   BOOST_MATH_STD_USING
-  
-  
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type x0 = static_cast<root_type>(x);
@@ -1341,17 +1335,15 @@ fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<Real
     derivatives[i+1] = (y-i) * derivatives[i] / x0;
   if (fabs(x0) < std::numeric_limits<root_type>::epsilon()) {
   	return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
+  } else {
+    return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
   }
-  return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, const fvar<RealType,Order>& y)
 {
   BOOST_MATH_STD_USING
-  
-  
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type logx = log(x);
@@ -1371,9 +1363,6 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
     pow(const fvar<RealType1,Order1>& x, const fvar<RealType2,Order2>& y)
 {
   BOOST_MATH_STD_USING
-  
-  
-  
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
   constexpr size_t order = return_type::order_sum;
@@ -1416,7 +1405,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using ssize_t = std::make_signed<std::size_t>::type;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
@@ -1454,7 +1442,6 @@ template<typename RealType, size_t Order>
 fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 {
     BOOST_MATH_STD_USING
-    
     using root_type = typename fvar<RealType, Order>::root_type;
     constexpr size_t order = fvar<RealType, Order>::order_sum;
     const root_type d0 = log(static_cast<root_type>(cr));
@@ -1493,8 +1480,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cos(static_cast<root_type>(cr));
@@ -1512,7 +1497,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sin(static_cast<root_type>(cr));
@@ -1530,7 +1514,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = asin(static_cast<root_type>(cr));
@@ -1548,7 +1531,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = tan(static_cast<root_type>(cr));
@@ -1566,7 +1548,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atan(static_cast<root_type>(cr));
@@ -1707,7 +1688,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = acos(static_cast<root_type>(cr));
@@ -1779,8 +1759,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cosh(static_cast<root_type>(cr));
@@ -1892,8 +1870,6 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
 {
   BOOST_MATH_STD_USING
-  
-  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sinh(static_cast<root_type>(cr));

@@ -18,7 +18,7 @@ int main()
     const auto x = make_fvar<T,0,m>(cx);
     const auto z = atan2(y, x);
     // Mathematica: Flatten@Transpose@Table[D[ArcTan[x,y],{x,i},{y,j}] /. {x->1/2, y->Sqrt[3]/2}, {i,0,5}, {j,0,5}]
-    const T expected[(m+1)*(m+1)] { boost::math::constants::third_pi<T>(),
+    /*const T expected[(m+1)*(m+1)] { boost::math::constants::third_pi<T>(),
         -0.5*boost::math::constants::root_three<T>(), 0.5*boost::math::constants::root_three<T>(), 0,
         -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0.5, 0.5, -2,
         3, 12, -120, -0.5*boost::math::constants::root_three<T>(), 0, 3*boost::math::constants::root_three<T>(),
@@ -26,7 +26,7 @@ int main()
         120, -360, -2520, -3*boost::math::constants::root_three<T>(), 12*boost::math::constants::root_three<T>(), 0,
         -360*boost::math::constants::root_three<T>(), 2520*boost::math::constants::root_three<T>(), 0, 12, -120, 360,
         2520, -40320, 181440 };
-    size_t k=0;
+     size_t k=0;*/
     std::cout << "Should be 0: z.derivative(4,5) = " << z.derivative(4,5) << std::endl;
     /*
     for (size_t i=0 ; i<=m ; ++i)

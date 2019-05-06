@@ -91,19 +91,22 @@ template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(orders...) * product(boost::math::factorial<root_type>(static_cast<unsigned>(orders))...);
+  return at(static_cast<size_t>(orders)...) * product(boost::math::factorial<root_type>(static_cast<unsigned>(orders))...);
 }
 
 template<typename RootType, typename Func>
 class Curry
 {
-  const Func& f;
-  const size_t i;
+  const Func& f_;
+  const size_t i_;
  public:
   template <typename SizeType> // typename SizeType to force inline constructor.
-  Curry(const Func& f, SizeType i):f(f),i(i) { }
+  Curry(const Func& f, SizeType i):f_(f),i_(static_cast<std::size_t>(i)) { }
   template <typename... Indices>
-  RootType operator()(Indices... indices) const { return f(i,indices...); }
+  RootType operator()(Indices... indices) const {
+    using unsigned_t = typename std::make_unsigned<typename std::common_type<Indices>::type...>::type;
+    return f_(i_,static_cast<unsigned_t>(indices)...);
+  }
 };
 
 // f : order -> derivative(order)/factorial(order)
@@ -185,13 +188,14 @@ template<typename SizeType>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply_cpp11(std::false_type /* !is_fvar */,
                                                                   SizeType z0, size_t isum0, const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
+  using ssize_t = typename std::make_signed<std::size_t>::type;
   const RealType zero(0);
   const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
   const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
   const size_t i_max = m0 + m1 < Order ? Order - (m0 + m1) : 0;
   fvar<RealType,Order> retval = fvar<RealType,Order>();
   for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
-    retval.v[j] = std::inner_product(v.cbegin()+m0, v.cend()-(i+m1), cr.v.crbegin()+(i+m0), zero);
+    retval.v[j] = std::inner_product(v.cbegin()+ssize_t(m0), v.cend()-ssize_t(i+m1), cr.v.crbegin()+ssize_t(i+m0), zero);
   return retval;
 }
 

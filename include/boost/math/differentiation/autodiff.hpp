@@ -6,15 +6,14 @@
 #ifndef BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
-#include <boost/config.hpp>
 #include <boost/math/tools/config.hpp>
 
+#include <boost/cstdfloat.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
-
-#include <boost/lexical_cast.hpp>
-#include <boost/mp11/function.hpp>
+#include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>
 #include <array>
@@ -31,11 +30,10 @@ namespace boost { namespace math { namespace differentiation { inline namespace 
 namespace detail {
 
 template<typename RealType, typename... RealTypes>
-struct promote_args_n { using type = typename boost::math::tools::promote_args_2<RealType,
-                                                                                 typename promote_args_n<RealTypes...>::type>::type; };
+struct promote_args_n { using type = typename tools::promote_args_2<RealType, typename promote_args_n<RealTypes...>::type>::type; };
 
 template<typename RealType>
-struct promote_args_n<RealType> { using type = typename boost::math::tools::promote_arg<RealType>::type; };
+struct promote_args_n<RealType> { using type = typename tools::promote_arg<RealType>::type; };
 
 } // namespace detail
 
@@ -47,17 +45,40 @@ namespace detail {
 template<typename RealType, size_t Order>
 class fvar;
 
+// Compile-time test for fvar<> type.
+template<typename T>
+struct is_fvar_t : std::false_type{};
+
+template<typename RealType, size_t Order>
+struct is_fvar_t<fvar<RealType,Order>> : std::true_type {};
+
+template<typename T>
+using is_fvar = is_fvar_t<decay_t<T>>;
+
+template<typename RealType, size_t Order, size_t... Orders> // specialized for fvar<> below.
+struct nest_fvar { using type = fvar<typename nest_fvar<RealType,Orders...>::type,Order>; };
+
+template<typename RealType, size_t Order>
+struct nest_fvar<RealType,Order> { using type = fvar<RealType,Order>; };
+
+
 template <typename>
-struct get_depth : std::integral_constant<size_t, 0> {};
+struct get_depth_t : std::integral_constant<size_t, 0> {};
 
 template <typename RealType, size_t Order>
-struct get_depth<fvar<RealType,Order>> : std::integral_constant<size_t,get_depth<RealType>::value+1> {};
+struct get_depth_t<fvar<RealType,Order>> : std::integral_constant<size_t, get_depth_t<RealType>::value+1> {};
+
+template<typename T>
+using get_depth = get_depth_t<decay_t<T>>;
 
 template <typename>
-struct get_order_sum : std::integral_constant<size_t, 0> {};
+struct get_order_sum_t : std::integral_constant<size_t, 0> {};
 
 template <typename RealType, size_t Order>
-struct get_order_sum<fvar<RealType,Order>> : std::integral_constant<size_t,get_order_sum<RealType>::value+Order> {};
+struct get_order_sum_t<fvar<RealType,Order>> : std::integral_constant<size_t, get_order_sum_t<RealType>::value+Order> {};
+
+template<typename T>
+using get_order_sum = get_order_sum_t<decay_t<T>>;
 
 // Get non-fvar<> root type T of autodiff_fvar<T,O0,O1,O2,...>.
 template<typename RealType>
@@ -66,13 +87,16 @@ struct get_root_type { using type = RealType; };
 template<typename RealType, size_t Order>
 struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
 
+
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
 struct type_at { using type = RealType; };
 
 template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
-  typename boost::conditional<Depth==0, fvar<RealType,Order>, typename type_at<RealType,Depth-1>::type>::type; };
+	typename conditional<Depth == 0, fvar<RealType, Order>, typename type_at<RealType, Depth - 1>::type>::type;
+};
+
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -280,7 +304,8 @@ class fvar
 
   explicit operator root_type() const; // Must be explicit, otherwise overloaded operators are ambiguous.
 
-  explicit operator int() const; // Must be explicit, otherwise overloaded operators are ambiguous.
+  template<typename T, typename = typename boost::enable_if<boost::is_arithmetic<decay_t<T>>>::type>
+  explicit operator T() const; // Must be explicit; multiprecision has trouble without the std::enable_if
 
   fvar& set_root(const root_type&);
 
@@ -536,19 +561,6 @@ long long lltrunc(const fvar<RealType,Order>&);
 template<typename RealType, size_t Order>
 long double truncl(const fvar<RealType,Order>&);
 
-// Compile-time test for fvar<> type.
-template<typename>
-struct is_fvar : std::false_type {};
-
-template<typename RealType, size_t Order>
-struct is_fvar<fvar<RealType,Order>> : std::true_type {};
-
-template<typename RealType, size_t Order, size_t... Orders> // specialized for fvar<> below.
-struct nest_fvar { using type = fvar<typename nest_fvar<RealType,Orders...>::type,Order>; };
-
-template<typename RealType, size_t Order>
-struct nest_fvar<RealType,Order> { using type = fvar<RealType,Order>; };
-
 } // namespace detail
 
 template<typename RealType, size_t Order, size_t... Orders>
@@ -608,7 +620,7 @@ fvar<RealType,Order>::fvar(const RealType2& ca)
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order>::fvar(const char* ca_str)
-    :    v{{static_cast<RealType>(boost::lexical_cast<promote<typename fvar<RealType, Order>::root_type, double>>(ca_str))}}
+    :    v{{static_cast<RealType>(boost::lexical_cast<promote<root_type, double>>(ca_str))}}
 {
 }
 
@@ -659,16 +671,17 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator*=(const fvar<RealType2,Order2>& cr)
 {
+  using diff_t = typename std::array<RealType, Order+1>::difference_type;
   const promote<RealType,RealType2> zero(0);
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order <= Order2)
     for (size_t i=0, j=Order ; i<=Order ; ++i, --j)
-      v[j] = std::inner_product(v.cbegin(), v.cend()-i, cr.v.crbegin()+i, zero);
+      v[j] = std::inner_product(v.cbegin(), v.cend()-diff_t(i), cr.v.crbegin()+diff_t(i), zero);
   else
   {
     for (size_t i=0, j=Order ; i<=Order-Order2 ; ++i, --j)
-      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+i, zero);
+      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cend(), v.crbegin()+diff_t(i), zero);
     for (size_t i=Order-Order2+1, j=Order2-1 ; i<=Order ; ++i, --j)
-      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+(j+1), v.crbegin()+i, zero);
+      v[j] = std::inner_product(cr.v.cbegin(), cr.v.cbegin()+diff_t(j+1), v.crbegin()+diff_t(i), zero);
   }
   return *this;
 }
@@ -683,14 +696,15 @@ template<typename RealType, size_t Order>
 template<typename RealType2, size_t Order2>
 fvar<RealType,Order>& fvar<RealType,Order>::operator/=(const fvar<RealType2,Order2>& cr)
 {
+  using diff_t = typename std::array<RealType, Order+1>::difference_type;
   const RealType zero(0);
   v.front() /= cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, --j, --k)
-      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
+      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), v.crbegin()+diff_t(k), zero)) /= cr.v.front();
   else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
-      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, v.crbegin()+k, zero)) /= cr.v.front();
+      (v[i] -= std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), v.crbegin()+diff_t(k), zero)) /= cr.v.front();
   else
     for (size_t i=1 ; i<=Order ; ++i)
       v[i] /= cr.v.front();
@@ -758,10 +772,10 @@ fvar<RealType,Order>::operator-(const fvar<RealType2,Order2>& cr) const
   for (size_t i=0 ; i<=(std::min)(Order,Order2) ; ++i)
     retval.v[i] = v[i] - cr.v[i];
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
-    for (size_t i=Order+1 ; i<=Order2 ; ++i)
+    for (auto i=Order+1 ; i<=Order2 ; ++i)
       retval.v[i] = -cr.v[i];
   else if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
-    for (size_t i=Order2+1 ; i<=Order ; ++i)
+    for (auto i=Order2+1 ; i<=Order ; ++i)
       retval.v[i] = v[i];
   return retval;
 }
@@ -787,14 +801,15 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator*(const fvar<RealType2,Order2>& cr) const
 {
+  using diff_t = typename std::array<RealType, Order+1>::difference_type;
   const promote<RealType,RealType2> zero(0);
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
     for (size_t i=0, j=Order, k=Order2 ; i<=Order2 ; ++i, j&&--j, --k)
-      retval.v[i] = std::inner_product(v.cbegin(), v.cend()-j, cr.v.crbegin()+k, zero);
+      retval.v[i] = std::inner_product(v.cbegin(), v.cend()-diff_t(j), cr.v.crbegin()+diff_t(k), zero);
   else
     for (size_t i=0, j=Order2, k=Order ; i<=Order ; ++i, j&&--j, --k)
-      retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-j, v.crbegin()+k, zero);
+      retval.v[i] = std::inner_product(cr.v.cbegin(), cr.v.cend()-diff_t(j), v.crbegin()+diff_t(k), zero);
   return retval;
 }
 
@@ -817,6 +832,7 @@ template<typename RealType2, size_t Order2>
 promote<fvar<RealType,Order>,fvar<RealType2,Order2>>
 fvar<RealType,Order>::operator/(const fvar<RealType2,Order2>& cr) const
 {
+  using diff_t = typename std::array<RealType, Order+1>::difference_type;
   const promote<RealType,RealType2> zero(0);
   promote<fvar<RealType,Order>,fvar<RealType2,Order2>> retval;
   retval.v.front() = v.front() / cr.v.front();
@@ -824,15 +840,15 @@ fvar<RealType,Order>::operator/(const fvar<RealType2,Order2>& cr) const
   {
     for (size_t i=1, j=Order2-1 ; i<=Order ; ++i, --j)
       retval.v[i] = (v[i] -
-          std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)) / cr.v.front();
+          std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), retval.v.crbegin()+diff_t(j+1), zero)) / cr.v.front();
     for (size_t i=Order+1, j=Order2-Order-1 ; i<=Order2 ; ++i, --j)
       retval.v[i] =
-          -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero) / cr.v.front();
+          -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), retval.v.crbegin()+diff_t(j+1), zero) / cr.v.front();
   }
   else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
     for (size_t i=1, j=Order2-1, k=Order ; i<=Order ; ++i, j&&--j, --k)
       retval.v[i] =
-          (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+k, zero)) / cr.v.front();
+          (v[i] - std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), retval.v.crbegin()+diff_t(k), zero)) / cr.v.front();
   else
     for (size_t i=1 ; i<=Order ; ++i)
       retval.v[i] = v[i] / cr.v.front();
@@ -850,13 +866,14 @@ fvar<RealType,Order> fvar<RealType,Order>::operator/(const root_type& ca) const
 template<typename RealType, size_t Order>
 fvar<RealType,Order> operator/(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
+  using diff_t = typename std::array<RealType, Order+1>::difference_type;
   fvar<RealType,Order> retval;
   retval.v.front() = ca / cr.v.front();
   if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order)
   {
     const RealType zero(0);
     for (size_t i=1, j=Order-1 ; i<=Order ; ++i, --j)
-      retval.v[i] = -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-j, retval.v.crbegin()+(j+1), zero)
+      retval.v[i] = -std::inner_product(cr.v.cbegin()+1, cr.v.cend()-diff_t(j), retval.v.crbegin()+diff_t(j+1), zero)
           / cr.v.front();
   }
   return retval;
@@ -1079,13 +1096,13 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivati
     const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
     fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
     promote<fvar<RealType,Order>,Fvar,Fvars...> accumulator = cr.apply_derivatives_nonhorner(
-        order, [&f](auto... indices) { return f(0,indices...); }, std::forward<Fvars>(fvars)...);
+        order, [&f](auto... indices) { return f(0,static_cast<std::size_t>(indices)...); }, std::forward<Fvars>(fvars)...);
     const size_t i_max = (std::min)(order, order_sum);
     for (size_t i=1 ; i<=i_max ; ++i)
     { // accumulator += (epsilon_i *= epsilon) * (f(i) / factorial<root_type>(i));
       epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
       accumulator += epsilon_i.epsilon_multiply(i, 0, cr.apply_derivatives_nonhorner(
-            order-i, [&f,i](auto... indices) { return f(i,indices...); }, std::forward<Fvars>(fvars)...)
+            order-i, [&f,i](auto... indices) { return f(i,static_cast<std::size_t>(indices)...); }, std::forward<Fvars>(fvars)...)
             / factorial<root_type>(static_cast<unsigned>(i)), 0, 0);
     }
     return accumulator;
@@ -1095,11 +1112,11 @@ promote<fvar<RealType,Order>,Fvar,Fvars...> fvar<RealType,Order>::apply_derivati
 // f : order -> derivative(order)
 template<typename RealType, size_t Order>
 template<typename Func>
-fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const size_t order, const Func& f) const
+fvar<RealType,Order> fvar<RealType,Order>::apply_derivatives_nonhorner(const size_t /*order*/, const Func& f) const
 {
   const fvar<RealType,Order> epsilon = fvar<RealType,Order>(*this).set_root(0);
   fvar<RealType,Order> epsilon_i = fvar<RealType,Order>(1); // epsilon to the power of i
-  fvar<RealType,Order> accumulator = fvar<RealType,Order>(f(0));
+  fvar<RealType,Order> accumulator = fvar<RealType,Order>(f(0u));
   for (size_t i=1 ; i<=order_sum ; ++i)
   { // accumulator += (epsilon_i *= epsilon) * (f(i) / factorial<root_type>(i));
     epsilon_i = epsilon_i.epsilon_multiply(i-1, 0, epsilon, 1, 0);
@@ -1115,7 +1132,7 @@ template<typename... Orders>
 get_type_at<RealType,sizeof...(Orders)> fvar<RealType,Order>::at(size_t order, Orders... orders) const
 {
     if constexpr (0 < sizeof...(Orders))
-        return v.at(order).at(orders...);
+        return v.at(order).at(static_cast<std::size_t>(orders)...);
     else
         return v.at(order);
 }
@@ -1128,18 +1145,18 @@ template<typename... Orders>
 get_type_at<fvar<RealType,Order>,sizeof...(Orders)> fvar<RealType,Order>::derivative(Orders... orders) const
 {
   static_assert(sizeof...(Orders) <= depth, "Number of parameters to derivative(...) cannot exceed fvar::depth.");
-  return at(orders...) * (... * factorial<root_type>(static_cast<unsigned>(orders)));
+  return at(static_cast<std::size_t>(orders)...) * (... * factorial<root_type>(static_cast<unsigned>(orders)));
 }
 #endif
 
 template<typename RealType, size_t Order>
-RealType fvar<RealType,Order>::epsilon_inner_product(size_t z0, size_t isum0, size_t m0,
-                                                     const fvar<RealType,Order>& cr, size_t z1, size_t isum1, size_t m1, size_t j) const
+RealType fvar<RealType,Order>::epsilon_inner_product(size_t z0, const size_t isum0, const size_t m0,
+                                                     const fvar<RealType,Order>& cr, size_t z1, const size_t isum1, const size_t m1, const size_t j) const
 {
   static_assert(is_fvar<RealType>::value, "epsilon_inner_product() must have 1 < depth.");
   RealType accumulator = RealType();
-  const size_t i0_max = m1 < j ? j-m1 : 0;
-  for (size_t i0=m0, i1=j-m0 ; i0<=i0_max ; ++i0, --i1)
+  const auto i0_max = m1 < j ? j-m1 : 0;
+  for (auto i0=m0, i1=j-m0 ; i0<=i0_max ; ++i0, --i1)
     accumulator += v.at(i0).epsilon_multiply(z0, isum0+i0, cr.v.at(i1), z1, isum1+i1);
   return accumulator;
 }
@@ -1149,6 +1166,7 @@ template<typename RealType, size_t Order>
 fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t isum0,
     const fvar<RealType,Order>& cr, size_t z1, size_t isum1) const
 {
+    using diff_t = typename std::array<RealType, Order+1>::difference_type;
     const RealType zero(0);
     const size_t m0 = order_sum + isum0 < Order + z0 ? Order + z0 - (order_sum + isum0) : 0;
     const size_t m1 = order_sum + isum1 < Order + z1 ? Order + z1 - (order_sum + isum1) : 0;
@@ -1159,7 +1177,7 @@ fvar<RealType,Order> fvar<RealType,Order>::epsilon_multiply(size_t z0, size_t is
             retval.v[j] = epsilon_inner_product(z0, isum0, m0, cr, z1, isum1, m1, j);
     else
         for (size_t i=0, j=Order ; i<=i_max ; ++i, --j)
-            retval.v[j] = std::inner_product(v.cbegin()+m0, v.cend()-(i+m1), cr.v.crbegin()+(i+m0), zero);
+            retval.v[j] = std::inner_product(v.cbegin()+diff_t(m0), v.cend()-diff_t(i+m1), cr.v.crbegin()+diff_t(i+m0), zero);
     return retval;
 }
 #endif
@@ -1240,15 +1258,16 @@ fvar<RealType,Order>& fvar<RealType,Order>::multiply_assign_by_root_type(bool is
 #endif
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>::operator root_type() const
+fvar<RealType, Order>::operator root_type() const
 {
   return static_cast<root_type>(v.front());
 }
 
 template<typename RealType, size_t Order>
-fvar<RealType,Order>::operator int() const
+template<typename T, typename /*unused*/>
+fvar<RealType,Order>::operator T() const
 {
-  return static_cast<int>(v.front());
+  return static_cast<T>(static_cast<root_type>(v.front()));
 }
 
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
@@ -1283,21 +1302,21 @@ fvar<RealType,Order> abs(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ceil(const fvar<RealType,Order>& cr)
 {
-  using std::ceil;
+  BOOST_MATH_STD_USING
   return fvar<RealType,Order>(ceil(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> floor(const fvar<RealType,Order>& cr)
 {
-  using std::floor;
+  BOOST_MATH_STD_USING
   return fvar<RealType,Order>(floor(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 {
-  using std::exp;
+  BOOST_MATH_STD_USING
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   using root_type = typename fvar<RealType,Order>::root_type;
   const root_type d0 = exp(static_cast<root_type>(cr));
@@ -1307,26 +1326,24 @@ fvar<RealType,Order> exp(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const fvar<RealType,Order>& x, const typename fvar<RealType,Order>::root_type& y)
 {
-  using std::fabs;
-  using std::pow;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type x0 = static_cast<root_type>(x);
   root_type derivatives[order+1] { pow(x0, y) };
   for (size_t i=0 ; i<order && y-i!=0 ; ++i)
     derivatives[i+1] = (y-i) * derivatives[i] / x0;
-  if (fabs(x0) < std::numeric_limits<root_type>::epsilon())
-    return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
-  else
+  if (fabs(x0) < std::numeric_limits<root_type>::epsilon()) {
+  	return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
+  } else {
     return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
+  }
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, const fvar<RealType,Order>& y)
 {
-  using std::fabs;
-  using std::log;
-  using std::pow;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type logx = log(x);
@@ -1335,26 +1352,26 @@ fvar<RealType,Order> pow(const typename fvar<RealType,Order>::root_type& x, cons
   *derivatives = pow(x, y0);
   for (size_t i=0 ; i<order ; ++i)
     derivatives[i+1] = derivatives[i] * logx;
-  if (fabs(x) < std::numeric_limits<root_type>::epsilon())
-    return y.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
-  else
-    return y.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
+  if (fabs(x) < std::numeric_limits<root_type>::epsilon()) {
+  	return y.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
+  }
+  return y.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
 }
 
 template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
     pow(const fvar<RealType1,Order1>& x, const fvar<RealType2,Order2>& y)
 {
-  using std::fabs;
-  using std::pow;
+  BOOST_MATH_STD_USING
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
   constexpr size_t order = return_type::order_sum;
   const root_type x0 = static_cast<root_type>(x);
   const root_type y0 = static_cast<root_type>(y);
   root_type dxydx[order+1] { pow(x0, y0) };
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-    return return_type(*dxydx);
+  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0) {
+  	return return_type(*dxydx);
+  }
   else
   {
     for (size_t i=0 ; i<order && y0-i!=0 ; ++i)
@@ -1377,24 +1394,25 @@ promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
         sum += binomial * dxydx[i-k] * lognx[j].derivative(k);
       }
       return sum; };
-    if (fabs(x0) < std::numeric_limits<root_type>::epsilon())
-      return x.apply_derivatives_nonhorner(order, f, y);
-    else
-      return x.apply_derivatives(order, f, y);
+	if (fabs(x0) < std::numeric_limits<root_type>::epsilon()) {
+		return x.apply_derivatives_nonhorner(order, f, y);
+	}
+  	return x.apply_derivatives(order, f, y);
   }
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 {
-  using std::sqrt;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   root_type derivatives[order+1];
   const root_type x = static_cast<root_type>(cr);
   *derivatives = sqrt(x);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-    return fvar<RealType,Order>(*derivatives);
+  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0) {
+  	return fvar<RealType, Order>(*derivatives);
+  }
   else
   {
     root_type numerator = 0.5;
@@ -1404,35 +1422,36 @@ fvar<RealType,Order> sqrt(const fvar<RealType,Order>& cr)
 #else // for compilers that compile this branch when order=0.
     derivatives[(std::min)(size_t(1),order)] = numerator / *derivatives;
 #endif
+    using diff_t = typename std::array<RealType, Order+1>::difference_type;
     for (size_t i=2 ; i<=order ; ++i)
     {
-      numerator *= -0.5 * ((i<<1)-3);
+      numerator *= root_type(-0.5) * ((diff_t(i)<<1)-3);
       powers *= x;
       derivatives[i] = numerator / (powers * *derivatives);
     }
     const auto f = [&derivatives](size_t i) { return derivatives[i]; };
-    if (cr < std::numeric_limits<root_type>::epsilon())
-      return cr.apply_derivatives_nonhorner(order, f);
-    else
-      return cr.apply_derivatives(order, f);
+	if (cr < std::numeric_limits<root_type>::epsilon()) {
+		return cr.apply_derivatives_nonhorner(order, f);
+	}
+    return cr.apply_derivatives(order, f);
   }
 }
 
 // Natural logarithm. If cr==0 then derivative(i) may have nans due to nans from inverse().
 template<typename RealType, size_t Order>
-fvar<RealType,Order> log(const fvar<RealType,Order>& cr)
+fvar<RealType, Order> log(const fvar<RealType, Order>& cr)
 {
-  using std::log;
-  using root_type = typename fvar<RealType,Order>::root_type;
-  constexpr size_t order = fvar<RealType,Order>::order_sum;
-  const root_type d0 = log(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
-    return fvar<RealType,Order>(d0);
-  else
-  {
-    const auto d1 = make_fvar<root_type,order-1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
-    return cr.apply_coefficients_nonhorner([&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
-  }
+    BOOST_MATH_STD_USING
+    using root_type = typename fvar<RealType, Order>::root_type;
+    constexpr size_t order = fvar<RealType, Order>::order_sum;
+    const root_type d0 = log(static_cast<root_type>(cr));
+    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+      return fvar<RealType, Order>(d0);
+    else
+    {
+      const auto d1 = make_fvar<root_type, order - 1>(static_cast<root_type>(cr)).inverse(); // log'(x) = 1 / x
+      return cr.apply_coefficients_nonhorner([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    }
 }
 
 template<typename RealType, size_t Order>
@@ -1440,24 +1459,27 @@ fvar<RealType,Order> frexp(const fvar<RealType,Order>& cr, int* exp)
 {
   using std::exp2;
   using std::frexp;
+  using multiprecision::exp2;
+  
+
   using root_type = typename fvar<RealType,Order>::root_type;
   frexp(static_cast<root_type>(cr), exp);
-  return cr * exp2(-*exp);
+  return cr * static_cast<root_type>(exp2(-*exp));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> ldexp(const fvar<RealType,Order>& cr, int exp)
 {
-  // argument to std::exp2 must be casted to RealType, otherwise std::exp2 returns double (always)
+  // argument to std::exp2 must be casted to root_type, otherwise std::exp2 returns double (always)
   using std::exp2;
+  using multiprecision::exp2;
   return cr * exp2(static_cast<typename fvar<RealType, Order>::root_type>(exp));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
 {
-  using std::cos;
-  using std::sin;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cos(static_cast<root_type>(cr));
@@ -1474,8 +1496,7 @@ fvar<RealType,Order> cos(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
 {
-  using std::sin;
-  using std::cos;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sin(static_cast<root_type>(cr));
@@ -1492,7 +1513,7 @@ fvar<RealType,Order> sin(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
 {
-  using std::asin;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = asin(static_cast<root_type>(cr));
@@ -1509,7 +1530,7 @@ fvar<RealType,Order> asin(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
 {
-  using std::tan;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = tan(static_cast<root_type>(cr));
@@ -1526,7 +1547,7 @@ fvar<RealType,Order> tan(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
 {
-  using std::atan;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atan(static_cast<root_type>(cr));
@@ -1543,7 +1564,8 @@ fvar<RealType,Order> atan(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan2(const fvar<RealType,Order>& cr, const typename fvar<RealType,Order>::root_type& ca)
 {
-  using std::atan2;
+  BOOST_MATH_STD_USING
+  using multiprecision::atan2;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atan2(static_cast<root_type>(cr), ca);
@@ -1560,7 +1582,8 @@ fvar<RealType,Order> atan2(const fvar<RealType,Order>& cr, const typename fvar<R
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atan2(const typename fvar<RealType,Order>::root_type& ca, const fvar<RealType,Order>& cr)
 {
-  using std::atan2;
+  BOOST_MATH_STD_USING
+  using multiprecision::atan2;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atan2(ca, static_cast<root_type>(cr));
@@ -1583,7 +1606,8 @@ template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
 atan2(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
-  using std::atan2;
+  BOOST_MATH_STD_USING
+  using multiprecision::atan2;
   using return_type = promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>;
   using root_type = typename return_type::root_type;
   constexpr size_t order = return_type::order_sum;
@@ -1610,7 +1634,8 @@ template<typename RealType1, size_t Order1, typename RealType2, size_t Order2>
 promote<fvar<RealType1,Order1>,fvar<RealType2,Order2>>
 fmod(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 {
-  using std::trunc;
+  using math::trunc;
+  
   const auto numer = static_cast<typename fvar<RealType1,Order1>::root_type>(cr1);
   const auto denom = static_cast<typename fvar<RealType2,Order2>::root_type>(cr2);
   return cr1 - cr2 * trunc(numer/denom);
@@ -1619,28 +1644,32 @@ fmod(const fvar<RealType1,Order1>& cr1, const fvar<RealType2,Order2>& cr2)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> round(const fvar<RealType,Order>& cr)
 {
-  using std::round;
+  using math::round;
+  
   return fvar<RealType,Order>(round(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
 template<typename RealType, size_t Order>
 int iround(const fvar<RealType,Order>& cr)
 {
-  using boost::math::iround;
+  using math::iround;
+  
   return iround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType, size_t Order>
 fvar<RealType,Order> trunc(const fvar<RealType,Order>& cr)
 {
-  using std::trunc;
+  using math::trunc;
+  
   return fvar<RealType,Order>(trunc(static_cast<typename fvar<RealType,Order>::root_type>(cr)));
 }
 
 template<typename RealType, size_t Order>
 int itrunc(const fvar<RealType,Order>& cr)
 {
-  using boost::math::itrunc;
+  using math::itrunc;
+  
   return itrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1658,7 +1687,7 @@ std::ostream& operator<<(std::ostream& out, const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 {
-  using std::acos;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = acos(static_cast<root_type>(cr));
@@ -1675,7 +1704,8 @@ fvar<RealType,Order> acos(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
 {
-  using std::acosh;
+  using math::acosh;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = acosh(static_cast<root_type>(cr));
@@ -1692,7 +1722,8 @@ fvar<RealType,Order> acosh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
 {
-  using std::asinh;
+  using math::asinh;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = asinh(static_cast<root_type>(cr));
@@ -1709,8 +1740,9 @@ fvar<RealType,Order> asinh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
 {
-  using std::atanh;
-  using root_type = typename fvar<RealType,Order>::root_type;
+  using math::atanh;
+  
+  using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = atanh(static_cast<root_type>(cr));
   if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
@@ -1726,8 +1758,7 @@ fvar<RealType,Order> atanh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
 {
-  using std::cosh;
-  using std::sinh;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = cosh(static_cast<root_type>(cr));
@@ -1743,7 +1774,8 @@ fvar<RealType,Order> cosh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> erf(const fvar<RealType,Order>& cr)
 {
-  using std::erf;
+  using math::erf;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = erf(static_cast<root_type>(cr));
@@ -1752,7 +1784,7 @@ fvar<RealType,Order> erf(const fvar<RealType,Order>& cr)
   else
   {
     auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr)); // d1 = 2/sqrt(pi)*exp(-x*x)
-    const auto d1 = 2*boost::math::constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
+    const auto d1 = 2*constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
     return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
   }
 }
@@ -1760,7 +1792,8 @@ fvar<RealType,Order> erf(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
 {
-  using std::erfc;
+  using math::erfc;
+  
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = erfc(static_cast<root_type>(cr));
@@ -1769,7 +1802,7 @@ fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
   else
   {
     auto x = make_fvar<root_type,order-1>(static_cast<root_type>(cr)); // erfc'(x) = -erf'(x)
-    const auto d1 = -2*boost::math::constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
+    const auto d1 = -2*constants::one_div_root_pi<root_type>()*exp((x*=x).negate());
     return cr.apply_coefficients(order, [&d0,&d1](size_t i) { return i ? d1.at(i-1)/i : d0; });
   }
 }
@@ -1777,8 +1810,8 @@ fvar<RealType,Order> erfc(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
 {
-  using boost::math::lambert_w0;
-  using std::exp;
+  BOOST_MATH_STD_USING
+  using math::lambert_w0;
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   root_type derivatives[order+1];
@@ -1793,6 +1826,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
       return cr.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
     else
     {
+      using diff_t = typename std::array<RealType, Order+1>::difference_type;
       root_type d1powers = derivatives[1] * derivatives[1];
       const root_type x = derivatives[1] * expw;
       derivatives[2] = d1powers * (-1 - x);
@@ -1804,7 +1838,7 @@ fvar<RealType,Order> lambert_w0(const fvar<RealType,Order>& cr)
           (coef[j] *= -static_cast<root_type>(n-1)) -= (n+j-2) * coef[j-1];
         coef[0] *= -static_cast<root_type>(n-1);
         d1powers *= derivatives[1];
-        derivatives[n] = d1powers * std::accumulate(coef.crend()-(n-1), coef.crend(), coef[n-1],
+        derivatives[n] = d1powers * std::accumulate(coef.crend()-diff_t(n-1), coef.crend(), coef[n-1],
                                                     [&x](const root_type& a, const root_type& b) { return a*x + b; });
       }
       return cr.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
@@ -1833,8 +1867,7 @@ fvar<RealType,Order> sinc(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 fvar<RealType,Order> sinh(const fvar<RealType,Order>& cr)
 {
-  using std::sinh;
-  using std::cosh;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType,Order>::root_type;
   constexpr size_t order = fvar<RealType,Order>::order_sum;
   const root_type d0 = sinh(static_cast<root_type>(cr));
@@ -1859,21 +1892,24 @@ fvar<RealType,Order> tanh(const fvar<RealType,Order>& cr)
 template<typename RealType, size_t Order>
 long lround(const fvar<RealType,Order>& cr)
 {
-  using std::lround;
+  using math::lround;
+  
   return lround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType, size_t Order>
 long long llround(const fvar<RealType,Order>& cr)
 {
-  using std::llround;
+  using math::llround;
+  
   return llround(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
 template<typename RealType, size_t Order>
 long long lltrunc(const fvar<RealType,Order>& cr)
 {
-  using boost::math::lltrunc;
+  using math::lltrunc;
+  
   return lltrunc(static_cast<typename fvar<RealType,Order>::root_type>(cr));
 }
 
@@ -1898,13 +1934,20 @@ class numeric_limits<boost::math::differentiation::detail::fvar<RealType,Order>>
 } // namespace std
 
 namespace boost { namespace math { namespace tools {
+namespace detail {
+template<typename RealType, std::size_t Order>
+using autodiff_fvar_type = differentiation::detail::fvar<RealType, Order>;
+
+template<typename RealType, std::size_t Order>
+using autodiff_root_type = typename autodiff_fvar_type<RealType, Order>::root_type;
+} // namespace detail
 
 // See boost/math/tools/promotion.hpp
 template<typename RealType0, size_t Order0, typename RealType1, size_t Order1>
-struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
-                      differentiation::detail::fvar<RealType1, Order1>>
+struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>,
+                      detail::autodiff_fvar_type<RealType1, Order1>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type,
+  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type,
 #ifndef BOOST_NO_CXX14_CONSTEXPR
            (std::max)(Order0,Order1)>;
 #else
@@ -1912,22 +1955,28 @@ struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>,
 #endif
 };
 
-template<typename RealType0, size_t Order0, typename RealType1>
-struct promote_args_2<differentiation::detail::fvar<RealType0, Order0>, RealType1>
+template<typename RealType, size_t Order>
+struct promote_args<detail::autodiff_fvar_type<RealType, Order>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order0>;
+  using type = detail::autodiff_fvar_type<typename promote_args<RealType>::type, Order>;
+};
+
+template<typename RealType0, size_t Order0, typename RealType1>
+struct promote_args_2<detail::autodiff_fvar_type<RealType0, Order0>, RealType1>
+{
+  using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order0>;
 };
 
 template<typename RealType0, typename RealType1, size_t Order1>
-struct promote_args_2<RealType0, differentiation::detail::fvar<RealType1, Order1>>
+struct promote_args_2<RealType0, detail::autodiff_fvar_type<RealType1, Order1>>
 {
-  using type = differentiation::detail::fvar<typename promote_args_2<RealType0, RealType1>::type, Order1>;
+      using type = detail::autodiff_fvar_type<typename promote_args_2<RealType0, RealType1>::type, Order1>;
 };
 
-template<typename ToType, typename RealType, std::size_t Order>
-inline ToType real_cast(const differentiation::detail::fvar<RealType, Order> &from_v)
+template<typename destination_t, typename RealType, std::size_t Order>
+inline BOOST_MATH_CONSTEXPR destination_t real_cast(const detail::autodiff_fvar_type<RealType, Order>& from_v) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType))
 {
-  return static_cast<ToType>(static_cast<RealType>(from_v));
+      return real_cast<destination_t>(static_cast<detail::autodiff_root_type<RealType, Order>>(from_v));
 }
 
 } // namespace tools
@@ -1938,13 +1987,13 @@ template <class Policy, std::size_t Order>
 using fvar_t = differentiation::detail::fvar<Policy, Order>;
 template <class Policy, std::size_t Order>
 struct evaluation<fvar_t<float, Order>, Policy> {
-  using type = fvar_t<typename boost::conditional<Policy::promote_float_type::value, double, float>::type, Order>;
+  using type = fvar_t<typename conditional<Policy::promote_float_type::value, double, float>::type, Order>;
 };
 
 template <class Policy, std::size_t Order>
 struct evaluation<fvar_t<double, Order>, Policy> {
   using type =
-  fvar_t<typename boost::conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
+  fvar_t<typename conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
 };
 
 } } } // namespace boost::math::policies

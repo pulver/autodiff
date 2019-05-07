@@ -6,12 +6,14 @@
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-project boost/autodiff/example :
-;
+import testing ;
+import ../../config/checks/config : requires ;
 
-run black_scholes.cpp ;
-run fourth_power.cpp ;
-run mixed_partials.cpp ;
-run multiprecision.cpp ;
-run simple.cpp ;
-
+test-suite autodiff_example
+    :   [ run atan2.cpp ]
+        [ run black_scholes.cpp ]
+        [ run fourth_power.cpp ]
+        [ run mixed_partials.cpp ]
+        [ run multiprecision.cpp ]
+        [ run simple.cpp ]
+    ;

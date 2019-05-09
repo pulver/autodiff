@@ -510,9 +510,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(zeta_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    BOOST_CHECK(
+    BOOST_WARN(
         isNearZero(boost::math::zeta(make_fvar<T, m>(x)).derivative(0u) -
                    boost::math::zeta(x)));
+    BOOST_CHECK_CLOSE(boost::math::zeta(make_fvar<T, m>(x)).derivative(0u),
+        boost::math::zeta(x), test_constants::pct_epsilon());
   }
 }
 

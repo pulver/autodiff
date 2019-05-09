@@ -5,7 +5,7 @@
 Branch          | Travis | Appveyor | codecov.io |
 :-------------: | ------ | -------- | ---------- |
 [`master`](https://github.com/pulver/autodiff/tree/master) | [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=master)](https://travis-ci.com/pulver/autodiff) | [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/master?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/master) | [![codecov](https://codecov.io/gh/pulver/autodiff/branch/master/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff)
-[`develop`](https://github.com/pulver/autodiff/tree/develop) | [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=develop)](https://travis-ci.com/pulver/autodiff) | [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/develop?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/develop) | [![codecov](https://codecov.io/gh/pulver/autodiff/branch/develop/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff)
+[`develop`](https://github.com/pulver/autodiff/tree/develop) | [![Build Status](https://travis-ci.com/pulver/autodiff.svg?branch=develop)](https://travis-ci.com/pulver/autodiff) | [![Build status](https://ci.appveyor.com/api/projects/status/hmhefrokif2n1b9t/branch/develop?svg=true)](https://ci.appveyor.com/project/pulver/autodiff/branch/develop) | [![codecov](https://codecov.io/gh/pulver/autodiff/branch/develop/graph/badge.svg)](https://codecov.io/gh/pulver/autodiff/branch/develop)
 
 ## Description
 

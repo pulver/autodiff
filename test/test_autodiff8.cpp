@@ -514,7 +514,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(zeta_hpp, T, all_float_types) {
         isNearZero(boost::math::zeta(make_fvar<T, m>(x)).derivative(0u) -
                    boost::math::zeta(x)));
     BOOST_CHECK_CLOSE(boost::math::zeta(make_fvar<T, m>(x)).derivative(0u),
-        boost::math::zeta(x), test_constants::pct_epsilon());
+        boost::math::zeta(x), 50 * test_constants::pct_epsilon());
   }
 }
 

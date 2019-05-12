@@ -22,6 +22,7 @@
 #include <limits>
 #include <numeric>
 #include <ostream>
+#include <tuple>
 #include <type_traits>
 
 // Automatic Differentiation v1
@@ -87,7 +88,6 @@ struct get_root_type { using type = RealType; };
 template<typename RealType, size_t Order>
 struct get_root_type<fvar<RealType,Order>> { using type = typename get_root_type<RealType>::type; };
 
-
 // Get type from descending Depth levels into fvar<>.
 template<typename RealType, size_t Depth>
 struct type_at { using type = RealType; };
@@ -96,7 +96,6 @@ template<typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType,Order>,Depth> { using type =
 	typename conditional<Depth == 0, fvar<RealType, Order>, typename type_at<RealType, Depth - 1>::type>::type;
 };
-
 
 template<typename RealType, size_t Depth>
 using get_type_at = typename type_at<RealType,Depth>::type;
@@ -567,9 +566,30 @@ template<typename RealType, size_t Order, size_t... Orders>
 using autodiff_fvar = typename detail::nest_fvar<RealType,Order,Orders...>::type;
 
 template<typename RealType, size_t Order, size_t... Orders>
-autodiff_fvar<RealType,Order,Orders...> make_fvar(const RealType& ca)
-{
+autodiff_fvar<RealType,Order,Orders...> make_fvar(const RealType& ca) {
   return autodiff_fvar<RealType,Order,Orders...>(ca, true);
+}
+
+namespace detail {
+
+template <size_t>
+struct zero : std::integral_constant<size_t,0> {};
+
+template<typename RealType, size_t Order, size_t... Is>
+auto make_fvar_for_tuple(std::index_sequence<Is...>, const RealType& ca) {
+  return make_fvar<RealType,zero<Is>::value...,Order>(ca);
+}
+
+template<typename RealType, size_t... Orders, size_t... Is, typename... RealTypes>
+auto make_ftuple(std::index_sequence<Is...>, const RealTypes&... ca) {
+  return std::make_tuple(make_fvar_for_tuple<RealType,Orders>(std::make_index_sequence<Is>{},ca)...);
+}
+
+} // namespace detail
+
+template<typename RealType, size_t... Orders, typename... RealTypes>
+auto make_ftuple(const RealTypes&... ca) {
+  return detail::make_ftuple<RealType,Orders...>(std::index_sequence_for<RealTypes...>{}, ca...);
 }
 
 namespace detail {

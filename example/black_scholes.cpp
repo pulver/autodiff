@@ -45,10 +45,10 @@ int main()
 {
   const double K = 100.0; // Strike price.
   const auto variables = make_ftuple<double,3,3,1,1>(105, 5, 30.0/365, 1.25/100);
-  const auto S     = std::get<0>(variables); // Stock price.
-  const auto sigma = std::get<1>(variables); // Volatility.
-  const auto tau   = std::get<2>(variables); // Time to expiration in years. (30 days).
-  const auto r     = std::get<3>(variables); // Interest rate.
+  const auto& S     = std::get<0>(variables); // Stock price.
+  const auto& sigma = std::get<1>(variables); // Volatility.
+  const auto& tau   = std::get<2>(variables); // Time to expiration in years. (30 days).
+  const auto& r     = std::get<3>(variables); // Interest rate.
   const auto call_price = black_scholes_option_price(call, K, S, sigma, tau, r);
   const auto put_price  = black_scholes_option_price(put,  K, S, sigma, tau, r);
 

@@ -589,6 +589,8 @@ auto make_ftuple(std::index_sequence<Is...>, const RealTypes&... ca) {
 
 template<typename RealType, size_t... Orders, typename... RealTypes>
 auto make_ftuple(const RealTypes&... ca) {
+  static_assert(sizeof...(Orders) == sizeof...(RealTypes),
+    "Number of Orders must match number of function parameters.");
   return detail::make_ftuple<RealType,Orders...>(std::index_sequence_for<RealTypes...>{}, ca...);
 }
 

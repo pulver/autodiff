@@ -582,17 +582,17 @@ auto make_fvar_for_tuple(mp11::index_sequence<Is...>, const RealType& ca) -> dec
 }
 
 template<typename RealType, size_t... Orders, size_t... Is, typename... RealTypes>
-auto make_ftuple(mp11::index_sequence<Is...>, const RealTypes&... ca) -> decltype(std::make_tuple(make_fvar_for_tuple<RealType,Orders>(mp11::make_index_sequence<Is>{},ca)...)) {
+auto make_ftuple_impl(mp11::index_sequence<Is...>, const RealTypes&... ca) -> decltype(std::make_tuple(make_fvar_for_tuple<RealType,Orders>(mp11::make_index_sequence<Is>{},ca)...)) {
   return std::make_tuple(make_fvar_for_tuple<RealType,Orders>(mp11::make_index_sequence<Is>{},ca)...);
 }
 
 } // namespace detail
 
 template<typename RealType, size_t... Orders, typename... RealTypes>
-auto make_ftuple(const RealTypes&... ca) -> decltype(detail::make_ftuple<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...)) {
+auto make_ftuple(const RealTypes&... ca) -> decltype(detail::make_ftuple_impl<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...)) {
   static_assert(sizeof...(Orders) == sizeof...(RealTypes),
     "Number of Orders must match number of function parameters.");
-  return detail::make_ftuple<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...);
+  return detail::make_ftuple_impl<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...);
 }
 
 namespace detail {

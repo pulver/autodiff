@@ -13,6 +13,7 @@
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/mp11/integer_sequence.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>
@@ -576,22 +577,22 @@ template <size_t>
 struct zero : std::integral_constant<size_t,0> {};
 
 template<typename RealType, size_t Order, size_t... Is>
-auto make_fvar_for_tuple(std::index_sequence<Is...>, const RealType& ca) {
+auto make_fvar_for_tuple(mp11::index_sequence<Is...>, const RealType& ca) -> decltype(make_fvar<RealType,zero<Is>::value...,Order>(ca)) {
   return make_fvar<RealType,zero<Is>::value...,Order>(ca);
 }
 
 template<typename RealType, size_t... Orders, size_t... Is, typename... RealTypes>
-auto make_ftuple(std::index_sequence<Is...>, const RealTypes&... ca) {
-  return std::make_tuple(make_fvar_for_tuple<RealType,Orders>(std::make_index_sequence<Is>{},ca)...);
+auto make_ftuple(mp11::index_sequence<Is...>, const RealTypes&... ca) -> decltype(std::make_tuple(make_fvar_for_tuple<RealType,Orders>(mp11::make_index_sequence<Is>{},ca)...)) {
+  return std::make_tuple(make_fvar_for_tuple<RealType,Orders>(mp11::make_index_sequence<Is>{},ca)...);
 }
 
 } // namespace detail
 
 template<typename RealType, size_t... Orders, typename... RealTypes>
-auto make_ftuple(const RealTypes&... ca) {
+auto make_ftuple(const RealTypes&... ca) -> decltype(detail::make_ftuple<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...)) {
   static_assert(sizeof...(Orders) == sizeof...(RealTypes),
     "Number of Orders must match number of function parameters.");
-  return detail::make_ftuple<RealType,Orders...>(std::index_sequence_for<RealTypes...>{}, ca...);
+  return detail::make_ftuple<RealType,Orders...>(mp11::index_sequence_for<RealTypes...>{}, ca...);
 }
 
 namespace detail {

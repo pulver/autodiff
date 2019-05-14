@@ -5,14 +5,18 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/math/differentiation/autodiff.hpp>
+#include <boost/mp11/tuple.hpp>
+#include <boost/mp11/utility.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
 
 using namespace boost::math::differentiation;
 
-auto f = [](const auto& w, const auto& x, const auto& y, const auto& z)
-{
+struct f {
+  template<typename W, typename X, typename Y, typename Z>
+  promote<W, X, Y, Z> operator()(const W& w, const X& x, const Y& y, const Z& z) const {
     return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
+  }
 };
 
 // Derivatives calculated from symbolic differentiation by Mathematica for comparison. Script: mixed_partials.nb
@@ -25,7 +29,7 @@ int main() {
   constexpr std::size_t Ny = 4; // Max order of derivative to calculate for y
   constexpr std::size_t Nz = 3; // Max order of derivative to calculate for z
   const auto variables = make_ftuple<type,Nw,Nx,Ny,Nz>(11,12,13,14);
-  const auto v = std::apply(f, variables);
+  const auto v = boost::mp11::tuple_apply(f{}, variables);
   std::size_t ia = 0;
   double max_relative_error = 0;
   for (std::size_t iw = 0; iw <= Nw; ++iw)

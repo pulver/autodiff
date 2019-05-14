@@ -32,7 +32,8 @@ if [ "$SELF" == "interval" ]; then
     export SELF=numeric/interval
 fi
 if [ "$TRAVIS_BRANCH" == "develop" ]; then
-    export BOOST_BRANCH="develop"
+# should be: export BOOST_BRANCH="develop", but currently autodiff exists in the Boost.Math develop branch
+    export BOOST_BRANCH="master"
 else
     export BOOST_BRANCH="master"
 fi

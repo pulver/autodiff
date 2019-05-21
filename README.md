@@ -16,24 +16,27 @@ of single and multiple variables.
 This implementation is based upon the [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of
 an analytic function *f* at the point *x₀*:
 
-![Taylor series](doc/quickbook/equations/taylor_series.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Taylor series](doc/quickbook/equations/taylor_series.svg)
 
-The essential idea of autodiff is the replacement of numbers with polynomials in the evaluation of *f*. By inputting
-the first-order polynomial *x₀+ε*, the resulting polynomial in *ε* contains the function's derivatives within the
-coefficients. Each coefficient is equal to a derivative of its respective order, divided by the factorial of the order.
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f(x₀)*. By
+substituting the number *x₀* with the first-order polynomial *x₀+ε*, and using the same algorithm to compute
+*f(x₀+ε)*, the resulting polynomial in *ε* contains the function's derivatives *f'(x₀)*, *f''(x₀)*,
+*f'''(x₀)*, ...  within the coefficients. Each coefficient is equal to a derivative of its respective order,
+divided by the factorial of the order.
 
-Assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without any loss of precision
-to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of *ε* greater than *N*
-can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial transformation:
+In a bit more detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without
+any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
+*ε* greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial
+transformation:
 
-![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
 
 C++'s ability to overload operators and functions allows for the creation of a class `fvar` that represents
 polynomials in *ε*. Thus the same algorithm that calculates the numeric value of *y₀=f(x₀)* is also used to
 calculate the polynomial *Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*.  The derivatives are then found from the
 product of the respective factorial and coefficient:
 
-![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
 
 
 ### Example 1: Single-Variable Differentiation
@@ -44,23 +47,22 @@ product of the respective factorial and coefficient:
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
-template<typename T>
-T fourth_power(const T& x)
-{
-    const T second_power = x * x;
-    return second_power * second_power;
+template <typename T>
+T fourth_power(T const& x) {
+  T x4 = x * x;  // retval in operator*() uses x4's memory via NRVO.
+  x4 *= x4;      // No copies of x4 are made within operator*=() even when squaring.
+  return x4;     // x4 uses y's memory in main() via NRVO.
 }
 
-int main()
-{
-    using namespace boost::math::differentiation;
+int main() {
+  using namespace boost::math::differentiation;
 
-    constexpr int Order=5; // The highest order derivative to be calculated.
-    const autodiff_fvar<double,Order> x = make_fvar<double,Order>(2.0); // Find derivatives at x=2.
-    const autodiff_fvar<double,Order> y = fourth_power(x);
-    for (int i=0 ; i<=Order ; ++i)
-        std::cout << "y.derivative("<<i<<") = " << y.derivative(i) << std::endl;
-    return 0;
+  constexpr unsigned Order = 5;                  // The highest order derivative to be calculated.
+  auto const x = make_fvar<double, Order>(2.0);  // Find derivatives at x=2.
+  auto const y = fourth_power(x);
+  for (unsigned i = 0; i <= Order; ++i)
+    std::cout << "y.derivative(" << i << ") = " << y.derivative(i) << std::endl;
+  return 0;
 }
 /*
 Output:
@@ -86,35 +88,35 @@ The above calculates
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <iostream>
 
-template<typename T>
-T f(const T& w, const T& x, const T& y, const T& z)
-{
+using namespace boost::math::differentiation;
+
+template <typename W, typename X, typename Y, typename Z>
+promote<W, X, Y, Z> f(const W& w, const X& x, const Y& y, const Z& z) {
   using namespace std;
-  return exp(w*sin(x*log(y)/z) + sqrt(w*z/(x*y))) + w*w/tan(z);
+  return exp(w * sin(x * log(y) / z) + sqrt(w * z / (x * y))) + w * w / tan(z);
 }
 
-int main()
-{
-  using cpp_bin_float_50 = boost::multiprecision::cpp_bin_float_50;
-  using namespace boost::math::differentiation;
+int main() {
+  using float50 = boost::multiprecision::cpp_bin_float_50;
 
-  constexpr int Nw=3; // Max order of derivative to calculate for w
-  constexpr int Nx=2; // Max order of derivative to calculate for x
-  constexpr int Ny=4; // Max order of derivative to calculate for y
-  constexpr int Nz=3; // Max order of derivative to calculate for z
-  using var = autodiff_fvar<cpp_bin_float_50,Nw,Nx,Ny,Nz>;
-  const var w = make_fvar<cpp_bin_float_50,Nw>(11);
-  const var x = make_fvar<cpp_bin_float_50,0,Nx>(12);
-  const var y = make_fvar<cpp_bin_float_50,0,0,Ny>(13);
-  const var z = make_fvar<cpp_bin_float_50,0,0,0,Nz>(14);
-  const var v = f(w,x,y,z);
+  constexpr unsigned Nw = 3;  // Max order of derivative to calculate for w
+  constexpr unsigned Nx = 2;  // Max order of derivative to calculate for x
+  constexpr unsigned Ny = 4;  // Max order of derivative to calculate for y
+  constexpr unsigned Nz = 3;  // Max order of derivative to calculate for z
+  // Declare 4 independent variables together into a std::tuple.
+  auto const variables = make_ftuple<float50, Nw, Nx, Ny, Nz>(11, 12, 13, 14);
+  auto const& w = std::get<0>(variables);  // Up to Nw derivatives at w=11
+  auto const& x = std::get<1>(variables);  // Up to Nx derivatives at x=12
+  auto const& y = std::get<2>(variables);  // Up to Ny derivatives at y=13
+  auto const& z = std::get<3>(variables);  // Up to Nz derivatives at z=14
+  auto const v = f(w, x, y, z);
   // Calculated from Mathematica symbolic differentiation.
-  const cpp_bin_float_50 answer("1976.319600747797717779881875290418720908121189218755");
-  std::cout << std::setprecision(std::numeric_limits<cpp_bin_float_50>::digits10)
-    << "mathematica   : " << answer << '\n'
-    << "autodiff      : " << v.derivative(Nw,Nx,Ny,Nz) << '\n'
-    << "relative error: " << std::setprecision(3) << (v.derivative(Nw,Nx,Ny,Nz)/answer-1)
-    << std::endl;
+  float50 const answer("1976.319600747797717779881875290418720908121189218755");
+  std::cout << std::setprecision(std::numeric_limits<float50>::digits10) << "mathematica   : " << answer
+            << '\n'
+            << "autodiff      : " << v.derivative(Nw, Nx, Ny, Nz) << '\n'
+            << "relative error: " << std::setprecision(3) << (v.derivative(Nw, Nx, Ny, Nz) / answer - 1)
+            << std::endl;
   return 0;
 }
 /*
@@ -124,6 +126,82 @@ autodiff      : 1976.3196007477977177798818752904187209081211892188
 relative error: 2.67e-50
 */
 ```
+
+### Example 3: Black-Scholes Option Pricing with Greeks Automatically Calculated
+
+``` c++
+#include <boost/math/differentiation/autodiff.hpp>
+#include <iostream>
+
+using namespace boost::math::constants;
+using namespace boost::math::differentiation;
+
+// Equations and function/variable names are from
+// https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+
+// Standard normal probability density function
+template <typename X>
+X phi(X const& x) {
+  return one_div_root_two_pi<X>() * exp(-0.5 * x * x);
+}
+
+// Standard normal cumulative distribution function
+template <typename X>
+X Phi(X const& x) {
+  return 0.5 * erfc(-one_div_root_two<X>() * x);
+}
+
+enum class CP { call, put };
+
+// Assume zero annual dividend yield (q=0).
+template <typename Price, typename Sigma, typename Tau, typename Rate>
+promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp,
+                                                            double K,
+                                                            Price const& S,
+                                                            Sigma const& sigma,
+                                                            Tau const& tau,
+                                                            Rate const& r) {
+  using namespace std;
+  auto const d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
+  auto const d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
+  if (cp == CP::call)
+    return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
+  else
+    return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+}
+
+int main() {
+  double const K = 100.0;                    // Strike price.
+  auto const S = make_fvar<double, 2>(105);  // Stock price.
+  double const sigma = 5;                    // Volatility.
+  double const tau = 30.0 / 365;             // Time to expiration in years. (30 days).
+  double const r = 1.25 / 100;               // Interest rate.
+  auto const call_price = black_scholes_option_price(CP::call, K, S, sigma, tau, r);
+  auto const put_price = black_scholes_option_price(CP::put, K, S, sigma, tau, r);
+
+  // Compare automatically calculated greeks by autodiff with formulas for greeks.
+  // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
+  std::cout << "black-scholes call price = " << call_price.derivative(0) << '\n'
+            << "black-scholes put  price = " << put_price.derivative(0) << '\n'
+            << "call delta = " << call_price.derivative(1) << '\n'
+            << "put  delta = " << put_price.derivative(1) << '\n'
+            << "call gamma = " << call_price.derivative(2) << '\n'
+            << "put  gamma = " << put_price.derivative(2) << '\n';
+  return 0;
+}
+/*
+Output:
+black-scholes call price = 56.5136
+black-scholes put  price = 51.4109
+call delta = 0.773818
+put  delta = -0.226182
+call gamma = 0.00199852
+put  gamma = 0.00199852
+*/
+```
+
+See [example/black\_scholes.cpp](example/black_scholes.cpp) for a larger list of automatically-calculated
+option greeks.
 
 ## Manual
 
@@ -135,9 +213,9 @@ Distributed under the [Boost Software License, Version 1.0](http://www.boost.org
 
 ### Properties
 
-* Optimized for C++17; also compiles and tested with the C++11, C++14 and the proposed C++20 standards
-* Header-Only
-* Only uses stack memory
+* Header-only.
+* Optimized for C++17. Also compiles and tested with the C++11, C++14 and proposed C++20 standards.
+* All memory is allocated on the stack.
 
 ### Directories
 

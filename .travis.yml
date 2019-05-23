@@ -71,6 +71,9 @@ script:
 #
 
 anchors:
+  clang-38: &clang-38 { apt: { packages: [ "clang-3.8",
+                                           "libstdc++-6-dev" ], sources: [ "llvm-toolchain-xenial-3.8",
+                                                                           "ubuntu-toolchain-r-test"   ] } }
   clang-4:  &clang-4  { apt: { packages: [ "clang-4.0",
                                            "libstdc++-6-dev" ], sources: [ "llvm-toolchain-xenial-4.0",
                                                                            "ubuntu-toolchain-r-test"   ] } }
@@ -110,6 +113,7 @@ jobs:
     - { os: "linux", env: [ "B2_TOOLSET=gcc-6",       "B2_CXXSTD=11,14"    ], addons: *gcc-6     }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-7",       "B2_CXXSTD=11,14,17" ], addons: *gcc-7     }
     - { os: "linux", env: [ "B2_TOOLSET=gcc-8",       "B2_CXXSTD=14,17,2a" ], addons: *gcc-8     }
+    - { os: "linux", env: [ "B2_TOOLSET=clang-3.8",   "B2_CXXSTD=11,14"    ], addons: *clang-38  }
     - { os: "linux", env: [ "B2_TOOLSET=clang-4.0",   "B2_CXXSTD=11,14"    ], addons: *clang-4   }
     - { os: "linux", env: [ "B2_TOOLSET=clang-5.0",   "B2_CXXSTD=11,14,17" ], addons: *clang-5   }
     - { os: "linux", env: [ "B2_TOOLSET=clang-6.0",   "B2_CXXSTD=14,17,2a" ], addons: *clang-6   }

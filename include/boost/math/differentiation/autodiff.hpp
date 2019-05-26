@@ -1362,8 +1362,6 @@ fvar<RealType, Order> pow(fvar<RealType, Order> const& x,
   root_type derivatives[order + 1]{pow(x0, y)};
   for (size_t i = 0; i < order && y - i != 0; ++i)
     derivatives[i + 1] = (y - i) * derivatives[i] / x0;
-  if (fabs(x0) < std::numeric_limits<root_type>::epsilon())
-    return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
   return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
 }
 
@@ -1373,14 +1371,12 @@ fvar<RealType, Order> pow(typename fvar<RealType, Order>::root_type const& x,
   BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
-  root_type const logx = log(x);
   root_type const y0 = static_cast<root_type>(y);
   root_type derivatives[order + 1];
   *derivatives = pow(x, y0);
+  root_type const logx = log(x);
   for (size_t i = 0; i < order; ++i)
     derivatives[i + 1] = derivatives[i] * logx;
-  if (fabs(x) < std::numeric_limits<root_type>::epsilon())
-    return y.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
   return y.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
 }
 
@@ -1659,11 +1655,8 @@ int itrunc(fvar<RealType, Order> const& cr) {
 
 template <typename RealType, size_t Order>
 std::ostream& operator<<(std::ostream& out, fvar<RealType, Order> const& cr) {
-  out << "depth(" << cr.depth;
-  if (cr.v.empty())
-    return out << ")()";
-  out << ")(" << cr.v.front();
-  for (size_t i = 1; i < cr.v.size(); ++i)
+  out << "depth(" << cr.depth << ")(" << cr.v.front();
+  for (size_t i = 1; i <= Order; ++i)
     out << ',' << cr.v[i];
   return out << ')';
 }

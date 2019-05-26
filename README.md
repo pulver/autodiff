@@ -16,27 +16,28 @@ of single and multiple variables.
 This implementation is based upon the [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of
 an analytic function *f* at the point *x₀*:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Taylor series](doc/quickbook/equations/taylor_series.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Taylor series](doc/quickbook/equations/taylor_series.svg)
 
 The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f(x₀)*. By
 substituting the number *x₀* with the first-order polynomial *x₀+ε*, and using the same algorithm to compute
 *f(x₀+ε)*, the resulting polynomial in *ε* contains the function's derivatives *f'(x₀)*, *f''(x₀)*,
-*f'''(x₀)*, ...  within the coefficients. Each coefficient is equal to a derivative of its respective order,
+*f'''(x₀)*, ... within the coefficients. Each coefficient is equal to a derivative of its respective order,
 divided by the factorial of the order.
 
-In a bit more detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without
+In greater detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without
 any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
 *ε* greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial
 transformation:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
 
 C++'s ability to overload operators and functions allows for the creation of a class `fvar` that represents
-polynomials in *ε*. Thus the same algorithm that calculates the numeric value of *y₀=f(x₀)* is also used to
-calculate the polynomial *Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*.  The derivatives are then found from the
-product of the respective factorial and coefficient:
+polynomials in *ε*. Thus the same algorithm *f* that calculates the numeric value of *y₀=f(x₀)*, when
+written to accept and return variables of a generic (template) type, is also used to calculate the polynomial
+*Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*. The derivatives *f<sup>(n)</sup>(x₀)* are then found from the
+product of the respective factorial *n!* and coefficient *y<sub>n</sub>*:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
 
 
 ### Example 1: Single-Variable Differentiation

@@ -108,8 +108,6 @@ class Curry {
   }
 };
 
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
 template <typename RealType, size_t Order>
 template <typename Func, typename Fvar, typename... Fvars>
 promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_coefficients(
@@ -128,8 +126,32 @@ promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_coef
   return accumulator;
 }
 
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan2().
+template <typename RealType, size_t Order>
+template <typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_coefficients_nonhorner(
+    size_t const order,
+    Func const& f,
+    Fvar const& cr,
+    Fvars&&... fvars) const {
+  fvar<RealType, Order> const epsilon = fvar<RealType, Order>(*this).set_root(0);
+  fvar<RealType, Order> epsilon_i = fvar<RealType, Order>(1);  // epsilon to the power of i
+  using return_type = promote<fvar<RealType, Order>, Fvar, Fvars...>;
+  return_type accumulator = cr.apply_coefficients_nonhorner(
+      order, Curry<typename return_type::root_type, Func>(f, 0), std::forward<Fvars>(fvars)...);
+  size_t const i_max = order < order_sum ? order : order_sum;
+  for (size_t i = 1; i <= i_max; ++i) {
+    epsilon_i = epsilon_i.epsilon_multiply(i - 1, 0, epsilon, 1, 0);
+    accumulator += epsilon_i.epsilon_multiply(
+        i,
+        0,
+        cr.apply_coefficients_nonhorner(
+            order - i, Curry<typename return_type::root_type, Func>(f, i), std::forward<Fvars>(fvars)...),
+        0,
+        0);
+  }
+  return accumulator;
+}
+
 template <typename RealType, size_t Order>
 template <typename Func, typename Fvar, typename... Fvars>
 promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_derivatives(
@@ -152,7 +174,6 @@ promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_deri
   return accumulator;
 }
 
-// f : order -> derivative(order)
 template <typename RealType, size_t Order>
 template <typename Func, typename Fvar, typename... Fvars>
 promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_derivatives_nonhorner(

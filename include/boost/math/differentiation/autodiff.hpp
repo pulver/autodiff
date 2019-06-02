@@ -336,7 +336,15 @@ class fvar {
   fvar apply_coefficients(size_t const order, Func const& f) const;
 
   // Use when function returns derivative(i)/factorial(i) and may have some infinite derivatives.
-  fvar apply_coefficients_nonhorner(std::function<root_type(size_t)> const&) const;
+  template <typename Func, typename Fvar, typename... Fvars>
+  promote<fvar<RealType, Order>, Fvar, Fvars...> apply_coefficients_nonhorner(size_t const order,
+                                                                             Func const& f,
+                                                                             Fvar const& cr,
+                                                                             Fvars&&... fvars) const;
+
+  template <typename Func>
+  fvar apply_coefficients_nonhorner(size_t const order, Func const& f) const;
+
 
   // Apply derivatives using horner method.
   template <typename Func, typename Fvar, typename... Fvars>
@@ -348,7 +356,7 @@ class fvar {
   template <typename Func>
   fvar apply_derivatives(size_t const order, Func const& f) const;
 
-  // Apply derivatives using horner method.
+  // Use when function returns derivative(i) and may have some infinite derivatives.
   template <typename Func, typename Fvar, typename... Fvars>
   promote<fvar<RealType, Order>, Fvar, Fvars...> apply_derivatives_nonhorner(size_t const order,
                                                                              Func const& f,
@@ -1051,15 +1059,52 @@ fvar<RealType, Order> fvar<RealType, Order>::apply_coefficients(size_t const ord
   return accumulator;
 }
 
-// f : order -> derivative(order)/factorial(order)
-// Use this when you have the polynomial coefficients, rather than just the derivatives. E.g. See atan().
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+// f : order -> derivative(order)
 template <typename RealType, size_t Order>
-fvar<RealType, Order> fvar<RealType, Order>::apply_coefficients_nonhorner(
-    std::function<root_type(size_t)> const& f) const {
+template <typename Func, typename Fvar, typename... Fvars>
+promote<fvar<RealType, Order>, Fvar, Fvars...> fvar<RealType, Order>::apply_coefficients_nonhorner(
+    size_t const order,
+    Func const& f,
+    Fvar const& cr,
+    Fvars&&... fvars) const {
   fvar<RealType, Order> const epsilon = fvar<RealType, Order>(*this).set_root(0);
   fvar<RealType, Order> epsilon_i = fvar<RealType, Order>(1);  // epsilon to the power of i
-  fvar<RealType, Order> accumulator = fvar<RealType, Order>(f(0));
-  for (size_t i = 1; i <= order_sum; ++i) {
+  promote<fvar<RealType, Order>, Fvar, Fvars...> accumulator = cr.apply_coefficients_nonhorner(
+      order,
+      [&f](auto... indices) { return f(0, static_cast<std::size_t>(indices)...); },
+      std::forward<Fvars>(fvars)...);
+  size_t const i_max = (std::min)(order, order_sum);
+  for (size_t i = 1; i <= i_max; ++i) {
+    epsilon_i = epsilon_i.epsilon_multiply(i - 1, 0, epsilon, 1, 0);
+    accumulator += epsilon_i.epsilon_multiply(
+        i,
+        0,
+        cr.apply_coefficients_nonhorner(
+            order - i,
+            [&f, i](auto... indices) { return f(i, static_cast<std::size_t>(indices)...); },
+            std::forward<Fvars>(fvars)...),
+        0,
+        0);
+  }
+  return accumulator;
+}
+#endif
+
+// f : order -> coefficient(order)
+template <typename RealType, size_t Order>
+template <typename Func>
+fvar<RealType, Order> fvar<RealType, Order>::apply_coefficients_nonhorner(size_t const order,
+                                                                         Func const& f) const {
+  fvar<RealType, Order> const epsilon = fvar<RealType, Order>(*this).set_root(0);
+  fvar<RealType, Order> epsilon_i = fvar<RealType, Order>(1);  // epsilon to the power of i
+  fvar<RealType, Order> accumulator = fvar<RealType, Order>(f(0u));
+#ifndef BOOST_NO_CXX17_IF_CONSTEXPR
+  size_t const i_max = (std::min)(order, order_sum);
+#else  // ODR-use of static constexpr
+  size_t const i_max = order < order_sum ? order : order_sum;
+#endif
+  for (size_t i = 1; i <= i_max; ++i) {
     epsilon_i = epsilon_i.epsilon_multiply(i - 1, 0, epsilon, 1, 0);
     accumulator += epsilon_i.epsilon_multiply(i, 0, f(i));
   }
@@ -1461,7 +1506,7 @@ fvar<RealType, Order> log(fvar<RealType, Order> const& cr) {
     return fvar<RealType, Order>(d0);
   else {
     auto const d1 = make_fvar<root_type, order - 1>(static_cast<root_type>(cr)).inverse();  // log'(x) = 1 / x
-    return cr.apply_coefficients_nonhorner([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
   }
 }
 
@@ -1524,7 +1569,7 @@ fvar<RealType, Order> asin(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x).negate() += 1).inverse();  // asin'(x) = 1 / sqrt(1-x*x).
-    return cr.apply_coefficients_nonhorner([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
   }
 }
 
@@ -1539,7 +1584,7 @@ fvar<RealType, Order> tan(fvar<RealType, Order> const& cr) {
   else {
     auto c = cos(make_fvar<root_type, order - 1>(static_cast<root_type>(cr)));
     auto const d1 = (c *= c).inverse();  // tan'(x) = 1 / cos(x)^2
-    return cr.apply_coefficients_nonhorner([&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
   }
 }
 
@@ -1822,7 +1867,7 @@ fvar<RealType, Order> sinc(fvar<RealType, Order> const& cr) {
   else {
     for (size_t n = 2; n <= order; n += 2)
       taylor[n] = (1 - static_cast<int>(n & 2)) / factorial<root_type>(static_cast<unsigned>(n + 1));
-    return cr.apply_coefficients_nonhorner([&taylor](size_t i) { return taylor[i]; });
+    return cr.apply_coefficients_nonhorner(order, [&taylor](size_t i) { return taylor[i]; });
   }
 }
 

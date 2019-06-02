@@ -114,11 +114,11 @@ int main() {
   auto const v = f(w, x, y, z);
   // Calculated from Mathematica symbolic differentiation.
   float50 const answer("1976.319600747797717779881875290418720908121189218755");
-  std::cout << std::setprecision(std::numeric_limits<float50>::digits10) << "mathematica   : " << answer
-            << '\n'
+  std::cout << std::setprecision(std::numeric_limits<float50>::digits10)
+            << "mathematica   : " << answer << '\n'
             << "autodiff      : " << v.derivative(Nw, Nx, Ny, Nz) << '\n'
-            << "relative error: " << std::setprecision(3) << (v.derivative(Nw, Nx, Ny, Nz) / answer - 1)
-            << std::endl;
+            << std::setprecision(3)
+            << "relative error: " << (v.derivative(Nw, Nx, Ny, Nz) / answer - 1) << '\n';
   return 0;
 }
 /*

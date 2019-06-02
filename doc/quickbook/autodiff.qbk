@@ -75,10 +75,10 @@ f(x_0+\varepsilon) &= f(x_0) + f'(x_0)\varepsilon + \frac{f''(x_0)}{2!}\varepsil
 \end{align*} ]
 [:[:[autodiff_equation taylor_series.svg]]]
 
-The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of /f(x[sub 0])/.
+The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of ['f(x[sub 0])].
 By substituting the number ['x[sub 0]] with the first-order polynomial ['x[sub 0]+\u03b5], and using the same
 algorithm to compute ['f(x[sub 0]+\u03b5)], the resulting polynomial in ['\u03b5] contains the function's derivatives
-['f'(x[sub 0])], ['f''(x[sub 0])], ['f'''(x[sub 0])], ... within the coefficients. Each coefficient is equal to the
+['f'(x[sub 0])], ['f''(x[sub 0])], ['f\'\'\'(x[sub 0])], ... within the coefficients. Each coefficient is equal to the
 derivative of its respective order, divided by the factorial of the order.
 
 In greater detail, assume one is interested in calculating the first /N/ derivatives of /f/ at ['x[sub 0]]. Without

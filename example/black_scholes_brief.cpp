@@ -12,12 +12,6 @@ using namespace boost::math::differentiation;
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
-// Standard normal probability density function
-template <typename X>
-X phi(X const& x) {
-  return one_div_root_two_pi<X>() * exp(-0.5 * x * x);
-}
-
 // Standard normal cumulative distribution function
 template <typename X>
 X Phi(X const& x) {

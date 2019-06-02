@@ -21,13 +21,14 @@ an analytic function *f* at the point *x₀*:
 The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f(x₀)*. By
 substituting the number *x₀* with the first-order polynomial *x₀+ε*, and using the same algorithm to compute
 *f(x₀+ε)*, the resulting polynomial in *ε* contains the function's derivatives *f'(x₀)*, *f''(x₀)*,
-*f'''(x₀)*, ... within the coefficients. Each coefficient is equal to a derivative of its respective order,
+*f'''(x₀)*, ... within the coefficients. Each coefficient is equal to the derivative of its respective order,
 divided by the factorial of the order.
 
-In greater detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without
-any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
-*ε* greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial
-transformation:
+In greater detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Without
+any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers
+of *ε* greater than *N* can be discarded. (This is due to the fact that each term in a polynomial depends only
+upon equal and lower-order terms under arithmetic operations.) Under these truncation rules, *f* provides a
+polynomial-to-polynomial transformation:
 
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
 
@@ -140,12 +141,6 @@ using namespace boost::math::differentiation;
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
-// Standard normal probability density function
-template <typename X>
-X phi(X const& x) {
-  return one_div_root_two_pi<X>() * exp(-0.5 * x * x);
-}
-
 // Standard normal cumulative distribution function
 template <typename X>
 X Phi(X const& x) {
@@ -230,6 +225,6 @@ Distributed under the [Boost Software License, Version 1.0](http://www.boost.org
 ### More information
 
 <!-- * [Ask questions](http://stackoverflow.com/questions/ask?tags=c%2B%2B,boost,boost-template) -->
-* [Report bugs](https://github.com/boostorg/template/issues): Be sure to mention Boost version, platform and compiler you're using. A small compilable code sample to reproduce the problem is always good as well.
+* [Report bugs](https://github.com/pulver/autodiff/issues): Be sure to mention Boost version, platform and compiler you're using. A small compilable code sample to reproduce the problem is always good as well.
 * Submit your patches as pull requests against **develop** branch. Note that by submitting patches you agree to license your modifications under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
 <!-- * Discussions about the library are held on the [Boost developers mailing list](http://www.boost.org/community/groups.html#main). Be sure to read the [discussion policy](http://www.boost.org/community/policy.html) before posting and add the `[template]` tag at the beginning of the subject line. -->

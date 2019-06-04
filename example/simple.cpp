@@ -6,17 +6,16 @@
 #include <boost/math/differentiation/autodiff.hpp>
 #include <iostream>
 
-int main()
-{
-    using namespace boost::math::differentiation;
+int main() {
+  using namespace boost::math::differentiation;
 
-    const auto x = make_fvar<double,3>(13);
-    const auto y = make_fvar<double,0,4>(14);
-    const auto z = 10*x*x + 50*x*y + 100*y*y; // promoted to autodiff_fvar<double,3,4>
-    for (int i=0 ; i<=3 ; ++i)
-        for (int j=0 ; j<=4 ; ++j)
-            std::cout << "z.derivative("<<i<<","<<j<<") = " << z.derivative(i,j) << std::endl;
-    return 0;
+  auto const x = make_fvar<double, 3>(13);
+  auto const y = make_fvar<double, 0, 4>(14);
+  auto const z = 10 * x * x + 50 * x * y + 100 * y * y;  // promoted to autodiff_fvar<double,3,4>
+  for (int i = 0; i <= 3; ++i)
+    for (int j = 0; j <= 4; ++j)
+      std::cout << "z.derivative(" << i << "," << j << ") = " << z.derivative(i, j) << std::endl;
+  return 0;
 }
 /*
 Output:

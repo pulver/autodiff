@@ -7,51 +7,53 @@
 
 #include <boost/math/differentiation/autodiff.hpp>
 
-namespace boost { namespace math { namespace differentiation {
+namespace boost {
+namespace math {
+namespace differentiation {
 
-// Type for variables and constants.
-template<typename RealType, size_t Order, size_t... Orders>
-using autodiff_fvar = typename detail::nest_fvar<RealType,Order,Orders...>::type;
+// Function returning a single variable of differentiation. Recommended: Use auto for type.
+template <typename RealType, size_t Order, size_t... Orders>
+autodiff_fvar<RealType, Order, Orders...> make_fvar(RealType const& ca);
 
-// Function returning a variable of differentiation.
-template<typename RealType, size_t Order, size_t... Orders>
-autodiff_fvar<RealType,Order,Orders...> make_fvar(const RealType& ca);
+// Function returning multiple independent variables of differentiation in a std::tuple.
+template<typename RealType, size_t... Orders, typename... RealTypes>
+auto make_ftuple(RealTypes const&... ca);
 
-// Type of combined autodiff types.
-template<typename RealType, typename... RealTypes>
-using promote = typename detail::promote_args_n<RealType,RealTypes...>::type;
+// Type of combined autodiff types. Recommended: Use auto for return type (C++14).
+template <typename RealType, typename... RealTypes>
+using promote = typename detail::promote_args_n<RealType, RealTypes...>::type;
 
 namespace detail {
 
-// Single autodiff variable. Independent variables are created by nesting.
-template<typename RealType, size_t Order>
-class fvar
-{
-  public:
+// Single autodiff variable. Use make_fvar() or make_ftuple() to instantiate.
+template <typename RealType, size_t Order>
+class fvar {
+ public:
+  // Query return value of function to get the derivatives.
+  template <typename... Orders>
+  get_type_at<RealType, sizeof...(Orders) - 1> derivative(Orders... orders) const;
 
-    // Query return value of function to get the derivatives.
-    template<typename... Orders>
-    get_type_at<RealType, sizeof...(Orders)-1> derivative(Orders... orders) const;
+  // All of the arithmetic and comparison operators are overloaded.
+  template <typename RealType2, size_t Order2>
+  fvar& operator+=(fvar<RealType2, Order2> const&);
 
-    // All of the arithmetic and comparison operators are overloaded.
-    template<typename RealType2, size_t Order2>
-    fvar& operator+=(const fvar<RealType2,Order2>&);
+  fvar& operator+=(root_type const&);
 
-    fvar& operator+=(const root_type&);
-
-    // ...
+  // ...
 };
 
 // Standard math functions are overloaded and called via argument-dependent lookup (ADL).
-template<typename RealType, size_t Order>
-fvar<RealType,Order> floor(const fvar<RealType,Order>&);
+template <typename RealType, size_t Order>
+fvar<RealType, Order> floor(fvar<RealType, Order> const&);
 
-template<typename RealType, size_t Order>
-fvar<RealType,Order> exp(const fvar<RealType,Order>&);
+template <typename RealType, size_t Order>
+fvar<RealType, Order> exp(fvar<RealType, Order> const&);
 
 // ...
 
-} // namespace detail
+}  // namespace detail
 
-} } } // namespace boost::math::differentiation
+}  // namespace differentiation
+}  // namespace math
+}  // namespace boost
 /**/

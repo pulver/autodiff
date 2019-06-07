@@ -6,14 +6,12 @@
 #ifndef BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 #define BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
 
-#include <boost/math/tools/config.hpp>
-
 #include <boost/cstdfloat.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions.hpp>
+#include <boost/math/tools/config.hpp>
 #include <boost/math/tools/promotion.hpp>
-#include <boost/mp11/integer_sequence.hpp>
 #include <boost/multiprecision/rational_adaptor.hpp>
 
 #include <algorithm>

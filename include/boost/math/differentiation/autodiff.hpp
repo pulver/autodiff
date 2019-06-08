@@ -559,12 +559,12 @@ long long llround(fvar<RealType, Order> const&);
 template <typename RealType, size_t Order>
 fvar<RealType, Order> trunc(fvar<RealType, Order> const&);
 
+template <typename RealType, size_t Order>
+long double truncl(fvar<RealType, Order> const&);
+
 // itrunc(cr1) | int
 template <typename RealType, size_t Order>
 int itrunc(fvar<RealType, Order> const&);
-
-template <typename RealType, size_t Order>
-long double truncl(fvar<RealType, Order> const&);
 
 template <typename RealType, size_t Order>
 long long lltrunc(fvar<RealType, Order> const&);
@@ -598,6 +598,9 @@ template <typename RealType, size_t Order>
 fvar<RealType, Order> lambert_w0(fvar<RealType, Order> const&);
 
 template <typename RealType, size_t Order>
+fvar<RealType, Order> lgamma(fvar<RealType, Order> const&);
+
+template <typename RealType, size_t Order>
 fvar<RealType, Order> sinc(fvar<RealType, Order> const&);
 
 template <typename RealType, size_t Order>
@@ -605,6 +608,9 @@ fvar<RealType, Order> sinh(fvar<RealType, Order> const&);
 
 template <typename RealType, size_t Order>
 fvar<RealType, Order> tanh(fvar<RealType, Order> const&);
+
+template <typename RealType, size_t Order>
+fvar<RealType, Order> tgamma(fvar<RealType, Order> const&);
 
 template <size_t>
 struct zero : std::integral_constant<size_t, 0> {};
@@ -1694,15 +1700,39 @@ int iround(fvar<RealType, Order> const& cr) {
 }
 
 template <typename RealType, size_t Order>
+long lround(fvar<RealType, Order> const& cr) {
+  using boost::math::lround;
+  return lround(static_cast<typename fvar<RealType, Order>::root_type>(cr));
+}
+
+template <typename RealType, size_t Order>
+long long llround(fvar<RealType, Order> const& cr) {
+  using boost::math::llround;
+  return llround(static_cast<typename fvar<RealType, Order>::root_type>(cr));
+}
+
+template <typename RealType, size_t Order>
 fvar<RealType, Order> trunc(fvar<RealType, Order> const& cr) {
   using boost::math::trunc;
   return fvar<RealType, Order>(trunc(static_cast<typename fvar<RealType, Order>::root_type>(cr)));
 }
 
 template <typename RealType, size_t Order>
+long double truncl(fvar<RealType, Order> const& cr) {
+  using std::truncl;
+  return truncl(static_cast<typename fvar<RealType, Order>::root_type>(cr));
+}
+
+template <typename RealType, size_t Order>
 int itrunc(fvar<RealType, Order> const& cr) {
   using boost::math::itrunc;
   return itrunc(static_cast<typename fvar<RealType, Order>::root_type>(cr));
+}
+
+template <typename RealType, size_t Order>
+long long lltrunc(fvar<RealType, Order> const& cr) {
+  using boost::math::lltrunc;
+  return lltrunc(static_cast<typename fvar<RealType, Order>::root_type>(cr));
 }
 
 template <typename RealType, size_t Order>
@@ -1875,6 +1905,23 @@ fvar<RealType, Order> lambert_w0(fvar<RealType, Order> const& cr) {
 }
 
 template <typename RealType, size_t Order>
+fvar<RealType, Order> lgamma(fvar<RealType, Order> const& cr) {
+  using std::lgamma;
+  using root_type = typename fvar<RealType, Order>::root_type;
+  constexpr size_t order = fvar<RealType, Order>::order_sum;
+  root_type const x = static_cast<root_type>(cr);
+  root_type const d0 = lgamma(x);
+  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+    return fvar<RealType, Order>(d0);
+  else {
+    static_assert(order <= static_cast<size_t>(std::numeric_limits<int>::max()) + 1,
+                  "order exceeds maximum derivative for boost::math::polygamma().");
+    return cr.apply_derivatives(
+        order, [&x, &d0](size_t i) { return i ? boost::math::polygamma(static_cast<int>(i - 1), x) : d0; });
+  }
+}
+
+template <typename RealType, size_t Order>
 fvar<RealType, Order> sinc(fvar<RealType, Order> const& cr) {
   if (cr != 0)
     return sin(cr) / cr;
@@ -1913,27 +1960,17 @@ fvar<RealType, Order> tanh(fvar<RealType, Order> const& cr) {
 }
 
 template <typename RealType, size_t Order>
-long lround(fvar<RealType, Order> const& cr) {
-  using boost::math::lround;
-  return lround(static_cast<typename fvar<RealType, Order>::root_type>(cr));
-}
-
-template <typename RealType, size_t Order>
-long long llround(fvar<RealType, Order> const& cr) {
-  using boost::math::llround;
-  return llround(static_cast<typename fvar<RealType, Order>::root_type>(cr));
-}
-
-template <typename RealType, size_t Order>
-long long lltrunc(fvar<RealType, Order> const& cr) {
-  using boost::math::lltrunc;
-  return lltrunc(static_cast<typename fvar<RealType, Order>::root_type>(cr));
-}
-
-template <typename RealType, size_t Order>
-long double truncl(fvar<RealType, Order> const& cr) {
-  using std::truncl;
-  return truncl(static_cast<typename fvar<RealType, Order>::root_type>(cr));
+fvar<RealType, Order> tgamma(fvar<RealType, Order> const& cr) {
+  using std::tgamma;
+  using root_type = typename fvar<RealType, Order>::root_type;
+  constexpr size_t order = fvar<RealType, Order>::order_sum;
+  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+    return fvar<RealType, Order>(tgamma(static_cast<root_type>(cr)));
+  else {
+    if (cr < 0)
+      return constants::pi<root_type>() / (sin(constants::pi<root_type>() * cr) * tgamma(1 - cr));
+    return exp(lgamma(cr)).set_root(tgamma(static_cast<root_type>(cr)));
+  }
 }
 
 }  // namespace detail

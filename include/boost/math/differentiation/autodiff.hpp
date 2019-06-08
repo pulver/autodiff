@@ -308,6 +308,8 @@ class fvar {
   template <typename... Orders>
   get_type_at<fvar, sizeof...(Orders)> derivative(Orders... orders) const;
 
+  const RealType& operator[](size_t) const;
+
   fvar inverse() const;  // Multiplicative inverse.
 
   fvar& negate();  // Negate and return reference to *this.
@@ -1230,6 +1232,11 @@ get_type_at<fvar<RealType, Order>, sizeof...(Orders)> fvar<RealType, Order>::der
 #endif
 
 template <typename RealType, size_t Order>
+const RealType& fvar<RealType, Order>::operator[](size_t i) const {
+  return v[i];
+}
+
+template <typename RealType, size_t Order>
 RealType fvar<RealType, Order>::epsilon_inner_product(size_t z0,
                                                       size_t const isum0,
                                                       size_t const m0,
@@ -1242,7 +1249,7 @@ RealType fvar<RealType, Order>::epsilon_inner_product(size_t z0,
   RealType accumulator = RealType();
   auto const i0_max = m1 < j ? j - m1 : 0;
   for (auto i0 = m0, i1 = j - m0; i0 <= i0_max; ++i0, --i1)
-    accumulator += v.at(i0).epsilon_multiply(z0, isum0 + i0, cr.v.at(i1), z1, isum1 + i1);
+    accumulator += v[i0].epsilon_multiply(z0, isum0 + i0, cr.v[i1], z1, isum1 + i1);
   return accumulator;
 }
 
@@ -1506,7 +1513,7 @@ fvar<RealType, Order> log(fvar<RealType, Order> const& cr) {
     return fvar<RealType, Order>(d0);
   else {
     auto const d1 = make_fvar<root_type, order - 1>(static_cast<root_type>(cr)).inverse();  // log'(x) = 1 / x
-    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1569,7 +1576,7 @@ fvar<RealType, Order> asin(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x).negate() += 1).inverse();  // asin'(x) = 1 / sqrt(1-x*x).
-    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1584,7 +1591,7 @@ fvar<RealType, Order> tan(fvar<RealType, Order> const& cr) {
   else {
     auto c = cos(make_fvar<root_type, order - 1>(static_cast<root_type>(cr)));
     auto const d1 = (c *= c).inverse();  // tan'(x) = 1 / cos(x)^2
-    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1599,7 +1606,7 @@ fvar<RealType, Order> atan(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = ((x *= x) += 1).inverse();  // atan'(x) = 1 / (x*x+1).
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1616,7 +1623,7 @@ fvar<RealType, Order> atan2(fvar<RealType, Order> const& cr,
   else {
     auto y = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = ca / ((y *= y) += (ca * ca));  // (d/dy)atan2(y,x) = x / (y*y+x*x)
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1633,7 +1640,7 @@ fvar<RealType, Order> atan2(typename fvar<RealType, Order>::root_type const& ca,
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = -ca / ((x *= x) += (ca * ca));  // (d/dx)atan2(y,x) = -y / (x*x+y*y)
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1659,7 +1666,7 @@ promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> atan2(fvar<RealType1, 
     auto x10 = make_fvar<typename fvar<RealType2, Order2>::root_type, 0, order2>(x);
     auto const d10 = x10 / ((x10 * x10) + (y10 *= y10));
     auto const f = [&d00, &d01, &d10](size_t i, size_t j) {
-      return i ? d10.at(i - 1, j) / i : j ? d01.at(j - 1) / j : d00;
+      return i ? d10[i - 1][j] / i : j ? d01[j - 1] / j : d00;
     };
     return cr1.apply_coefficients(order, f, cr2);
   }
@@ -1719,7 +1726,7 @@ fvar<RealType, Order> acos(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x).negate() += 1).inverse().negate();  // acos'(x) = -1 / sqrt(1-x*x).
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1734,7 +1741,7 @@ fvar<RealType, Order> acosh(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x) -= 1).inverse();  // acosh'(x) = 1 / sqrt(x*x-1).
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1749,7 +1756,7 @@ fvar<RealType, Order> asinh(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x) += 1).inverse();  // asinh'(x) = 1 / sqrt(x*x+1).
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1764,7 +1771,7 @@ fvar<RealType, Order> atanh(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
     auto const d1 = ((x *= x).negate() += 1).inverse();  // atanh'(x) = 1 / (1-x*x)
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1810,7 +1817,7 @@ fvar<RealType, Order> erf(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));  // d1 = 2/sqrt(pi)*exp(-x*x)
     auto const d1 = 2 * constants::one_div_root_pi<root_type>() * exp((x *= x).negate());
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 
@@ -1825,7 +1832,7 @@ fvar<RealType, Order> erfc(fvar<RealType, Order> const& cr) {
   else {
     auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));  // erfc'(x) = -erf'(x)
     auto const d1 = -2 * constants::one_div_root_pi<root_type>() * exp((x *= x).negate());
-    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1.at(i - 1) / i : d0; });
+    return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
 

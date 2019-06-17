@@ -25,8 +25,8 @@ substituting the number *x₀* with the first-order polynomial *x₀+ε*, and us
 divided by the factorial of the order.
 
 In greater detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Without
-any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers
-of *ε* greater than *N* can be discarded. (This is due to the fact that each term in a polynomial depends only
+loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
+*ε* greater than *N* can be discarded. (This is due to the fact that each term in a polynomial depends only
 upon equal and lower-order terms under arithmetic operations.) Under these truncation rules, *f* provides a
 polynomial-to-polynomial transformation:
 
@@ -59,7 +59,7 @@ T fourth_power(T const& x) {
 int main() {
   using namespace boost::math::differentiation;
 
-  constexpr unsigned Order = 5;                  // The highest order derivative to be calculated.
+  constexpr unsigned Order = 5;                  // Highest order derivative to be calculated.
   auto const x = make_fvar<double, Order>(2.0);  // Find derivatives at x=2.
   auto const y = fourth_power(x);
   for (unsigned i = 0; i <= Order; ++i)
@@ -160,10 +160,12 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp,
   using namespace std;
   auto const d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   auto const d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
-  if (cp == CP::call)
-    return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
-  else
-    return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  switch (cp) {
+    case CP::call:
+      return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
+    case CP::put:
+      return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  }
 }
 
 int main() {
@@ -175,8 +177,6 @@ int main() {
   auto const call_price = black_scholes_option_price(CP::call, K, S, sigma, tau, r);
   auto const put_price = black_scholes_option_price(CP::put, K, S, sigma, tau, r);
 
-  // Compare automatically calculated greeks by autodiff with formulas for greeks.
-  // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
   std::cout << "black-scholes call price = " << call_price.derivative(0) << '\n'
             << "black-scholes put  price = " << put_price.derivative(0) << '\n'
             << "call delta = " << call_price.derivative(1) << '\n'
@@ -198,6 +198,25 @@ put  gamma = 0.00199852
 
 See [example/black\_scholes.cpp](example/black_scholes.cpp) for a larger list of automatically-calculated
 option greeks.
+
+## Advantages of Automatic Differentiation
+The above examples illustrate some of the advantages of using autodiff:
+
+* Elimination of code redundancy. The existence of *N* separate functions to calculate derivatives is a form
+  of code redundancy, with all the liabilities that come with it:
+    * Changes to one function require *N* additional changes to other functions. In the 3rd example above,
+      consider how much larger and inter-dependent the above code base would be if a separate function were
+      written for [each Greek](https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks)
+      value.
+    * Dependencies upon a derivative function for a different purpose will break when changes are made to
+      the original function. What doesn't need to exist cannot break.
+    * Code bloat, reducing conceptual integrity. Control over the evolution of code is easier/safer when
+      the code base is smaller and able to be intuitively grasped.
+* Accuracy of derivatives over finite difference methods. Finite difference methods always include a
+  *Δx* free variable that must be carefully chosen for each application. If *Δx* is too small, then
+  numerical errors become large. If *Δx* is too large, then mathematical errors become large.  With autodiff,
+  there are no free variables to set and the accuracy of the answer is generally superior to finite difference
+  methods even with the best choice of *Δx*.
 
 ## Manual
 

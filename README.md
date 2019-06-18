@@ -16,27 +16,29 @@ of single and multiple variables.
 This implementation is based upon the [Taylor series](https://en.wikipedia.org/wiki/Taylor_series) expansion of
 an analytic function *f* at the point *x₀*:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Taylor series](doc/quickbook/equations/taylor_series.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Taylor series](doc/quickbook/equations/taylor_series.svg)
 
 The essential idea of autodiff is the substitution of numbers with polynomials in the evaluation of *f(x₀)*. By
 substituting the number *x₀* with the first-order polynomial *x₀+ε*, and using the same algorithm to compute
 *f(x₀+ε)*, the resulting polynomial in *ε* contains the function's derivatives *f'(x₀)*, *f''(x₀)*,
-*f'''(x₀)*, ...  within the coefficients. Each coefficient is equal to a derivative of its respective order,
+*f'''(x₀)*, ... within the coefficients. Each coefficient is equal to the derivative of its respective order,
 divided by the factorial of the order.
 
-In a bit more detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Then without
-any loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
-*ε* greater than *N* can be discarded, and under these truncation rules, *f* provides a polynomial-to-polynomial
-transformation:
+In greater detail, assume one is interested in calculating the first *N* derivatives of *f* at *x₀*. Without
+loss of precision to the calculation of the derivatives, all terms *O(ε<sup>N+1</sup>)* that include powers of
+*ε* greater than *N* can be discarded. (This is due to the fact that each term in a polynomial depends only
+upon equal and lower-order terms under arithmetic operations.) Under these truncation rules, *f* provides a
+polynomial-to-polynomial transformation:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Polynomial transform](doc/quickbook/equations/polynomial_transform.svg)
 
 C++'s ability to overload operators and functions allows for the creation of a class `fvar` that represents
-polynomials in *ε*. Thus the same algorithm that calculates the numeric value of *y₀=f(x₀)* is also used to
-calculate the polynomial *Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*.  The derivatives are then found from the
-product of the respective factorial and coefficient:
+polynomials in *ε*. Thus the same algorithm *f* that calculates the numeric value of *y₀=f(x₀)*, when
+written to accept and return variables of a generic (template) type, is also used to calculate the polynomial
+*Ʃ<sub>n</sub>y<sub>n</sub>εⁿ=f(x₀+ε)*. The derivatives *f<sup>(n)</sup>(x₀)* are then found from the
+product of the respective factorial *n!* and coefficient *y<sub>n</sub>*:
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ![Derivative formula](doc/quickbook/equations/derivative_formula.svg)
 
 
 ### Example 1: Single-Variable Differentiation
@@ -57,7 +59,7 @@ T fourth_power(T const& x) {
 int main() {
   using namespace boost::math::differentiation;
 
-  constexpr unsigned Order = 5;                  // The highest order derivative to be calculated.
+  constexpr unsigned Order = 5;                  // Highest order derivative to be calculated.
   auto const x = make_fvar<double, Order>(2.0);  // Find derivatives at x=2.
   auto const y = fourth_power(x);
   for (unsigned i = 0; i <= Order; ++i)
@@ -112,11 +114,11 @@ int main() {
   auto const v = f(w, x, y, z);
   // Calculated from Mathematica symbolic differentiation.
   float50 const answer("1976.319600747797717779881875290418720908121189218755");
-  std::cout << std::setprecision(std::numeric_limits<float50>::digits10) << "mathematica   : " << answer
-            << '\n'
+  std::cout << std::setprecision(std::numeric_limits<float50>::digits10)
+            << "mathematica   : " << answer << '\n'
             << "autodiff      : " << v.derivative(Nw, Nx, Ny, Nz) << '\n'
-            << "relative error: " << std::setprecision(3) << (v.derivative(Nw, Nx, Ny, Nz) / answer - 1)
-            << std::endl;
+            << std::setprecision(3)
+            << "relative error: " << (v.derivative(Nw, Nx, Ny, Nz) / answer - 1) << '\n';
   return 0;
 }
 /*
@@ -139,12 +141,6 @@ using namespace boost::math::differentiation;
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
-// Standard normal probability density function
-template <typename X>
-X phi(X const& x) {
-  return one_div_root_two_pi<X>() * exp(-0.5 * x * x);
-}
-
 // Standard normal cumulative distribution function
 template <typename X>
 X Phi(X const& x) {
@@ -164,10 +160,12 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp,
   using namespace std;
   auto const d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   auto const d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
-  if (cp == CP::call)
-    return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
-  else
-    return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  switch (cp) {
+    case CP::call:
+      return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
+    case CP::put:
+      return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  }
 }
 
 int main() {
@@ -179,8 +177,6 @@ int main() {
   auto const call_price = black_scholes_option_price(CP::call, K, S, sigma, tau, r);
   auto const put_price = black_scholes_option_price(CP::put, K, S, sigma, tau, r);
 
-  // Compare automatically calculated greeks by autodiff with formulas for greeks.
-  // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
   std::cout << "black-scholes call price = " << call_price.derivative(0) << '\n'
             << "black-scholes put  price = " << put_price.derivative(0) << '\n'
             << "call delta = " << call_price.derivative(1) << '\n'
@@ -202,6 +198,25 @@ put  gamma = 0.00199852
 
 See [example/black\_scholes.cpp](example/black_scholes.cpp) for a larger list of automatically-calculated
 option greeks.
+
+## Advantages of Automatic Differentiation
+The above examples illustrate some of the advantages of using autodiff:
+
+* Elimination of code redundancy. The existence of *N* separate functions to calculate derivatives is a form
+  of code redundancy, with all the liabilities that come with it:
+    * Changes to one function require *N* additional changes to other functions. In the 3rd example above,
+      consider how much larger and inter-dependent the above code base would be if a separate function were
+      written for [each Greek](https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks)
+      value.
+    * Dependencies upon a derivative function for a different purpose will break when changes are made to
+      the original function. What doesn't need to exist cannot break.
+    * Code bloat, reducing conceptual integrity. Control over the evolution of code is easier/safer when
+      the code base is smaller and able to be intuitively grasped.
+* Accuracy of derivatives over finite difference methods. Finite difference methods always include a
+  *Δx* free variable that must be carefully chosen for each application. If *Δx* is too small, then
+  numerical errors become large. If *Δx* is too large, then mathematical errors become large.  With autodiff,
+  there are no free variables to set and the accuracy of the answer is generally superior to finite difference
+  methods even with the best choice of *Δx*.
 
 ## Manual
 
@@ -229,6 +244,6 @@ Distributed under the [Boost Software License, Version 1.0](http://www.boost.org
 ### More information
 
 <!-- * [Ask questions](http://stackoverflow.com/questions/ask?tags=c%2B%2B,boost,boost-template) -->
-* [Report bugs](https://github.com/boostorg/template/issues): Be sure to mention Boost version, platform and compiler you're using. A small compilable code sample to reproduce the problem is always good as well.
+* [Report bugs](https://github.com/pulver/autodiff/issues): Be sure to mention Boost version, platform and compiler you're using. A small compilable code sample to reproduce the problem is always good as well.
 * Submit your patches as pull requests against **develop** branch. Note that by submitting patches you agree to license your modifications under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
 <!-- * Discussions about the library are held on the [Boost developers mailing list](http://www.boost.org/community/groups.html#main). Be sure to read the [discussion policy](http://www.boost.org/community/policy.html) before posting and add the `[template]` tag at the beginning of the subject line. -->

@@ -15,7 +15,7 @@ namespace differentiation {
 template <typename RealType, size_t Order, size_t... Orders>
 autodiff_fvar<RealType, Order, Orders...> make_fvar(RealType const& ca);
 
-// Function returning multiple independent variables of differentiation.
+// Function returning multiple independent variables of differentiation in a std::tuple.
 template<typename RealType, size_t... Orders, typename... RealTypes>
 auto make_ftuple(RealTypes const&... ca);
 
@@ -25,7 +25,7 @@ using promote = typename detail::promote_args_n<RealType, RealTypes...>::type;
 
 namespace detail {
 
-// Single autodiff variable. Independent variables are created by make_ftuple.
+// Single autodiff variable. Use make_fvar() or make_ftuple() to instantiate.
 template <typename RealType, size_t Order>
 class fvar {
  public:

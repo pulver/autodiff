@@ -133,7 +133,6 @@ jobs:
         - B2_CXXSTD=11,17
       addons: *gcc-8
       script:
-        - pushd /tmp && git clone https://github.com/linux-test-project/lcov.git && export PATH=/tmp/lcov/bin:$PATH && which lcov && lcov --version && popd
         - cd $BOOST_ROOT/libs/$SELF
         - ./tools/codecov.sh
 

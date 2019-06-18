@@ -12,12 +12,6 @@ using namespace boost::math::differentiation;
 // Equations and function/variable names are from
 // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
 
-// Standard normal probability density function
-template <typename X>
-X phi(X const& x) {
-  return one_div_root_two_pi<X>() * exp(-0.5 * x * x);
-}
-
 // Standard normal cumulative distribution function
 template <typename X>
 X Phi(X const& x) {
@@ -37,10 +31,12 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp,
   using namespace std;
   auto const d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   auto const d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
-  if (cp == CP::call)
-    return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
-  else
-    return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  switch (cp) {
+    case CP::call:
+      return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
+    case CP::put:
+      return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  }
 }
 
 int main() {
@@ -52,8 +48,6 @@ int main() {
   auto const call_price = black_scholes_option_price(CP::call, K, S, sigma, tau, r);
   auto const put_price = black_scholes_option_price(CP::put, K, S, sigma, tau, r);
 
-  // Compare automatically calculated greeks by autodiff with formulas for greeks.
-  // https://en.wikipedia.org/wiki/Greeks_(finance)#Formulas_for_European_option_Greeks
   std::cout << "black-scholes call price = " << call_price.derivative(0) << '\n'
             << "black-scholes put  price = " << put_price.derivative(0) << '\n'
             << "call delta = " << call_price.derivative(1) << '\n'

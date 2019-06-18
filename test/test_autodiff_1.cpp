@@ -123,6 +123,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(ostream, T, all_float_types) {
   std::ostringstream ss;
   ss << "x = " << x;
   BOOST_CHECK_EQUAL(ss.str(), "x = depth(1)(10,1,0,0)");
+  ss.str(std::string());
+  const auto scalar = make_fvar<T,0>(cx);
+  ss << "scalar = " << scalar;
+  BOOST_CHECK_EQUAL(ss.str(), "scalar = depth(1)(10)");
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(addition_assignment, T, all_float_types) {

@@ -212,11 +212,11 @@ The above examples illustrate some of the advantages of using autodiff:
       the original function. What doesn't need to exist cannot break.
     * Code bloat, reducing conceptual integrity. Control over the evolution of code is easier/safer when
       the code base is smaller and able to be intuitively grasped.
-* Accuracy of derivatives over finite difference methods. Finite difference methods always include a
-  *Δx* free variable that must be carefully chosen for each application. If *Δx* is too small, then
-  numerical errors become large. If *Δx* is too large, then mathematical errors become large.  With autodiff,
-  there are no free variables to set and the accuracy of the answer is generally superior to finite difference
-  methods even with the best choice of *Δx*.
+* Accuracy of derivatives over finite difference methods. Single-iteration finite difference methods always include
+  a *Δx* free variable that must be carefully chosen for each application. If *Δx* is too small, then numerical
+  errors become large. If *Δx* is too large, then mathematical errors become large.  With autodiff, there are
+  no free variables to set and the accuracy of the answer is generally superior to finite difference methods even
+  with the best choice of *Δx*.
 
 ## Manual
 
@@ -245,5 +245,5 @@ Distributed under the [Boost Software License, Version 1.0](http://www.boost.org
 
 <!-- * [Ask questions](http://stackoverflow.com/questions/ask?tags=c%2B%2B,boost,boost-template) -->
 * [Report bugs](https://github.com/pulver/autodiff/issues): Be sure to mention Boost version, platform and compiler you're using. A small compilable code sample to reproduce the problem is always good as well.
-* Submit your patches as pull requests against **develop** branch. Note that by submitting patches you agree to license your modifications under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
+* Submit your patches as pull requests against the [develop](https://github.com/pulver/autodiff/tree/develop) branch. Note that by submitting patches you agree to license your modifications under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
 <!-- * Discussions about the library are held on the [Boost developers mailing list](http://www.boost.org/community/groups.html#main). Be sure to read the [discussion policy](http://www.boost.org/community/policy.html) before posting and add the `[template]` tag at the beginning of the subject line. -->

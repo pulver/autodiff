@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: x: " << x << std::endl;
-        std::rethrow_exception(std::current_exception());
+        
       }
     }
 
@@ -111,7 +111,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: x: " << x << std::endl;
-        std::rethrow_exception(std::current_exception());
       }
     }
 
@@ -123,7 +122,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: x: " << x_ << std::endl;
-        std::rethrow_exception(std::current_exception());
+        
       }
     }
 
@@ -135,7 +134,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: x: " << x_ << std::endl;
-        std::rethrow_exception(std::current_exception());
       }
     }
 
@@ -147,7 +145,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
           BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
         } catch (...) {
           std::cerr << "Inputs: i: " << i << std::endl;
-          std::rethrow_exception(std::current_exception());
         }
       }
 
@@ -158,7 +155,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
           BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
         } catch (...) {
           std::cerr << "Inputs: i: " << i << std::endl;
-          std::rethrow_exception(std::current_exception());
         }
       }
     }
@@ -180,7 +176,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
       BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
     } catch (...) {
       std::cerr << "Inputs: x: " << x << std::endl;
-      std::rethrow_exception(std::current_exception());
+      
     }
   }
 }
@@ -201,7 +197,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
       BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
     } catch (...) {
       std::cerr << "Inputs: x: " << x << std::endl;
-      std::rethrow_exception(std::current_exception());
     }
   }
 }
@@ -225,7 +220,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
       BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
     } catch (...) {
       std::cerr << "Inputs: x: " << x << std::endl;
-      std::rethrow_exception(std::current_exception());
     }
   }
 }
@@ -260,7 +254,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
       BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
     } catch (...) {
       std::cerr << "Inputs: x: " << x << std::endl;
-      std::rethrow_exception(std::current_exception());
     }
   }
 }
@@ -280,7 +273,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 50 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: i: " << i << std::endl;
-        std::rethrow_exception(std::current_exception());
+        
       }
     }
     {
@@ -291,7 +284,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
         BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 50 * test_constants::pct_epsilon());
       } catch (...) {
         std::cerr << "Inputs: i_: " << i_ << std::endl;
-        std::rethrow_exception(std::current_exception());
       }
     }
   }
@@ -339,8 +331,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       BOOST_CHECK_THROW(boost::math::cyl_bessel_i(v, x),
                         boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      std::cout << "Inputs: v: " << v << " x: " << x << std::endl;
-      std::rethrow_exception(std::current_exception());
+      std::cerr << "Inputs: v: " << v << " x: " << x << std::endl;
     }
 
     {
@@ -358,8 +349,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::cyl_bessel_j(v, x_j),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: v: " << v << " x: " << x_j << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: v: " << v << " x: " << x_j << std::endl;
       }
     }
 
@@ -376,8 +366,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
       BOOST_CHECK_THROW(boost::math::cyl_bessel_j_zero(v, i + 1),
                         boost::wrapexcept<std::overflow_error>);
     } catch (...) {
-      std::cout << "Inputs: v: " << v << " i: " << (i + 1) << std::endl;
-      std::rethrow_exception(std::current_exception());
+      std::cerr << "Inputs: v: " << v << " i: " << (i + 1) << std::endl;
+      
     }
 
     {
@@ -395,8 +385,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::cyl_bessel_k(v, x_k),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: v: " << v << " x: " << x_k << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: v: " << v << " x: " << x_k << std::endl;
       }
     }
 
@@ -415,8 +404,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::cyl_neumann(v, x_neumann),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: v: " << v << " x: " << x_neumann << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: v: " << v << " x: " << x_neumann << std::endl;
       }
     }
 
@@ -434,8 +422,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::cyl_neumann_zero(v, i + 1),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: v: " << v << " i: " << (i + 1) << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: v: " << v << " i: " << (i + 1) << std::endl;
       }
     }
 
@@ -455,8 +442,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::sph_bessel<T>(i_, fabs(v)),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: i: " << i_ << " v: " << (fabs(v)) << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: i: " << i_ << " v: " << (fabs(v)) << std::endl;
       }
 
       {
@@ -476,8 +462,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           BOOST_CHECK_THROW(((boost::math::sph_neumann<T>(i_, v_))),
                             boost::wrapexcept<std::overflow_error>);
         } catch (...) {
-          std::cout << "Inputs: i: " << i_ << " v: " << v_ << std::endl;
-          std::rethrow_exception(std::current_exception());
+          std::cerr << "Inputs: i: " << i_ << " v: " << v_ << std::endl;
         }
       }
 
@@ -494,8 +479,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW(boost::math::cyl_bessel_i_prime(v, x),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: v: " << v << " x: " << x << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: v: " << v << " x: " << x << std::endl;
       }
 
       {
@@ -513,8 +497,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           BOOST_CHECK_THROW(boost::math::cyl_bessel_j_prime(v, x_j),
                             boost::wrapexcept<std::overflow_error>);
         } catch (...) {
-          std::cout << "Inputs: v: " << v << " x_k: " << x_j << std::endl;
-          std::rethrow_exception(std::current_exception());
+          std::cerr << "Inputs: v: " << v << " x_k: " << x_j << std::endl;
         }
       }
 
@@ -533,8 +516,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           BOOST_CHECK_THROW(boost::math::cyl_bessel_k_prime(v, x_k),
                             boost::wrapexcept<std::overflow_error>);
         } catch (...) {
-          std::cout << "Inputs: v: " << v << " x: " << x_k << std::endl;
-          std::rethrow_exception(std::current_exception());
+          std::cerr << "Inputs: v: " << v << " x: " << x_k << std::endl;
         }
       }
 
@@ -554,8 +536,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
           BOOST_CHECK_THROW(boost::math::cyl_neumann_prime(v, x_neumann),
                             boost::wrapexcept<std::overflow_error>);
         } catch (...) {
-          std::cout << "Inputs: v: " << v << " x: " << x_neumann << std::endl;
-          std::rethrow_exception(std::current_exception());
+          std::cerr << "Inputs: v: " << v << " x: " << x_neumann << std::endl;
         }
       }
 
@@ -573,9 +554,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW((boost::math::sph_neumann<T>)(i_, fabs(v) + 1),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: i: " << i_ << " v: " << (fabs(v) + 1)
+        std::cerr << "Inputs: i: " << i_ << " v: " << (fabs(v) + 1)
                   << std::endl;
-        std::rethrow_exception(std::current_exception());
       }
 
       try {
@@ -592,8 +572,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
         BOOST_CHECK_THROW((boost::math::sph_neumann_prime<T>)(i_, fabs(v) + 1),
                           boost::wrapexcept<std::overflow_error>);
       } catch (...) {
-        std::cout << "Inputs: i: " << i << " v: " << (fabs(v) + 1) << std::endl;
-        std::rethrow_exception(std::current_exception());
+        std::cerr << "Inputs: i: " << i << " v: " << (fabs(v) + 1) << std::endl;
       }
     }
   }

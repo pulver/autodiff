@@ -94,48 +94,72 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(airy_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     const auto &x = x_sampler.next();
     {
-      auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::airy_ai(x);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        1e4 * test_constants::pct_epsilon());
+      try {
+        auto autodiff_v = boost::math::airy_ai(make_fvar<T, m>(x));
+        auto anchor_v = boost::math::airy_ai(x);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: x: " << x << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
 
     {
-      auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
-      auto anchor_v = boost::math::airy_ai_prime(x);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        1e4 * test_constants::pct_epsilon());
+      try {
+        auto autodiff_v = boost::math::airy_ai_prime(make_fvar<T, m>(x));
+        auto anchor_v = boost::math::airy_ai_prime(x);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: x: " << x << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
 
     {
       auto x_ = (min)(x, T(26));
-      auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x_));
-      auto anchor_v = boost::math::airy_bi(x_);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        1e4 * test_constants::pct_epsilon());
+      try {
+        auto autodiff_v = boost::math::airy_bi(make_fvar<T, m>(x_));
+        auto anchor_v = boost::math::airy_bi(x_);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: x: " << x_ << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
 
     {
-      auto x_ = ((min))(x, T(26));
-      auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x_));
-      auto anchor_v = boost::math::airy_bi_prime(x_);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        1e4 * test_constants::pct_epsilon());
+      auto x_ = (min)(x, T(26));
+      try {
+        auto autodiff_v = boost::math::airy_bi_prime(make_fvar<T, m>(x_));
+        auto anchor_v = boost::math::airy_bi_prime(x_);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: x: " << x_ << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
 
     if (i > 0) {
       {
-        auto autodiff_v = boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i);
-        auto anchor_v = boost::math::airy_ai_zero<T>(i);
-        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                          1e4 * test_constants::pct_epsilon());
+        try {
+          auto autodiff_v = boost::math::airy_ai_zero<autodiff_fvar<T, m>>(i);
+          auto anchor_v = boost::math::airy_ai_zero<T>(i);
+          BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+        } catch (...) {
+          std::cerr << "Inputs: i: " << i << std::endl;
+          std::rethrow_exception(std::current_exception());
+        }
       }
 
       {
-        auto autodiff_v = boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i);
-        auto anchor_v = boost::math::airy_bi_zero<T>(i);
-        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                          1e4 * test_constants::pct_epsilon());
+        try {
+          auto autodiff_v = boost::math::airy_bi_zero<autodiff_fvar<T, m>>(i);
+          auto anchor_v = boost::math::airy_bi_zero<T>(i);
+          BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e4 * test_constants::pct_epsilon());
+        } catch (...) {
+          std::cerr << "Inputs: i: " << i << std::endl;
+          std::rethrow_exception(std::current_exception());
+        }
       }
     }
   }
@@ -150,10 +174,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(acosh_hpp, T, all_float_types) {
   for (auto i : boost::irange(test_constants::n_samples)) {
     std::ignore = i;
     auto x = x_sampler.next();
-    auto autodiff_v = acosh(make_fvar<T, m>(x));
-    auto anchor_v = acosh(x);
-    BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                      1e3 * test_constants::pct_epsilon());
+    try {
+      auto autodiff_v = acosh(make_fvar<T, m>(x));
+      auto anchor_v = acosh(x);
+      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
+    } catch (...) {
+      std::cerr << "Inputs: x: " << x << std::endl;
+      std::rethrow_exception(std::current_exception());
+    }
   }
 }
 
@@ -167,10 +195,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(asinh_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
 
-    auto autodiff_v = asinh(make_fvar<T, m>(x));
-    auto anchor_v = asinh(x);
-    BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                      1e3 * test_constants::pct_epsilon());
+    try {
+      auto autodiff_v = asinh(make_fvar<T, m>(x));
+      auto anchor_v = asinh(x);
+      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
+    } catch (...) {
+      std::cerr << "Inputs: x: " << x << std::endl;
+      std::rethrow_exception(std::current_exception());
+    }
   }
 }
 
@@ -187,10 +219,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atanh_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = nextafter(x_sampler.next(), T(0));
 
-    auto autodiff_v = atanh(make_fvar<T, m>(x));
-    auto anchor_v = atanh(x);
-    BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                      1e3 * test_constants::pct_epsilon());
+    try {
+      auto autodiff_v = atanh(make_fvar<T, m>(x));
+      auto anchor_v = atanh(x);
+      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
+    } catch (...) {
+      std::cerr << "Inputs: x: " << x << std::endl;
+      std::rethrow_exception(std::current_exception());
+    }
   }
 }
 
@@ -218,10 +254,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(atan_hpp, T, all_float_types) {
       x = x_sampler.next();
     }
 
-    auto autodiff_v = atan(make_fvar<T, m>(x));
-    auto anchor_v = atan(x);
-    BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                      1e3 * test_constants::pct_epsilon());
+    try {
+      auto autodiff_v = atan(make_fvar<T, m>(x));
+      auto anchor_v = atan(x);
+      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 1e3 * test_constants::pct_epsilon());
+    } catch (...) {
+      std::cerr << "Inputs: x: " << x << std::endl;
+      std::rethrow_exception(std::current_exception());
+    }
   }
 }
 
@@ -234,22 +274,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(bernoulli_hpp, T, all_float_types) {
 
   for (auto i : boost::irange(test_constants::n_samples)) {
     {
-      auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
-      auto anchor_v = boost::math::bernoulli_b2n<T>(i);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        50 * test_constants::pct_epsilon());
+      try {
+        auto autodiff_v = boost::math::bernoulli_b2n<autodiff_fvar<T, m>>(i);
+        auto anchor_v = boost::math::bernoulli_b2n<T>(i);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 50 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: i: " << i << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
     {
       auto i_ = (min)(19, i);
-      auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
-      auto anchor_v = boost::math::tangent_t2n<T>(i_);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                        50 * test_constants::pct_epsilon());
+      try {
+        auto autodiff_v = boost::math::tangent_t2n<autodiff_fvar<T, m>>(i_);
+        auto anchor_v = boost::math::tangent_t2n<T>(i_);
+        BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v, 50 * test_constants::pct_epsilon());
+      } catch (...) {
+        std::cerr << "Inputs: i_: " << i_ << std::endl;
+        std::rethrow_exception(std::current_exception());
+      }
     }
   }
 }
 
-// TODO(kbhat): Something in here is very slow with boost::multiprecision
+// boost::multiprecision is horribly slow in this test
 BOOST_AUTO_TEST_CASE_TEMPLATE(bessel_hpp, T, bin_float_types) {
   using boost::math::fpclassify;
   using boost::math::nextafter;

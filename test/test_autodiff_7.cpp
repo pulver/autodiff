@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(fpclassify_hpp, T, all_float_types) {
 }
 
 // multiprecision types are breaking in here due to a lexical_cast error
-BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, bin_float_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, all_float_types) {
   using boost::math::nextafter;
   using boost::multiprecision::nextafter;
 
@@ -285,98 +285,5 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(gamma_hpp, T, bin_float_types) {
     }
   }
 }
-
-// Requires pow(complex<autodiff_fvar<T,m>>, T)
-/* BOOST_AUTO_TEST_CASE_TEMPLATE(hankel_hpp, T, all_float_types) {
-  using test_constants = test_constants_t<T>;
-  static constexpr auto m = test_constants::order;
-  test_detail::RandomSample<T> v_sampler{-200, 200};
-  test_detail::RandomSample<T> x_sampler{-200, 200};
-  for (auto i : boost::irange(test_constants::n_samples)) {
-    std::ignore = i;
-    auto v = v_sampler.next();
-    auto x = x_sampler.next();
-
-    try {
-      auto autodiff_v = boost::math::cyl_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)); auto anchor_v = boost::math::cyl_hankel_1(v, x);
-      BOOST_CHECK_CLOSE(autodiff_v.real(), anchor_v.real(),
-                                   test_constants::pct_epsilon());
-      BOOST_CHECK_CLOSE(autodiff_v.imag(), anchor_v.imag(),
-                                   test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_CHECK_THROW(boost::math::cyl_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::domain_error>);
-BOOST_CHECK_THROW(boost::math::cyl_hankel_1(v, x),
-boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
-      BOOST_CHECK_THROW(boost::math::cyl_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::overflow_error>);
-BOOST_CHECK_THROW(boost::math::cyl_hankel_1(v, x),
-boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout <<
-std::setprecision(20) << "Input: x: " << x<< " max: "<<
-std::numeric_limits<T>::max() << std::endl;
-std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-
-    try {
-      auto autodiff_v = boost::math::cyl_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)); auto anchor_v = boost::math::cyl_hankel_2(v, x);
-      BOOST_CHECK_CLOSE(autodiff_v.real(), anchor_v.real(),
-                                   test_constants::pct_epsilon());
-      BOOST_CHECK_CLOSE(autodiff_v.imag(), anchor_v.imag(),
-                                   test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_CHECK_THROW(boost::math::cyl_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::domain_error>);
-BOOST_CHECK_THROW(boost::math::cyl_hankel_2(v, x),
-boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
-      BOOST_CHECK_THROW(boost::math::cyl_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::overflow_error>);
-BOOST_CHECK_THROW(boost::math::cyl_hankel_2(v, x),
-boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout <<
-std::setprecision(20) << "Input: x: " << x<< " max: "<<
-std::numeric_limits<T>::max() << std::endl;
-std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-
-    try {
-      auto autodiff_v = boost::math::sph_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)); auto anchor_v = boost::math::sph_hankel_1(v, x);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                                   test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_CHECK_THROW(boost::math::sph_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::domain_error>);
-BOOST_CHECK_THROW(boost::math::sph_hankel_1(v, x),
-boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
-      BOOST_CHECK_THROW(boost::math::sph_hankel_1(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::overflow_error>);
-BOOST_CHECK_THROW(boost::math::sph_hankel_1(v, x),
-boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout <<
-std::setprecision(20) << "Input: x: " << x<< " max: "<<
-std::numeric_limits<T>::max() << std::endl;
-std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-
-    try {
-      auto autodiff_v = boost::math::sph_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)); auto anchor_v = boost::math::sph_hankel_2(v, x);
-      BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
-                                   test_constants::pct_epsilon());
-    } catch (const std::domain_error &) {
-      BOOST_CHECK_THROW(boost::math::sph_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::domain_error>);
-BOOST_CHECK_THROW(boost::math::sph_hankel_2(v, x),
-boost::wrapexcept<std::domain_error>); } catch (const std::overflow_error &) {
-      BOOST_CHECK_THROW(boost::math::sph_hankel_2(make_fvar<T,m>(v),
-make_fvar<T,m>(x)), boost::wrapexcept<std::overflow_error>);
-BOOST_CHECK_THROW(boost::math::sph_hankel_2(v, x),
-boost::wrapexcept<std::overflow_error>); } catch (...) { std::cout <<
-std::setprecision(20) << "Input: x: " << x<< " max: "<<
-std::numeric_limits<T>::max() << std::endl;
-std::rethrow_exception(std::exception_ptr(std::current_exception()));
-    }
-  }
-} */
 
 BOOST_AUTO_TEST_SUITE_END()

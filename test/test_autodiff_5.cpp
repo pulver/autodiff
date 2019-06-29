@@ -351,22 +351,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(chebyshev_hpp, T, all_float_types) {
       } catch (...) {
         std::cerr << "Inputs: n: " << n << " x: " << x << std::endl;
       }
-
-      /*/usr/include/boost/math/special_functions/chebyshev.hpp:164:40: error:
-       cannot convert
-       boost::math::differentiation::autodiff_v1::detail::fvar<double, 3> to
-       double in return
-       BOOST_CHECK_EQUAL(boost::math::chebyshev_clenshaw_recurrence(c.data(),c.size(),make_fvar<T,m>(0.20))
-       ,
-       boost::math::chebyshev_clenshaw_recurrence(c.data(),c.size(),static_cast<T>(0.20)));*/
-      /*try {
-        std::array<T, 4> c0{{14.2, -13.7, 82.3, 96}};
-        BOOST_CHECK_CLOSE(boost::math::chebyshev_clenshaw_recurrence(c0.data(),
-      c0.size(), make_fvar<T,m>(x)),
-                                     boost::math::chebyshev_clenshaw_recurrence(c0.data(),
-      c0.size(), x), 10*test_constants::pct_epsilon()); } catch (...) {
-        std::rethrow_exception(std::exception_ptr(std::current_exception()));
-      }*/
     }
   }
 }

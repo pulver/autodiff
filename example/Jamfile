@@ -6,28 +6,8 @@
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
-import common ;
-import modules ;
 import testing ;
 import ../../config/checks/config : requires ;
-
-local BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
-
-project autodiff_examples
-    : requirements
-    <toolset>msvc:<exception-handling>on
-    <toolset>msvc:<asynch-exceptions>off
-    <toolset>msvc:<extern-c-nothrow>on
-    <toolset>msvc:<cxxflags>/bigobj
-    <toolset>msvc-14.1:<cxxflags>/permissive-
-    <toolset>msvc-14.2:<cxxflags>/permissive-
-    <toolset>msvc:<cxxflags>/wd4244
-    <toolset>msvc:<cxxflags>/wd4305
-    <toolset>msvc:<cxxflags>/wd4701
-    <toolset>msvc:<warnings>all
-    <toolset>clang:<cxxflags>"-Wall -pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-header-hygiene -Wno-used-but-marked-unused -Wno-global-constructors -Wno-disabled-macro-expansion --system-header-prefix=$(BOOST_ROOT) --no-system-header-prefix=$(BOOST_ROOT)/libs/$(SELF)"
-    <target-os>linux,<toolset>gcc:<cxxflags>"-fstrict-enums -Wall -Wextra -pedantic -I$(BOOST_ROOT)/libs/$(SELF) -isystem $(BOOST_ROOT)"
-    ;
 
 test-suite autodiff_example
     :   [ run fourth_power.cpp ]

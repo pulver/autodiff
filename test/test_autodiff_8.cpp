@@ -527,7 +527,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sinhc_hpp, T, all_float_types) {
     std::ignore = i;
     auto x = x_sampler.next();
     try {
-    auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
+      auto autodiff_v = boost::math::sinhc_pi(make_fvar<T, m>(x));
       auto anchor_v = boost::math::sinhc_pi(x);
       BOOST_CHECK_CLOSE(autodiff_v.derivative(0u), anchor_v,
                         50 * test_constants::pct_epsilon());

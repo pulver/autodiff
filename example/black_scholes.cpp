@@ -36,11 +36,11 @@ promote<Price, Sigma, Tau, Rate> black_scholes_option_price(CP cp,
   using namespace std;
   auto const d1 = (log(S / K) + (r + sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
   auto const d2 = (log(S / K) + (r - sigma * sigma / 2) * tau) / (sigma * sqrt(tau));
-  if (cp == CP::call) {
-    return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
-  } else {
-    assert(cp == CP::put);
-    return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
+  switch (cp) {
+    case CP::call:
+      return S * Phi(d1) - exp(-r * tau) * K * Phi(d2);
+    case CP::put:
+      return exp(-r * tau) * K * Phi(-d2) - S * Phi(-d1);
   }
 }
 

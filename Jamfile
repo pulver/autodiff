@@ -24,7 +24,7 @@ project autodiff
     <toolset>msvc:<cxxflags>/wd4701
     <toolset>msvc:<warnings>all
     <toolset>clang:<cxxflags>"-Wall -pedantic -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-header-hygiene -Wno-used-but-marked-unused -Wno-global-constructors -Wno-disabled-macro-expansion --system-header-prefix=$(BOOST_ROOT) --no-system-header-prefix=$(BOOST_ROOT)/libs/$(SELF)"
-    <target-os>linux,<toolset>gcc:<cxxflags>"-Wall -Wextra -pedantic -I$(BOOST_ROOT)/libs/$(SELF) -isystem $(BOOST_ROOT)"
+    <target-os>linux,<toolset>gcc:<cxxflags>"-fstrict-enums -Wall -Wextra -pedantic -I$(BOOST_ROOT)/libs/$(SELF) -isystem $(BOOST_ROOT)"
     ;
 
 build-project test ;

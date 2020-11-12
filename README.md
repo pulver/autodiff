@@ -1,5 +1,7 @@
 # Autodiff - Automatic Differentiation C++ Library
 
+This project has moved to Boost (math/differentiation/[autodiff](https://github.com/boostorg/math/blob/develop/include/boost/math/differentiation/autodiff.hpp)) and this repository is no longer being updated.
+
 ### Build Status
 
 Branch          | Travis | Appveyor | codecov.io |
